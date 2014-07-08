@@ -239,7 +239,7 @@
 	"control_zones": [
 		{
 			"name": "zone1",
-			"optimum_contol": "dim_to_min",
+            "optimum_control": "dim_to_min",
 			"sensor": {
 				"name": "narrowsensor",
 				"location": {

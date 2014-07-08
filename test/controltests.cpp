@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     StadicControl controlFile;
     if (argc<2){
-        if (!controlFile.parseJson(QString("c:/example/Scontrol.json"))){
+        if (!controlFile.parseJson(":/resources/TestSControl.json")){
             std::cerr<<"The program has encountered an error reading the STADIC control file.\n\tThe program will now close.\n";
             return false;
         }
