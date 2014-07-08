@@ -12,4 +12,7 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 
 add_subdirectory(lib)
+# The following line is only for visual studio #11 with google test (Fix later)
+add_definitions(-D_VARIADIC_MAX=10)
+add_subdirectory(gtest-1.7.0)
 add_subdirectory(test)

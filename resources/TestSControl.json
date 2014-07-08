@@ -1,0 +1,307 @@
+{
+	"project_name": "prj1",
+	"project_folder": "c:/example/",
+	"tmp_folder": "tmp/",
+	"geometry_folder": "rad/",
+	"ies_folder": "ies/",
+	"results_folder": "res/",
+	"data_folder": "data/",
+	
+	"ground_reflectance": 0.2,
+	"wea_data_file": "c:/weaData/state_college.wea",
+	"first_day": 1,
+	
+	"material_file": "main_mat.rad",
+	"geometry_file": "main_geo.rad",
+	"building_rotation": 0,
+	"analysis_points": "calc_grid.pts",
+	"window_groups": [
+		{
+			"name": "WG1",
+			"base_geometry": "wg1base.rad",
+			"glazing_layers": ["l_glazing", "l_glazing2"],
+			"shade_control":{
+				"method": "automated_profile_angle",
+				"elevation_azimuth": 30,
+				"angle_settings": [30, 60]
+			},
+			"shade_settings":["wg1set1.rad", "wg1set2.rad"]
+		},
+		{
+			"name": "WG2",
+			"BSDF": true,
+			"base_geometry": "wg2base.rad",
+			"glazing_layers": ["l_window"],
+			"bsdf_base_layers": ["l_window"],
+			"shade_control":{
+				"method": "automated_signal",
+				"sensor": {
+					"name": "shadesensor",
+					"location": {
+						"x": 4,
+						"y": 0,
+						"z": 5,
+						"xd": 0,
+						"yd": -1,
+						"zd": 0,
+						"spin_ccw": 0
+					}
+				},
+				"signal_settings": [13000, 10000, 8000]
+			},
+			"shade_settings":["wg2set1.rad", "wg2set2.rad"],
+			"bsdf_setting_layers":[
+				["l_window"],
+				["l_window"]
+			]
+		}
+	],
+	
+	"import_units": "in",
+	"illum_units": "lux",
+	"display_units": "ft",
+	
+	"occupancy_schedule": "sched.csv",
+	"target_illuminance": 500,
+	
+	"luminaire_schedule":[
+		{
+			"name": "fixture1",
+			"ies_file": "pendant.ies",
+			"ballast": "ballast1",
+			"LLF": 0.9,
+			"lamp_lumens": 2700
+		},
+		{
+			"name": "fixture2",
+			"ies_file": "recessed.ies",
+			"ballast": "ballast2",
+			"LLF": 0.85,
+			"lamp_lumens": 2550
+		}
+	],
+	
+	"luminaire_layout":[
+		{
+			"luminaire": "fixture1",
+			"zone": "zone1",
+			"placement": {
+				"x": 4,
+				"y": 4,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture1",
+			"zone": "zone1",
+			"placement": {
+				"x": 10,
+				"y": 4,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture1",
+			"zone": "zone1",
+			"placement": {
+				"x": 16,
+				"y": 4,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture1",
+			"zone": "zone1",
+			"placement": {
+				"x": 22,
+				"y": 4,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture1",
+			"zone": "zone1",
+			"placement": {
+				"x": 28,
+				"y": 4,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture2",
+			"zone": "zone2",
+			"placement": {
+				"x": 4,
+				"y": 10,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture2",
+			"zone": "zone2",
+			"placement": {
+				"x": 10,
+				"y": 10,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture2",
+			"zone": "zone2",
+			"placement": {
+				"x": 16,
+				"y": 10,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture2",
+			"zone": "zone2",
+			"placement": {
+				"x": 22,
+				"y": 10,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		},
+		{
+			"luminaire": "fixture2",
+			"zone": "zone2",
+			"placement": {
+				"x": 28,
+				"y": 10,
+				"z": 10,
+				"rotation": 0,
+				"tilt": 0,
+				"spin_ccw": 0
+			}
+		}
+	],
+	
+	"ballast_driver_schedule":[
+		{
+			"name": "ballast1",
+			"type": 1,
+			"BFMax": 1.0,
+			"BFMin": 0.01,
+			"WattMax": 28,
+			"WattMin": 10
+		},
+		{
+			"name": "ballast2",
+			"type": 1,
+			"BFMax": 1.0,
+			"BFMin": 0.05,
+			"WattMax": 32,
+			"WattMin": 10
+		}
+	],
+	
+	"photosensors": [
+		{
+			"name": "shadesensor",
+			"sensor_type": 1,
+			"sensor_file": "cos.sen"
+		},
+		{
+			"name": "narrowsensor",
+			"sensor_type": 1,
+			"sensor_file": "narrow.sen"
+		}
+	],
+	
+	"control_zones": [
+		{
+			"name": "zone1",
+			"optimum_contol": "dim_to_min",
+			"sensor": {
+				"name": "narrowsensor",
+				"location": {
+					"x": 14,
+					"y": 8,
+					"z": 10,
+					"xd": 0,
+					"yd": 0,
+					"zd": -1,
+					"spin_ccw": 0
+				}
+			},
+			"cp_method": "auto",
+			"quantity": 3,
+			"target_percentage": 0.1,
+			"excluded_points": "exclude.pts",
+			"open_dimming": {
+				"maximum_bf_signal": 1,
+				"minimum_bf_signal": 0.01,
+				"off_signal": 300
+			}
+		},
+		{
+			"name": "zone2",
+			"control_method": "on"
+		}
+	],
+	"sky_divisions": 3,
+	"sun_divisions": 4,
+	"radiance_parameters": {
+		"ab": 4,
+		"ad": 300,
+		"as": 20,
+		"ar": 150,
+		"aa": 0.1,
+		"lr": 6,
+		"st": 0.1500,
+		"sj": 1.0000,
+		"lw": 0.004000,
+		"dj": 0.0000,
+		"ds": 0.200,
+		"dr": 2,
+		"dp": 512
+	},
+	
+	"daylight_savings_time": true,
+	"sda_settings": {
+		"illuminance": 300,
+		"DA_fraction": 0.5,
+		"start_time": 8,
+		"end_time": 17
+	},
+	"occupied_sDA": {
+		"illuminance": 300,
+		"DA_fraction": 0.5
+		
+	},
+	"DA": 300,
+	"cDA": 300,
+	"DF": true,
+	"UDI": {
+		"minimum": 100,
+		"maximum": 250
+	}
+}

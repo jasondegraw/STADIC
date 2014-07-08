@@ -1,3 +1,4 @@
 build
 *.user
 gitCommands.txt
+gtest-1.7.0
