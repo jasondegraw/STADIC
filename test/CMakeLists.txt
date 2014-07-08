@@ -12,4 +12,4 @@ add_executable(controltests controltests.cpp ${QRCS})
 
 add_test(controltests controltests)
 
-target_link_libraries(controltests stadic_core )#gtest gtest_main)
+target_link_libraries(controltests stadic_core gtest gtest_main)

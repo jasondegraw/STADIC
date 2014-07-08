@@ -1,9 +1,14 @@
-#include "../lib/stadiccontrol.h"
+#include "stadiccontrol.h"
+#include "gtest/gtest.h"
 #include <iostream>
 
-int main(int argc, char *argv[])
+TEST(ControlTests, ReadJson)
 {
-    StadicControl controlFile;
+  StadicControl controlFile;
+  ASSERT_TRUE(controlFile.parseJson(":/resources/TestSControl.json"));
+  EXPECT_EQ("prj1",controlFile.projectName());
+  /*
+
     if (argc<2){
         if (!controlFile.parseJson(":/resources/TestSControl.json")){
             std::cerr<<"The program has encountered an error reading the STADIC control file.\n\tThe program will now close.\n";
@@ -15,7 +20,7 @@ int main(int argc, char *argv[])
             return false;
         }
     }
-    std::cout<<"project_name "<<controlFile.projectName().toStdString()<<std::endl;
+    std::cout<<"project_name "<<.toStdString()<<std::endl;
     std::cout<<"project_folder "<<controlFile.projectFolder().toStdString()<<std::endl;
     std::cout<<"tmp_folder "<<controlFile.tmpFolder().toStdString()<<std::endl;
     std::cout<<"geometry_folder "<<controlFile.geoFolder().toStdString()<<std::endl;
@@ -118,4 +123,5 @@ int main(int argc, char *argv[])
     std::cout<<"\tdp "<<controlFile.dp()<<std::endl;
 
     return EXIT_SUCCESS;
+    */
 }

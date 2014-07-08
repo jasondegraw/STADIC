@@ -12,6 +12,6 @@ set(HDRS stadiccontrol.h
          shadecontrol.h
          controlzone.h)
 
-add_library(stadic_core ${HDRS} ${SRCS})
+add_library(stadic_core SHARED ${HDRS} ${SRCS})
 
 target_link_libraries(stadic_core Qt5::Core)
