@@ -36,7 +36,7 @@ std::vector<QString> WindowGroup::glazingLayers(){
 std::vector<QString> WindowGroup::shadeSettingGeometry(){
     return m_ShadeSettingGeometry;
 }
-std::vector<std::vector<QString>> WindowGroup::bsdfSettingLayers(){
+std::vector<std::vector<QString> > WindowGroup::bsdfSettingLayers(){
     return m_BSDFSettingLayers;
 }
 ShadeControl* WindowGroup::shadeControl(){

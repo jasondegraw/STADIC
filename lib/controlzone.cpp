@@ -319,7 +319,7 @@ double ControlZone::ballastFactor(){
 double ControlZone::watts(){
     return m_Watts;
 }
-std::vector<std::vector<double>> ControlZone::luminaireLayout(){
+std::vector<std::vector<double> > ControlZone::luminaireLayout(){
     return m_LuminaireLayout;
 }
 

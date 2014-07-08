@@ -22,7 +22,7 @@ public:
     std::vector<QString> bsdfBaseLayers();
     std::vector<QString> glazingLayers();
     std::vector<QString> shadeSettingGeometry();
-    std::vector<std::vector<QString>> bsdfSettingLayers();
+    std::vector<std::vector<QString> > bsdfSettingLayers();
     ShadeControl *shadeControl();
 
 private:
@@ -31,7 +31,7 @@ private:
     std::vector<QString> m_BSDFBaseLayers;
     std::vector<QString> m_GlazingLayers;
     std::vector<QString> m_ShadeSettingGeometry;
-    std::vector<std::vector<QString>> m_BSDFSettingLayers;
+    std::vector<std::vector<QString> > m_BSDFSettingLayers;
     ShadeControl *m_ShadeControl;
 
 
