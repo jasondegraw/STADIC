@@ -63,6 +63,19 @@ bool ShadeControl::setSignalSettings(double value){
     }
     return true;
 }
+bool ShadeControl::setSensorType(QString type){
+    if (type=="sensitivity_file"){
+        m_SensorType=type;
+    }else{
+        std::cerr<<"ERROR: The key \"sensor_type\" does not contain an acceptable type."<<std::endl;
+        std::cerr<<"\tThe acceptable type is as follows: \"sensitivity_file\""<<std::endl;
+        return false;
+    }
+    return true;
+}
+void ShadeControl::setSensorFile(QString file){
+    m_SensorFile=file;
+}
 
 
 //Getters
@@ -80,6 +93,12 @@ std::vector<double> ShadeControl::location(){
 }
 std::vector<double> ShadeControl::signalSettings(){
     return m_SignalSettings;
+}
+QString ShadeControl::sensorType(){
+    return m_SensorType;
+}
+QString ShadeControl::sensorFile(){
+    return m_SensorFile;
 }
 
 
@@ -139,6 +158,31 @@ bool ShadeControl::parseJson(const QJsonObject &object){
                     }else{
                         if (val.isObject()){
                             QJsonObject object1=val.toObject();
+                            val=object1.value("sensor_type");
+                            if (val.isUndefined()){
+                                std::cerr<<"ERROR: The key \"sensor_type\" is not found within \"sensor\" in one of the window groups."<<std::endl;
+                                return false;
+                            }else{
+                                if (val.isString()){
+                                    setSensorType(val.toString());
+                                }else{
+                                    std::cerr<<"The key \"sensor_type\" does not contain a string in one of the window groups."<<std::endl;
+                                    return false;
+                                }
+                            }
+
+                            val=object1.value("sensor_file");
+                            if (val.isUndefined()){
+                                std::cerr<<"ERROR: The key \"sensor_file\" is not found within \"sensor\" in one of the window groups."<<std::endl;
+                                return false;
+                            }else{
+                                if (val.isString()){
+                                    setSensorFile(val.toString());
+                                }else{
+                                    std::cerr<<"The key \"sensor_file\" does not contain a string in one of the window groups."<<std::endl;
+                                    return false;
+                                }
+                            }
                             val=object1.value("location");
                             if (val.isUndefined()){
                                 std::cerr<<"ERROR: The key \"location\" was not found with control method\"automated_signal\"."<<std::endl;

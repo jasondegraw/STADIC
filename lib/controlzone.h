@@ -76,7 +76,7 @@ public:
     double wattsMin();
     double ballastFactor();
     double watts();
-    std::vector<std::vector<double>> luminaireLayout();
+    std::vector<std::vector<double> > luminaireLayout();
 
 
 private:
@@ -109,7 +109,7 @@ private:
     double m_WattsMin;                                          //  Variable holding the Minimum Watts
     double m_BallastFactor;                                     //  Variable holding the Ballast Factor
     double m_Watts;                                             //  Variable holding the Watts
-    std::vector<std::vector<double>> m_LuminaireLayout;         //  Variable holding the luminaire positions
+    std::vector<std::vector<double> > m_LuminaireLayout;         //  Variable holding the luminaire positions
 
 signals:
     

@@ -17,6 +17,8 @@ public:
     bool setAngleSettings(double value);
     bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
     bool setSignalSettings(double value);
+    bool setSensorType(QString type);
+    void setSensorFile(QString file);
 
     //Getters
     QString controlMethod();
@@ -24,6 +26,8 @@ public:
     std::vector<double> angleSettings();
     std::vector<double> location();
     std::vector<double> signalSettings();
+    QString sensorType();
+    QString sensorFile();
 
 
 private:
@@ -32,6 +36,8 @@ private:
     std::vector<double> m_AngleSettings;
     std::vector<double> m_Location;
     std::vector<double>m_SignalSettings;
+    QString m_SensorType;                                       //  Variable holding the sensor type
+    QString m_SensorFile;                                       //  Variable holding the sensor file
 
 signals:
     

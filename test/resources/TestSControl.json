@@ -36,7 +36,8 @@
 			"shade_control":{
 				"method": "automated_signal",
 				"sensor": {
-					"name": "shadesensor",
+                    "sensor_type": "sensitivity_file",
+                    "sensor_file": "cos.sen",
 					"location": {
 						"x": 4,
 						"y": 0,
@@ -64,184 +65,13 @@
 	"occupancy_schedule": "sched.csv",
 	"target_illuminance": 500,
 	
-	"luminaire_schedule":[
-		{
-			"name": "fixture1",
-			"ies_file": "pendant.ies",
-			"ballast": "ballast1",
-			"LLF": 0.9,
-			"lamp_lumens": 2700
-		},
-		{
-			"name": "fixture2",
-			"ies_file": "recessed.ies",
-			"ballast": "ballast2",
-			"LLF": 0.85,
-			"lamp_lumens": 2550
-		}
-	],
-	
-	"luminaire_layout":[
-		{
-			"luminaire": "fixture1",
-			"zone": "zone1",
-			"placement": {
-				"x": 4,
-				"y": 4,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture1",
-			"zone": "zone1",
-			"placement": {
-				"x": 10,
-				"y": 4,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture1",
-			"zone": "zone1",
-			"placement": {
-				"x": 16,
-				"y": 4,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture1",
-			"zone": "zone1",
-			"placement": {
-				"x": 22,
-				"y": 4,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture1",
-			"zone": "zone1",
-			"placement": {
-				"x": 28,
-				"y": 4,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture2",
-			"zone": "zone2",
-			"placement": {
-				"x": 4,
-				"y": 10,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture2",
-			"zone": "zone2",
-			"placement": {
-				"x": 10,
-				"y": 10,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture2",
-			"zone": "zone2",
-			"placement": {
-				"x": 16,
-				"y": 10,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture2",
-			"zone": "zone2",
-			"placement": {
-				"x": 22,
-				"y": 10,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		},
-		{
-			"luminaire": "fixture2",
-			"zone": "zone2",
-			"placement": {
-				"x": 28,
-				"y": 10,
-				"z": 10,
-				"rotation": 0,
-				"tilt": 0,
-				"spin_ccw": 0
-			}
-		}
-	],
-	
-	"ballast_driver_schedule":[
-		{
-			"name": "ballast1",
-			"type": 1,
-			"BFMax": 1.0,
-			"BFMin": 0.01,
-			"WattMax": 28,
-			"WattMin": 10
-		},
-		{
-			"name": "ballast2",
-			"type": 1,
-			"BFMax": 1.0,
-			"BFMin": 0.05,
-			"WattMax": 32,
-			"WattMin": 10
-		}
-	],
-	
-	"photosensors": [
-		{
-			"name": "shadesensor",
-			"sensor_type": 1,
-			"sensor_file": "cos.sen"
-		},
-		{
-			"name": "narrowsensor",
-			"sensor_type": 1,
-			"sensor_file": "narrow.sen"
-		}
-	],
-	
 	"control_zones": [
 		{
 			"name": "zone1",
             "optimum_control": "dim_to_min",
 			"sensor": {
-				"name": "narrowsensor",
+                "sensor_type": "sensitivity_file",
+                "sensor_file": "cos.sen",
 				"location": {
 					"x": 14,
 					"y": 8,
@@ -260,11 +90,117 @@
 				"maximum_bf_signal": 1,
 				"minimum_bf_signal": 0.01,
 				"off_signal": 300
-			}
+            },
+            "luminaire_information": {
+                "ies_file": "pendant.ies",
+                "LLF": 0.9,
+                "lamp_lumens": 2700
+            },
+            "ballast_driver_information": {
+                "ballast_type": "linear_dimming",
+                "bf_max": 1.0,
+                "bf_min": 0.01,
+                "watts_max": 28,
+                "watts_min": 10
+            },
+            "luminaire_layout":[
+                {
+                    "x": 4,
+                    "y": 4,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 10,
+                    "y": 4,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 16,
+                    "y": 4,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 22,
+                    "y": 4,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 28,
+                    "y": 4,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                }
+            ]
 		},
 		{
 			"name": "zone2",
-			"control_method": "on"
+            "optimum_control": "on",
+            "luminaire_information": {
+                "ies_file": "downlight.ies",
+                "LLF": 0.85,
+                "lamp_lumens": 2900
+            },
+            "ballast_driver_information": {
+                "ballast_type": "non_dimming",
+                "ballast_factor": 1.0,
+                "watts": 32
+            },
+            "luminaire_layout":[
+                {
+                    "x": 4,
+                    "y": 10,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 10,
+                    "y": 10,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 16,
+                    "y": 10,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 22,
+                    "y": 10,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                },
+                {
+                    "x": 28,
+                    "y": 10,
+                    "z": 10,
+                    "rotation": 0,
+                    "tilt": 0,
+                    "spin_ccw": 0
+                }
+            ]
 		}
 	],
 	"sky_divisions": 3,

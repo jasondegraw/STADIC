@@ -194,7 +194,7 @@ bool ControlZone::setBallastFactor(double value){
     return true;
 }
 bool ControlZone::setWatts(double value){
-    if (value<0){
+    if (value>0){
         m_Watts=value;
     }else{
         std::cerr<<"ERROR: The \"watts\" must be greater than 0."<<std::endl;
@@ -319,7 +319,7 @@ double ControlZone::ballastFactor(){
 double ControlZone::watts(){
     return m_Watts;
 }
-std::vector<std::vector<double>> ControlZone::luminaireLayout(){
+std::vector<std::vector<double> > ControlZone::luminaireLayout(){
     return m_LuminaireLayout;
 }
 
@@ -342,7 +342,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("optimum_control");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key\"optimum_control\" is not found within \"control_zones\"."<<std::endl;
+        std::cerr<<"ERROR: The key\"optimum_control\" is not found within the control zone "<<objectName().toStdString()<<"."<<std::endl;
         return false;
     }else{
         if (val.isString()){
@@ -577,6 +577,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("open_dimming");
     if (!val.isUndefined()){
+        if (!setAlgorithm("open_dimming")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"open_dimming\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("maximum_bf_signal");
@@ -622,6 +626,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
     }
     val=object.value("closed_proportional");
     if (!val.isUndefined()){
+        if (!setAlgorithm("closed_proportional")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"closed_proportional\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("maximum_bf_signal");
@@ -668,6 +676,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("constant_setpoint");
     if (!val.isUndefined()){
+        if (!setAlgorithm("constant_setpoint")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"constant_setpoint\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("setpoint_signal");
@@ -702,6 +714,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("open_switching");
     if (!val.isUndefined()){
+        if (!setAlgorithm("open_switching")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"open_switching\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("off_signal");
@@ -736,6 +752,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("closed_switching");
     if (!val.isUndefined()){
+        if (!setAlgorithm("closed_switching")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"closed_switching\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("off_signal");
@@ -769,7 +789,11 @@ bool ControlZone::parseJson(const QJsonObject &object){
     }
 
     val=object.value("user_defined_1");
-    if (val.isUndefined()){
+    if (!val.isUndefined()){
+        if (!setAlgorithm("user_defined_1")){
+            std::cerr<<"ERROR: There was a problem setting the algorithm to \"user_defined_1\"."<<std::endl;
+            return false;
+        }
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("signal");
@@ -816,7 +840,6 @@ bool ControlZone::parseJson(const QJsonObject &object){
     //After parsing for the algorithm test to see if the algorithm has been set.  Alert user if it hasn't been set
     if (algorithm()=="null"){
         std::cerr<<"WARNING: There is no algorithm specified for the control zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
-        return false;
     }
 
     val=object.value("luminaire_information");
