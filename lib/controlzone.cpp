@@ -933,7 +933,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
                                 return false;
                             }else{
                                 if (val.isDouble()){
-                                    if (!setBFMin(val.toDouble())){
+                                    if (!setBFMax(val.toDouble())){
                                         return false;
                                     }
                                 }else{

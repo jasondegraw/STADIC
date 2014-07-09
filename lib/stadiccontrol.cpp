@@ -1181,6 +1181,116 @@ bool StadicControl::parseJson(QString file){
     //******************
     //Metrics
     //******************
+    val=jsonObj.value(QString("sDA"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double illum, frac, start, endTime;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("illuminance"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"illuminance\" is missing under sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                illum=300;
+            }else{
+                if (val.isDouble()){
+                    illum=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"illuminance\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                    illum=300;
+                }
+            }
+            val=tempObject.value(QString("DA_fraction"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"DA_fraction\" is missing under sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                frac=0.5;
+            }else{
+                if (val.isDouble()){
+                    frac=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"DA_fraction\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                    frac=0.5;
+                }
+            }
+            val=tempObject.value(QString("start_time"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"start_time\" is missing under sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 8 will be used."<<std::endl;
+                start=8;
+            }else{
+                if (val.isDouble()){
+                    start=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"start_time\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 8 will be used."<<std::endl;
+                    start=8;
+                }
+            }
+            val=tempObject.value(QString("end_time"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"end_time\" is missing under sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 17 will be used."<<std::endl;
+                endTime=17;
+            }else{
+                if (val.isDouble()){
+                    endTime=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"end_time\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 17 will be used."<<std::endl;
+                    endTime=17;
+                }
+            }
+            if (!setsDA(true, illum, frac, start, endTime)){
+                return false;
+            }
+        }else{
+            std::cerr<<"ERROR: The \"sDA\" is not an object."<<std::endl;
+            return false;
+        }
+    }
+    val=jsonObj.value(QString("occupied_sDA"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double illum, frac;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("illuminance"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"illuminance\" is missing under occupied_sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                illum=300;
+            }else{
+                if (val.isDouble()){
+                    illum=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"illuminance\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                    illum=300;
+                }
+            }
+            val=tempObject.value(QString("DA_fraction"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"DA_fraction\" is missing under occupied_sDA."<<std::endl;
+                std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                frac=0.5;
+            }else{
+                if (val.isDouble()){
+                    frac=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"DA_fraction\" does not contain a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                    frac=0.5;
+                }
+            }
+            if (!setOccsDA(true, illum, frac)){
+                return false;
+            }
+        }else{
+            std::cerr<<"ERROR: The key \"occupied_sDA\" is not an object."<<std::endl;
+            return false;
+        }
+    }
     val=jsonObj.value(QString("DA"));
     if (!val.isUndefined()){
         if (val.isDouble()){
@@ -1211,6 +1321,47 @@ bool StadicControl::parseJson(QString file){
                setDF(val.toBool());
         }else{
             std::cerr<<"ERROR: The \"DF\" is not a boolean."<<std::endl;
+            return false;
+        }
+    }
+    val=jsonObj.value(QString("UDI"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double minimum, maximum;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("minimum"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"minimum\" is missing under UDI."<<std::endl;
+                std::cerr<<"\tAn assumed value of 100 will be used."<<std::endl;
+                minimum=100;
+            }else{
+                if (val.isDouble()){
+                    minimum=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"minimum\" is not a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 100 will be used."<<std::endl;
+                    minimum=100;
+                }
+            }
+            val=tempObject.value(QString("maximum"));
+            if (val.isUndefined()){
+                std::cerr<<"WARNING: The key \"maximum\" is missing under UDI."<<std::endl;
+                std::cerr<<"\tAn assumed value of 250 will be used."<<std::endl;
+                maximum=250;
+            }else{
+                if (val.isDouble()){
+                    maximum=val.toDouble();
+                }else{
+                    std::cerr<<"WARNING: The key \"maximum\" is not a number."<<std::endl;
+                    std::cerr<<"\tAn assumed value of 250 will be used."<<std::endl;
+                    maximum=250;
+                }
+            }
+            if (!setUDI(true, minimum, maximum)){
+                return false;
+            }
+        }else{
+            std::cerr<<"ERROR: The key \"UDI\" is not an object."<<std::endl;
             return false;
         }
     }

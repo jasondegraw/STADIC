@@ -80,15 +80,15 @@
 					"yd": 0,
 					"zd": -1,
 					"spin_ccw": 0
-				}
+                }
 			},
 			"cp_method": "auto",
 			"quantity": 3,
 			"target_percentage": 0.1,
 			"excluded_points": "exclude.pts",
 			"open_dimming": {
-				"maximum_bf_signal": 1,
-				"minimum_bf_signal": 0.01,
+                "maximum_bf_signal": 3000,
+                "minimum_bf_signal": 100,
 				"off_signal": 300
             },
             "luminaire_information": {
@@ -222,7 +222,7 @@
 	},
 	
 	"daylight_savings_time": true,
-	"sda_settings": {
+    "sDA": {
 		"illuminance": 300,
 		"DA_fraction": 0.5,
 		"start_time": 8,
