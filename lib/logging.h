@@ -1,7 +1,17 @@
 #ifndef LUMBERJACK_H
 #define LUMBERJACK_H
+#include <iostream>
+#include <QString>
 
-#define ERROR(mesg) std::cerr << "ERROR: " << (mesg) << std::endl;
-#define WARNING(mesg) std::cerr << "WARNING: " << (mesg) << std::endl;
+void ERROR(QString mesg){
+    QString string;
+    string ="ERROR: "+mesg;
+    std::cerr << string.toStdString() << std::endl;
+}
+void WARNING(QString mesg){
+    QString string;
+    string="WARNING: "+mesg;
+    std::cerr << string.toStdString() << std::endl;
+}
 
 #endif

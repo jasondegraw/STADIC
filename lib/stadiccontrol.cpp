@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QFile>
 #include <iostream>
+#include "logging.h"
 
 StadicControl::StadicControl(QObject *parent) :
     QObject(parent)
@@ -46,7 +47,8 @@ void StadicControl::setDataFolder(QString folder){
 //******************
 bool StadicControl::setGroundReflect(double value){
     if (value>1 || value<0){
-        std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
+        WARNING("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied.");
+        //std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
         m_GroundReflect=0.2;
     }else{
         m_GroundReflect=value;

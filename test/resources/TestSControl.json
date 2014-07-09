@@ -7,7 +7,7 @@
 	"results_folder": "res/",
 	"data_folder": "data/",
 	
-	"ground_reflectance": 0.2,
+    "ground_reflectance": 1.1,
 	"wea_data_file": "c:/weaData/state_college.wea",
 	"first_day": 1,
 	
