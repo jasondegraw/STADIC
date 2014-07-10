@@ -7,7 +7,8 @@ set(SRCS stadiccontrol.cpp
          shadecontrol.cpp
          controlzone.cpp
          gridmaker.cpp
-         radgeometry.cpp)
+         radgeometry.cpp
+         makewea.cpp)
 		 
 set(HDRS stadiccontrol.h
          windowgroup.h
@@ -15,7 +16,8 @@ set(HDRS stadiccontrol.h
          controlzone.h
          logging.h
          gridmaker.h
-         radgeometry.h)
+         radgeometry.h
+         makewea.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 
