@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QStringList>
+#include <iostream>
 
 MakeWea::MakeWea(QObject *parent) :
     QObject(parent)
@@ -13,32 +14,42 @@ MakeWea::MakeWea(QObject *parent) :
 void MakeWea::setMonth(int month){
     m_Month.push_back(month);
 }
-void MakeWea::setDay(int day){
+void MakeWea::setDay(QString day){
     m_Day.push_back(day);
 }
 void MakeWea::setHour(double hour){
     m_Hour.push_back(hour);
 }
-void MakeWea::setDN(double dn){
+bool MakeWea::setDN(QString dn){
+    if (dn=="9999"){
+        std::cerr<<"ERROR: The imported file is missing Direct Normal data."<<std::endl;
+        return false;
+    }
     m_DirectNormal.push_back(dn);
+    return true;
 }
-void MakeWea::setDH(double dh){
+bool MakeWea::setDH(QString dh){
+    if (dh=="9999"){
+        std::cerr<<"ERROR: The imported file is missing Direct Horizontal data."<<std::endl;
+        return false;
+    }
     m_DirectHorizontal.push_back(dh);
+    return true;
 }
 */
 void MakeWea::setPlace(QString place){
     m_Place=place;
 }
-void MakeWea::setLatitude(double lat){
+void MakeWea::setLatitude(QString lat){
     m_Latitude=lat;
 }
-void MakeWea::setLongitude(double lon){
+void MakeWea::setLongitude(QString lon){
     m_Longitude=lon;
 }
-void MakeWea::setTimeZone(double timeZone){
+void MakeWea::setTimeZone(QString timeZone){
     m_TimeZone=timeZone;
 }
-void MakeWea::setElevation(double elev){
+void MakeWea::setElevation(QString elev){
     m_Elevation=elev;
 }
 
@@ -61,16 +72,16 @@ std::vector<QString> MakeWea::directHorizontal(){
 QString MakeWea::place(){
     return m_Place;
 }
-double MakeWea::latitude(){
+QString MakeWea::latitude(){
     return m_Latitude;
 }
-double MakeWea::longitude(){
+QString MakeWea::longitude(){
     return m_Longitude;
 }
-double MakeWea::timeZone(){
+QString MakeWea::timeZone(){
     return m_TimeZone;
 }
-double MakeWea::elevation(){
+QString MakeWea::elevation(){
     return m_Elevation;
 }
 
@@ -118,10 +129,10 @@ bool MakeWea::parseEPW(QString file){
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
     setPlace(vals.at(1));
-    setLatitude(vals.at(6).toDouble());
-    setLongitude(vals.at(7).toDouble());
-    setTimeZone(vals.at(8).toDouble());
-    setElevation(vals.at(9).toDouble());
+    setLatitude(vals.at(6));
+    setLongitude(vals.at(7));
+    setTimeZone(vals.at(8));
+    setElevation(vals.at(9));
     while(!data.contains("DATA")){
         data=iFile.readLine();
     }
@@ -166,10 +177,10 @@ bool MakeWea::parseTMY(QString file){
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
     setPlace(vals.at(1));
-    setLatitude(vals.at(4).toDouble());
-    setLongitude(vals.at(5).toDouble());
-    setTimeZone(vals.at(3).toDouble());
-    setElevation(vals.at(6).toDouble());
+    setLatitude(vals.at(4));
+    setLongitude(vals.at(5));
+    setTimeZone(vals.at(3));
+    setElevation(vals.at(6));
     data=iFile.readLine();
     QString tempString;
     QStringList parseDate;

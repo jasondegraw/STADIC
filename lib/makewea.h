@@ -21,10 +21,10 @@ public:
     void setDH(double dh);
     */
     void setPlace(QString place);
-    void setLatitude(double lat);
-    void setLongitude(double lon);
-    void setTimeZone(double timeZone);
-    void setElevation(double elev);
+    void setLatitude(QString lat);
+    void setLongitude(QString lon);
+    void setTimeZone(QString timeZone);
+    void setElevation(QString elev);
 
     //Getters
     std::vector<int> month();
@@ -33,10 +33,10 @@ public:
     std::vector<QString> directNormal();
     std::vector<QString> directHorizontal();
     QString place();
-    double latitude();
-    double longitude();
-    double timeZone();
-    double elevation();
+    QString latitude();
+    QString longitude();
+    QString timeZone();
+    QString elevation();
 
 
 
@@ -50,10 +50,10 @@ private:
     std::vector<QString> m_DirectNormal;
     std::vector<QString> m_DirectHorizontal;
     QString m_Place;
-    double m_Latitude;
-    double m_Longitude;
-    double m_TimeZone;
-    double m_Elevation;
+    QString m_Latitude;
+    QString m_Longitude;
+    QString m_TimeZone;
+    QString m_Elevation;
 
 
 
