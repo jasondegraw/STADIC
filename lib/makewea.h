@@ -13,28 +13,28 @@ public:
     bool writeWea(QString file);
 
     //Setters
-    void setMonth(int month);
-    void setDay(int day);
+    void setMonth(QString month);
+    void setDay(QString day);
     void setHour(double hour);
-    void setDN(double dn);
-    void setDH(double dh);
+    bool setDN(QString dn);
+    bool setDH(QString dh);
     void setPlace(QString place);
-    void setLatitude(double lat);
-    void setLongitude(double lon);
-    void setTimeZone(double timeZone);
-    void setElevation(double elev);
+    void setLatitude(QString lat);
+    void setLongitude(QString lon);
+    void setTimeZone(QString timeZone);
+    void setElevation(QString elev);
 
     //Getters
-    std::vector<int> month();
-    std::vector<int> day();
+    std::vector<QString> month();
+    std::vector<QString> day();
     std::vector<double> hour();
-    std::vector<double> directNormal();
-    std::vector<double> directHorizontal();
+    std::vector<QString> directNormal();
+    std::vector<QString> directHorizontal();
     QString place();
-    double latitude();
-    double longitude();
-    double timeZone();
-    double elevation();
+    QString latitude();
+    QString longitude();
+    QString timeZone();
+    QString elevation();
 
 
 
@@ -42,16 +42,16 @@ private:
     bool parseEPW(QString file);
     bool parseTMY(QString file);
 
-    std::vector<int> m_Month;
-    std::vector<int> m_Day;
+    std::vector<QString> m_Month;
+    std::vector<QString> m_Day;
     std::vector<double> m_Hour;
-    std::vector<double> m_DirectNormal;
-    std::vector<double> m_DirectHorizontal;
+    std::vector<QString> m_DirectNormal;
+    std::vector<QString> m_DirectHorizontal;
     QString m_Place;
-    double m_Latitude;
-    double m_Longitude;
-    double m_TimeZone;
-    double m_Elevation;
+    QString m_Latitude;
+    QString m_Longitude;
+    QString m_TimeZone;
+    QString m_Elevation;
 
 
 

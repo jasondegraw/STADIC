@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QStringList>
+#include <iostream>
 
 MakeWea::MakeWea(QObject *parent) :
     QObject(parent)
@@ -9,66 +10,76 @@ MakeWea::MakeWea(QObject *parent) :
 }
 
 //Setters
-void MakeWea::setMonth(int month){
+void MakeWea::setMonth(QString month){
     m_Month.push_back(month);
 }
-void MakeWea::setDay(int day){
+void MakeWea::setDay(QString day){
     m_Day.push_back(day);
 }
 void MakeWea::setHour(double hour){
     m_Hour.push_back(hour);
 }
-void MakeWea::setDN(double dn){
+bool MakeWea::setDN(QString dn){
+    if (dn=="9999"){
+        std::cerr<<"ERROR: The imported file is missing Direct Normal data."<<std::endl;
+        return false;
+    }
     m_DirectNormal.push_back(dn);
+    return true;
 }
-void MakeWea::setDH(double dh){
+bool MakeWea::setDH(QString dh){
+    if (dh=="9999"){
+        std::cerr<<"ERROR: The imported file is missing Direct Horizontal data."<<std::endl;
+        return false;
+    }
     m_DirectHorizontal.push_back(dh);
+    return true;
 }
 void MakeWea::setPlace(QString place){
     m_Place=place;
 }
-void MakeWea::setLatitude(double lat){
+void MakeWea::setLatitude(QString lat){
     m_Latitude=lat;
 }
-void MakeWea::setLongitude(double lon){
+void MakeWea::setLongitude(QString lon){
     m_Longitude=lon;
 }
-void MakeWea::setTimeZone(double timeZone){
+void MakeWea::setTimeZone(QString timeZone){
     m_TimeZone=timeZone;
 }
-void MakeWea::setElevation(double elev){
+void MakeWea::setElevation(QString elev){
     m_Elevation=elev;
 }
 
 //Getters
-std::vector<int> MakeWea::month(){
+std::vector<QString> MakeWea::month(){
     return m_Month;
 }
-std::vector<int> MakeWea::day(){
+std::vector<QString> MakeWea::day(){
     return m_Day;
 }
 std::vector<double> MakeWea::hour(){
     return m_Hour;
 }
-std::vector<double> MakeWea::directNormal(){
+std::vector<QString> MakeWea::directNormal(){
     return m_DirectNormal;
 }
-std::vector<double> MakeWea::directHorizontal(){
+std::vector<QString> MakeWea::directHorizontal(){
     return m_DirectHorizontal;
 }
 QString MakeWea::place(){
     return m_Place;
 }
-double MakeWea::latitude(){
+QString MakeWea::latitude(){
     return m_Latitude;
 }
-double MakeWea::longitude(){
+QString MakeWea::longitude(){
     return m_Longitude;
 }
-double MakeWea::timeZone(){
+QString MakeWea::timeZone(){
     return m_TimeZone;
 }
-double MakeWea::elevation(){
+QString MakeWea::elevation(){
     return m_Elevation;
 }
 
@@ -116,10 +127,10 @@ bool MakeWea::parseEPW(QString file){
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
     setPlace(vals.at(1));
-    setLatitude(vals.at(6).toDouble());
-    setLongitude(vals.at(7).toDouble());
-    setTimeZone(vals.at(8).toDouble());
-    setElevation(vals.at(9).toDouble());
+    setLatitude(vals.at(6));
+    setLongitude(vals.at(7));
+    setTimeZone(vals.at(8));
+    setElevation(vals.at(9));
     while(!data.contains("DATA")){
         data=iFile.readLine();
     }
@@ -129,23 +140,23 @@ bool MakeWea::parseEPW(QString file){
     double correction;
     data=iFile.readLine();
     vals=data.split(',');
-    setMonth(vals.at(1).toInt());
-    setDay(vals.at(2).toInt());
+    setMonth(vals.at(1));
+    setDay(vals.at(2));
     double tempHour=vals.at(3).toDouble()+vals.at(4).toDouble()/60;
     correction=tempHour-(intervals/2.0);
     setHour(tempHour-correction);
-    setDN(vals.at(14).toDouble());
-    setDH(vals.at(15).toDouble());
+    setDN(vals.at(14));
+    setDH(vals.at(15));
     while (!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
         vals=data.split(',');
-        setMonth(vals.at(1).toInt());
-        setDay(vals.at(2).toInt());
+        setMonth(vals.at(1));
+        setDay(vals.at(2));
         tempHour=vals.at(3).toDouble()+vals.at(4).toDouble()/60;
         setHour(tempHour-correction);
-        setDN(vals.at(14).toDouble());
-        setDH(vals.at(15).toDouble());
+        setDN(vals.at(14));
+        setDH(vals.at(15));
     }
     iFile.close();
     return true;
@@ -157,10 +168,10 @@ bool MakeWea::parseTMY(QString file){
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
     setPlace(vals.at(1));
-    setLatitude(vals.at(4).toDouble());
-    setLongitude(vals.at(5).toDouble());
-    setTimeZone(vals.at(3).toDouble());
-    setElevation(vals.at(6).toDouble());
+    setLatitude(vals.at(4));
+    setLongitude(vals.at(5));
+    setTimeZone(vals.at(3));
+    setElevation(vals.at(6));
     data=iFile.readLine();
     QString tempString;
     QStringList parseDate;
@@ -169,8 +180,8 @@ bool MakeWea::parseTMY(QString file){
     //Read Date String
     tempString=vals.at(0);
     parseDate=tempString.split('/');
-    setMonth(parseDate.at(0).toInt());
-    setDay(parseDate.at(1).toInt());
+    setMonth(parseDate.at(0));
+    setDay(parseDate.at(1));
     //Read Hour String
     tempString=vals.at(1);
     parseDate.clear();
@@ -179,8 +190,8 @@ bool MakeWea::parseTMY(QString file){
     //Determine time correction factor
     double correction=tempHour-0.5;
     setHour(tempHour-correction);
-    setDN(vals.at(7).toDouble());
-    setDH(vals.at(10).toDouble());
+    setDN(vals.at(7));
+    setDH(vals.at(10));
     while(!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
@@ -188,16 +199,16 @@ bool MakeWea::parseTMY(QString file){
         //Read Date String
         tempString=vals.at(0);
         parseDate=tempString.split('/');
-        setMonth(parseDate.at(0).toInt());
-        setDay(parseDate.at(1).toInt());
+        setMonth(parseDate.at(0));
+        setDay(parseDate.at(1));
         //Read Hour String
         tempString=vals.at(1);
         parseDate.clear();
         parseDate=tempString.split(':');
         double tempHour=parseDate.at(0).toDouble()+parseDate.at(1).toDouble()/60;
         setHour(tempHour-correction);
-        setDN(vals.at(7).toDouble());
-        setDH(vals.at(10).toDouble());
+        setDN(vals.at(7));
+        setDH(vals.at(10));
     }
 
     iFile.close();
