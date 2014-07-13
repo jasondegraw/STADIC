@@ -6,6 +6,7 @@ set(SRCS stadiccontrol.cpp
          windowgroup.cpp
          shadecontrol.cpp
          controlzone.cpp
+         logging.cpp
          gridmaker.cpp
          radgeometry.cpp
          makewea.cpp)
