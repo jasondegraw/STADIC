@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <iostream>
 #include <QString>
+#include <QLineF>
 
 GridMaker::GridMaker(QObject *parent) :
     QObject(parent)
@@ -219,7 +220,7 @@ bool GridMaker::makeGrid(){
             firstPolygon=false;
             m_UnitedPolygon=m_Polygons.at(i);
         }else if (properName==true){
-            m_UnitedPolygon.united(m_Polygons.at(i));
+            m_UnitedPolygon=m_UnitedPolygon.united(m_Polygons.at(i));
         }
     }
 
@@ -233,14 +234,72 @@ bool GridMaker::makeGrid(){
         setMinY(m_UnitedPolygon.boundingRect().top());
         setMaxY(m_UnitedPolygon.boundingRect().bottom());
     }
-
+    std::cout<<"Points:"<<std::endl;
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        std::cout<<"\t"<<m_UnitedPolygon.at(i).x()<<" "<<m_UnitedPolygon.at(i).y()<<std::endl;
+    }
     //Create vector of test points
     double x=minX()+offsetX();
+    if (x==minX()){
+        x=x+spaceX();
+    }
     while (x<maxX()){
         double y=minY()+offsetY();
+        if (y==minY()){
+            y=y+spaceY();
+        }
         while (y<maxY()){
-            if (m_UnitedPolygon.containsPoint(QPointF(x,y), Qt::OddEvenFill)){
-                setTestPoints(x,y);
+            QPointF tempPoint;
+            tempPoint.setX(x);
+            tempPoint.setY(y);
+            //QPointF interPoint;
+            if (m_UnitedPolygon.containsPoint(tempPoint, Qt::OddEvenFill)){
+                //This code uses 9 points surrounding the point in question.  If all of the surrounding points are inside then this point is also inside.
+                bool surroundIn=true;
+                for (int i=-1;i<2;i++){
+                    double tempX=x+.01*i;
+                    for (int j=-1;j<2;j++){
+                        double tempY=y+.01*j;
+                        if (!m_UnitedPolygon.containsPoint(QPointF(tempX, tempY), Qt::OddEvenFill)){
+                            surroundIn=false;
+                        }
+                    }
+                }
+                if (surroundIn==true){
+                    setTestPoints(x,y);
+                }
+
+                //Old code that tested to see if a point was on a line using QLineF::intersect
+                /*
+                bool onLine=false;
+                for (int i=0;i<m_UnitedPolygon.size()-1;i++){
+                    QLineF line;
+                    QLineF line1;
+                    line1.setP1(tempPoint);
+                    line1.setP2(QPointF(0,0));
+                    line.setP1(m_UnitedPolygon.at(i));
+                    line.setP2(m_UnitedPolygon.at(i+1));
+                    if (line.intersect(line1, &interPoint)==1){
+                        if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
+                            onLine=true;
+                        }
+                    }
+                }
+                QLineF line;
+                QLineF line1;
+                line1.setP1(tempPoint);
+                line1.setP2(QPointF(0,0));
+                line.setP1(m_UnitedPolygon.at(m_UnitedPolygon.size()-1));
+                line.setP2(m_UnitedPolygon.at(0));
+                if (line.intersect(line1, &interPoint)==1){
+                    if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
+                    //if (interPoint==tempPoint){
+                        onLine=true;
+                    }
+                }
+                if (!onLine){
+                    setTestPoints(x,y);
+                }*/
             }
             y=y+spaceY();
         }
