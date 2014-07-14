@@ -52,34 +52,34 @@ void MakeWea::setElevation(QString elev){
 }
 
 //Getters
-std::vector<QString> MakeWea::month(){
+std::vector<QString> MakeWea::month() const {
     return m_Month;
 }
-std::vector<QString> MakeWea::day(){
+std::vector<QString> MakeWea::day() const {
     return m_Day;
 }
-std::vector<double> MakeWea::hour(){
+std::vector<double> MakeWea::hour()const {
     return m_Hour;
 }
-std::vector<QString> MakeWea::directNormal(){
+std::vector<QString> MakeWea::directNormal() const {
     return m_DirectNormal;
 }
-std::vector<QString> MakeWea::directHorizontal(){
+std::vector<QString> MakeWea::directHorizontal() const{
     return m_DirectHorizontal;
 }
-QString MakeWea::place(){
+QString MakeWea::place() const {
     return m_Place;
 }
-QString MakeWea::latitude(){
+QString MakeWea::latitude() const {
     return m_Latitude;
 }
-QString MakeWea::longitude(){
+QString MakeWea::longitude() const {
     return m_Longitude;
 }
-QString MakeWea::timeZone(){
+QString MakeWea::timeZone() const {
     return m_TimeZone;
 }
-QString MakeWea::elevation(){
+QString MakeWea::elevation() const {
     return m_Elevation;
 }
 
@@ -126,11 +126,11 @@ bool MakeWea::parseEPW(QString file){
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
-    setPlace(vals.at(1));
-    setLatitude(vals.at(6));
-    setLongitude(vals.at(7));
-    setTimeZone(vals.at(8));
-    setElevation(vals.at(9));
+    setPlace(vals[1].trimmed());
+    setLatitude(vals[6].trimmed());
+    setLongitude(vals[7].trimmed());
+    setTimeZone(vals[8].trimmed());
+    setElevation(vals[9].trimmed());
     while(!data.contains("DATA")){
         data=iFile.readLine();
     }
