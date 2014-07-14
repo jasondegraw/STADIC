@@ -54,34 +54,34 @@ void MakeWea::setElevation(QString elev){
 }
 
 //Getters
-std::vector<int> MakeWea::month(){
+std::vector<int> MakeWea::month() const {
     return m_Month;
 }
-std::vector<int> MakeWea::day(){
+std::vector<int> MakeWea::day() const {
     return m_Day;
 }
-std::vector<double> MakeWea::hour(){
+std::vector<double> MakeWea::hour() const {
     return m_Hour;
 }
-std::vector<QString> MakeWea::directNormal(){
+std::vector<QString> MakeWea::directNormal() const {
     return m_DirectNormal;
 }
-std::vector<QString> MakeWea::directHorizontal(){
+std::vector<QString> MakeWea::directHorizontal() const{
     return m_DirectHorizontal;
 }
-QString MakeWea::place(){
+QString MakeWea::place() const {
     return m_Place;
 }
-QString MakeWea::latitude(){
+QString MakeWea::latitude() const {
     return m_Latitude;
 }
-QString MakeWea::longitude(){
+QString MakeWea::longitude() const {
     return m_Longitude;
 }
-QString MakeWea::timeZone(){
+QString MakeWea::timeZone() const {
     return m_TimeZone;
 }
-QString MakeWea::elevation(){
+QString MakeWea::elevation() const {
     return m_Elevation;
 }
 
@@ -128,19 +128,19 @@ bool MakeWea::parseEPW(QString file){
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
-    setPlace(vals.at(1));
-    setLatitude(vals.at(6));
-    setLongitude(vals.at(7));
-    setTimeZone(vals.at(8));
-    setElevation(vals.at(9));
+    setPlace(vals[1].trimmed());
+    setLatitude(vals[6].trimmed());
+    setLongitude(vals[7].trimmed());
+    setTimeZone(vals[8].trimmed());
+    setElevation(vals[9].trimmed());
     while(!data.contains("DATA")){
         data=iFile.readLine();
     }
     //This is where the number of periods per hour should be read in.
     vals=data.split(',');
     int intervals=vals[2].toInt();
-    double delta = 60.0/(double)intervals;
-    int counter=1;
+    double delta = 1.0/(double)intervals;
+    int counter=0;
     while (!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
@@ -148,13 +148,13 @@ bool MakeWea::parseEPW(QString file){
         // For now, assume the date/time is legit
         int month = vals[1].toInt();
         int day = vals[2].toInt();
-        int hour=vals[3].toDouble()-1.0+counter*delta;
+        double hour=vals[3].toDouble()-1.0+(counter+0.5)*delta;
         // Probably should check that these conversions go Ok
         double DN = vals[14].toDouble();
         double DH = vals[15].toDouble();
         counter++;
         if(counter == intervals) {
-          counter = 1;
+          counter = 0;
         }
         // Validate before keeping the data
         if(DN >= 9999 || DH >= 9999) {

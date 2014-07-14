@@ -27,18 +27,16 @@ public:
     void setElevation(QString elev);
 
     //Getters
-    std::vector<int> month();
-    std::vector<int> day();
-    std::vector<double> hour();
-    std::vector<QString> directNormal();
-    std::vector<QString> directHorizontal();
-    QString place();
-    QString latitude();
-    QString longitude();
-    QString timeZone();
-    QString elevation();
-
-
+    std::vector<int> month() const;
+    std::vector<int> day() const;
+    std::vector<double> hour() const;
+    std::vector<QString> directNormal() const;
+    std::vector<QString> directHorizontal() const;
+    QString place() const;
+    QString latitude() const;
+    QString longitude() const;
+    QString timeZone() const;
+    QString elevation() const;
 
 private:
     bool parseEPW(QString file);
@@ -54,8 +52,6 @@ private:
     QString m_Longitude;
     QString m_TimeZone;
     QString m_Elevation;
-
-
 
 signals:
 

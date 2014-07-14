@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/TestSControl.json</file>
+        <file>resources/USA_PA_Lancaster.AP.725116_TMY3.epw</file>
     </qresource>
 </RCC>
