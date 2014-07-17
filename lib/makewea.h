@@ -4,11 +4,13 @@
 #include <QObject>
 #include <vector>
 
-class MakeWea : public QObject
+namespace stadic {
+
+class WeatherData : public QObject
 {
     Q_OBJECT
 public:
-    explicit MakeWea(QObject *parent = 0);
+    explicit WeatherData(QObject *parent = 0);
     bool parseWeather(QString file);
     bool writeWea(QString file);
 
@@ -58,5 +60,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // MAKEWEA_H

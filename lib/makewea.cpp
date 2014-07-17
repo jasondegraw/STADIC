@@ -4,22 +4,24 @@
 #include <QStringList>
 #include <iostream>
 
-MakeWea::MakeWea(QObject *parent) :
+namespace stadic {
+
+WeatherData::WeatherData(QObject *parent) :
     QObject(parent)
 {
 }
 
 //Setters
-void MakeWea::setMonth(QString month){
+void WeatherData::setMonth(QString month){
     m_Month.push_back(month);
 }
-void MakeWea::setDay(QString day){
+void WeatherData::setDay(QString day){
     m_Day.push_back(day);
 }
-void MakeWea::setHour(double hour){
+void WeatherData::setHour(double hour){
     m_Hour.push_back(hour);
 }
-bool MakeWea::setDN(QString dn){
+bool WeatherData::setDN(QString dn){
     if (dn=="9999"){
         std::cerr<<"ERROR: The imported file is missing Direct Normal data."<<std::endl;
         return false;
@@ -27,7 +29,7 @@ bool MakeWea::setDN(QString dn){
     m_DirectNormal.push_back(dn);
     return true;
 }
-bool MakeWea::setDH(QString dh){
+bool WeatherData::setDH(QString dh){
     if (dh=="9999"){
         std::cerr<<"ERROR: The imported file is missing Direct Horizontal data."<<std::endl;
         return false;
@@ -35,56 +37,56 @@ bool MakeWea::setDH(QString dh){
     m_DirectHorizontal.push_back(dh);
     return true;
 }
-void MakeWea::setPlace(QString place){
+void WeatherData::setPlace(QString place){
     m_Place=place;
 }
-void MakeWea::setLatitude(QString lat){
+void WeatherData::setLatitude(QString lat){
     m_Latitude=lat;
 }
-void MakeWea::setLongitude(QString lon){
+void WeatherData::setLongitude(QString lon){
     m_Longitude=lon;
 }
-void MakeWea::setTimeZone(QString timeZone){
+void WeatherData::setTimeZone(QString timeZone){
     m_TimeZone=timeZone;
 }
-void MakeWea::setElevation(QString elev){
+void WeatherData::setElevation(QString elev){
     m_Elevation=elev;
 }
 
 //Getters
-std::vector<QString> MakeWea::month() const {
+std::vector<QString> WeatherData::month() const {
     return m_Month;
 }
-std::vector<QString> MakeWea::day() const {
+std::vector<QString> WeatherData::day() const {
     return m_Day;
 }
-std::vector<double> MakeWea::hour()const {
+std::vector<double> WeatherData::hour()const {
     return m_Hour;
 }
-std::vector<QString> MakeWea::directNormal() const {
+std::vector<QString> WeatherData::directNormal() const {
     return m_DirectNormal;
 }
-std::vector<QString> MakeWea::directHorizontal() const{
+std::vector<QString> WeatherData::directHorizontal() const{
     return m_DirectHorizontal;
 }
-QString MakeWea::place() const {
+QString WeatherData::place() const {
     return m_Place;
 }
-QString MakeWea::latitude() const {
+QString WeatherData::latitude() const {
     return m_Latitude;
 }
-QString MakeWea::longitude() const {
+QString WeatherData::longitude() const {
     return m_Longitude;
 }
-QString MakeWea::timeZone() const {
+QString WeatherData::timeZone() const {
     return m_TimeZone;
 }
-QString MakeWea::elevation() const {
+QString WeatherData::elevation() const {
     return m_Elevation;
 }
 
 //Utilities
-bool MakeWea::parseWeather(QString file){
+bool WeatherData::parseWeather(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -100,7 +102,7 @@ bool MakeWea::parseWeather(QString file){
 
     return true;
 }
-bool MakeWea::writeWea(QString file){
+bool WeatherData::writeWea(QString file){
     QFile oFile;
     oFile.setFileName(file);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -120,7 +122,7 @@ bool MakeWea::writeWea(QString file){
     oFile.close();
     return true;
 }
-bool MakeWea::parseEPW(QString file){
+bool WeatherData::parseEPW(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -161,7 +163,7 @@ bool MakeWea::parseEPW(QString file){
     iFile.close();
     return true;
 }
-bool MakeWea::parseTMY(QString file){
+bool WeatherData::parseTMY(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -213,4 +215,6 @@ bool MakeWea::parseTMY(QString file){
 
     iFile.close();
     return true;
+}
+
 }
