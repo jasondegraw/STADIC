@@ -1,4 +1,4 @@
-#include "makewea.h"
+#include "weatherdata.h"
 #include "logging.h"
 
 int main (int argc, char *argv[]){

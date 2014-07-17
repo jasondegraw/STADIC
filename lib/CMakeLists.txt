@@ -9,7 +9,7 @@ set(SRCS stadiccontrol.cpp
          logging.cpp
          gridmaker.cpp
          radgeometry.cpp
-         makewea.cpp
+         weatherdata.cpp
          dayill.cpp
          elecill.cpp)
 		 
@@ -20,7 +20,7 @@ set(HDRS stadiccontrol.h
          logging.h
          gridmaker.h
          radgeometry.h
-         makewea.h
+         weatherdata.h
          dayill.h
          elecill.h)
 

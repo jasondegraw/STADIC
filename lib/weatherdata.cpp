@@ -1,4 +1,4 @@
-#include "makewea.h"
+#include "weatherdata.h"
 #include <QTextStream>
 #include <QFile>
 #include <QStringList>

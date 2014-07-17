@@ -1,4 +1,4 @@
-#include "makewea.h"
+#include "weatherdata.h"
 #include "gtest/gtest.h"
 
 TEST(WeatherTests, ReadEpw)
