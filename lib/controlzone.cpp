@@ -4,6 +4,8 @@
 #include <QJsonValue>
 #include <QJsonArray>
 
+namespace stadic {
+
 ControlZone::ControlZone(QObject *parent) :
     QObject(parent)
 {
@@ -1110,4 +1112,6 @@ bool ControlZone::parseJson(const QJsonObject &object){
     }
 
     return true;
+}
+
 }

@@ -8,7 +8,9 @@
 #include <iostream>
 #include "logging.h"
 
-StadicControl::StadicControl(QObject *parent) :
+namespace stadic {
+
+Control::Control(QObject *parent) :
     QObject(parent)
 {
 
@@ -20,32 +22,32 @@ StadicControl::StadicControl(QObject *parent) :
 //******************
 //Folder Information
 //******************
-void StadicControl::setProjectName(QString name){
+void Control::setProjectName(QString name){
     m_ProjectName=name;
 }
-void StadicControl::setProjectFolder(QString folder){
+void Control::setProjectFolder(QString folder){
     m_ProjectFolder=folder;
 }
-void StadicControl::setTmpFolder(QString folder){
+void Control::setTmpFolder(QString folder){
     m_TmpFolder=folder;
 }
-void StadicControl::setGeoFolder(QString folder){
+void Control::setGeoFolder(QString folder){
     m_GeoFolder=folder;
 }
-void StadicControl::setIESFolder(QString folder){
+void Control::setIESFolder(QString folder){
     m_IESFolder=folder;
 }
-void StadicControl::setResultsFolder(QString folder){
+void Control::setResultsFolder(QString folder){
     m_ResultsFolder=folder;
 }
-void StadicControl::setDataFolder(QString folder){
+void Control::setDataFolder(QString folder){
     m_DataFolder=folder;
 }
 
 //******************
 //Site Information
 //******************
-bool StadicControl::setGroundReflect(double value){
+bool Control::setGroundReflect(double value){
     if (value>1 || value<0){
         WARNING("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied.");
         //std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
@@ -55,10 +57,10 @@ bool StadicControl::setGroundReflect(double value){
     }
     return true;
 }
-void StadicControl::setWeaDataFile(QString file){
+void Control::setWeaDataFile(QString file){
     m_WeaDataFile=file;
 }
-bool StadicControl::setFirstDay(int value){
+bool Control::setFirstDay(int value){
     if (value>7 || value<1){
         std::cerr<<"WARNING: The first day must be an integer between 1 and 7.\n\tA default value of 1 will be applied."<<std::endl;
         m_FirstDay=1;
@@ -71,13 +73,13 @@ bool StadicControl::setFirstDay(int value){
 //******************
 //Geometry Information
 //******************
-void StadicControl::setMatFile(QString file){
+void Control::setMatFile(QString file){
     m_MatFile=file;
 }
-void StadicControl::setGeoFile(QString file){
+void Control::setGeoFile(QString file){
     m_GeoFile=file;
 }
-bool StadicControl::setBuildingRotation(double value){
+bool Control::setBuildingRotation(double value){
     if (value>360 || value<-360){
         std::cerr<<"ERROR: The building rotation must be between -360 and 360."<<std::endl;
         return false;
@@ -86,10 +88,10 @@ bool StadicControl::setBuildingRotation(double value){
     }
     return true;
 }
-void StadicControl::setPTSFile(QString file){
+void Control::setPTSFile(QString file){
     m_PTSFile=file;
 }
-bool StadicControl::setImportUnits(QString units){
+bool Control::setImportUnits(QString units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_ImportUnits=units;
     }else{
@@ -98,7 +100,7 @@ bool StadicControl::setImportUnits(QString units){
     }
     return true;
 }
-bool StadicControl::setIllumUnits(QString units){
+bool Control::setIllumUnits(QString units){
     if (units=="lux" || units=="fc"){
         m_IllumUnits=units;
     }else{
@@ -107,7 +109,7 @@ bool StadicControl::setIllumUnits(QString units){
     }
     return true;
 }
-bool StadicControl::setDisplayUnits(QString units){
+bool Control::setDisplayUnits(QString units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_DisplayUnits=units;
     }else{
@@ -116,10 +118,10 @@ bool StadicControl::setDisplayUnits(QString units){
     }
     return true;
 }
-void StadicControl::setOccSchedule(QString file){
+void Control::setOccSchedule(QString file){
     m_OccSchedule=file;
 }
-bool StadicControl::setTargetIlluminance(double value){
+bool Control::setTargetIlluminance(double value){
     if (value<0){
         std::cerr<<"ERROR: The target illuminance must be greater than 0."<<std::endl;
         return false;
@@ -132,7 +134,7 @@ bool StadicControl::setTargetIlluminance(double value){
 //******************
 //Simulation Settings
 //******************
-bool StadicControl::setSunDivisions(int value){
+bool Control::setSunDivisions(int value){
     if (value<1 || value>6){
         std::cerr<<"WARNING: The sun divisions must be between 1 and 6.\n\tA default value of 3 will be applied."<<std::endl;
         m_SunDivisions=3;
@@ -141,7 +143,7 @@ bool StadicControl::setSunDivisions(int value){
     }
     return true;
 }
-bool StadicControl::setSkyDivisions(int value){
+bool Control::setSkyDivisions(int value){
     if (value<1 || value>6){
         std::cerr<<"WARNING: The sky divisions must be between 1 and 6.\n\tA default value of 3 will be applied."<<std::endl;
         m_SkyDivisions=3;
@@ -150,10 +152,10 @@ bool StadicControl::setSkyDivisions(int value){
     }
     return true;
 }
-void StadicControl::setDaylightSavingsTime(bool value){
+void Control::setDaylightSavingsTime(bool value){
     m_DaylightSavingsTime=value;
 }
-bool StadicControl::setDefaultRadianceParameters(){
+bool Control::setDefaultRadianceParameters(){
     std::cerr<<"\t\tab=4"<<std::endl;
     if (!setAB(4)){
         return false;
@@ -209,55 +211,55 @@ bool StadicControl::setDefaultRadianceParameters(){
     return true;
 }
 
-bool StadicControl::setAB(int value){
+bool Control::setAB(int value){
     m_AB=value;
     return true;
 }
-bool StadicControl::setAD(int value){
+bool Control::setAD(int value){
     m_AD=value;
     return true;
 }
-bool StadicControl::setAS(int value){
+bool Control::setAS(int value){
     m_AS=value;
     return true;
 }
-bool StadicControl::setAR(int value){
+bool Control::setAR(int value){
     m_AR=value;
     return true;
 }
-bool StadicControl::setAA(double value){
+bool Control::setAA(double value){
     m_AA=value;
     return true;
 }
-bool StadicControl::setLR(int value){
+bool Control::setLR(int value){
     m_LR=value;
     return true;
 }
-bool StadicControl::setST(double value){
+bool Control::setST(double value){
     m_ST=value;
     return true;
 }
-bool StadicControl::setSJ(double value){
+bool Control::setSJ(double value){
     m_SJ=value;
     return true;
 }
-bool StadicControl::setLW(double value){
+bool Control::setLW(double value){
     m_LW=value;
     return true;
 }
-bool StadicControl::setDJ(double value){
+bool Control::setDJ(double value){
     m_DJ=value;
     return true;
 }
-bool StadicControl::setDS(double value){
+bool Control::setDS(double value){
     m_DS=value;
     return true;
 }
-bool StadicControl::setDR(int value){
+bool Control::setDR(int value){
     m_DR=value;
     return true;
 }
-bool StadicControl::setDP(double value){
+bool Control::setDP(double value){
     m_DP=value;
     return true;
 }
@@ -266,7 +268,7 @@ bool StadicControl::setDP(double value){
 //******************
 //Metrics
 //******************
-bool StadicControl::setDA(bool run, double illum){
+bool Control::setDA(bool run, double illum){
     m_DA=run;
     if (illum>0){
         m_DAIllum=illum;
@@ -276,7 +278,7 @@ bool StadicControl::setDA(bool run, double illum){
     }
     return true;
 }
-bool StadicControl::setcDA(bool run, double illum){
+bool Control::setcDA(bool run, double illum){
     m_cDA=run;
     if (illum>0){
         m_cDAIllum=illum;
@@ -286,7 +288,7 @@ bool StadicControl::setcDA(bool run, double illum){
     }
     return true;
 }
-bool StadicControl::setsDA(bool run, double illum, double DAFrac, double startTime, double endTime){
+bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, double endTime){
     m_sDA=run;
     if (illum>0){
         m_sDAIllum=illum;
@@ -314,7 +316,7 @@ bool StadicControl::setsDA(bool run, double illum, double DAFrac, double startTi
     }
     return true;
 }
-bool StadicControl::setOccsDA(bool run, double illum, double DAFrac){
+bool Control::setOccsDA(bool run, double illum, double DAFrac){
     m_OccsDA=run;
     if (illum>0){
         m_OccsDAIllum=illum;
@@ -330,10 +332,10 @@ bool StadicControl::setOccsDA(bool run, double illum, double DAFrac){
     }
     return true;
 }
-void StadicControl::setDF(bool run){
+void Control::setDF(bool run){
     m_DF=run;
 }
-bool StadicControl::setUDI(bool run, double minIllum, double maxIllum){
+bool Control::setUDI(bool run, double minIllum, double maxIllum){
     m_UDI=run;
     if (minIllum>=0 && minIllum<maxIllum){
         m_UDIMin=minIllum;
@@ -351,184 +353,184 @@ bool StadicControl::setUDI(bool run, double minIllum, double maxIllum){
 //******************
 //Folder Information
 //******************
-QString StadicControl::projectName(){
+QString Control::projectName(){
     return m_ProjectName;
 }
-QString StadicControl::projectFolder(){
+QString Control::projectFolder(){
     return m_ProjectFolder;
 }
-QString StadicControl::tmpFolder(){
+QString Control::tmpFolder(){
     return m_TmpFolder;
 }
-QString StadicControl::geoFolder(){
+QString Control::geoFolder(){
     return m_GeoFolder;
 }
-QString StadicControl::iesFolder(){
+QString Control::iesFolder(){
     return m_IESFolder;
 }
-QString StadicControl::resultsFolder(){
+QString Control::resultsFolder(){
     return m_ResultsFolder;
 }
-QString StadicControl::dataFolder(){
+QString Control::dataFolder(){
     return m_DataFolder;
 }
 
 //******************
 //Site Information
 //******************
-double StadicControl::groundReflect(){
+double Control::groundReflect(){
     return m_GroundReflect;
 }
-QString StadicControl::weaDataFile(){
+QString Control::weaDataFile(){
     return m_WeaDataFile;
 }
-int StadicControl::firstDay(){
+int Control::firstDay(){
     return m_FirstDay;
 }
 
 //******************
 //Geometry Information
 //******************
-QString StadicControl::matFile(){
+QString Control::matFile(){
     return m_MatFile;
 }
-QString StadicControl::geoFile(){
+QString Control::geoFile(){
     return m_GeoFile;
 }
-double StadicControl::buildingRotation(){
+double Control::buildingRotation(){
     return m_BuildingRotation;
 }
-QString StadicControl::ptsFile(){
+QString Control::ptsFile(){
     return m_PTSFile;
 }
-std::vector<WindowGroup*> StadicControl::windowGroups(){
+std::vector<WindowGroup*> Control::windowGroups(){
     return m_WindowGroups;
 }
-QString StadicControl::importUnits(){
+QString Control::importUnits(){
     return m_ImportUnits;
 }
-QString StadicControl::illumUnits(){
+QString Control::illumUnits(){
     return m_IllumUnits;
 }
-QString StadicControl::displayUnits(){
+QString Control::displayUnits(){
     return m_DisplayUnits;
 }
-QString StadicControl::occSchedule(){
+QString Control::occSchedule(){
     return m_OccSchedule;
 }
-double StadicControl::targetIlluminance(){
+double Control::targetIlluminance(){
     return m_TargetIlluminance;
 }
 
 //******************
 //Simulation Settings
 //******************
-int StadicControl::sunDivisions(){
+int Control::sunDivisions(){
     return m_SunDivisions;
 }
-int StadicControl::skyDivisions(){
+int Control::skyDivisions(){
     return m_SkyDivisions;
 }
 
-bool StadicControl::daylightSavingsTime(){
+bool Control::daylightSavingsTime(){
     return m_DaylightSavingsTime;
 }
-int StadicControl::ab(){
+int Control::ab(){
     return m_AB;
 }
-int StadicControl::ad(){
+int Control::ad(){
     return m_AD;
 }
-int StadicControl::as(){
+int Control::as(){
     return m_AS;
 }
-int StadicControl::ar(){
+int Control::ar(){
     return m_AR;
 }
-double StadicControl::aa(){
+double Control::aa(){
     return m_AA;
 }
-int StadicControl::lr(){
+int Control::lr(){
     return m_LR;
 }
-double StadicControl::st(){
+double Control::st(){
     return m_ST;
 }
-double StadicControl::sj(){
+double Control::sj(){
     return m_SJ;
 }
-double StadicControl::lw(){
+double Control::lw(){
     return m_LW;
 }
-double StadicControl::dj(){
+double Control::dj(){
     return m_DJ;
 }
-double StadicControl::ds(){
+double Control::ds(){
     return m_DS;
 }
-int StadicControl::dr(){
+int Control::dr(){
     return m_DR;
 }
-double StadicControl::dp(){
+double Control::dp(){
     return m_DP;
 }
 
 //******************
 //Lighting Control
 //******************
-std::vector<ControlZone*> StadicControl::controlZones(){
+std::vector<ControlZone*> Control::controlZones(){
     return m_ControlZones;
 }
 
 //******************
 //Metrics
 //******************
-bool StadicControl::runDA(){
+bool Control::runDA(){
     return m_DA;
 }
-double StadicControl::DAIllum(){
+double Control::DAIllum(){
     return m_DAIllum;
 }
-bool StadicControl::runsDA(){
+bool Control::runsDA(){
     return m_sDA;
 }
-double StadicControl::sDAIllum(){
+double Control::sDAIllum(){
     return m_sDAIllum;
 }
-double StadicControl::sDAFrac(){
+double Control::sDAFrac(){
     return m_sDAFrac;
 }
-double StadicControl::sDAStart(){
+double Control::sDAStart(){
     return m_sDAStart;
 }
-double StadicControl::sDAEnd(){
+double Control::sDAEnd(){
     return m_sDAEnd;
 }
-bool StadicControl::runOccsDA(){
+bool Control::runOccsDA(){
     return m_OccsDA;
 }
-double StadicControl::occsDAIllum(){
+double Control::occsDAIllum(){
     return m_OccsDAIllum;
 }
-double StadicControl::occsDAFrac(){
+double Control::occsDAFrac(){
     return m_OccsDAFrac;
 }
-bool StadicControl::runcDA(){
+bool Control::runcDA(){
     return m_cDA;
 }
-double StadicControl::cDAIllum(){
+double Control::cDAIllum(){
     return m_cDAIllum;
 }
-bool StadicControl::runDF(){
+bool Control::runDF(){
     return m_DF;
 }
-bool StadicControl::runUDI(){
+bool Control::runUDI(){
     return m_UDI;
 }
-double StadicControl::UDIMin(){
+double Control::UDIMin(){
     return m_UDIMin;
 }
-double StadicControl::UDIMax(){
+double Control::UDIMax(){
     return m_UDIMax;
 }
 
@@ -536,7 +538,7 @@ double StadicControl::UDIMax(){
 //******************
 //PARSER
 //******************
-bool StadicControl::parseJson(QString file){
+bool Control::parseJson(QString file){
     QString data;
     QFile iFile;
     iFile.setFileName(file);
@@ -1370,4 +1372,6 @@ bool StadicControl::parseJson(QString file){
 
 
     return true;
+}
+
 }

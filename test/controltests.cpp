@@ -4,7 +4,7 @@
 
 TEST(ControlTests, ReadJson)
 {
-  StadicControl controlFile;
+  stadic::Control controlFile;
   ASSERT_TRUE(controlFile.parseJson(":/resources/TestSControl.json"));
   EXPECT_EQ("prj1",controlFile.projectName());
   EXPECT_EQ("c:/example/", controlFile.projectFolder());

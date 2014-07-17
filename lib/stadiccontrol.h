@@ -7,11 +7,13 @@
 #include "windowgroup.h"
 #include "controlzone.h"
 
-class StadicControl : public QObject
+namespace stadic {
+
+class Control : public QObject
 {
     Q_OBJECT
 public:
-    explicit StadicControl(QObject *parent = 0);
+    explicit Control(QObject *parent = 0);
     bool parseJson(QString file);
 
     //Setters
@@ -241,5 +243,7 @@ signals:
 public slots:
     
 };
+
+}
 
 #endif // STADICCONTROL_H
