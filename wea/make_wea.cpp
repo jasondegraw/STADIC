@@ -6,10 +6,10 @@ int main (int argc, char *argv[]){
     QString resultsFile=argv[2];
     stadic::WeatherData wea;
     if (!wea.parseWeather(fileName)){
-        EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
     if (!wea.writeWea(resultsFile)){
-        EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
-    EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
