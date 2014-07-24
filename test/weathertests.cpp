@@ -13,8 +13,8 @@ TEST(WeatherTests, ReadEpw)
   EXPECT_EQ("126.0", data.elevation().toStdString());
   ASSERT_EQ(8760,data.month().size());
   // Spot check of data
-  //EXPECT_EQ("",data.month()[710].toStdString());
-  //EXPECT_EQ("",data.day()[710].toStdString());
+  EXPECT_EQ(1,data.month()[710]);
+  EXPECT_EQ(30,data.day()[710]);
   EXPECT_EQ(14.5,data.hour()[710]);
   EXPECT_EQ("0",data.directNormal()[710].toStdString());
   EXPECT_EQ("67",data.directHorizontal()[710].toStdString());
