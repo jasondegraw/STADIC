@@ -1,5 +1,7 @@
 #include "radgeometry.h"
 
+std::array<QString,50> RadGeometry::s_typeStrings = {"Source", "Sphere", "Bubble", "Polygon", "Cone", "Cup", "Cylinder", "Tube", "Ring", "Instance", "Mesh", "Light", "Illum", "Glow", "Spotlight", "Mirror", "Prism1", "Prism2", "Plastic", "Metal", "Trans", "Plastic2", "Metal2", "Trans2", "Mist", "Dielectric", "Interface", "Glass", "Plasfunc", "Metfunc", "Transfunc", "BRTDfunc", "Plasdata", "Metdata", "Transdata", "BSDF", "Antimatter", "Texfunc", "Texdata", "Colorfunc", "Brightfunc", "Colordata", "Brightdata", "Colorpict", "Colortext", "Brighttext", "Mixfunc", "Mixdata", "Mixpict", "Mixtext"};
+
 RadGeometry::RadGeometry(QObject *parent) :
     QObject(parent)
 {

@@ -2,11 +2,18 @@
 #define RADGEOMETRY_H
 
 #include <QObject>
+#include<array>
 
 class RadGeometry : public QObject
 {
     Q_OBJECT
 public:
+    enum Type {Source, Sphere, Bubble, Polygon, Cone, Cup, Cylinder, Tube, Ring, Instance,
+               Mesh, Light, Illum, Glow, Spotlight, Mirror, Prism1, Prism2, Plastic, Metal,
+               Trans, Plastic2, Metal2, Trans2, Mist, Dielectric, Interface, Glass, Plasfunc,
+               Metfunc, Transfunc, BRTDfunc, Plasdata, Metdata, Transdata, BSDF, Antimatter,
+               Texfunc, Texdata, Colorfunc, Brightfunc, Colordata, Brightdata, Colorpict, Colortext,
+               Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext};
     explicit RadGeometry(QObject *parent = 0);
 
     //Setters
@@ -27,6 +34,9 @@ public:
 
 
 private:
+    static std::array<QString,50> s_typeStrings;
+    static Type typeFromString(QString string);
+
     QString m_Modifier;
     QString m_Type;
     QString m_Name;
