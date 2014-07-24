@@ -50,6 +50,8 @@ public:
     bool parseRad(QString file);
     bool makeGrid();
     bool writePTS(QString file);
+    bool writePTScsv(QString file);
+    bool writeRadPoly(QString file);
 
 private:
     //Points

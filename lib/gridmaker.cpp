@@ -326,3 +326,37 @@ bool GridMaker::writePTS(QString file){
     oFile.close();
     return true;
 }
+
+bool GridMaker::writePTScsv(QString file){
+    QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    for (int i=0;i<m_TestPoints.size();i++){
+        out<<m_TestPoints.at(i).rx()<<","<<m_TestPoints.at(i).ry()<<","<<m_ZHeight<<",0,0,1"<<endl;
+    }
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::writeRadPoly(QString file){
+ QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    out<<"floor\tpolygon\tfloor1"<<endl;
+    out<<"0\t0\t"<<m_UnitedPolygon.size()*3;
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        out<<endl<<m_UnitedPolygon.at(i).x()<<"\t"<<m_UnitedPolygon.at(i).y()<<"\t0";
+    }
+    oFile.close();
+    return true;
+
+
+}
