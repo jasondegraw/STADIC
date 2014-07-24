@@ -10,7 +10,8 @@ MakeWea::MakeWea(QObject *parent) :
 }
 
 //Setters
-void MakeWea::setMonth(QString month){
+/*
+void MakeWea::setMonth(int month){
     m_Month.push_back(month);
 }
 void MakeWea::setDay(QString day){
@@ -35,6 +36,7 @@ bool MakeWea::setDH(QString dh){
     m_DirectHorizontal.push_back(dh);
     return true;
 }
+*/
 void MakeWea::setPlace(QString place){
     m_Place=place;
 }
@@ -52,13 +54,13 @@ void MakeWea::setElevation(QString elev){
 }
 
 //Getters
-std::vector<QString> MakeWea::month() const {
+std::vector<int> MakeWea::month() const {
     return m_Month;
 }
-std::vector<QString> MakeWea::day() const {
+std::vector<int> MakeWea::day() const {
     return m_Day;
 }
-std::vector<double> MakeWea::hour()const {
+std::vector<double> MakeWea::hour() const {
     return m_Hour;
 }
 std::vector<QString> MakeWea::directNormal() const {
@@ -136,27 +138,34 @@ bool MakeWea::parseEPW(QString file){
     }
     //This is where the number of periods per hour should be read in.
     vals=data.split(',');
-    int intervals=vals.at(2).toInt();
-    double correction;
-    data=iFile.readLine();
-    vals=data.split(',');
-    setMonth(vals.at(1));
-    setDay(vals.at(2));
-    double tempHour=vals.at(3).toDouble()+vals.at(4).toDouble()/60;
-    correction=tempHour-(intervals/2.0);
-    setHour(tempHour-correction);
-    setDN(vals.at(14));
-    setDH(vals.at(15));
+    int intervals=vals[2].toInt();
+    double delta = 1.0/(double)intervals;
+    int counter=0;
     while (!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
         vals=data.split(',');
-        setMonth(vals.at(1));
-        setDay(vals.at(2));
-        tempHour=vals.at(3).toDouble()+vals.at(4).toDouble()/60;
-        setHour(tempHour-correction);
-        setDN(vals.at(14));
-        setDH(vals.at(15));
+        // For now, assume the date/time is legit
+        int month = vals[1].toInt();
+        int day = vals[2].toInt();
+        double hour=vals[3].toDouble()-1.0+(counter+0.5)*delta;
+        // Probably should check that these conversions go Ok
+        double DN = vals[14].toDouble();
+        double DH = vals[15].toDouble();
+        counter++;
+        if(counter == intervals) {
+          counter = 0;
+        }
+        // Validate before keeping the data
+        if(DN >= 9999 || DH >= 9999) {
+          // Does this need a warning?
+          continue;
+        }
+        m_Month.push_back(month);
+        m_Day.push_back(day);
+        m_Hour.push_back(hour);
+        m_DirectHorizontal.push_back(vals[15]);
+        m_DirectNormal.push_back(vals[14]);
     }
     iFile.close();
     return true;
@@ -180,8 +189,8 @@ bool MakeWea::parseTMY(QString file){
     //Read Date String
     tempString=vals.at(0);
     parseDate=tempString.split('/');
-    setMonth(parseDate.at(0));
-    setDay(parseDate.at(1));
+    m_Month.push_back(parseDate.at(0).toInt());
+    m_Day.push_back(parseDate.at(1).toInt());
     //Read Hour String
     tempString=vals.at(1);
     parseDate.clear();
@@ -189,9 +198,9 @@ bool MakeWea::parseTMY(QString file){
     double tempHour=parseDate.at(0).toDouble()+parseDate.at(1).toDouble()/60;
     //Determine time correction factor
     double correction=tempHour-0.5;
-    setHour(tempHour-correction);
-    setDN(vals.at(7));
-    setDH(vals.at(10));
+    m_Hour.push_back(tempHour-correction);
+    m_DirectNormal.push_back(vals.at(7));
+    m_DirectHorizontal.push_back(vals.at(10));
     while(!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
@@ -199,16 +208,16 @@ bool MakeWea::parseTMY(QString file){
         //Read Date String
         tempString=vals.at(0);
         parseDate=tempString.split('/');
-        setMonth(parseDate.at(0));
-        setDay(parseDate.at(1));
+        m_Month.push_back(parseDate.at(0).toInt());
+        m_Day.push_back(parseDate.at(1).toInt());
         //Read Hour String
         tempString=vals.at(1);
         parseDate.clear();
         parseDate=tempString.split(':');
         double tempHour=parseDate.at(0).toDouble()+parseDate.at(1).toDouble()/60;
-        setHour(tempHour-correction);
-        setDN(vals.at(7));
-        setDH(vals.at(10));
+        m_Hour.push_back(tempHour-correction);
+        m_DirectNormal.push_back(vals.at(7));
+        m_DirectHorizontal.push_back(vals.at(10));
     }
 
     iFile.close();
