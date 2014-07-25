@@ -3,11 +3,13 @@
 
 #include <QObject>
 
-class RadGeometry : public QObject
+namespace stadic {
+
+class RadPrimitive : public QObject
 {
     Q_OBJECT
 public:
-    explicit RadGeometry(QObject *parent = 0);
+    explicit RadPrimitive(QObject *parent = 0);
 
     //Setters
     void setModifier(QString modifier);
@@ -44,5 +46,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // RADGEOMETRY_H

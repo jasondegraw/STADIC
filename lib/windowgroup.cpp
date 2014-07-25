@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 
+namespace stadic {
+
 WindowGroup::WindowGroup(QObject *parent) :
     QObject(parent)
 {
@@ -184,3 +186,4 @@ bool WindowGroup::parseJson(const QJsonObject &object){
     return true;
 }
 
+}

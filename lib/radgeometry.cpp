@@ -1,6 +1,8 @@
 #include "radgeometry.h"
 
-RadGeometry::RadGeometry(QObject *parent) :
+namespace stadic {
+
+RadPrimitive::RadPrimitive(QObject *parent) :
     QObject(parent)
 {
     m_Arg1.clear();
@@ -9,21 +11,21 @@ RadGeometry::RadGeometry(QObject *parent) :
 }
 
 //Setters
-void RadGeometry::setModifier(QString modifier){
+void RadPrimitive::setModifier(QString modifier){
     m_Modifier=modifier;
 }
-void RadGeometry::setType(QString type){
+void RadPrimitive::setType(QString type){
     m_Type=type;
 }
-void RadGeometry::setName(QString name){
+void RadPrimitive::setName(QString name){
     m_Name=name;
 }
-bool RadGeometry::setArg1(std::vector<QString> vals){
+bool RadPrimitive::setArg1(std::vector<QString> vals){
     m_Arg1.clear();
     m_Arg1=vals;
     return true;
 }
-bool RadGeometry::setArg1(QString arg, int position) {
+bool RadPrimitive::setArg1(QString arg, int position) {
     if(position<m_Arg1.size()) {
         if(!validateArg(1,arg,position)) {
             return false;
@@ -33,12 +35,12 @@ bool RadGeometry::setArg1(QString arg, int position) {
     }
     return false;
 }
-bool RadGeometry::setArg2(std::vector<QString> vals){
+bool RadPrimitive::setArg2(std::vector<QString> vals){
     m_Arg2.clear();
     m_Arg2=vals;
     return true;
 }
-bool RadGeometry::setArg2(QString arg, int position) {
+bool RadPrimitive::setArg2(QString arg, int position) {
     if(position<m_Arg2.size()) {
         if(!validateArg(2,arg,position)) {
             return false;
@@ -48,12 +50,12 @@ bool RadGeometry::setArg2(QString arg, int position) {
     }
     return false;
 }
-bool RadGeometry::setArg3(std::vector<QString> vals){
+bool RadPrimitive::setArg3(std::vector<QString> vals){
     m_Arg3.clear();
     m_Arg3=vals;
     return true;
 }
-bool RadGeometry::setArg3(QString arg, int position) {
+bool RadPrimitive::setArg3(QString arg, int position) {
     if(position<m_Arg3.size()) {
         if(!validateArg(3,arg,position)) {
             return false;
@@ -65,22 +67,23 @@ bool RadGeometry::setArg3(QString arg, int position) {
 }
 
 //Getters
-QString RadGeometry::modifier(){
+QString RadPrimitive::modifier(){
     return m_Modifier;
 }
-QString RadGeometry::type(){
+QString RadPrimitive::type(){
     return m_Type;
 }
-QString RadGeometry::name(){
+QString RadPrimitive::name(){
     return m_Name;
 }
-std::vector<QString> RadGeometry::arg1(){
+std::vector<QString> RadPrimitive::arg1(){
     return m_Arg1;
 }
-std::vector<QString> RadGeometry::arg2(){
+std::vector<QString> RadPrimitive::arg2(){
     return m_Arg2;
 }
-std::vector<QString> RadGeometry::arg3(){
+std::vector<QString> RadPrimitive::arg3(){
     return m_Arg3;
 }
 
+}

@@ -5,6 +5,8 @@
 #include <vector>
 #include "shadecontrol.h"
 
+namespace stadic {
+
 class WindowGroup : public QObject
 {
     Q_OBJECT
@@ -40,5 +42,7 @@ signals:
 public slots:
     
 };
+
+}
 
 #endif // WINDOWGROUPS_H
