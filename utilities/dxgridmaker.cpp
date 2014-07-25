@@ -7,6 +7,10 @@ int main (int argc, char *argv[]){
     fileName.clear();
     QString resultFile;
     resultFile.clear();
+    QString csvFile;
+    csvFile.clear();
+    QString polyFile;
+    polyFile.clear();
     std::vector<QString> layerNames;
     double Sx, Sy, Ox, Oy, Z;
     Sx=0;
@@ -39,6 +43,12 @@ int main (int argc, char *argv[]){
         }else if(QString(argv[i])=="-l"){
             i++;
             layerNames.push_back(QString(argv[i]));
+        }else if(QString(argv[i])=="-p"){
+            i++;
+            polyFile=argv[i];
+        }else if(QString(argv[i])=="-csv"){
+            i++;
+            csvFile=argv[i];
         }else{
             QString temp=argv[i];
             WARNING("The argument "+temp+" is an unkown argument.");
@@ -70,13 +80,24 @@ int main (int argc, char *argv[]){
         ERROR("The parsing of the rad file failed.");
         return EXIT_FAILURE;
     }
-    if (!grid.makeGrid()){
-        ERROR("The creation of the grid failed.");
-        return EXIT_FAILURE;
+    if (!grid.makeGrid(fileName)){
+        ERROR(QString("The creation of the grid failed."));
+        EXIT_FAILURE;
     }
     if (!grid.writePTS(resultFile)){
         ERROR("The writing of the points file failed.");
         return EXIT_FAILURE;
     }
-    return EXIT_SUCCESS;
+    if (!polyFile.isEmpty()){
+        if (!grid.writeRadPoly(polyFile)){
+            EXIT_FAILURE;
+        }
+    }
+    if (!csvFile.isEmpty()){
+        if (!grid.writePTScsv(csvFile)){
+            EXIT_FAILURE;
+        }
+    }
+
+    EXIT_SUCCESS;
 }
