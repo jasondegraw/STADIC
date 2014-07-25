@@ -100,9 +100,11 @@ bool RadFileData::addRad(QString file){
                     }
                     m_RadGeo.push_back(rad);
                 }else{                          //If it isn't a polygon, the info still needs to be read in
-                    WARNING("The rad file contains a modifer that is not \"null\", but is not a polygon.\nThis piece of input will be ignored.");
                     data>>string;   //reads name
-                    data>>string;   //Reads number of arguments from first line
+                    data>>string2;   //Reads number of arguments from first line
+                    if (!string.isEmpty()){
+                        WARNING("The rad file contains a modifer that is not \"null\", but is not a polygon.\nThis piece of input will be ignored for the polygon named \"" + string +"\".");
+                    }
                     if (string.toInt()>0){
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;

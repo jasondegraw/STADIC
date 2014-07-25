@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>resources/TestSControl.json</file>
         <file>resources/USA_PA_Lancaster.AP.725116_TMY3.epw</file>
+        <file>resources/material.rad</file>
+        <file>resources/Simple.rad</file>
     </qresource>
 </RCC>
