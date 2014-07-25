@@ -35,24 +35,30 @@ bool ParseRad::addRad(QString file){
                 rad->setName(string);
                 data>>string;   //Reads number of arguments from first line
                 if (string.toInt()>0){
+                    std::vector<QString> args;
                     for (int i=0;i<string.toInt();i++){
                         data>>string2;
-                        rad->setArg1(string2);
+                        args.push_back(string2);
                     }
+                    rad->setArg1(args);
                 }
                 data>>string;   //Reads number of arguments from second line
                 if (string.toInt()>0){
+                    std::vector<QString> args;
                     for (int i=0;i<string.toInt();i++){
                         data>>string2;
-                        rad->setArg2(string2);
+                        args.push_back(string2);
                     }
+                    rad->setArg2(args);
                 }
                 data>>string;   //Reads number of arguments from third line
                 if (string.toInt()>0){
+                    std::vector<QString> args;
                     for (int i=0;i<string.toInt();i++){
                         data>>string2;
-                        rad->setArg3(string2);
+                        args.push_back(string2);
                     }
+                    rad->setArg3(args);
                 }
                 m_RadMat.push_back(rad);
             }else{
@@ -65,24 +71,30 @@ bool ParseRad::addRad(QString file){
                     rad->setName(string);
                     data>>string;               //Read number of arguments from first line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg1(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg1(args);
                     }
                     data>>string;               //Read number of arguments from second line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg2(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg1(args);
                     }
                     data>>string;               //Read number of arguments from third line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg3(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg3(args);
                     }
                     m_RadGeo.push_back(rad);
                 }else{                          //If it isn't a polygon, the info still needs to be read in
@@ -175,7 +187,7 @@ bool ParseRad::removeLayer(QString layer, QString outFile){
             out<<endl<<endl;
         }
     }
-
+    //Remove material and geometry from respective vectors
 
 
     oFile.close();
@@ -185,4 +197,13 @@ bool ParseRad::blackOutLayer(QString layer){
 }
 bool ParseRad::writeRadFile(QString file){
 
+}
+
+
+//Getters
+std::vector<RadGeometry *> ParseRad::geometry(){
+    return m_RadGeo;
+}
+std::vector<RadGeometry *> ParseRad::materials(){
+    return m_RadMat;
 }

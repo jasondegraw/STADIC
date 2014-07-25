@@ -80,7 +80,7 @@ int main (int argc, char *argv[]){
         ERROR(QString("The parsing of the rad file failed."));
         EXIT_FAILURE;
     }
-    if (!grid.makeGrid()){
+    if (!grid.makeGrid(fileName)){
         ERROR(QString("The creation of the grid failed."));
         EXIT_FAILURE;
     }

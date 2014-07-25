@@ -31,7 +31,3 @@ set(HDRS stadiccontrol.h
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 
 target_link_libraries(stadic_core Qt5::Widgets)
-
-add_executable(grid_maker grid_maker.cpp)
-
-target_link_libraries(grid_maker stadic_core)

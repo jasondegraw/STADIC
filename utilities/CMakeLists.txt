@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-project(wea)
+project(utilities)
 
 enable_testing(true)
 
 include_directories(../lib)
 
-add_executable(make_wea make_wea.cpp)
+add_executable(dxmakewea dxmakewea.cpp)
 
-target_link_libraries(make_wea stadic_core)
+target_link_libraries(dxmakewea stadic_core)
+
+add_executable(dxgridmaker dxgridmaker.cpp)
+
+target_link_libraries(dxgridmaker stadic_core)

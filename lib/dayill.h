@@ -4,30 +4,43 @@
 #include <QObject>
 #include <QVector>
 
-class DayIll : public QObject
+class TemporalIlluminance
 {
-    Q_OBJECT
 public:
-    explicit DayIll(QObject *parent = 0);
-    bool parseIll(QString fileName);
-
-    //Setters
-    void setIlluminance(double value);
-    bool setMonth(QString month);
-    bool setDay(QString day);
-    bool setHour(QString hour);
+    TemporalIlluminance();
+    TemporalIlluminance(int month, int day, double hour, const std::vector<double> &illuminance);
 
     //Getters
     std::vector<double> illuminance();
-    std::vector<QString> month();
-    std::vector<QString> day();
-    std::vector<QString> hour();
+    int month();
+    int day();
+    double hour();
 
 private:
     std::vector<double> m_Illuminance;
-    std::vector<QString> m_Month;
-    std::vector<QString> m_Day;
-    std::vector<QString> m_Hour;
+    int m_Month;
+    int m_Day;
+    double m_Hour;
+};
+
+
+class DaylightIlluminanceData : public QObject
+{
+    Q_OBJECT
+public:
+    explicit DaylightIlluminanceData(QObject *parent = 0);
+    bool parse(QString fileName);
+
+    //Setters
+    //void setIlluminance(double value);
+
+    //Getters
+    std::vector<TemporalIlluminance> illuminance();
+
+    //int hoursGreaterThan(double value, int point);
+
+private:
+    std::vector<TemporalIlluminance> m_data;
 
 signals:
 

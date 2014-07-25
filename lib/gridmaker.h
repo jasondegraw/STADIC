@@ -48,7 +48,7 @@ public:
 
     //Utilities
     bool parseRad(QString file);
-    bool makeGrid();
+    bool makeGrid(QString file);
     bool writePTS(QString file);
     bool writePTScsv(QString file);
     bool writeRadPoly(QString file);
