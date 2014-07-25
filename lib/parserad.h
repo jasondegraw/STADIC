@@ -7,11 +7,11 @@
 
 namespace stadic {
 
-class ParseRad : public QObject
+class RadFileData : public QObject
 {
     Q_OBJECT
 public:
-    explicit ParseRad(QObject *parent = 0);
+    explicit RadFileData(QObject *parent = 0);
 
     bool addRad(QString file); 
     bool removeLayer(QString layer, QString outFile);                     //Function to remove a layer from the list to its own geometry file

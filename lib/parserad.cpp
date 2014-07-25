@@ -5,12 +5,12 @@
 
 namespace stadic {
 
-ParseRad::ParseRad(QObject *parent) :
+RadFileData::RadFileData(QObject *parent) :
     QObject(parent)
 {
 }
 //Setters
-bool ParseRad::addRad(QString file){
+bool RadFileData::addRad(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -126,7 +126,7 @@ bool ParseRad::addRad(QString file){
     }
     iFile.close();
 }
-bool ParseRad::removeLayer(QString layer, QString outFile){
+bool RadFileData::removeLayer(QString layer, QString outFile){
     QFile oFile;
     oFile.setFileName(outFile);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -194,19 +194,19 @@ bool ParseRad::removeLayer(QString layer, QString outFile){
 
     oFile.close();
 }
-bool ParseRad::blackOutLayer(QString layer){
+bool RadFileData::blackOutLayer(QString layer){
 
 }
-bool ParseRad::writeRadFile(QString file){
+bool RadFileData::writeRadFile(QString file){
 
 }
 
 
 //Getters
-std::vector<RadGeometry *> ParseRad::geometry(){
+std::vector<RadGeometry *> RadFileData::geometry(){
     return m_RadGeo;
 }
-std::vector<RadGeometry *> ParseRad::materials(){
+std::vector<RadGeometry *> RadFileData::materials(){
     return m_RadMat;
 }
 
