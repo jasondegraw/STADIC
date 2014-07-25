@@ -8,7 +8,7 @@ daylight::daylight(QObject *parent) :
 }
 
 bool daylight::simDaylight(QString fileName){
-    StadicControl model;
+    stadic::Control model;
     if (!model.parseJson(fileName)){
         return false;
     }

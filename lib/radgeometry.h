@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+namespace stadic {
+
 class RadGeometry : public QObject
 {
     Q_OBJECT
@@ -44,5 +46,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // RADGEOMETRY_H

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVector>
 
+namespace stadic {
+
 class ElecIll : public QObject
 {
     Q_OBJECT
@@ -34,5 +36,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // ELECILL_H

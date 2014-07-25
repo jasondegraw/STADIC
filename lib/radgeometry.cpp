@@ -1,5 +1,7 @@
 #include "radgeometry.h"
 
+namespace stadic {
+
 RadGeometry::RadGeometry(QObject *parent) :
     QObject(parent)
 {
@@ -84,3 +86,4 @@ std::vector<QString> RadGeometry::arg3(){
     return m_Arg3;
 }
 
+}

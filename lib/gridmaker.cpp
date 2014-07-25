@@ -97,7 +97,7 @@ double GridMaker::maxY(){
 
 //Utilities
 bool GridMaker::parseRad(QString file){
-    ParseRad radGeo;
+    stadic::ParseRad radGeo;
     radGeo.addRad(file);
     //set polygons
     if (radGeo.geometry().empty()){
@@ -230,7 +230,7 @@ bool GridMaker::parseRad(QString file){
 }
 
 bool GridMaker::makeGrid(QString file){
-    ParseRad radGeo;
+    stadic::ParseRad radGeo;
     radGeo.addRad(file);
     //unite polygons that are the right layer name
     bool firstPolygon=true;

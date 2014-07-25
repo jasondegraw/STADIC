@@ -3,6 +3,8 @@
 #include <QTextStream>
 #include "logging.h"
 
+namespace stadic {
+
 ParseRad::ParseRad(QObject *parent) :
     QObject(parent)
 {
@@ -206,4 +208,6 @@ std::vector<RadGeometry *> ParseRad::geometry(){
 }
 std::vector<RadGeometry *> ParseRad::materials(){
     return m_RadMat;
+}
+
 }

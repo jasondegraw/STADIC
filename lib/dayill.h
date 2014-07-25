@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVector>
 
+namespace stadic {
+
 class TemporalIlluminance
 {
 public:
@@ -47,5 +49,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // DAYILL_H

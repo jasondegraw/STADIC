@@ -3,6 +3,8 @@
 #include <QStringList>
 #include "logging.h"
 
+namespace stadic {
+
 ElecIll::ElecIll(QObject *parent) :
     QObject(parent)
 {
@@ -56,4 +58,6 @@ bool ElecIll::parseIll(QString fileName){
         setIlluminance(vals.at(3).toDouble());
     }
     iFile.close();
+}
+
 }

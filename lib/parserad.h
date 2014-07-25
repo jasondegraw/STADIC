@@ -5,6 +5,8 @@
 #include "radgeometry.h"
 #include <vector>
 
+namespace stadic {
+
 class ParseRad : public QObject
 {
     Q_OBJECT
@@ -29,5 +31,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // PARSERAD_H

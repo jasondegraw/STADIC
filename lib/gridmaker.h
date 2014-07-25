@@ -63,7 +63,7 @@ private:
 
     //InputData
     std::vector<QString> m_LayerNames;
-    std::vector<RadGeometry *> m_RadGeo;
+    std::vector<stadic::RadGeometry *> m_RadGeo;
     double m_SpaceX;
     double m_SpaceY;
     double m_OffsetX;
