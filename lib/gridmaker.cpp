@@ -1,5 +1,5 @@
 #include "gridmaker.h"
-#include "radgeometry.h"
+#include "radprimitive.h"
 //#include "logging.h"
 #include <QFile>
 #include <QTextStream>

@@ -1,5 +1,5 @@
-#ifndef RADGEOMETRY_H
-#define RADGEOMETRY_H
+#ifndef RADPRIMITIVE_H
+#define RADPRIMITIVE_H
 
 #include <QObject>
 #include <QFile>
@@ -96,4 +96,4 @@ private:
 
 }
 
-#endif // RADGEOMETRY_H
+#endif // RADPRIMITIVE_H

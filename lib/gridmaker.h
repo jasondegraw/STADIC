@@ -5,7 +5,7 @@
 #include <QPointF>
 #include <QPolygonF>
 #include <vector>
-#include "radgeometry.h"
+#include "radprimitive.h"
 
 namespace stadic {
 

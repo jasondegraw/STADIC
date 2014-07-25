@@ -2,7 +2,7 @@
 #define PARSERAD_H
 
 #include <QObject>
-#include "radgeometry.h"
+#include "radprimitive.h"
 #include <vector>
 
 namespace stadic {
