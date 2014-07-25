@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QString>
 #include <QLineF>
+#include <parserad.h>
 
 GridMaker::GridMaker(QObject *parent) :
     QObject(parent)
@@ -96,6 +97,21 @@ double GridMaker::maxY(){
 
 //Utilities
 bool GridMaker::parseRad(QString file){
+    ParseRad radGeo;
+    radGeo.addRad(file);
+    //set polygons
+    if (radGeo.geometry().empty()){
+        std::cerr<<"There are no polygons."<<std::endl;
+        return false;
+    }
+    for (int i=0;i<radGeo.geometry().size();i++){
+        QPolygonF tempPolygon;
+        for (int j=0;j<radGeo.geometry().at(i)->arg3().size()/3;j++){
+            tempPolygon.append(QPointF(radGeo.geometry().at(i)->arg3()[j*3].toDouble(), radGeo.geometry().at(i)->arg3()[j*3+1].toDouble()));
+        }
+        m_Polygons.push_back(tempPolygon);
+    }
+    /*
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -145,24 +161,30 @@ bool GridMaker::parseRad(QString file){
                     rad->setName(string);
                     data>>string;               //Read number of arguments from first line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg1(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg1(args);
                     }
                     data>>string;               //Read number of arguments from second line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg2(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg2(args);
                     }
                     data>>string;               //Read number of arguments from third line
                     if (string.toInt()>0){
+                        std::vector<QString> args;
                         for (int i=0;i<string.toInt();i++){
                             data>>string2;
-                            rad->setArg3(string2);
+                            args.push_back(string2);
                         }
+                        rad->setArg3(args);
                     }
                     m_RadGeo.push_back(rad);
                 }else{                          //If it isn't a polygon, the info still needs to be read in
@@ -190,6 +212,7 @@ bool GridMaker::parseRad(QString file){
         }
     }
     iFile.close();
+
     //set polygons
     if (m_RadGeo.empty()){
         std::cerr<<"There are no polygons."<<std::endl;
@@ -202,17 +225,19 @@ bool GridMaker::parseRad(QString file){
         }
         m_Polygons.push_back(tempPolygon);
     }
-
+    */
     return true;
 }
 
-bool GridMaker::makeGrid(){
+bool GridMaker::makeGrid(QString file){
+    ParseRad radGeo;
+    radGeo.addRad(file);
     //unite polygons that are the right layer name
     bool firstPolygon=true;
-    for (int i=0;i<m_RadGeo.size();i++){
+    for (int i=0;i<radGeo.geometry().size();i++){
         bool properName=false;
         for (int j=0;j<m_LayerNames.size();j++){
-            if (m_RadGeo.at(i)->modifier()==m_LayerNames.at(j)){
+            if (radGeo.geometry().at(i)->modifier()==m_LayerNames.at(j)){
                 properName=true;
             }
         }
@@ -325,4 +350,38 @@ bool GridMaker::writePTS(QString file){
     }
     oFile.close();
     return true;
+}
+
+bool GridMaker::writePTScsv(QString file){
+    QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    for (int i=0;i<m_TestPoints.size();i++){
+        out<<m_TestPoints.at(i).rx()<<","<<m_TestPoints.at(i).ry()<<","<<m_ZHeight<<",0,0,1"<<endl;
+    }
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::writeRadPoly(QString file){
+ QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    out<<"floor\tpolygon\tfloor1"<<endl;
+    out<<"0\t0\t"<<m_UnitedPolygon.size()*3;
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        out<<endl<<m_UnitedPolygon.at(i).x()<<"\t"<<m_UnitedPolygon.at(i).y()<<"\t0";
+    }
+    oFile.close();
+    return true;
+
+
 }

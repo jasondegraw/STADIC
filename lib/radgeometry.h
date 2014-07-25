@@ -21,9 +21,12 @@ public:
     void setModifier(QString modifier);
     void setType(QString type);
     void setName(QString name);
-    void setArg1(QString arg);
-    void setArg2(QString arg);
-    void setArg3(QString arg);
+    bool setArg1(std::vector<QString> vals);
+    bool setArg1(QString arg, int position);
+    bool setArg2(std::vector<QString> vals);
+    bool setArg2(QString arg, int position);
+    bool setArg3(std::vector<QString> vals);
+    bool setArg3(QString arg, int position);
 
     virtual bool setArg(int number, QString value, int position);
 
