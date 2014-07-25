@@ -19,12 +19,12 @@ public:
     bool writeRadFile(QString file);
 
     //Getters
-    std::vector<RadGeometry *> geometry();
-    std::vector<RadGeometry *> materials();
+    std::vector<RadPrimitive *> geometry();
+    std::vector<RadPrimitive *> materials();
 
 private:
-    std::vector<RadGeometry *> m_RadGeo;                //Vector to hold the radiance polygons
-    std::vector<RadGeometry *> m_RadMat;                //Vector to hold the radiance materials
+    std::vector<RadPrimitive *> m_RadGeo;                //Vector to hold the radiance polygons
+    std::vector<RadPrimitive *> m_RadMat;                //Vector to hold the radiance materials
 
 signals:
 

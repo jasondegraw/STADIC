@@ -29,7 +29,7 @@ bool RadFileData::addRad(QString file){
             tempString=data.readLine();
         }else{
             if (string.contains("void")){
-                RadGeometry *rad=new RadGeometry(this);
+                RadPrimitive *rad=new RadPrimitive(this);
                 rad->setModifier("void");
                 data>>string;   //reads type
                 rad->setType(string);
@@ -66,7 +66,7 @@ bool RadFileData::addRad(QString file){
             }else{
                 data>>string2;
                 if (string2=="polygon"){
-                    RadGeometry *rad=new RadGeometry(this);
+                    RadPrimitive *rad=new RadPrimitive(this);
                     rad->setModifier(string);
                     rad->setType(string2);
                     data>>string;
@@ -203,10 +203,10 @@ bool RadFileData::writeRadFile(QString file){
 
 
 //Getters
-std::vector<RadGeometry *> RadFileData::geometry(){
+std::vector<RadPrimitive *> RadFileData::geometry(){
     return m_RadGeo;
 }
-std::vector<RadGeometry *> RadFileData::materials(){
+std::vector<RadPrimitive *> RadFileData::materials(){
     return m_RadMat;
 }
 
