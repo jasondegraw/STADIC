@@ -7,6 +7,8 @@
 #include <vector>
 #include "radgeometry.h"
 
+namespace stadic {
+
 class GridMaker : public QObject
 {
     Q_OBJECT
@@ -63,7 +65,7 @@ private:
 
     //InputData
     std::vector<QString> m_LayerNames;
-    std::vector<RadGeometry *> m_RadGeo;
+    std::vector<RadPrimitive *> m_RadGeo;
     double m_SpaceX;
     double m_SpaceY;
     double m_OffsetX;
@@ -84,5 +86,7 @@ signals:
 public slots:
 
 };
+
+}
 
 #endif // GRIDMAKER_H

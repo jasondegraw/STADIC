@@ -4,6 +4,8 @@
 #include <QJsonArray>
 #include <iostream>
 
+namespace stadic {
+
 ShadeControl::ShadeControl(QObject *parent) :
     QObject(parent)
 {
@@ -297,4 +299,6 @@ bool ShadeControl::parseJson(const QJsonObject &object){
 
 
     return true;
+}
+
 }

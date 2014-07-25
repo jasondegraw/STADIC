@@ -4,6 +4,8 @@
 #include <QObject>
 #include <vector>
 
+namespace stadic {
+
 class ShadeControl : public QObject
 {
     Q_OBJECT
@@ -44,5 +46,7 @@ signals:
 public slots:
     
 };
+
+}
 
 #endif // SHADECONTROL_H

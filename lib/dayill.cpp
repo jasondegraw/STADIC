@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QStringList>
 
+namespace stadic {
+
 TemporalIlluminance::TemporalIlluminance()
 {
     m_Month = 1;
@@ -135,3 +137,5 @@ int DaylightIlluminanceData::hoursGreaterThan(double value,int point)
     return count;
 }
 */
+
+}

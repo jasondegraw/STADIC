@@ -5,7 +5,9 @@
 #include <QFile>
 #include<array>
 
-class RadGeometry : public QObject
+namespace stadic {
+
+class RadPrimitive : public QObject
 {
     Q_OBJECT
 public:
@@ -15,7 +17,7 @@ public:
                Metfunc, Transfunc, BRTDfunc, Plasdata, Metdata, Transdata, BSDF, Antimatter,
                Texfunc, Texdata, Colorfunc, Brightfunc, Colordata, Brightdata, Colorpict, Colortext,
                Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext, Unknown};
-    explicit RadGeometry(QObject *parent = 0);
+    explicit RadPrimitive(QObject *parent = 0);
 
     //Setters
     void setModifier(QString modifier);
@@ -44,7 +46,7 @@ public:
     virtual QString getArg3(int position) const;
     virtual QString getArg(int number, int position) const;
 
-    static RadGeometry *fromRad(QFile file, QObject *parent = 0);
+    static RadPrimitive *fromRad(QFile file, QObject *parent = 0);
 
 protected:
     void initArg(int number, std::vector<QString> arg);
@@ -69,7 +71,7 @@ public slots:
 
 };
 
-class PlasticMaterial : public RadGeometry
+class PlasticMaterial : public RadPrimitive
 {
 public:
     explicit PlasticMaterial(QObject *parent=0);
@@ -91,5 +93,7 @@ private:
    virtual bool validateArg(int number, QString value, int position) const;
    virtual bool validateArg(int number, std::vector<QString> value) const;
 };
+
+}
 
 #endif // RADGEOMETRY_H

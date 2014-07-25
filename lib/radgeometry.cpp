@@ -1,39 +1,43 @@
 #include "radgeometry.h"
 
-std::array<QString,51> RadGeometry::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
-                                                     "cylinder", "tube", "ring", "instance", "mesh", "light",
-                                                     "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
-                                                     "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
-                                                     "mist", "dielectric", "interface", "glass", "plasfunc",
-                                                     "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
-                                                     "transdata", "bsdf", "antimatter", "texfunc", "texdata",
-                                                     "colorfunc", "brightfunc", "colordata", "brightdata",
-                                                     "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
-                                                     "mixpict", "mixtext", "unknown"};
+namespace stadic {
 
-RadGeometry::RadGeometry(QObject *parent) :
+std::array<QString,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
+                                                      "cylinder", "tube", "ring", "instance", "mesh", "light",
+                                                      "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
+                                                      "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
+                                                      "mist", "dielectric", "interface", "glass", "plasfunc",
+                                                      "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
+                                                      "transdata", "bsdf", "antimatter", "texfunc", "texdata",
+                                                      "colorfunc", "brightfunc", "colordata", "brightdata",
+                                                      "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
+                                                      "mixpict", "mixtext", "unknown"};
+
+RadPrimitive::RadPrimitive(QObject *parent) :
     QObject(parent)
 {
 }
 
 //Setters
-void RadGeometry::setModifier(QString modifier){
+void RadPrimitive::setModifier(QString modifier){
     m_Modifier=modifier;
 }
-void RadGeometry::setType(QString type){
+
+void RadPrimitive::setType(QString type){
     m_TypeString=type;
 }
-void RadGeometry::setName(QString name){
+void RadPrimitive::setName(QString name){
     m_Name=name;
 }
-bool RadGeometry::setArg1(std::vector<QString> vals){
+
+bool RadPrimitive::setArg1(std::vector<QString> vals){
     if(validateArg(1,vals)) {
       m_Arg1=vals;
       return true;
     }
     return false;
 }
-bool RadGeometry::setArg1(QString arg, int position) {
+bool RadPrimitive::setArg1(QString arg, int position) {
     if(position<m_Arg1.size()) {
         if(!validateArg(1,arg,position)) {
             return false;
@@ -43,14 +47,14 @@ bool RadGeometry::setArg1(QString arg, int position) {
     }
     return false;
 }
-bool RadGeometry::setArg2(std::vector<QString> vals){
+bool RadPrimitive::setArg2(std::vector<QString> vals){
     if(validateArg(2,vals)) {
       m_Arg2=vals;
       return true;
     }
     return false;
 }
-bool RadGeometry::setArg2(QString arg, int position) {
+bool RadPrimitive::setArg2(QString arg, int position) {
     if(position<m_Arg2.size()) {
         if(!validateArg(2,arg,position)) {
             return false;
@@ -60,14 +64,14 @@ bool RadGeometry::setArg2(QString arg, int position) {
     }
     return false;
 }
-bool RadGeometry::setArg3(std::vector<QString> vals){
+bool RadPrimitive::setArg3(std::vector<QString> vals){
     if(validateArg(3,vals)) {
       m_Arg3=vals;
       return true;
     }
     return false;
 }
-bool RadGeometry::setArg3(QString arg, int position) {
+bool RadPrimitive::setArg3(QString arg, int position) {
     if(position<m_Arg3.size()) {
         if(!validateArg(3,arg,position)) {
             return false;
@@ -78,7 +82,7 @@ bool RadGeometry::setArg3(QString arg, int position) {
     return false;
 }
 
-bool RadGeometry::setArg(int number, QString value, int position)
+bool RadPrimitive::setArg(int number, QString value, int position)
 {
     std::vector<QString> *arg;
     switch(number) {
@@ -108,54 +112,54 @@ bool RadGeometry::setArg(int number, QString value, int position)
 }
 
 //Getters
-QString RadGeometry::modifier() const {
+QString RadPrimitive::modifier() const {
     return m_Modifier;
 }
-RadGeometry::Type RadGeometry::type() const{
+RadPrimitive::Type RadPrimitive::type() const{
     return typeFromString(m_TypeString);
 }
-QString RadGeometry::typeString() const {
+QString RadPrimitive::typeString() const {
     return m_TypeString;
 }
-QString RadGeometry::name() const {
+QString RadPrimitive::name() const {
     return m_Name;
 }
-std::vector<QString> RadGeometry::arg1() const {
+std::vector<QString> RadPrimitive::arg1() const {
     return m_Arg1;
 }
-std::vector<QString> RadGeometry::arg2() const {
+std::vector<QString> RadPrimitive::arg2() const {
     return m_Arg2;
 }
-std::vector<QString> RadGeometry::arg3() const{
+std::vector<QString> RadPrimitive::arg3() const{
     return m_Arg3;
 }
 
-RadGeometry* RadGeometry::fromRad(QFile file, QObject *parent)
+RadPrimitive* RadPrimitive::fromRad(QFile file, QObject *parent)
 {
-    RadGeometry *obj;
+    RadPrimitive *obj;
     QString type;
     switch(typeFromString(type)) {
     case Plastic:
         obj = new PlasticMaterial(parent);
         break;
     default:
-        obj = new RadGeometry(parent);
+        obj = new RadPrimitive(parent);
         break;
     }
     return obj;
 }
 
-RadGeometry::Type RadGeometry::typeFromString(QString string)
+RadPrimitive::Type RadPrimitive::typeFromString(QString string)
 {
     for(unsigned i=0;i<s_typeStrings.size();i++) {
         if(s_typeStrings[i] == string) {
-            return (RadGeometry::Type)i;
+            return (RadPrimitive::Type)i;
         }
     }
     return Unknown;
 }
 
-QString RadGeometry::getArg1(int position) const
+QString RadPrimitive::getArg1(int position) const
 {
     if(position<0 || position>=m_Arg1.size()) {
         return QString();
@@ -163,7 +167,7 @@ QString RadGeometry::getArg1(int position) const
     return m_Arg1[position];
 }
 
-QString RadGeometry::getArg2(int position) const
+QString RadPrimitive::getArg2(int position) const
 {
     if(position<0 || position>=m_Arg2.size()) {
         return QString();
@@ -171,7 +175,7 @@ QString RadGeometry::getArg2(int position) const
     return m_Arg2[position];
 }
 
-QString RadGeometry::getArg3(int position) const
+QString RadPrimitive::getArg3(int position) const
 {
     if(position<0 || position>=m_Arg3.size()) {
         return QString();
@@ -179,7 +183,7 @@ QString RadGeometry::getArg3(int position) const
     return m_Arg3[position];
 }
 
-QString RadGeometry::getArg(int number, int position) const
+QString RadPrimitive::getArg(int number, int position) const
 {
     std::vector<QString> *arg;
     switch(number) {
@@ -194,7 +198,7 @@ QString RadGeometry::getArg(int number, int position) const
     return QString();
 }
 
-void RadGeometry::initArg(int number, std::vector<QString> arg)
+void RadPrimitive::initArg(int number, std::vector<QString> arg)
 {
     switch(number) {
     case 1:
@@ -212,14 +216,14 @@ void RadGeometry::initArg(int number, std::vector<QString> arg)
     }
 }
 
-PlasticMaterial::PlasticMaterial(QObject *parent) : RadGeometry(parent)
+PlasticMaterial::PlasticMaterial(QObject *parent) : RadPrimitive(parent)
 {
     std::vector<QString> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
 PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
-    : RadGeometry(parent)
+    : RadPrimitive(parent)
 {
     setArg(3,QString().sprintf("%g",red),0);
     setArg(3,QString().sprintf("%g",green),1);
@@ -341,4 +345,6 @@ bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
         }
     }
     return false;
+}
+
 }

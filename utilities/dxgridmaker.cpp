@@ -51,23 +51,23 @@ int main (int argc, char *argv[]){
             csvFile=argv[i];
         }else{
             QString temp=argv[i];
-            WARNING(QString("The argument "+temp+" is an unkown argument."));
+            WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
     if (Sx==0 ||Sy==0){
-        ERROR(QString("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-Sx\" and \"-Sy\"."));
-        EXIT_FAILURE;
+        ERROR("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-Sx\" and \"-Sy\".");
+        return EXIT_FAILURE;
     }
     if (fileName.isEmpty()){
-        ERROR(QString("The rad file name must be specified.\n\tSpecify with \"-f\"."));
-        EXIT_FAILURE;
+        ERROR("The rad file name must be specified.\n\tSpecify with \"-f\".");
+        return EXIT_FAILURE;
     }
     if (resultFile.isEmpty()){
-        ERROR(QString("The result file name must be specified.\n\tSpecify with \"-r\"."));
-        EXIT_FAILURE;
+        ERROR("The result file name must be specified.\n\tSpecify with \"-r\".");
+        return EXIT_FAILURE;
     }
     //Instantiate GridMaker Object
-    GridMaker grid;
+    stadic::GridMaker grid;
     for (int i=0;i<layerNames.size();i++){
         grid.setLayerNames(layerNames.at(i));
     }
@@ -77,16 +77,16 @@ int main (int argc, char *argv[]){
     grid.setOffsetY(Oy);
     grid.setZHeight(Z);
     if (!grid.parseRad(fileName)){
-        ERROR(QString("The parsing of the rad file failed."));
-        EXIT_FAILURE;
+        ERROR("The parsing of the rad file failed.");
+        return EXIT_FAILURE;
     }
     if (!grid.makeGrid(fileName)){
         ERROR(QString("The creation of the grid failed."));
         EXIT_FAILURE;
     }
     if (!grid.writePTS(resultFile)){
-        ERROR(QString("The writing of the points file failed."));
-        EXIT_FAILURE;
+        ERROR("The writing of the points file failed.");
+        return EXIT_FAILURE;
     }
     if (!polyFile.isEmpty()){
         if (!grid.writeRadPoly(polyFile)){

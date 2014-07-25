@@ -1,9 +1,9 @@
-#include "makewea.h"
+#include "weatherdata.h"
 #include "gtest/gtest.h"
 
 TEST(WeatherTests, ReadEpw)
 {
-  MakeWea data;
+  stadic::WeatherData data;
   data.parseWeather(":/resources/USA_PA_Lancaster.AP.725116_TMY3.epw");
   // Check location
   EXPECT_EQ("Lancaster", data.place().toStdString());
