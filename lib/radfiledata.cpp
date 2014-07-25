@@ -1,4 +1,4 @@
-#include "parserad.h"
+#include "radfiledata.h"
 #include <QFile>
 #include <QTextStream>
 #include "logging.h"

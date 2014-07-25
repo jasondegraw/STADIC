@@ -6,7 +6,7 @@
 #include <iostream>
 #include <QString>
 #include <QLineF>
-#include <parserad.h>
+#include <radfiledata.h>
 
 namespace stadic {
 
