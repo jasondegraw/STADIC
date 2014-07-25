@@ -14,9 +14,6 @@ std::array<QString,51> RadGeometry::s_typeStrings = {"source", "sphere", "bubble
 RadGeometry::RadGeometry(QObject *parent) :
     QObject(parent)
 {
-    m_Arg1.clear();
-    m_Arg2.clear();
-    m_Arg3.clear();
 }
 
 //Setters
@@ -30,9 +27,11 @@ void RadGeometry::setName(QString name){
     m_Name=name;
 }
 bool RadGeometry::setArg1(std::vector<QString> vals){
-    m_Arg1.clear();
-    m_Arg1=vals;
-    return true;
+    if(validateArg(1,vals)) {
+      m_Arg1=vals;
+      return true;
+    }
+    return false;
 }
 bool RadGeometry::setArg1(QString arg, int position) {
     if(position<m_Arg1.size()) {
@@ -45,9 +44,11 @@ bool RadGeometry::setArg1(QString arg, int position) {
     return false;
 }
 bool RadGeometry::setArg2(std::vector<QString> vals){
-    m_Arg2.clear();
-    m_Arg2=vals;
-    return true;
+    if(validateArg(2,vals)) {
+      m_Arg2=vals;
+      return true;
+    }
+    return false;
 }
 bool RadGeometry::setArg2(QString arg, int position) {
     if(position<m_Arg2.size()) {
@@ -60,9 +61,11 @@ bool RadGeometry::setArg2(QString arg, int position) {
     return false;
 }
 bool RadGeometry::setArg3(std::vector<QString> vals){
-    m_Arg3.clear();
-    m_Arg3=vals;
-    return true;
+    if(validateArg(3,vals)) {
+      m_Arg3=vals;
+      return true;
+    }
+    return false;
 }
 bool RadGeometry::setArg3(QString arg, int position) {
     if(position<m_Arg3.size()) {
@@ -75,26 +78,55 @@ bool RadGeometry::setArg3(QString arg, int position) {
     return false;
 }
 
+bool RadGeometry::setArg(int number, QString value, int position)
+{
+    std::vector<QString> *arg;
+    switch(number) {
+    case 1:
+        arg = &m_Arg1;
+        break;
+    case 2:
+        arg = &m_Arg2;
+        break;
+    case 3:
+        arg = &m_Arg3;
+        break;
+    default:
+        // Error/warning message?
+        return false;
+    }
+    if(validateArg(number,value,position)) {
+        if(position>=arg->size()) {
+            arg->resize(position+1);
+        }
+        (*arg)[position] = value;
+        return true;
+    } else {
+        // Error/warning message?
+    }
+    return false;
+}
+
 //Getters
-QString RadGeometry::modifier(){
+QString RadGeometry::modifier() const {
     return m_Modifier;
 }
-RadGeometry::Type RadGeometry::type(){
+RadGeometry::Type RadGeometry::type() const{
     return typeFromString(m_TypeString);
 }
-QString RadGeometry::typeString(){
+QString RadGeometry::typeString() const {
     return m_TypeString;
 }
-QString RadGeometry::name(){
+QString RadGeometry::name() const {
     return m_Name;
 }
-std::vector<QString> RadGeometry::arg1(){
+std::vector<QString> RadGeometry::arg1() const {
     return m_Arg1;
 }
-std::vector<QString> RadGeometry::arg2(){
+std::vector<QString> RadGeometry::arg2() const {
     return m_Arg2;
 }
-std::vector<QString> RadGeometry::arg3(){
+std::vector<QString> RadGeometry::arg3() const{
     return m_Arg3;
 }
 
@@ -103,8 +135,8 @@ RadGeometry* RadGeometry::fromRad(QFile file, QObject *parent)
     RadGeometry *obj;
     QString type;
     switch(typeFromString(type)) {
-    case RadGeometry::Plastic:
-        obj = new ::Plastic(parent);
+    case Plastic:
+        obj = new PlasticMaterial(parent);
         break;
     default:
         obj = new RadGeometry(parent);
@@ -162,35 +194,6 @@ QString RadGeometry::getArg(int number, int position) const
     return QString();
 }
 
-bool RadGeometry::setArg(int number, QString value, int position)
-{
-    std::vector<QString> *arg;
-    switch(number) {
-    case 1:
-        arg = &m_Arg1;
-        break;
-    case 2:
-        arg = &m_Arg2;
-        break;
-    case 3:
-        arg = &m_Arg3;
-        break;
-    default:
-        // Error/warning message?
-        return false;
-    }
-    if(validateArg(number,value,position)) {
-        if(position>=arg->size()) {
-            arg->resize(position+1);
-        }
-        (*arg)[position] = value;
-        return true;
-    } else {
-        // Error/warning message?
-    }
-    return false;
-}
-
 void RadGeometry::initArg(int number, std::vector<QString> arg)
 {
     switch(number) {
@@ -209,13 +212,13 @@ void RadGeometry::initArg(int number, std::vector<QString> arg)
     }
 }
 
-Plastic::Plastic(QObject *parent) : RadGeometry(parent)
+PlasticMaterial::PlasticMaterial(QObject *parent) : RadGeometry(parent)
 {
     std::vector<QString> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-Plastic::Plastic(double red, double green, double blue, double spec, double rough, QObject *parent)
+PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
     : RadGeometry(parent)
 {
     setArg(3,QString().sprintf("%g",red),0);
@@ -226,33 +229,33 @@ Plastic::Plastic(double red, double green, double blue, double spec, double roug
 }
 
 // Setters
-bool Plastic::setRed(double value)
+bool PlasticMaterial::setRed(double value)
 {
     return setArg(3,QString().sprintf("%g",value),0);
 }
 
-bool Plastic::setGreen(double value)
+bool PlasticMaterial::setGreen(double value)
 {
     return setArg(3,QString().sprintf("%g",value),1);
 }
 
-bool Plastic::setBlue(double value)
+bool PlasticMaterial::setBlue(double value)
 {
     return setArg(3,QString().sprintf("%g",value),2);
 }
 
-bool Plastic::setSpecularity(double value)
+bool PlasticMaterial::setSpecularity(double value)
 {
     return setArg(3,QString().sprintf("%g",value),3);
 }
 
-bool Plastic::setRoughness(double value)
+bool PlasticMaterial::setRoughness(double value)
 {
     return setArg(3,QString().sprintf("%g",value),4);
 }
 
 // Getters
-double Plastic::red() const
+double PlasticMaterial::red() const
 {
     bool ok;
     double value = getArg3(0).toDouble(&ok);
@@ -264,7 +267,7 @@ double Plastic::red() const
     return value;
 }
 
-double Plastic::green() const
+double PlasticMaterial::green() const
 {
     bool ok;
     double value = getArg3(1).toDouble(&ok);
@@ -276,7 +279,7 @@ double Plastic::green() const
     return value;
 }
 
-double Plastic::blue() const
+double PlasticMaterial::blue() const
 {
     bool ok;
     double value = getArg3(2).toDouble(&ok);
@@ -288,7 +291,7 @@ double Plastic::blue() const
     return value;
 }
 
-double Plastic::specularity() const
+double PlasticMaterial::specularity() const
 {
     bool ok;
     double value = getArg3(3).toDouble(&ok);
@@ -300,7 +303,7 @@ double Plastic::specularity() const
     return value;
 }
 
-double Plastic::roughness() const
+double PlasticMaterial::roughness() const
 {
     bool ok;
     double value = getArg3(4).toDouble(&ok);
@@ -312,10 +315,24 @@ double Plastic::roughness() const
     return value;
 }
 
-bool Plastic::validateArg(int number, QString value, int position)
+bool PlasticMaterial::validateArg(int number, QString value, int position) const
 {
     if(number==3) {
         if(position>0 && position<5) {
+            bool ok;
+            double dval = value.toDouble(&ok);
+            if(ok && dval >= 0 and dval <= 1.0) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
+{
+    if(number==3) {
+        for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
             if(ok && dval >= 0 and dval <= 1.0) {

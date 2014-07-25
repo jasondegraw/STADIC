@@ -31,13 +31,13 @@ public:
     virtual bool setArg(int number, QString value, int position);
 
     //Getters
-    QString modifier();
-    Type type();
-    QString typeString();
-    QString name();
-    std::vector<QString> arg1();
-    std::vector<QString> arg2();
-    std::vector<QString> arg3();
+    QString modifier() const;
+    Type type() const;
+    QString typeString() const;
+    QString name() const;
+    std::vector<QString> arg1() const;
+    std::vector<QString> arg2() const;
+    std::vector<QString> arg3() const;
 
     virtual QString getArg1(int position) const;
     virtual QString getArg2(int position) const;
@@ -50,7 +50,8 @@ protected:
     void initArg(int number, std::vector<QString> arg);
 
 private:
-    virtual bool validateArg(int number, QString value, int position) {return true;}
+    virtual bool validateArg(int number, QString value, int position) const {return true;}
+    virtual bool validateArg(int number, std::vector<QString> value) const {return true;}
     static std::array<QString,51> s_typeStrings;
     static Type typeFromString(QString string);
 
@@ -68,11 +69,11 @@ public slots:
 
 };
 
-class Plastic : public RadGeometry
+class PlasticMaterial : public RadGeometry
 {
 public:
-    explicit Plastic(QObject *parent=0);
-    Plastic(double red, double green, double blue, double spec, double rough, QObject *parent=0);
+    explicit PlasticMaterial(QObject *parent=0);
+    PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent=0);
 
     // Setters
     bool setRed(double value);
@@ -87,7 +88,8 @@ public:
     double specularity() const;
     double roughness() const;
 private:
-   bool validateArg(int number, QString value, int position);
+   virtual bool validateArg(int number, QString value, int position) const;
+   virtual bool validateArg(int number, std::vector<QString> value) const;
 };
 
 #endif // RADGEOMETRY_H
