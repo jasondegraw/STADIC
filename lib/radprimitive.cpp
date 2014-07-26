@@ -1,4 +1,5 @@
 #include "radprimitive.h"
+#include <QTextStream>
 
 namespace stadic {
 
@@ -134,19 +135,81 @@ std::vector<QString> RadPrimitive::arg3() const{
     return m_Arg3;
 }
 
+static QString nextNonComment(QTextStream &data)
+{
+  QString string;
+  while(!data.atEnd()) {
+    string = data.readLine();
+    if(!string.isEmpty()) {
+      if(!string.trimmed().startsWith('#')) {
+        return string;
+      }
+    }
+  }
+  return QString();
+}
+
 RadPrimitive* RadPrimitive::fromRad(QFile file, QObject *parent)
 {
-    RadPrimitive *obj;
-    QString type;
-    switch(typeFromString(type)) {
+    RadPrimitive *rad;
+    QTextStream data(&file);
+
+    QString string = nextNonComment(data);
+    if(string.isEmpty()) {
+      return nullptr;
+    }
+    QStringList list = string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
+    if(list.size() != 3) {
+      return nullptr;
+    }
+
+    switch(typeFromString(list[1])) {
     case Plastic:
-        obj = new PlasticMaterial(parent);
+        rad = new PlasticMaterial(parent);
         break;
     default:
-        obj = new RadPrimitive(parent);
+        rad = new RadPrimitive(parent);
+        rad->setType(list[1]);
         break;
     }
-    return obj;
+    rad->setModifier(list[0]);
+    rad->setName(list[2]);
+
+    int nargs;
+    data>>string;   //Reads number of arguments from first line
+    nargs = string.toInt();
+    if (nargs>0){
+        std::vector<QString> args;
+        for (int i=0;i<nargs;i++){
+            data>>string;
+            args.push_back(string);
+        }
+        rad->setArg1(args);
+    }
+
+    data>>string;   //Reads number of arguments from second line
+    nargs = string.toInt();
+    if (nargs>0){
+        std::vector<QString> args;
+        for (int i=0;i<nargs;i++){
+            data>>string;
+            args.push_back(string);
+        }
+        rad->setArg2(args);
+    }
+
+    data>>string;   //Reads number of arguments from third line
+    nargs = string.toInt();
+    if (nargs>0){
+        std::vector<QString> args;
+        for (int i=0;i<nargs;i++){
+            data>>string;
+            args.push_back(string);
+        }
+        rad->setArg3(args);
+    }
+
+    return rad;
 }
 
 RadPrimitive::Type RadPrimitive::typeFromString(QString string)
