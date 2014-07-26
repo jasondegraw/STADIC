@@ -16,3 +16,8 @@ add_executable(weathertests weathertests.cpp ${QRCS})
 add_test(weathertests weathertests)
 target_link_libraries(weathertests stadic_core gtest gtest_main)
 
+add_executable(primitivetests primitivetests.cpp ${QRCS})
+add_test(primitivetests primitivetests)
+target_link_libraries(primitivetests stadic_core gtest gtest_main)
+
+

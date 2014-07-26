@@ -24,8 +24,9 @@ void RadPrimitive::setModifier(QString modifier){
     m_Modifier=modifier;
 }
 
-void RadPrimitive::setType(QString type){
+bool RadPrimitive::setType(QString type){
     m_TypeString=type;
+    return true;
 }
 void RadPrimitive::setName(QString name){
     m_Name=name;
@@ -281,6 +282,7 @@ void RadPrimitive::initArg(int number, std::vector<QString> arg)
 
 PlasticMaterial::PlasticMaterial(QObject *parent) : RadPrimitive(parent)
 {
+    RadPrimitive::setType("plastic");
     std::vector<QString> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
@@ -288,6 +290,7 @@ PlasticMaterial::PlasticMaterial(QObject *parent) : RadPrimitive(parent)
 PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
     : RadPrimitive(parent)
 {
+    RadPrimitive::setType("plastic");
     setArg(3,QString().sprintf("%g",red),0);
     setArg(3,QString().sprintf("%g",green),1);
     setArg(3,QString().sprintf("%g",blue),2);
@@ -385,7 +388,7 @@ double PlasticMaterial::roughness() const
 bool PlasticMaterial::validateArg(int number, QString value, int position) const
 {
     if(number==3) {
-        if(position>0 && position<5) {
+        if(position>=0 && position<5) {
             bool ok;
             double dval = value.toDouble(&ok);
             if(ok && dval >= 0 and dval <= 1.0) {
@@ -399,6 +402,9 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
 bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
 {
     if(number==3) {
+        if(arg.size() != 5) {
+            return false;
+        }
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);

@@ -21,7 +21,7 @@ public:
 
     //Setters
     void setModifier(QString modifier);
-    void setType(QString type);
+    virtual bool setType(QString type);
     void setName(QString name);
     bool setArg1(std::vector<QString> vals);
     bool setArg1(QString arg, int position);
@@ -58,7 +58,6 @@ private:
     static Type typeFromString(QString string);
 
     QString m_Modifier;
-    Type m_Type;
     QString m_TypeString;
     QString m_Name;
     std::vector<QString> m_Arg1;
@@ -78,6 +77,7 @@ public:
     PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent=0);
 
     // Setters
+    bool setType(QString){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
