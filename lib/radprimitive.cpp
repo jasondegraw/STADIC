@@ -391,7 +391,7 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
         if(position>=0 && position<5) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -408,7 +408,7 @@ bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }

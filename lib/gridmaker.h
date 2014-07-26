@@ -7,9 +7,11 @@
 #include <vector>
 #include "radprimitive.h"
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class GridMaker : public QObject
+class STADIC_API GridMaker : public QObject
 {
     Q_OBJECT
 public:

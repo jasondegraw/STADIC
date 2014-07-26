@@ -15,7 +15,8 @@ set(SRCS stadiccontrol.cpp
          elecill.cpp
          daylight.cpp)
 		 
-set(HDRS stadiccontrol.h
+set(HDRS stadicapi.h
+         stadiccontrol.h
          windowgroup.h
          shadecontrol.h
          controlzone.h

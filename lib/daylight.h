@@ -3,11 +3,13 @@
 
 #include <QObject>
 
-class daylight : public QObject
+#include "stadicapi.h"
+
+class STADIC_API Daylight : public QObject
 {
     Q_OBJECT
 public:
-    explicit daylight(QObject *parent = 0);
+    explicit Daylight(QObject *parent = 0);
     bool simDaylight(QString fileName);
 
 private:

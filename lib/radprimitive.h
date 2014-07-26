@@ -5,9 +5,11 @@
 #include <QFile>
 #include<array>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class RadPrimitive : public QObject
+class STADIC_API RadPrimitive : public QObject
 {
     Q_OBJECT
 public:
@@ -70,7 +72,7 @@ public slots:
 
 };
 
-class PlasticMaterial : public RadPrimitive
+class STADIC_API PlasticMaterial : public RadPrimitive
 {
 public:
     explicit PlasticMaterial(QObject *parent=0);

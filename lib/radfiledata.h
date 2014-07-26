@@ -5,9 +5,11 @@
 #include "radprimitive.h"
 #include <vector>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class RadFileData : public QObject
+class STADIC_API RadFileData : public QObject
 {
     Q_OBJECT
 public:

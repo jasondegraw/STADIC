@@ -6,9 +6,11 @@
 #include <vector>
 #include <QJsonObject>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class ControlZone : public QObject
+class STADIC_API ControlZone : public QObject
 {
     Q_OBJECT
 public:

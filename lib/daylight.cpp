@@ -2,12 +2,12 @@
 #include "stadiccontrol.h"
 #include "logging.h"
 
-daylight::daylight(QObject *parent) :
+Daylight::Daylight(QObject *parent) :
     QObject(parent)
 {
 }
 
-bool daylight::simDaylight(QString fileName){
+bool Daylight::simDaylight(QString fileName){
     stadic::Control model;
     if (!model.parseJson(fileName)){
         return false;

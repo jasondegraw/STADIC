@@ -195,10 +195,10 @@ bool RadFileData::removeLayer(QString layer, QString outFile){
     oFile.close();
 }
 bool RadFileData::blackOutLayer(QString layer){
-
+	return true;
 }
 bool RadFileData::writeRadFile(QString file){
-
+	return true;
 }
 
 
