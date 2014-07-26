@@ -90,14 +90,14 @@ int main (int argc, char *argv[]){
     }
     if (!polyFile.isEmpty()){
         if (!grid.writeRadPoly(polyFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
     if (!csvFile.isEmpty()){
         if (!grid.writePTScsv(csvFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
 
-    EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
