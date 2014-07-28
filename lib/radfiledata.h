@@ -22,15 +22,30 @@ public:
     std::vector<RadPrimitive *> geometry();
     std::vector<RadPrimitive *> materials();
 
+    template<class T> std::vector<T*> getPrimitives();
+
 private:
-    std::vector<RadPrimitive *> m_RadGeo;                //Vector to hold the radiance polygons
-    std::vector<RadPrimitive *> m_RadMat;                //Vector to hold the radiance materials
+    //std::vector<RadPrimitive *> m_RadGeo;                //Vector to hold the radiance polygons
+    //std::vector<RadPrimitive *> m_RadMat;                //Vector to hold the radiance materials
+    std::vector<RadPrimitive *> m_Primitives;            //Vector to hold EVERYTHING
 
 signals:
 
 public slots:
 
 };
+
+template<class T> std::vector<T*> RadFileData::getPrimitives()
+{
+    std::vector<T*> primitives;
+    for(RadPrimitive *primitive : m_Primitives) {
+        T* cast = dynamic_cast<T*>(primitive);
+        if(cast) {
+            primitives.push_back(cast);
+        }
+    }
+    return primitives;
+}
 
 }
 

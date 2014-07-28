@@ -19,6 +19,9 @@ public:
                Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext, Unknown};
     explicit RadPrimitive(QObject *parent = 0);
 
+    bool isGeometry() const;
+    bool isMaterial() const;
+
     //Setters
     void setModifier(QString modifier);
     virtual bool setType(QString type);
@@ -46,7 +49,7 @@ public:
     virtual QString getArg3(int position) const;
     virtual QString getArg(int number, int position) const;
 
-    static RadPrimitive *fromRad(QFile file, QObject *parent = 0);
+    static RadPrimitive *fromRad(QFile *file, QObject *parent = 0);
 
 protected:
     void initArg(int number, std::vector<QString> arg);

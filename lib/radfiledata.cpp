@@ -15,120 +15,28 @@ bool RadFileData::addRad(QString file){
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.exists()){
-        ERROR("The opening of the rad file failed.");
+        ERROR(QString("The opening of the rad file '%1' failed.").arg(file));
         return false;
     }
 
     QTextStream data(&iFile);
-    while (!data.atEnd()){
-        QString string;
-        QString string2;
-        data>>string;
-        if (string.contains('#')){
-            QString tempString;
-            tempString=data.readLine();
-        }else{
-            if (string.contains("void")){
-                RadPrimitive *rad=new RadPrimitive(this);
-                rad->setModifier("void");
-                data>>string;   //reads type
-                rad->setType(string);
-                data>>string;   //reads name
-                rad->setName(string);
-                data>>string;   //Reads number of arguments from first line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg1(args);
-                }
-                data>>string;   //Reads number of arguments from second line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg2(args);
-                }
-                data>>string;   //Reads number of arguments from third line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg3(args);
-                }
-                m_RadMat.push_back(rad);
-            }else{
-                data>>string2;
-                if (string2=="polygon"){
-                    RadPrimitive *rad=new RadPrimitive(this);
-                    rad->setModifier(string);
-                    rad->setType(string2);
-                    data>>string;
-                    rad->setName(string);
-                    data>>string;               //Read number of arguments from first line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from second line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from third line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg3(args);
-                    }
-                    m_RadGeo.push_back(rad);
-                }else{                          //If it isn't a polygon, the info still needs to be read in
-                    data>>string;   //reads name
-                    data>>string2;   //Reads number of arguments from first line
-                    if (!string.isEmpty()){
-                        WARNING("The rad file contains a modifer that is not \"null\", but is not a polygon.\nThis piece of input will be ignored for the polygon named \"" + string +"\".");
-                    }
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from second line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from third line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                }
-            }
+    std::vector<RadPrimitive*> primitives;
+    while (!data.atEnd()) {
+        RadPrimitive *primitive = RadPrimitive::fromRad(&iFile,this->parent());
+        if(!primitive) {
+            iFile.close();
+            return false;
         }
+        primitives.push_back(primitive);
     }
+    m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());
     iFile.close();
+    return true;
 }
+
 bool RadFileData::removeLayer(QString layer, QString outFile){
+    /*
+     What is this doing?
     QFile oFile;
     oFile.setFileName(outFile);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -195,6 +103,8 @@ bool RadFileData::removeLayer(QString layer, QString outFile){
 
 
     oFile.close();
+    */
+    return false;
 }
 bool RadFileData::blackOutLayer(QString layer){
 
@@ -205,11 +115,25 @@ bool RadFileData::writeRadFile(QString file){
 
 
 //Getters
-std::vector<RadPrimitive *> RadFileData::geometry(){
-    return m_RadGeo;
+std::vector<RadPrimitive *> RadFileData::geometry()
+{
+    std::vector<RadPrimitive*> primitives;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(primitive->isGeometry()) {
+            primitives.push_back(primitive);
+        }
+    }
+    return primitives;
 }
-std::vector<RadPrimitive *> RadFileData::materials(){
-    return m_RadMat;
+std::vector<RadPrimitive *> RadFileData::materials()
+{
+    std::vector<RadPrimitive*> primitives;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(primitive->isMaterial()) {
+            primitives.push_back(primitive);
+        }
+    }
+    return primitives;
 }
 
 }

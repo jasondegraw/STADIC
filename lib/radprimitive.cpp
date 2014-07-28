@@ -19,6 +19,59 @@ RadPrimitive::RadPrimitive(QObject *parent) :
 {
 }
 
+bool RadPrimitive::isGeometry() const
+{
+    switch(type()) {
+    case Source:
+    case Sphere:
+    case Bubble:
+    case Polygon:
+    case Cone:
+    case Cup:
+    case Cylinder:
+    case Tube:
+    case Ring:
+    case Instance:
+    case Mesh:
+        return true;
+    }
+    return false;
+}
+
+bool RadPrimitive::isMaterial() const
+{
+    switch(type()) {
+    case Light:
+    case Illum:
+    case Glow:
+    case Spotlight:
+    case Mirror:
+    case Prism1:
+    case Prism2:
+    case Plastic:
+    case Metal:
+    case Trans:
+    case Plastic2:
+    case Metal2:
+    case Trans2:
+    case Mist:
+    case Dielectric:
+    case Interface:
+    case Glass:
+    case Plasfunc:
+    case Metfunc:
+    case Transfunc:
+    case BRTDfunc:
+    case Plasdata:
+    case Metdata:
+    case Transdata:
+    case BSDF:
+    case Antimatter:
+        return true;
+    }
+    return false;
+}
+
 //Setters
 void RadPrimitive::setModifier(QString modifier){
     m_Modifier=modifier;
@@ -150,10 +203,10 @@ static QString nextNonComment(QTextStream &data)
   return QString();
 }
 
-RadPrimitive* RadPrimitive::fromRad(QFile file, QObject *parent)
+RadPrimitive* RadPrimitive::fromRad(QFile *file, QObject *parent)
 {
     RadPrimitive *rad;
-    QTextStream data(&file);
+    QTextStream data(file);
 
     QString string = nextNonComment(data);
     if(string.isEmpty()) {
