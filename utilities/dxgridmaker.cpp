@@ -17,7 +17,20 @@ void usage(){
     std::cout<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
 }
 
-int main (int argc, char *argv[]){
+#include <iostream>
+
+void usage()
+{
+    // Stub for usage function
+    std::cout << "dxgridmaker - make grids" << std::endl;
+    std::cout << "usage: dxgridmaker [options]" << std::endl;
+}
+
+int main (int argc, char *argv[])
+{
+    if(argc == 1) {
+        usage();
+    }
     QString fileName;
     fileName.clear();
     QString resultFile;
@@ -82,7 +95,7 @@ int main (int argc, char *argv[]){
         return EXIT_FAILURE;
     }
     //Instantiate GridMaker Object
-    GridMaker grid;
+    stadic::GridMaker grid;
     for (int i=0;i<layerNames.size();i++){
         grid.setLayerNames(layerNames.at(i));
     }
@@ -105,14 +118,14 @@ int main (int argc, char *argv[]){
     }
     if (!polyFile.isEmpty()){
         if (!grid.writeRadPoly(polyFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
     if (!csvFile.isEmpty()){
         if (!grid.writePTScsv(csvFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
 
-    EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

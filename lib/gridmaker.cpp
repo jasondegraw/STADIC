@@ -1,12 +1,14 @@
 #include "gridmaker.h"
-#include "radgeometry.h"
+#include "radprimitive.h"
 //#include "logging.h"
 #include <QFile>
 #include <QTextStream>
 #include <iostream>
 #include <QString>
 #include <QLineF>
-#include <parserad.h>
+#include <radfiledata.h>
+
+namespace stadic {
 
 GridMaker::GridMaker(QObject *parent) :
     QObject(parent)
@@ -382,6 +384,6 @@ bool GridMaker::writeRadPoly(QString file){
     }
     oFile.close();
     return true;
-
+}
 
 }

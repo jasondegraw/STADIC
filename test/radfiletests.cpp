@@ -1,4 +1,4 @@
-#include "parserad.h"
+#include "radfiledata.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
@@ -6,11 +6,18 @@ TEST(RadFileTests, ParseRadFile)
 {
   stadic::RadFileData radData;
   ASSERT_TRUE(radData.addRad(":/resources/Simple.rad"));
+  ASSERT_EQ(36, radData.primitives().size());
+  ASSERT_EQ(36, radData.geometry().size());
+  ASSERT_EQ(0, radData.materials().size());
   ASSERT_TRUE(radData.addRad(":/resources/material.rad"));
-  //EXPECT_EQ("prj1",controlFile.projectName());
+  //Testing to ensure all of the primitives are read in
+  ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_EQ(36, radData.geometry().size());
+  ASSERT_EQ(6, radData.materials().size());
+
   //Testing First Polygon for contents
   EXPECT_EQ("l_floor", radData.geometry().at(0)->modifier());
-  EXPECT_EQ("polygon", radData.geometry().at(0)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(0)->type());
   EXPECT_EQ("l_floor.0.1", radData.geometry().at(0)->name());
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
@@ -22,7 +29,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing Last Polygon for contents
   EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifier());
-  EXPECT_EQ("polygon", radData.geometry().at(radData.geometry().size()-1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(radData.geometry().size()-1)->type());
   EXPECT_EQ("l_ceiling.39.1", radData.geometry().at(radData.geometry().size()-1)->name());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg2().size());
@@ -32,12 +39,9 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(240, radData.geometry().at(radData.geometry().size()-1)->arg3().at(6).toDouble());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg3().at(10).toDouble());
 
-  //Testing to ensure all of the polygons are read in
-  EXPECT_EQ(36, radData.geometry().size());
-
   //Testing first material for contents
   EXPECT_EQ("void", radData.materials().at(0)->modifier());
-  EXPECT_EQ("plastic", radData.materials().at(0)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(0)->type());
   EXPECT_EQ("l_wall", radData.materials().at(0)->name());
   EXPECT_EQ(0, radData.materials().at(0)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(0)->arg2().size());
@@ -50,7 +54,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing second material for contents
   EXPECT_EQ("void", radData.materials().at(1)->modifier());
-  EXPECT_EQ("glass", radData.materials().at(1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Glass, radData.materials().at(1)->type());
   EXPECT_EQ("l_window", radData.materials().at(1)->name());
   EXPECT_EQ(0, radData.materials().at(1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(1)->arg2().size());
@@ -61,7 +65,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing last material for contents
   EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifier());
-  EXPECT_EQ("plastic", radData.materials().at(radData.materials().size()-1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(radData.materials().size()-1)->type());
   EXPECT_EQ("l_ceiling", radData.materials().at(radData.materials().size()-1)->name());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg2().size());
@@ -72,6 +76,15 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg3().at(3).toDouble());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg3().at(4).toDouble());
 
-  //Testing to ensure all of the materials are read in
-  EXPECT_EQ(6, radData.materials().size());
+  //Test getting primitives by type
+  std::vector<stadic::PlasticMaterial*> plastic = radData.getPrimitives<stadic::PlasticMaterial>();
+  ASSERT_EQ(5,plastic.size());
+
+  //Testing second plastic for contents
+  EXPECT_EQ("l_extwall",plastic[1]->name());
+  EXPECT_EQ(.15,plastic[1]->red());
+  EXPECT_EQ(.15,plastic[1]->green());
+  EXPECT_EQ(.15,plastic[1]->blue());
+  EXPECT_EQ(0,plastic[1]->specularity());
+  EXPECT_EQ(0,plastic[1]->roughness());
 }
