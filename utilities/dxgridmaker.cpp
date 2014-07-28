@@ -2,7 +2,20 @@
 #include "logging.h"
 #include <vector>
 
-int main (int argc, char *argv[]){
+#include <iostream>
+
+void usage()
+{
+    // Stub for usage function
+    std::cout << "dxgridmaker - make grids" << std::endl;
+    std::cout << "usage: dxgridmaker [options]" << std::endl;
+}
+
+int main (int argc, char *argv[])
+{
+    if(argc == 1) {
+        usage();
+    }
     QString fileName;
     fileName.clear();
     QString resultFile;
@@ -90,14 +103,14 @@ int main (int argc, char *argv[]){
     }
     if (!polyFile.isEmpty()){
         if (!grid.writeRadPoly(polyFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
     if (!csvFile.isEmpty()){
         if (!grid.writePTScsv(csvFile)){
-            EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
     }
 
-    EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
