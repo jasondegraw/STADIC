@@ -17,15 +17,6 @@ void usage(){
     std::cout<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
 }
 
-#include <iostream>
-
-void usage()
-{
-    // Stub for usage function
-    std::cout << "dxgridmaker - make grids" << std::endl;
-    std::cout << "usage: dxgridmaker [options]" << std::endl;
-}
-
 int main (int argc, char *argv[])
 {
     if(argc == 1) {
