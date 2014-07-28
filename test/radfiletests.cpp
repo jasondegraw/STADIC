@@ -1,4 +1,4 @@
-#include "parserad.h"
+#include "radfiledata.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
@@ -10,7 +10,7 @@ TEST(RadFileTests, ParseRadFile)
   //EXPECT_EQ("prj1",controlFile.projectName());
   //Testing First Polygon for contents
   EXPECT_EQ("l_floor", radData.geometry().at(0)->modifier());
-  EXPECT_EQ("polygon", radData.geometry().at(0)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(0)->type());
   EXPECT_EQ("l_floor.0.1", radData.geometry().at(0)->name());
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
@@ -22,7 +22,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing Last Polygon for contents
   EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifier());
-  EXPECT_EQ("polygon", radData.geometry().at(radData.geometry().size()-1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(radData.geometry().size()-1)->type());
   EXPECT_EQ("l_ceiling.39.1", radData.geometry().at(radData.geometry().size()-1)->name());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg2().size());
@@ -37,7 +37,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing first material for contents
   EXPECT_EQ("void", radData.materials().at(0)->modifier());
-  EXPECT_EQ("plastic", radData.materials().at(0)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(0)->type());
   EXPECT_EQ("l_wall", radData.materials().at(0)->name());
   EXPECT_EQ(0, radData.materials().at(0)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(0)->arg2().size());
@@ -50,7 +50,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing second material for contents
   EXPECT_EQ("void", radData.materials().at(1)->modifier());
-  EXPECT_EQ("glass", radData.materials().at(1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Glass, radData.materials().at(1)->type());
   EXPECT_EQ("l_window", radData.materials().at(1)->name());
   EXPECT_EQ(0, radData.materials().at(1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(1)->arg2().size());
@@ -61,7 +61,7 @@ TEST(RadFileTests, ParseRadFile)
 
   //Testing last material for contents
   EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifier());
-  EXPECT_EQ("plastic", radData.materials().at(radData.materials().size()-1)->type());
+  EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(radData.materials().size()-1)->type());
   EXPECT_EQ("l_ceiling", radData.materials().at(radData.materials().size()-1)->name());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg2().size());

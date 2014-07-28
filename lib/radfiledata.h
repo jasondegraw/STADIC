@@ -2,6 +2,7 @@
 #define PARSERAD_H
 
 #include <QObject>
+#include <QPair>
 #include "radprimitive.h"
 #include <vector>
 
@@ -12,9 +13,10 @@ class RadFileData : public QObject
     Q_OBJECT
 public:
     explicit RadFileData(QObject *parent = 0);
+    RadFileData(const std::vector<RadPrimitive *> &primitives, QObject *parent = 0);
 
     bool addRad(QString file); 
-    bool removeLayer(QString layer, QString outFile);                     //Function to remove a layer from the list to its own geometry file
+    bool removeLayer(const QString &layer, const QString &removing, const QString &rest);                     //Function to remove a layer from the list to its own geometry file
     bool blackOutLayer(QString layer);
     bool writeRadFile(QString file);
 
@@ -23,6 +25,7 @@ public:
     std::vector<RadPrimitive *> materials();
 
     template<class T> std::vector<T*> getPrimitives();
+    QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*,const QString&), const QString &label);
 
 private:
     //std::vector<RadPrimitive *> m_RadGeo;                //Vector to hold the radiance polygons

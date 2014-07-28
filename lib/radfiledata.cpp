@@ -9,6 +9,12 @@ RadFileData::RadFileData(QObject *parent) :
     QObject(parent)
 {
 }
+
+RadFileData::RadFileData(const std::vector<RadPrimitive *> &primitives, QObject *parent) : QObject(parent)
+{
+    m_Primitives = primitives;
+}
+
 //Setters
 bool RadFileData::addRad(QString file){
     QFile iFile;
@@ -34,76 +40,56 @@ bool RadFileData::addRad(QString file){
     return true;
 }
 
-bool RadFileData::removeLayer(QString layer, QString outFile){
-    /*
-     What is this doing?
-    QFile oFile;
-    oFile.setFileName(outFile);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        ERROR("The opening of the rad file named " + outFile +" has failed.");
+QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*,const QString&), const QString &label)
+{
+    std::vector<RadPrimitive*> in, out;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(f(primitive,label)) {
+            in.push_back(primitive);
+        } else {
+            out.push_back(primitive);
+        }
+    }
+    // Need to account for o size vectors!
+    return QPair<RadFileData*,RadFileData*>(new RadFileData(in,this->parent()),
+                                            new RadFileData(out,this->parent()));
+}
+
+static bool checkLayer(RadPrimitive *primitive, const QString &name)
+{
+    if(primitive->isMaterial() && primitive->name() == name) {
+        return true;
+    } else if(primitive->isGeometry() && primitive->modifier() == name) {
+        return true;
+    }
+    return false;
+}
+
+bool RadFileData::removeLayer(const QString &layer, const QString &removing, const QString &rest)
+{
+    QFile oFile1;
+    oFile1.setFileName(removing);
+    oFile1.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile1.exists()){
+        ERROR("The opening of the rad file named " + removing +" has failed.");
         return false;
     }
 
-    QTextStream out(&oFile);
-    for (int i=0;i<m_RadMat.size();i++){
-        if (m_RadMat.at(i)->name()==layer){
-            out<<m_RadMat.at(i)->modifier()<<" "<<m_RadMat.at(i)->type()<<" "<<m_RadMat.at(i)->name()<<endl;
-            out<<m_RadMat.at(i)->arg1().size();
-            if (m_RadMat.at(i)->arg1().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg1().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg1().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadMat.at(i)->arg2().size();
-            if (m_RadMat.at(i)->arg2().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg2().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg2().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadMat.at(i)->arg3().size();
-            if (m_RadMat.at(i)->arg3().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg3().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg3().at(j);
-                }
-            }
-            out<<endl<<endl;
-        }
+    QFile oFile2;
+    oFile2.setFileName(rest);
+    oFile2.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile2.exists()){
+        ERROR("The opening of the rad file named " + rest +" has failed.");
+        return false;
     }
 
-    for (int i=0;i<m_RadGeo.size();i++){
-        if (m_RadGeo.at(i)->modifier()==layer){
-            out<<m_RadGeo.at(i)->modifier()<<" "<<m_RadGeo.at(i)->type()<<" "<<m_RadGeo.at(i)->name()<<endl;
-            out<<m_RadGeo.at(i)->arg1().size();
-            if (m_RadGeo.at(i)->arg1().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg1().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg1().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadGeo.at(i)->arg2().size();
-            if (m_RadGeo.at(i)->arg2().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg2().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg2().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadGeo.at(i)->arg3().size();
-            if (m_RadGeo.at(i)->arg3().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg3().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg3().at(j);
-                }
-            }
-            out<<endl<<endl;
-        }
-    }
-    //Remove material and geometry from respective vectors
+    QPair<RadFileData*,RadFileData*> results = split(checkLayer,layer);
 
+    // Write out the two files
 
-    oFile.close();
-    */
+    oFile1.close();
+    oFile2.close();
+
     return false;
 }
 bool RadFileData::blackOutLayer(QString layer){
