@@ -20,4 +20,3 @@ add_executable(primitivetests primitivetests.cpp ${QRCS})
 add_test(primitivetests primitivetests)
 target_link_libraries(primitivetests stadic_core gtest gtest_main)
 
-
