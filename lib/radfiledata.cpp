@@ -28,15 +28,17 @@ bool RadFileData::addRad(QString file){
     QTextStream data(&iFile);
     std::vector<RadPrimitive*> primitives;
     while (!data.atEnd()) {
-        RadPrimitive *primitive = RadPrimitive::fromRad(&iFile,this->parent());
-        if(!primitive) {
-            iFile.close();
-            return false;
+        RadPrimitive *primitive = RadPrimitive::fromRad(data,this->parent());
+        if(primitive == nullptr) {
+            break;
         }
         primitives.push_back(primitive);
     }
-    m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());
     iFile.close();
+    if(primitives.size() == 0) {
+        return false;
+    }
+    m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());
     return true;
 }
 
@@ -101,7 +103,7 @@ bool RadFileData::writeRadFile(QString file){
 
 
 //Getters
-std::vector<RadPrimitive *> RadFileData::geometry()
+std::vector<RadPrimitive *> RadFileData::geometry() const
 {
     std::vector<RadPrimitive*> primitives;
     for(RadPrimitive *primitive : m_Primitives) {
@@ -111,7 +113,7 @@ std::vector<RadPrimitive *> RadFileData::geometry()
     }
     return primitives;
 }
-std::vector<RadPrimitive *> RadFileData::materials()
+std::vector<RadPrimitive *> RadFileData::materials() const
 {
     std::vector<RadPrimitive*> primitives;
     for(RadPrimitive *primitive : m_Primitives) {
@@ -120,6 +122,11 @@ std::vector<RadPrimitive *> RadFileData::materials()
         }
     }
     return primitives;
+}
+
+std::vector<RadPrimitive *> RadFileData::primitives() const
+{
+    return m_Primitives;
 }
 
 }

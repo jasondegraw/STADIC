@@ -21,8 +21,10 @@ public:
     bool writeRadFile(QString file);
 
     //Getters
-    std::vector<RadPrimitive *> geometry();
-    std::vector<RadPrimitive *> materials();
+    std::vector<RadPrimitive *> geometry() const;
+    std::vector<RadPrimitive *> materials() const;
+    std::vector<RadPrimitive *> primitives() const;
+
 
     template<class T> std::vector<T*> getPrimitives();
     QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*,const QString&), const QString &label);

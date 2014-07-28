@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QFile>
+#include <QTextStream>
 #include<array>
 
 namespace stadic {
@@ -49,7 +50,7 @@ public:
     virtual QString getArg3(int position) const;
     virtual QString getArg(int number, int position) const;
 
-    static RadPrimitive *fromRad(QFile *file, QObject *parent = 0);
+    static RadPrimitive *fromRad(QTextStream &data, QObject *parent = 0);
 
 protected:
     void initArg(int number, std::vector<QString> arg);

@@ -1,6 +1,8 @@
 #include "radprimitive.h"
 #include <QTextStream>
 
+#include <iostream>
+
 namespace stadic {
 
 std::array<QString,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
@@ -193,9 +195,10 @@ static QString nextNonComment(QTextStream &data)
 {
   QString string;
   while(!data.atEnd()) {
-    string = data.readLine();
+    string = data.readLine().trimmed();
+    //std::cout << "### " << string.toStdString() << std::endl;
     if(!string.isEmpty()) {
-      if(!string.trimmed().startsWith('#')) {
+      if(!string.startsWith('#')) {
         return string;
       }
     }
@@ -203,18 +206,17 @@ static QString nextNonComment(QTextStream &data)
   return QString();
 }
 
-RadPrimitive* RadPrimitive::fromRad(QFile *file, QObject *parent)
+RadPrimitive* RadPrimitive::fromRad(QTextStream &data, QObject *parent)
 {
     RadPrimitive *rad;
-    QTextStream data(file);
 
     QString string = nextNonComment(data);
     if(string.isEmpty()) {
-      return nullptr;
+        return nullptr;
     }
     QStringList list = string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
     if(list.size() != 3) {
-      return nullptr;
+        return nullptr;
     }
 
     switch(typeFromString(list[1])) {
@@ -262,7 +264,6 @@ RadPrimitive* RadPrimitive::fromRad(QFile *file, QObject *parent)
         }
         rad->setArg3(args);
     }
-
     return rad;
 }
 
