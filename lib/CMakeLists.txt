@@ -10,6 +10,7 @@ set(SRCS stadiccontrol.cpp
          gridmaker.cpp
          radfiledata.cpp
          radprimitive.cpp
+         geometryprimitives.cpp
          weatherdata.cpp
          dayill.cpp
          elecill.cpp
@@ -23,6 +24,7 @@ set(HDRS stadiccontrol.h
          gridmaker.h
          radfiledata.h
          radprimitive.h
+         geometryprimitives.h
          weatherdata.h
          dayill.h
          elecill.h
