@@ -13,7 +13,8 @@ set(SRCS stadiccontrol.cpp
          weatherdata.cpp
          dayill.cpp
          elecill.cpp
-         daylight.cpp)
+         daylight.cpp
+         materialprimitives.cpp)
 		 
 set(HDRS stadiccontrol.h
          windowgroup.h
@@ -26,7 +27,8 @@ set(HDRS stadiccontrol.h
          weatherdata.h
          dayill.h
          elecill.h
-         daylight.h)
+         daylight.h
+         materialprimitives.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 

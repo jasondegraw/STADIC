@@ -1,6 +1,6 @@
 #include "radprimitive.h"
 #include "gtest/gtest.h"
-
+#include "materialprimitives.h"
 TEST(PrimitiveTests, Plastic)
 {
   stadic::PlasticMaterial rad(0.2,0.8,0.1,0.5,0.75);
