@@ -2,6 +2,7 @@
 #include "logging.h"
 #include <QFile>
 #include <QTextStream>
+#include "radfiledata.h"
 
 namespace stadic {
 daylight::daylight(QObject *parent) :
@@ -172,6 +173,280 @@ bool daylight::writeSky(stadic::Control &model){
     out<<"void light solar 0 0 3 1.00e+06 1.00e+06 1.00e+06";
     oFile.close();
 
+}
+
+bool daylight::createBaseRadFiles(stadic::Control &model){
+    stadic::RadFileData radModel;
+    //Add the main material file to the primitive list
+    radModel.addRad(model.projectFolder()+model.geoFolder()+model.matFile());
+    //Create a file of a black material
+    QFile oFile;
+    QString tempFile=model.projectFolder()+model.geoFolder()+"blackmat.rad";
+    oFile.setFileName(tempFile);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        ERROR("There was an error opening the file "+tempFile+".");
+        return false;
+    }
+    QTextStream out(&oFile);
+    out<<"void plastic black"<<endl;
+    out<<"0"<<endl<<"0"<<endl<<"5 0 0 0 0 0"<<endl;
+    oFile.close();
+    //Add the black material to the primitive list
+    radModel.addRad(model.projectFolder()+model.geoFolder()+"blackmat.rad");
+    //Add the main geometry file to the primitive list
+    radModel.addRad(model.projectFolder()+model.geoFolder()+model.geoFile());
+
+    //Create main rad files for each of the window groups
+        //The window group rad file will contain the base rad files and each of the other
+        //base rad files except their own.  The glazing layers for the other groups will
+        //be blacked out.
+    for (int i=0;i<model.windowGroups().size();i++){
+        /*stadic::RadFileData wgRadModel=radModel;
+        for (int j=0;j<model.windowGroups().size();j++){
+            if (i!=j){
+                if(!wgRadModel.addRad(model.projectFolder()+model.geoFolder()+model.windowGroups()[j]->baseGeometry())){
+                    return false;
+                }
+                for (int k=0;k<model.windowGroups()[j]->glazingLayers().size();k++){
+                    if(!wgRadModel.blackOutLayer(model.windowGroups()[j]->glazingLayers()[k])){
+                        return false;
+                    }
+                }
+            }
+        }
+        tempFile=model.projectFolder()+model.tmpFolder()+model.projectName()+"_"+model.windowGroups()[i]->objectName()+"_Main.rad";
+        if (!wgRadModel.writeRadFile(tempFile)){
+            return false;
+        }
+        */
+    }
+    return true;
+
+    /*
+    //*******************************************************************
+    //	Section of the code for creating the main rad file
+    //*******************************************************************
+    RadIn.open(string(material_file));														//	open the main material file for placing at the beginning of the main dds rad file
+    if (RadIn.fail()){																		//	test that the file exists
+        cout << "The main material file could not be opened." << endl;
+        cout << "The program will assume the materials are in the geometry file."<<endl;
+    }
+    MainRadFileName=string(project_directory)+"tmp/"+string(project_name)+"_base.rad";
+    RadOut.open(MainRadFileName);														//	open the output file for the main dds rad file
+    //black material for the BSDF runs.
+    RadOut<<"void plastic black"<<endl;
+    RadOut<<"0"<<endl<<"0"<<endl<<"5 0 0 0 0 0"<<endl;
+
+    while (getline(RadIn,PassString)){  //	Pulls each line out one by one
+        ss << PassString;				//	Places the string into the string stream
+        while (ss.get(tempchar)){				//	Checks to make sure that the string stream isn't empty
+            RadOut<<tempchar;
+        }
+        ss.clear();
+        RadOut<< endl;
+    }
+    RadIn.close();
+
+    RadIn.open(string(geometry_file));														//	open the main geometry file for placing after the main material file
+    if (RadIn.fail()){																		//	test that the file exists
+        cout << "The main geometry file could not be opened." << endl;
+        cout<< "Please specify your geometry before running the sDA analysis." << endl;
+        cout<< "The program will now close.";
+        exit(1);
+    }
+    while (getline(RadIn,PassString)){  //	Pulls each line out one by one
+        ss << PassString;				//	Places the string into the string stream
+        while (ss.get(tempchar)){				//	Checks to make sure that the string stream isn't empty
+            RadOut<<tempchar;
+        }
+        ss.clear();
+        RadOut<< endl;
+    }
+    RadIn.close();
+    RadOut.close();
+    #pragma endregion
+
+    #pragma region "Window Group Main Geometry Files"
+    //Section of the code to create the main radiance file for each of the window groups
+    //These files contain the main base geometry + the base case geometry from each of the other window groups (the other window groups will be blacked out)
+    for (int i=1;i<=NumBlindSettings;i++){														//	loop through each of the base case rad files
+        RadIn.open(MainRadFileName);
+        cout<<"Attempting to open the Rad In file."<<endl;
+        if (RadIn.fail()){
+            cout<<"The opening of the temporary main rad file for has failed."<<endl;
+            cout<<"The program will now close."<<endl;
+            exit(1);
+        }
+        RadOut.open(string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.tmp");
+        cout<<"Attempting to Open the Rad Out file."<<endl;
+        if (RadOut.fail()){
+            cout<<"The first attempt at opening the temporary main rad file for "<<string(BlindGroupName[i])<<" has failed."<<endl;
+            cout<<"The program will now attempt to close any open streams and re-open the file."<<endl;
+            RadOut.close();
+            RadOut.open(string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.tmp");
+            if (RadOut.fail()){
+                cout<<"The opening of the temporary main rad file for "<<string(BlindGroupName[i])<<" has still failed."<<endl;
+                cout<<"The program will now close."<<endl;
+                exit(1);
+            }
+        }
+        while (getline(RadIn,PassString)){  //	Pulls each line out one by one
+            ss << PassString;				//	Places the string into the string stream
+            while (ss.get(tempchar)){				//	Checks to make sure that the string stream isn't empty
+                RadOut<<tempchar;
+            }
+            ss.clear();
+            RadOut<< endl;
+        }
+        RadIn.close();
+        cout<<"The Rad In file has been closed."<<endl;
+
+        for (int j=1;j<=NumBlindSettings;j++){
+            if (i!=j){
+                RadInFileName=string(project_directory)+string(BlindGroupGeometryInRadiance[0][j]);		//	get the file name for the base case rad file
+                RadIn.open(RadInFileName);																//	open the rad file for placing into the main dds rad file
+                cout<<"Attempting to open the Rad In file."<<endl;
+                if (RadIn.fail()){																		//	test that the file exists
+                    cout << "The geometry file " << RadInFileName << " could not be opened." << endl;
+                    cout<< "Please specify your geometry before the simulation." << endl;
+                    cout<< "The program will now close.";
+                    exit(1);
+                }
+                while (getline(RadIn,PassString)){  //	Pulls each line out one by one
+                    ss << PassString;				//	Places the string into the string stream
+                    while (ss.get(tempchar)){				//	Checks to make sure that the string stream isn't empty
+                    RadOut<<tempchar;
+                    }
+                    ss.clear();
+                RadOut<< endl;
+                }
+                RadIn.close();
+                cout<<"The Rad In file has been closed."<<endl;
+            }
+            //RadOut.close();			//Changed the location of this to two lines below.
+        }
+        RadOut.close();
+        cout<<"The Rad Out file has been closed."<<endl;
+        RadIn.open(string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.tmp");
+        cout<<"Attempting to open the Rad In file."<<endl;
+        if (RadIn.fail()){
+            cout<<"The opening of the temporary main rad file for "<<string(BlindGroupName[i])<<" has failed."<<endl;
+            cout<<"The program will now close."<<endl;
+            exit(1);
+        }
+        RadOut.open(string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.rad");
+
+        RadIn>>PassString;
+        while (!RadIn.eof()){
+            //RadIn>> PassString;
+            if (PassString.find("#") != string::npos){
+                getline(RadIn, PassString);
+            }else{
+                if (PassString=="void"){
+                    MatFound=false;
+                    RadIn>>PassString;
+                    RadIn>>PassString2;
+                    for (int n=1;n<=NumBlindSettings;n++){							//loop through window groups
+                        if (n!=i){													//skip the window group that this is being created for
+                            for (int j=1;j<=NumGlazingMaterials[i]; j++){			//loop through glazing materials in those groups
+                                if (PassString2==GlazingMaterials[n][j]){			//if the layer in the material file equals the glazing layer of another window group
+                                    MatFound=true;
+                                    RadOut<<"void plastic "<<PassString2<<endl;
+                                    RadOut<<"0 0 5 0 0 0 0 0"<<endl;
+                                }
+                            }
+                        }
+                    }
+                    if (MatFound==false){
+                        RadOut<<"void "<<PassString<<" "<<PassString2<<endl;
+                        RadIn>>PassString;
+                        RadOut<<PassString;
+                        if (PassString!="0"){									// Section to read the first line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                                RadOut<<" "<<PassString2;
+                            }
+                        }
+                        RadOut<<endl;
+                        RadIn>>PassString;
+                        RadOut<<PassString;
+                        if (PassString!="0"){									// Section to read the second line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                                RadOut<<" "<<PassString2;
+                            }
+                        }
+                        RadOut<<endl;
+                        RadIn>>PassString;
+                        RadOut<<PassString;
+                        if (PassString!="0"){									// Section to read the third line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                                RadOut<<" "<<PassString2;
+                            }
+                        }
+                        RadOut<<endl;
+                    }else{
+                        RadIn>>PassString;
+                        if (PassString!="0"){									// Section to read the first line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                            }
+                        }
+                        RadIn>>PassString;
+                        if (PassString!="0"){									// Section to read the second line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                            }
+                        }
+                        RadIn>>PassString;
+                        if (PassString!="0"){									// Section to read the third line of arguments
+                            for (int m=0;m<atoi(PassString.c_str());m++){
+                                RadIn>>PassString2;
+                            }
+                        }
+                    }
+                }else{
+                    RadOut<<PassString<<" ";		//Write Modifier
+                    RadIn>>PassString;				//Read Material Type
+                    RadOut<<PassString<<" ";		//Write Material Type
+                    RadIn>>PassString;				//Read Identifier
+                    RadOut<<PassString<<endl;		//Write Identifier
+                    RadIn>>PassString;
+                    RadOut<<PassString;
+                    if (PassString!="0"){									// Section to read the first line of arguments
+                        for (int m=0;m<atoi(PassString.c_str());m++){
+                            RadIn>>PassString2;
+                            RadOut<<" "<<PassString2;
+                        }
+                    }
+                    RadOut<<endl;
+                    RadIn>>PassString;
+                    RadOut<<PassString;
+                    if (PassString!="0"){									// Section to read the second line of arguments
+                        for (int m=0;m<atoi(PassString.c_str());m++){
+                            RadIn>>PassString2;
+                            RadOut<<" "<<PassString2;
+                        }
+                    }
+                    RadOut<<endl;
+                    RadIn>>PassString;
+                    RadOut<<PassString;
+                    if (PassString!="0"){									// Section to read the third line of arguments
+                        for (int m=0;m<atoi(PassString.c_str());m++){
+                            RadIn>>PassString2;
+                            RadOut<<" "<<PassString2;
+                        }
+                    }
+                    RadOut<<endl;
+                }
+            }
+            RadIn>>PassString;
+        }
+        RadIn.close();
+    }
+    */
 }
 
 }

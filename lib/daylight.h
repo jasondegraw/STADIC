@@ -20,7 +20,7 @@ private:
     bool testSimCase(stadic::Control &model);
     bool setSimCase(int setting, int simCase);
     bool writeSky(stadic::Control &model);
-
+    bool createBaseRadFiles(stadic::Control &model);
 
     std::vector<int> m_SimCase;
 signals:

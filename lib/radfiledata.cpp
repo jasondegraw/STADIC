@@ -95,10 +95,47 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
     return false;
 }
 bool RadFileData::blackOutLayer(QString layer){
-
+    for(int i=0;i<m_Primitives.size();i++) {
+        if(m_Primitives[i]->modifier()==layer) {
+            m_Primitives[i]->setModifier("black");
+        }
+    }
 }
 bool RadFileData::writeRadFile(QString file){
+    QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        ERROR("The opening of the rad file named "+file + " has failed.");
+        return false;
+    }
+    QTextStream out(&oFile);
+    std::vector<RadPrimitive*> primitives;
+    primitives=materials();
+    for (int i=0;i<primitives.size();i++){
+        out<<endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<endl;
+        out<<primitives[i]->arg1().size();
+        if (primitives[i]->arg1().size()>0){
+            for (int j=0;j<primitives[i]->arg1().size();j++){
+                out<<" "<<primitives[i]->arg1()[j];
+            }
+        }
+        out<<endl;
+    }
 
+    primitives=geometry();
+    for (int i=0;i<primitives.size();i++){
+        out<<endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<endl;
+        out<<primitives[i]->arg1().size();
+        if (primitives[i]->arg1().size()>0){
+            for (int j=0;j<primitives[i]->arg1().size();j++){
+                out<<" "<<primitives[i]->arg1()[j];
+            }
+        }
+        out<<endl;
+    }
+    oFile.close();
+    return true;
 }
 
 
