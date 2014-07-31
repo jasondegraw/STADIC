@@ -1,5 +1,7 @@
 #include "radprimitive.h"
 #include <QTextStream>
+#include "materialprimitives.h"
+#include <iostream>
 
 namespace stadic {
 
@@ -17,6 +19,59 @@ std::array<QString,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubbl
 RadPrimitive::RadPrimitive(QObject *parent) :
     QObject(parent)
 {
+}
+
+bool RadPrimitive::isGeometry() const
+{
+    switch(type()) {
+    case Source:
+    case Sphere:
+    case Bubble:
+    case Polygon:
+    case Cone:
+    case Cup:
+    case Cylinder:
+    case Tube:
+    case Ring:
+    case Instance:
+    case Mesh:
+        return true;
+    }
+    return false;
+}
+
+bool RadPrimitive::isMaterial() const
+{
+    switch(type()) {
+    case Light:
+    case Illum:
+    case Glow:
+    case Spotlight:
+    case Mirror:
+    case Prism1:
+    case Prism2:
+    case Plastic:
+    case Metal:
+    case Trans:
+    case Plastic2:
+    case Metal2:
+    case Trans2:
+    case Mist:
+    case Dielectric:
+    case Interface:
+    case Glass:
+    case Plasfunc:
+    case Metfunc:
+    case Transfunc:
+    case BRTDfunc:
+    case Plasdata:
+    case Metdata:
+    case Transdata:
+    case BSDF:
+    case Antimatter:
+        return true;
+    }
+    return false;
 }
 
 //Setters
@@ -140,9 +195,10 @@ static QString nextNonComment(QTextStream &data)
 {
   QString string;
   while(!data.atEnd()) {
-    string = data.readLine();
+    string = data.readLine().trimmed();
+    //std::cout << "### " << string.toStdString() << std::endl;
     if(!string.isEmpty()) {
-      if(!string.trimmed().startsWith('#')) {
+      if(!string.startsWith('#')) {
         return string;
       }
     }
@@ -150,18 +206,17 @@ static QString nextNonComment(QTextStream &data)
   return QString();
 }
 
-RadPrimitive* RadPrimitive::fromRad(QFile file, QObject *parent)
+RadPrimitive* RadPrimitive::fromRad(QTextStream &data, QObject *parent)
 {
     RadPrimitive *rad;
-    QTextStream data(&file);
 
     QString string = nextNonComment(data);
     if(string.isEmpty()) {
-      return nullptr;
+        return nullptr;
     }
     QStringList list = string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
     if(list.size() != 3) {
-      return nullptr;
+        return nullptr;
     }
 
     switch(typeFromString(list[1])) {
@@ -209,7 +264,6 @@ RadPrimitive* RadPrimitive::fromRad(QFile file, QObject *parent)
         }
         rad->setArg3(args);
     }
-
     return rad;
 }
 
@@ -278,142 +332,6 @@ void RadPrimitive::initArg(int number, std::vector<QString> arg)
         // Error message?
         break;
     }
-}
-
-PlasticMaterial::PlasticMaterial(QObject *parent) : RadPrimitive(parent)
-{
-    RadPrimitive::setType("plastic");
-    std::vector<QString> arg3 = {"0","0","0","0","0"};
-    initArg(3,arg3);
-}
-
-PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
-    : RadPrimitive(parent)
-{
-    RadPrimitive::setType("plastic");
-    setArg(3,QString().sprintf("%g",red),0);
-    setArg(3,QString().sprintf("%g",green),1);
-    setArg(3,QString().sprintf("%g",blue),2);
-    setArg(3,QString().sprintf("%g",spec),3);
-    setArg(3,QString().sprintf("%g",rough),4);
-}
-
-// Setters
-bool PlasticMaterial::setRed(double value)
-{
-    return setArg(3,QString().sprintf("%g",value),0);
-}
-
-bool PlasticMaterial::setGreen(double value)
-{
-    return setArg(3,QString().sprintf("%g",value),1);
-}
-
-bool PlasticMaterial::setBlue(double value)
-{
-    return setArg(3,QString().sprintf("%g",value),2);
-}
-
-bool PlasticMaterial::setSpecularity(double value)
-{
-    return setArg(3,QString().sprintf("%g",value),3);
-}
-
-bool PlasticMaterial::setRoughness(double value)
-{
-    return setArg(3,QString().sprintf("%g",value),4);
-}
-
-// Getters
-double PlasticMaterial::red() const
-{
-    bool ok;
-    double value = getArg3(0).toDouble(&ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
-}
-
-double PlasticMaterial::green() const
-{
-    bool ok;
-    double value = getArg3(1).toDouble(&ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
-}
-
-double PlasticMaterial::blue() const
-{
-    bool ok;
-    double value = getArg3(2).toDouble(&ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
-}
-
-double PlasticMaterial::specularity() const
-{
-    bool ok;
-    double value = getArg3(3).toDouble(&ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
-}
-
-double PlasticMaterial::roughness() const
-{
-    bool ok;
-    double value = getArg3(4).toDouble(&ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
-}
-
-bool PlasticMaterial::validateArg(int number, QString value, int position) const
-{
-    if(number==3) {
-        if(position>=0 && position<5) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
-{
-    if(number==3) {
-        if(arg.size() != 5) {
-            return false;
-        }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
-    }
-    return false;
 }
 
 }

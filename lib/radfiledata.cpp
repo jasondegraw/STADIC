@@ -9,205 +9,161 @@ RadFileData::RadFileData(QObject *parent) :
     QObject(parent)
 {
 }
+
+RadFileData::RadFileData(const std::vector<RadPrimitive *> &primitives, QObject *parent) : QObject(parent)
+{
+    m_Primitives = primitives;
+}
+
 //Setters
 bool RadFileData::addRad(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.exists()){
-        ERROR("The opening of the rad file failed.");
+        ERROR(QString("The opening of the rad file '%1' failed.").arg(file));
         return false;
     }
 
     QTextStream data(&iFile);
-    while (!data.atEnd()){
-        QString string;
-        QString string2;
-        data>>string;
-        if (string.contains('#')){
-            QString tempString;
-            tempString=data.readLine();
-        }else{
-            if (string.contains("void")){
-                RadPrimitive *rad=new RadPrimitive(this);
-                rad->setModifier("void");
-                data>>string;   //reads type
-                rad->setType(string);
-                data>>string;   //reads name
-                rad->setName(string);
-                data>>string;   //Reads number of arguments from first line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg1(args);
-                }
-                data>>string;   //Reads number of arguments from second line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg2(args);
-                }
-                data>>string;   //Reads number of arguments from third line
-                if (string.toInt()>0){
-                    std::vector<QString> args;
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                        args.push_back(string2);
-                    }
-                    rad->setArg3(args);
-                }
-                m_RadMat.push_back(rad);
-            }else{
-                data>>string2;
-                if (string2=="polygon"){
-                    RadPrimitive *rad=new RadPrimitive(this);
-                    rad->setModifier(string);
-                    rad->setType(string2);
-                    data>>string;
-                    rad->setName(string);
-                    data>>string;               //Read number of arguments from first line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from second line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from third line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg3(args);
-                    }
-                    m_RadGeo.push_back(rad);
-                }else{                          //If it isn't a polygon, the info still needs to be read in
-                    WARNING("The rad file contains a modifer that is not \"null\", but is not a polygon.\nThis piece of input will be ignored.");
-                    data>>string;   //reads name
-                    data>>string;   //Reads number of arguments from first line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from second line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from third line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                }
-            }
+    std::vector<RadPrimitive*> primitives;
+    while (!data.atEnd()) {
+        RadPrimitive *primitive = RadPrimitive::fromRad(data,this->parent());
+        if(primitive == nullptr) {
+            break;
         }
+        primitives.push_back(primitive);
     }
     iFile.close();
+    if(primitives.size() == 0) {
+        return false;
+    }
+    m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());
+    return true;
 }
-bool RadFileData::removeLayer(QString layer, QString outFile){
-    QFile oFile;
-    oFile.setFileName(outFile);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        ERROR("The opening of the rad file named " + outFile +" has failed.");
+
+QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*,const QString&), const QString &label)
+{
+    std::vector<RadPrimitive*> in, out;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(f(primitive,label)) {
+            in.push_back(primitive);
+        } else {
+            out.push_back(primitive);
+        }
+    }
+    // Need to account for o size vectors!
+    return QPair<RadFileData*,RadFileData*>(new RadFileData(in,this->parent()),
+                                            new RadFileData(out,this->parent()));
+}
+
+static bool checkLayer(RadPrimitive *primitive, const QString &name)
+{
+    if(primitive->isMaterial() && primitive->name() == name) {
+        return true;
+    } else if(primitive->isGeometry() && primitive->modifier() == name) {
+        return true;
+    }
+    return false;
+}
+
+bool RadFileData::removeLayer(const QString &layer, const QString &removing, const QString &rest)
+{
+    QFile oFile1;
+    oFile1.setFileName(removing);
+    oFile1.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile1.exists()){
+        ERROR("The opening of the rad file named " + removing +" has failed.");
         return false;
     }
 
-    QTextStream out(&oFile);
-    for (int i=0;i<m_RadMat.size();i++){
-        if (m_RadMat.at(i)->name()==layer){
-            out<<m_RadMat.at(i)->modifier()<<" "<<m_RadMat.at(i)->type()<<" "<<m_RadMat.at(i)->name()<<endl;
-            out<<m_RadMat.at(i)->arg1().size();
-            if (m_RadMat.at(i)->arg1().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg1().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg1().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadMat.at(i)->arg2().size();
-            if (m_RadMat.at(i)->arg2().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg2().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg2().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadMat.at(i)->arg3().size();
-            if (m_RadMat.at(i)->arg3().size()>0){
-                for (int j=0;j<m_RadMat.at(i)->arg3().size();j++){
-                    out<<" "<<m_RadMat.at(i)->arg3().at(j);
-                }
-            }
-            out<<endl<<endl;
-        }
+    QFile oFile2;
+    oFile2.setFileName(rest);
+    oFile2.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile2.exists()){
+        ERROR("The opening of the rad file named " + rest +" has failed.");
+        return false;
     }
 
-    for (int i=0;i<m_RadGeo.size();i++){
-        if (m_RadGeo.at(i)->modifier()==layer){
-            out<<m_RadGeo.at(i)->modifier()<<" "<<m_RadGeo.at(i)->type()<<" "<<m_RadGeo.at(i)->name()<<endl;
-            out<<m_RadGeo.at(i)->arg1().size();
-            if (m_RadGeo.at(i)->arg1().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg1().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg1().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadGeo.at(i)->arg2().size();
-            if (m_RadGeo.at(i)->arg2().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg2().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg2().at(j);
-                }
-            }
-            out<<endl;
-            out<<m_RadGeo.at(i)->arg3().size();
-            if (m_RadGeo.at(i)->arg3().size()>0){
-                for (int j=0;j<m_RadGeo.at(i)->arg3().size();j++){
-                    out<<" "<<m_RadGeo.at(i)->arg3().at(j);
-                }
-            }
-            out<<endl<<endl;
-        }
-    }
-    //Remove material and geometry from respective vectors
+    QPair<RadFileData*,RadFileData*> results = split(checkLayer,layer);
 
+    // Write out the two files
 
-    oFile.close();
+    oFile1.close();
+    oFile2.close();
+
+    return false;
 }
 bool RadFileData::blackOutLayer(QString layer){
-	return true;
+    for(int i=0;i<m_Primitives.size();i++) {
+        if(m_Primitives[i]->modifier()==layer) {
+            m_Primitives[i]->setModifier("black");
+        }
+    }
+    return true;
 }
 bool RadFileData::writeRadFile(QString file){
-	return true;
-}
+    QFile oFile;
+    oFile.setFileName(file);
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        ERROR("The opening of the rad file named "+file + " has failed.");
+        return false;
+    }
+    QTextStream out(&oFile);
+    std::vector<RadPrimitive*> primitives;
+    primitives=materials();
+    for (int i=0;i<primitives.size();i++){
+        out<<endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<endl;
+        out<<primitives[i]->arg1().size();
+        if (primitives[i]->arg1().size()>0){
+            for (int j=0;j<primitives[i]->arg1().size();j++){
+                out<<" "<<primitives[i]->arg1()[j];
+            }
+        }
+        out<<endl;
+    }
 
+    primitives=geometry();
+    for (int i=0;i<primitives.size();i++){
+        out<<endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<endl;
+        out<<primitives[i]->arg1().size();
+        if (primitives[i]->arg1().size()>0){
+            for (int j=0;j<primitives[i]->arg1().size();j++){
+                out<<" "<<primitives[i]->arg1()[j];
+            }
+        }
+        out<<endl;
+    }
+    oFile.close();
+    return true;
+}
 
 //Getters
-std::vector<RadPrimitive *> RadFileData::geometry(){
-    return m_RadGeo;
+std::vector<RadPrimitive *> RadFileData::geometry() const
+{
+    std::vector<RadPrimitive*> primitives;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(primitive->isGeometry()) {
+            primitives.push_back(primitive);
+        }
+    }
+    return primitives;
 }
-std::vector<RadPrimitive *> RadFileData::materials(){
-    return m_RadMat;
+std::vector<RadPrimitive *> RadFileData::materials() const
+{
+    std::vector<RadPrimitive*> primitives;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(primitive->isMaterial()) {
+            primitives.push_back(primitive);
+        }
+    }
+    return primitives;
+}
+
+std::vector<RadPrimitive *> RadFileData::primitives() const
+{
+    return m_Primitives;
 }
 
 }

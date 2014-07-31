@@ -10,10 +10,12 @@ set(SRCS stadiccontrol.cpp
          gridmaker.cpp
          radfiledata.cpp
          radprimitive.cpp
+         geometryprimitives.cpp
          weatherdata.cpp
          dayill.cpp
          elecill.cpp
-         daylight.cpp)
+         daylight.cpp
+         materialprimitives.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -24,10 +26,12 @@ set(HDRS stadicapi.h
          gridmaker.h
          radfiledata.h
          radprimitive.h
+         geometryprimitives.h
          weatherdata.h
          dayill.h
          elecill.h
-         daylight.h)
+         daylight.h
+         materialprimitives.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 

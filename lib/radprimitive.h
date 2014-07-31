@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QFile>
+#include <QTextStream>
 #include<array>
 
 #include "stadicapi.h"
@@ -20,6 +21,9 @@ public:
                Texfunc, Texdata, Colorfunc, Brightfunc, Colordata, Brightdata, Colorpict, Colortext,
                Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext, Unknown};
     explicit RadPrimitive(QObject *parent = 0);
+
+    bool isGeometry() const;
+    bool isMaterial() const;
 
     //Setters
     void setModifier(QString modifier);
@@ -48,7 +52,7 @@ public:
     virtual QString getArg3(int position) const;
     virtual QString getArg(int number, int position) const;
 
-    static RadPrimitive *fromRad(QFile file, QObject *parent = 0);
+    static RadPrimitive *fromRad(QTextStream &data, QObject *parent = 0);
 
 protected:
     void initArg(int number, std::vector<QString> arg);
@@ -70,30 +74,6 @@ signals:
 
 public slots:
 
-};
-
-class STADIC_API PlasticMaterial : public RadPrimitive
-{
-public:
-    explicit PlasticMaterial(QObject *parent=0);
-    PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent=0);
-
-    // Setters
-    bool setType(QString){return false;}
-    bool setRed(double value);
-    bool setGreen(double value);
-    bool setBlue(double value);
-    bool setSpecularity(double value);
-    bool setRoughness(double value);
-    // Getters
-    double red() const;
-    double green() const;
-    double blue() const;
-    double specularity() const;
-    double roughness() const;
-private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
 };
 
 }
