@@ -20,6 +20,8 @@ public:
     bool blackOutLayer(QString layer);
     bool writeRadFile(QString file);
 
+    bool addPrimitive(RadPrimitive *primitive);
+
     //Getters
     std::vector<RadPrimitive *> geometry() const;
     std::vector<RadPrimitive *> materials() const;

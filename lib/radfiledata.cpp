@@ -138,6 +138,11 @@ bool RadFileData::writeRadFile(QString file){
     return true;
 }
 
+bool RadFileData::addPrimitive(RadPrimitive *primitive)
+{
+    m_Primitives.push_back(primitive);
+    return true;
+}
 
 //Getters
 std::vector<RadPrimitive *> RadFileData::geometry() const
