@@ -1,2 +1,5 @@
-STADIC   Developed by Craig Casey at Penn State
-		
+STADIC
+======
+
+Developed by Craig Casey at Penn State
+	
