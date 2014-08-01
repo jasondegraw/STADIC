@@ -104,6 +104,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum){
 }
 
 bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
+    //rcontrib for sky
     QProcess *rcontrib=new QProcess(this);
     QString rcontribProgram="rcontrib.exe";
     rcontrib->setProgram(rcontribProgram);
@@ -111,16 +112,15 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("-I+");
     arguments.push_back("-ab");
     //This value should probably be based off of a value in the control file
-    arguments.push_back(QString().sprintf("%g",10));
+    arguments.push_back("10");
     arguments.push_back("-ad");
     //This value should probably be based off of a value in the control file
-    arguments.push_back(QString().sprintf("%g",5000));
+    arguments.push_back("5000");
     arguments.push_back("-lw");
     //This value should probably be based off of a value in the control file
     arguments.push_back("2e-5");
     arguments.push_back("-e");
-    //This next line should probably be based off of a value in the control file
-    arguments.push_back("MF:1");
+    arguments.push_back("MF:"+QString().sprintf("%g",model->skyDivisions()));
     arguments.push_back("-f");
     arguments.push_back("reinhart.cal");
     arguments.push_back("-b");
@@ -130,23 +130,26 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("-m");
     arguments.push_back("sky_glow");
     arguments.push_back("-faa");
+    QString skyDC;
     if (setting==-1){
         //This is the base case
         arguments.push_back(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct");
-        rcontrib->setStandardOutputFile(model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1k.dc");
+        skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1k.dc";
     }
-
+    rcontrib->setStandardOutputFile(skyDC);
     rcontrib->setWorkingDirectory(model->projectFolder());
     rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The creation of the octree has failed with the following errors.");
+        ERROR("The rcontrib run for the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
     }
+
+    //Create Suns
     int nSuns;
     if(model->sunDivisions()==1){
         nSuns=145;
@@ -160,11 +163,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         nSuns=3601;
     }else if (model->sunDivisions()==6){
         nSuns=5185;
-    }
-
-
+    } 
     QFile tempFile;
-    tempFile.setFileName(model->tmpFolder()+model->projectName()+"_suns_m1.rad");
+    tempFile.setFileName(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
     if (!tempFile.exists()){
         QProcess *cnt=new QProcess(this);
         QString cntProgram="cnt.exe";
@@ -187,35 +188,218 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments2.append("-o");
         arguments2.append("\"solar source sun 0 0 4 ${ Dx } ${ Dy } ${ Dz } 0.533\"");
         rcalc->setWorkingDirectory(model->projectFolder());
-        rcalc->setStandardOutputFile(model->tmpFolder()+model->projectName()+"_suns_m1.rad");
+        rcalc->setStandardOutputFile(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
         rcalc->setArguments(arguments2);
 
         cnt->start();
         rcalc->start();
 
         if(!rcalc->waitForFinished(-1)){
-            ERROR("The running of rcalc for suns_m1.rad has failed.");
+            ERROR("The running of rcalc for the suns has failed.");
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
         }
     }
 
-    //oconv rad\room_material.rad rad\room_geometry.rad C:/dcs/tmp/suns_m1.rad > C:/dcs/tmp/suns.oct
+    //Create suns octree
+    QStringList octFiles;
+    QString sunsOct;
+    if (setting==-1){
+        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad"));
+        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad"));
+        sunsOct=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_base.rad";
 
-    //rcontrib  -I+ -ab 0 -ad 50000 -lw 2e-5 -e MF:%MFsun% -f reinhart.cal -b rbin -bn Nrbins -m solar -faa c:/dcs/tmp/suns.oct < c:/dcs/pts/XXX.pts  > 1d.dc
+    }
+    if(!createOctree(octFiles,sunsOct)){
+        return false;
+    }
 
-    //gendaymtx -m 4 -5 -d -h C:/dcs/wea/USA_PA_State.College-Penn.State.University.725128_TMY3_60min.wea > C:/dcs/d.smx
+    //rcontrib for sun
+    arguments.clear();
+    arguments.push_back("-I+");
+    arguments.push_back("-ab");
+    //This value should probably be based off of a value in the control file
+    arguments.push_back("0");
+    arguments.push_back("-ad");
+    //This value should probably be based off of a value in the control file
+    arguments.push_back("5000");
+    arguments.push_back("-lw");
+    //This value should probably be based off of a value in the control file
+    arguments.push_back("2e-5");
+    arguments.push_back("-e");
+    arguments.push_back("MF:"+QString().sprintf("%g",model->sunDivisions()));
+    arguments.push_back("-f");
+    arguments.push_back("reinhart.cal");
+    arguments.push_back("-b");
+    arguments.push_back("rbin");
+    arguments.push_back("-bn");
+    arguments.push_back("Nrbins");
+    arguments.push_back("-m");
+    arguments.push_back("solar");
+    arguments.push_back("-faa");
+    QString sunDC;
+    if (setting==-1){
+        //This is the base case
+        arguments.push_back(sunsOct);
+        sunDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1d.dc";
+    }
+    rcontrib->setStandardOutputFile(sunDC);
+    rcontrib->setWorkingDirectory(model->projectFolder());
+    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setArguments(arguments);
 
-    //gendaymtx -m 1 -c 1 1 1 -h C:/dcs/wea/USA_PA_State.College-Penn.State.University.725128_TMY3_60min.wea > C:/dcs/k.smx
+    rcontrib->start();
+    if (!rcontrib->waitForFinished(-1)){
+        ERROR("The sun rcontrib run failed with the following errors.");
+        //I want to display the errors here if the standard error has any errors to show.
 
-    //gendaymtx -m 1 -d -h C:/dcs/wea/USA_PA_State.College-Penn.State.University.725128_TMY3_60min.wea > C:/dcs/kd.smx
+        return false;
+    }
 
-    //dctimestep -n 8760  C:/dcs/1k.dc C:/dcs/k.smx | rcollate -ho -oc 1 > C:/dcs/sun1.txt
+    //gendaymtx for sun
+    QProcess *gendaymtx=new QProcess(this);
+    QString gendaymtxProgram="gendaymtx.exe";
+    gendaymtx->setProgram(gendaymtxProgram);
+    arguments.clear();
+    arguments.append("-m");
+    arguments.append(QString().sprintf("%g", model->sunDivisions()));
+    arguments.append("-5");
+    arguments.append("-d");
+    arguments.append("-h");
+    arguments.append(model->weaDataFile());
+    gendaymtx->setArguments(arguments);
+    QString sunSMX;
+    if (setting==-1){
+        sunSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_d.smx";
+    }
+    gendaymtx->setStandardOutputFile(sunSMX);
+    gendaymtx->setWorkingDirectory(model->projectFolder());
+    gendaymtx->start();
+    if (!gendaymtx->waitForFinished(-1)){
+        ERROR("The creation of the suns has failed with the following errors.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
+
+    //gendaymtx for sky
+    arguments.clear();
+    arguments.append("-m");
+    arguments.append(QString().sprintf("%g", model->skyDivisions()));
+    arguments.append("-c");
+    arguments.append("1");
+    arguments.append("1");
+    arguments.append("1");
+    arguments.append("-h");
+    arguments.append(model->weaDataFile());
+    gendaymtx->setArguments(arguments);
+    QString skySMX;
+    if (setting==-1){
+        skySMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_k.smx";
+    }
+    gendaymtx->setStandardOutputFile(skySMX);
+    gendaymtx->start();
+    if (!gendaymtx->waitForFinished(-1)){
+        ERROR("The creation of the sky has failed with the following errors.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
+
+    //gendaymtx fun sun in patches
+    arguments.clear();
+    arguments.append("-m");
+    arguments.append(QString().sprintf("%g", model->skyDivisions()));
+    arguments.append("d");
+    arguments.append("-h");
+    arguments.append(model->weaDataFile());
+    gendaymtx->setArguments(arguments);
+    QString sunPatchSMX;
+    if (setting==-1){
+        sunPatchSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_kd.smx";
+    }
+    gendaymtx->setStandardOutputFile(sunPatchSMX);
+    gendaymtx->start();
+    if (!gendaymtx->waitForFinished(-1)){
+        ERROR("The creation of the sun patches has failed with the following errors.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
+
+    //dctimestep | rcollate for the sky
+    QProcess *dctimestep=new QProcess(this);
+    QString dctimestepProgram="dctimestep.exe";
+    dctimestep->setProgram(dctimestepProgram);
+    arguments.clear();
+    arguments.append("-n");
+    arguments.append("8760");
+    arguments.append(skySMX);
+    dctimestep->setWorkingDirectory(model->projectFolder());
+
+    QProcess *rcollate=new QProcess(this);
+    QString rcollateProgram="rcollate.exe";
+    rcollate->setProgram(rcollateProgram);
+    dctimestep->setStandardOutputProcess(rcollate);
+    QStringList arguments2;
+    arguments2.append("-ho");
+    arguments2.append("-oc");
+    arguments2.append("1");
+    rcollate->setArguments(arguments2);
+    QString skyCollated;
+    if (setting==-1){
+        skyCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sky.txt";
+    }
+    rcollate->setStandardOutputFile(skyCollated);
+    rcollate->setWorkingDirectory(model->projectFolder());
+
+    dctimestep->start();
+    rcollate->start();
+
+    if(!rcollate->waitForFinished(-1)){
+        ERROR("The running of rcollate for the sky has failed.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
 
     //dctimestep -n 8760  C:/dcs/1d.dc C:/dcs/d.smx | rcollate -ho -oc 1 > C:/dcs/sun1A.txt
+    arguments.replace(2,sunSMX);
+    dctimestep->setArguments(arguments);
+    QString sunCollated;
+    if (setting==-1){
+        sunCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sun.txt";
+    }
+    rcollate->setStandardOutputFile(sunCollated);
+    dctimestep->start();
+    rcollate->start();
+
+    if(!rcollate->waitForFinished(-1)){
+        ERROR("The running of rcollate for the sun has failed.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
+
 
     //dctimestep -n 8760  C:/dcs/1K.dc C:/dcs/Kd.smx | rcollate -ho -oc 1 > C:/dcs/sun1B.TXT
+    arguments.replace(2,sunPatchSMX);
+    dctimestep->setArguments(arguments);
+    QString sunPatchCollated;
+    if (setting==-1){
+        sunPatchCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sunPatch.txt";
+    }
+    rcollate->setStandardOutputFile(sunPatchCollated);
+    dctimestep->start();
+    rcollate->start();
+
+    if(!rcollate->waitForFinished(-1)){
+        ERROR("The running of rcollate for the sun patches has failed.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
 
     //rlam SUN1.TXT SUN1B.TXT SUN1A.TXT| rcalc -e "r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9" -e "ill=179*(.265*r +.670*g + .065*b)" -e "$1=floor(ill+.5)" > OUT1.ill
 
