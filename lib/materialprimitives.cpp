@@ -116,14 +116,14 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a plastic must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 and dval <=0.07){
+                if (ok && dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07&&dval<1){
                     WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
@@ -135,7 +135,7 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 and dval <=0.02){
+                if (ok && dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a plastic cannot be less than 0.");
@@ -160,7 +160,7 @@ bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -284,14 +284,14 @@ bool MetalMaterial::validateArg(int number, QString value, int position) const
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a metal must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=.5 and dval <=1){
+                if (ok && dval >=.5 && dval <=1){
                     return true;
                 }else if (dval<.5&&dval>=0){
                     WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
@@ -303,7 +303,7 @@ bool MetalMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 and dval <=0.5){
+                if (ok && dval >=0 && dval <=0.5){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a metal cannot be less than 0.");
@@ -328,7 +328,7 @@ bool MetalMaterial::validateArg(int number, std::vector<QString> arg) const
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -493,16 +493,16 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a trans must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 and dval <=0.07){
+                if (ok && dval >=0 && dval <=0.07){
                     return true;
-                }else if (dval>.07&&dval<1){
+                }else if (dval>.07 && dval<1){
                     WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
                     return true;
                 }else if (dval>1){
@@ -512,7 +512,7 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 and dval <=0.02){
+                if (ok && dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a trans cannot be less than 0.");
@@ -524,14 +524,14 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 5:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The transmissivity value for a trans must be between 0 and 1.");
                 }
                 break;
             case 6:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
@@ -551,7 +551,7 @@ bool TransMaterial::validateArg(int number, std::vector<QString> arg) const
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -664,14 +664,14 @@ bool GlassMaterial::validateArg(int number, QString value, int position) const
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 and dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 and dval <=5){
+                if (ok && dval >=0 && dval <=5){
                     return true;
                 }else {
                     ERROR("The index of refraction value for glass must be between 0 and 5.");
@@ -691,7 +691,7 @@ bool GlassMaterial::validateArg(int number, std::vector<QString> arg) const
         for(QString value : arg) {
             bool ok;
             double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 and dval <= 1.0) {
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }

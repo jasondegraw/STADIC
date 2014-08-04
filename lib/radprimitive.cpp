@@ -334,6 +334,4 @@ void RadPrimitive::initArg(int number, std::vector<QString> arg)
     }
 }
 
-
-
 }

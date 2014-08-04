@@ -100,6 +100,7 @@ bool RadFileData::blackOutLayer(QString layer){
             m_Primitives[i]->setModifier("black");
         }
     }
+    return true;
 }
 bool RadFileData::writeRadFile(QString file){
     QFile oFile;

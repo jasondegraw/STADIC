@@ -6,9 +6,11 @@
 #include <QTextStream>
 #include<array>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class RadPrimitive : public QObject
+class STADIC_API RadPrimitive : public QObject
 {
     Q_OBJECT
 public:
@@ -73,8 +75,6 @@ signals:
 public slots:
 
 };
-
-
 
 }
 

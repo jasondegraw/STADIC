@@ -7,9 +7,11 @@
 #include "windowgroup.h"
 #include "controlzone.h"
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class Control : public QObject
+class STADIC_API Control : public QObject
 {
     Q_OBJECT
 public:

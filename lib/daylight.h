@@ -7,8 +7,10 @@
 #include <QStringList>
 #include "radfiledata.h"
 
+#include "stadicapi.h"
+
 namespace stadic {
-class Daylight : public QObject
+class STADIC_API Daylight : public QObject
 {
     Q_OBJECT
 public:

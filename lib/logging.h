@@ -2,7 +2,9 @@
 #define LUMBERJACK_H
 #include <QString>
 
-void ERROR(QString mesg);
-void WARNING(QString mesg);
+#include "stadicapi.h"
+
+void STADIC_API ERROR(QString mesg);
+void STADIC_API WARNING(QString mesg);
 
 #endif

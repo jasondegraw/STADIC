@@ -4,9 +4,11 @@
 #include <QObject>
 #include <QVector>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class ElecIll : public QObject
+class STADIC_API ElecIll : public QObject
 {
     Q_OBJECT
 public:

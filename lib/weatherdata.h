@@ -4,9 +4,11 @@
 #include <QObject>
 #include <vector>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class WeatherData : public QObject
+class STADIC_API WeatherData : public QObject
 {
     Q_OBJECT
 public:

@@ -4,9 +4,11 @@
 #include <QObject>
 #include <vector>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class ShadeControl : public QObject
+class STADIC_API ShadeControl : public QObject
 {
     Q_OBJECT
 public:

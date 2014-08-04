@@ -2,9 +2,11 @@
 #define MATERIALPRIMITIVES_H
 #include "radprimitive.h"
 
+#include "stadicapi.h"
+
 namespace stadic{
 //PLASTIC
-class PlasticMaterial : public RadPrimitive
+class STADIC_API PlasticMaterial : public RadPrimitive
 {
 public:
     explicit PlasticMaterial(QObject *parent=0);
@@ -28,7 +30,7 @@ private:
    virtual bool validateArg(int number, std::vector<QString> value) const;
 };
 //METAL
-class MetalMaterial : public RadPrimitive
+class STADIC_API MetalMaterial : public RadPrimitive
 {
 public:
     explicit MetalMaterial(QObject *parent=0);
@@ -52,7 +54,7 @@ private:
    virtual bool validateArg(int number, std::vector<QString> value) const;
 };
 //TRANS
-class TransMaterial : public RadPrimitive
+class STADIC_API TransMaterial : public RadPrimitive
 {
 public:
     explicit TransMaterial(QObject *parent=0);
@@ -83,7 +85,7 @@ private:
    virtual bool validateArg(int number, std::vector<QString> value) const;
 };
 //GLASS
-class GlassMaterial : public RadPrimitive
+class STADIC_API GlassMaterial : public RadPrimitive
 {
 public:
     explicit GlassMaterial(QObject *parent=0);

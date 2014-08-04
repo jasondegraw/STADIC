@@ -5,9 +5,11 @@
 #include <vector>
 #include "shadecontrol.h"
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class WindowGroup : public QObject
+class STADIC_API WindowGroup : public QObject
 {
     Q_OBJECT
 public:

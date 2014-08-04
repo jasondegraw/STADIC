@@ -4,9 +4,11 @@
 #include <QObject>
 #include <QVector>
 
+#include "stadicapi.h"
+
 namespace stadic {
 
-class TemporalIlluminance
+class STADIC_API TemporalIlluminance
 {
 public:
     TemporalIlluminance();
@@ -26,7 +28,7 @@ private:
 };
 
 
-class DaylightIlluminanceData : public QObject
+class STADIC_API DaylightIlluminanceData : public QObject
 {
     Q_OBJECT
 public:
