@@ -135,6 +135,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         //This is the base case
         arguments.push_back(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct");
         skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1k.dc";
+    }else{
+        arguments.push_back(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+".oct");
+        skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_1k.dc";
     }
     rcontrib->setStandardOutputFile(skyDC);
     rcontrib->setWorkingDirectory(model->projectFolder());
@@ -209,6 +212,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad"));
         octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad"));
         sunsOct=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_base.rad";
+
+    }else{
+
+        sunsOct=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_bas"+QString().sprintf("%g",(setting+1))+".rad";
 
     }
     if(!createOctree(octFiles,sunsOct)){
@@ -364,7 +371,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
-    //dctimestep -n 8760  C:/dcs/1d.dc C:/dcs/d.smx | rcollate -ho -oc 1 > C:/dcs/sun1A.txt
+    //dctimestep | rcollate for the sun
     arguments.replace(2,sunSMX);
     dctimestep->setArguments(arguments);
     QString sunCollated;
@@ -383,7 +390,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
 
 
-    //dctimestep -n 8760  C:/dcs/1K.dc C:/dcs/Kd.smx | rcollate -ho -oc 1 > C:/dcs/sun1B.TXT
+    //dctimestep | rcollate for the sun patch
     arguments.replace(2,sunPatchSMX);
     dctimestep->setArguments(arguments);
     QString sunPatchCollated;
@@ -401,10 +408,38 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
-    //rlam SUN1.TXT SUN1B.TXT SUN1A.TXT| rcalc -e "r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9" -e "ill=179*(.265*r +.670*g + .065*b)" -e "$1=floor(ill+.5)" > OUT1.ill
+    //rlam | rcalc bringing it all together
+    QProcess *rlam=new QProcess(this);
+    QString rlamProgram="rlam.exe";
+    rlam->setProgram(rlamProgram);
 
+    arguments.clear();
+    arguments.append(skyCollated);
+    arguments.append(sunCollated);
+    arguments.append(sunPatchCollated);
+    rlam->setArguments(arguments);
 
+    QProcess *rcalc=new QProcess(this);
+    QString rcalcProgram="rcalc.exe";
+    rcalc->setProgram(rcalcProgram);
+    rlam->setStandardOutputProcess(rcalc);
+    arguments2.clear();
+    arguments2.append("-e");
+    arguments2.append("\"r=$1-$4+$7;g=$2-@5+8;b=$3-$6+$9\"");
+    arguments2.append("-e");
+    arguments2.append("\"ill=179*(.265*r+.670*g+.065*b)\"");
+    arguments2.append("-e");
+    arguments2.append("\"$1=floor(ill+.5)\"");
+    rcalc->setArguments(arguments2);
+    QString finalIll;
+    if (setting==-1){
+        finalIll=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_ill.tmp";
+    }
 
+    rcalc->setStandardOutputFile(finalIll);
+
+    rlam->start();
+    rcalc->start();
 
 
 
