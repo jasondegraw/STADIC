@@ -108,5 +108,29 @@ private:
    virtual bool validateArg(int number, QString value, int position) const;
    virtual bool validateArg(int number, std::vector<QString> value) const;
 };
+//BSDF
+class STADIC_API BSDFMaterial : public RadPrimitive
+{
+public:
+    explicit BSDFMaterial(QObject *parent=0);
+    BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz, QObject *parent);
+
+    // Setters
+    bool setType(QString){return false;}
+    bool setThickness(double value);
+    bool setBSDFfile(QString name);
+    bool setUX(double value);
+    bool setUY(double value);
+    bool setUZ(double value);
+    // Getters
+    double thickness() const;
+    QString bsdfFile() const;
+    double ux() const;
+    double uy() const;
+    double uz() const;
+private:
+   virtual bool validateArg(int number, QString value, int position) const;
+   virtual bool validateArg(int number, std::vector<QString> value) const;
+};
 }
 #endif // MATERIALPRIMITIVES_H

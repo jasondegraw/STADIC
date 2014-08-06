@@ -698,5 +698,172 @@ bool GlassMaterial::validateArg(int number, std::vector<QString> arg) const
     }
     return false;
 }
+//BSDF
+BSDFMaterial::BSDFMaterial(QObject *parent) : RadPrimitive(parent)
+{
+    RadPrimitive::setType("BSDF");
+    std::vector<QString> arg1 = {"0","null","0","0","0","."};
+    initArg(1,arg1);
+}
+
+BSDFMaterial::BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz, QObject *parent)
+    : RadPrimitive(parent)
+{
+    RadPrimitive::setType("BSDF");
+    setArg(1,QString().sprintf("%g",thickness),0);
+    setArg(1,BSDFfile,1);
+    setArg(1,QString().sprintf("%g",ux),2);
+    setArg(1,QString().sprintf("%g",uy),3);
+    setArg(1,QString().sprintf("%g",uz),4);
+    setArg(1,".",5);
+}
+
+// Setters
+bool BSDFMaterial::setThickness(double value)
+{
+    return setArg(1,QString().sprintf("%g",value),0);
+}
+
+bool BSDFMaterial::setBSDFfile(QString name)
+{
+    return setArg(1,name,1);
+}
+
+bool BSDFMaterial::setUX(double value)
+{
+    return setArg(1,QString().sprintf("%g",value),2);
+}
+
+bool BSDFMaterial::setUY(double value)
+{
+    return setArg(1,QString().sprintf("%g",value),3);
+}
+
+bool BSDFMaterial::setUZ(double value)
+{
+    return setArg(1,QString().sprintf("%g",value),4);
+}
+
+// Getters
+double BSDFMaterial::thickness() const
+{
+    bool ok;
+    double value = getArg1(0).toDouble(&ok);
+    if(!ok) {
+        // This is bad and should *never* happen
+        // Probably need to issue a panicky error message
+        return 0;
+    }
+    return value;
+}
+
+QString BSDFMaterial::bsdfFile() const
+{
+
+    QString name = getArg1(1);
+    return name;
+}
+
+double BSDFMaterial::ux() const
+{
+    bool ok;
+    double value = getArg1(2).toDouble(&ok);
+    if(!ok) {
+        // This is bad and should *never* happen
+        // Probably need to issue a panicky error message
+        return 0;
+    }
+    return value;
+}
+
+double BSDFMaterial::uy() const
+{
+    bool ok;
+    double value = getArg1(3).toDouble(&ok);
+    if(!ok) {
+        // This is bad and should *never* happen
+        // Probably need to issue a panicky error message
+        return 0;
+    }
+    return value;
+}
+
+double BSDFMaterial::uz() const
+{
+    bool ok;
+    double value = getArg1(4).toDouble(&ok);
+    if(!ok) {
+        // This is bad and should *never* happen
+        // Probably need to issue a panicky error message
+        return 0;
+    }
+    return value;
+}
+
+bool BSDFMaterial::validateArg(int number, QString value, int position) const
+{
+    if(number==1) {
+        bool ok;
+        double dval = 0;
+        if (position!=1){dval=value.toDouble(&ok);}
+        switch (position){
+            case 0:
+                if (ok&&dval>=0){
+                    return true;
+                }
+                break;
+            case 1:
+                //This should test to make sure the file exists.
+                return true;
+                break;
+            case 2:
+                if(ok) {
+                    return true;
+                }else{
+                    ERROR("There was an error in the x vector for the BSDF material.");
+                }
+                break;
+            case 3:
+                if (ok){
+                    return true;
+                }else{
+                    ERROR("There was an error in the y vector for the BSDF material.");
+                }
+                break;
+            case 4:
+                if (ok ){
+                    return true;
+                }else{
+                    ERROR("There was an error in the z vector for the BSDF material.");
+                }
+                break;
+            case 5:
+                if (value=="."){
+                    return true;
+                }else{
+                    ERROR("The last argument on the first line of the BSDF material\n\tshould be a period \".\".");
+                }
+                break;
+        }
+    }
+    return false;
+}
+
+bool BSDFMaterial::validateArg(int number, std::vector<QString> arg) const
+{
+    if(number==1) {
+        if(arg.size() != 6) {
+            return false;
+        }
+        for(QString value : arg) {
+            bool ok;
+            double dval = value.toDouble(&ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 }
