@@ -115,11 +115,15 @@ TEST(RadFileTests, SplitRadFile)
   // Split based on whether the type is glass or not
   QPair<stadic::RadFileData*, stadic::RadFileData*> splitGlass = radData.split(isGlass);
   ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_NE(nullptr, splitGlass.first);
+  ASSERT_NE(nullptr, splitGlass.second);
   ASSERT_EQ(1, splitGlass.first->primitives().size());
   ASSERT_EQ(41, splitGlass.second->primitives().size());
   // Split based on what the name starts with
   QPair<stadic::RadFileData*, stadic::RadFileData*> splitName = radData.split(nameStartsWith,QString("l_wa"));
   ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_NE(nullptr, splitName.first);
+  ASSERT_NE(nullptr, splitName.second);
   ASSERT_EQ(17, splitName.first->primitives().size());
   ASSERT_EQ(25, splitName.second->primitives().size());
 }
