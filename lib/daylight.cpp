@@ -100,7 +100,7 @@ bool Daylight::simDaylight(){
 
 //Private
 bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum){
-
+  return true;
 }
 
 bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
