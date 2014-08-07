@@ -497,7 +497,14 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 /*
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
                 wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
-                wgRad->split()
+                //The bsdf layers need to be looped through
+                //Each layer needs to have the rest of the geometry separate from itself
+                //The glazing layers should also be removed into their own file.
+                QPair<stadic::RadFileData*, stadic::RadFileData*> glassSplit=wgRad->split();
+                for (int j=0;j<model->windowGroups()[blindGroupNum]->bsdfSettingsLayers().size();j++){
+                    QPair<stadic::RadFileData*, stadic::RadFileData*> splitRad = wgRad->split(checkLayer(wgRad,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[j]));
+
+                }
                 QString wgSetStandardFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
 
                 wgRad->writeRadFile(wgSetFile);

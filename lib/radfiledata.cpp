@@ -3,6 +3,7 @@
 #include <QTextStream>
 #include "logging.h"
 
+
 namespace stadic {
 
 RadFileData::RadFileData(QObject *parent) :
@@ -70,6 +71,18 @@ static bool checkLayer(RadPrimitive *primitive, const QString &name)
         return true;
     } else if(primitive->isGeometry() && primitive->modifier() == name) {
         return true;
+    }
+    return false;
+}
+
+static bool checkLayer(RadPrimitive *primitive, const std::vector<QString> &names)
+{
+    for (int i=0;i<names.size();i++){
+        if(primitive->isMaterial() && primitive->name() == names[i]) {
+            return true;
+        } else if(primitive->isGeometry() && primitive->modifier() == names[i]) {
+            return true;
+        }
     }
     return false;
 }
