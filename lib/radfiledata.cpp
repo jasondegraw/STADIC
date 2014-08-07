@@ -42,19 +42,26 @@ bool RadFileData::addRad(QString file){
     return true;
 }
 
-QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*,const QString&), const QString &label)
+QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
 {
     std::vector<RadPrimitive*> in, out;
     for(RadPrimitive *primitive : m_Primitives) {
-        if(f(primitive,label)) {
+        if(f(primitive)) {
             in.push_back(primitive);
         } else {
             out.push_back(primitive);
         }
     }
-    // Need to account for o size vectors!
-    return QPair<RadFileData*,RadFileData*>(new RadFileData(in,this->parent()),
-                                            new RadFileData(out,this->parent()));
+    // Account for 0 size vectors
+    RadFileData *first = nullptr;
+    RadFileData *second = nullptr;
+    if (in.size() > 0) {
+        first = new RadFileData(in, this->parent());
+    }
+    if (out.size() > 0) {
+        second = new RadFileData(out, this->parent());
+    }
+    return QPair<RadFileData*,RadFileData*>(first,second);
 }
 
 static bool checkLayer(RadPrimitive *primitive, const QString &name)

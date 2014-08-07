@@ -31,11 +31,10 @@ public:
 
 
     template<class T> std::vector<T*> getPrimitives();
-    QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*,const QString&), const QString &label);
+    QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
+    template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
 
 private:
-    //std::vector<RadPrimitive *> m_RadGeo;                //Vector to hold the radiance polygons
-    //std::vector<RadPrimitive *> m_RadMat;                //Vector to hold the radiance materials
     std::vector<RadPrimitive *> m_Primitives;            //Vector to hold EVERYTHING
 
 signals:
@@ -54,6 +53,28 @@ template<class T> std::vector<T*> RadFileData::getPrimitives()
         }
     }
     return primitives;
+}
+
+template <class T> QPair<RadFileData*, RadFileData*> RadFileData::split(bool(*f)(RadPrimitive*, const T&), const T &label)
+{
+    std::vector<RadPrimitive*> in, out;
+    for (RadPrimitive *primitive : m_Primitives) {
+        if (f(primitive, label)) {
+          in.push_back(primitive);
+        } else {
+            out.push_back(primitive);
+        }
+    }
+    // Account for 0 size vectors
+    RadFileData *first = nullptr;
+    RadFileData *second = nullptr;
+    if (in.size() > 0) {
+      first = new RadFileData(in, this->parent());
+    }
+    if (out.size() > 0) {
+      second = new RadFileData(out, this->parent());
+    }
+    return QPair<RadFileData*, RadFileData*>(first, second);
 }
 
 }

@@ -762,19 +762,19 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
 }
 
 bool Daylight::simCase3(int blindGroupNum, Control *model){
-
+    return true;
 }
 
 bool Daylight::simCase4(int blindGroupNum, Control *model){
-
+    return true;
 }
 
 bool Daylight::simCase5(int blindGroupNum, Control *model){
-
+    return true;
 }
 
 bool Daylight::simCase6(int blindGroupNum, Control *model){
-
+    return true;
 }
 
 bool Daylight::uniqueGlazingMaterials(Control *model){

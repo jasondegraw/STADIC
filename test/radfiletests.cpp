@@ -89,3 +89,37 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0,plastic[1]->specularity());
   EXPECT_EQ(0,plastic[1]->roughness());
 }
+
+bool isGlass(stadic::RadPrimitive* primitive)
+{
+    return primitive->type() == stadic::RadPrimitive::Glass;
+}
+
+bool nameStartsWith(stadic::RadPrimitive* primitive, const QString &name)
+{
+  return primitive->name().startsWith(name);
+}
+
+TEST(RadFileTests, SplitRadFile)
+{
+  stadic::RadFileData radData;
+  ASSERT_TRUE(radData.addRad(":/resources/Simple.rad"));
+  ASSERT_EQ(36, radData.primitives().size());
+  ASSERT_EQ(36, radData.geometry().size());
+  ASSERT_EQ(0, radData.materials().size());
+  ASSERT_TRUE(radData.addRad(":/resources/material.rad"));
+  //Testing to ensure all of the primitives are read in
+  ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_EQ(36, radData.geometry().size());
+  ASSERT_EQ(6, radData.materials().size());
+  // Split based on whether the type is glass or not
+  QPair<stadic::RadFileData*, stadic::RadFileData*> splitGlass = radData.split(isGlass);
+  ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_EQ(1, splitGlass.first->primitives().size());
+  ASSERT_EQ(41, splitGlass.second->primitives().size());
+  // Split based on what the name starts with
+  QPair<stadic::RadFileData*, stadic::RadFileData*> splitName = radData.split(nameStartsWith,QString("l_wa"));
+  ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_EQ(17, splitName.first->primitives().size());
+  ASSERT_EQ(25, splitName.second->primitives().size());
+}
