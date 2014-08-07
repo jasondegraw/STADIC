@@ -20,6 +20,12 @@ public:
 private:
     bool simBSDF(int blindGroupNum, int setting, int bsdfNum);
     bool simStandard(int blindGroupNum, int setting, Control *model);
+    bool simCase1(int blindGroupNum, Control *model);
+    bool simCase2(int blindGroupNum, Control *model);
+    bool simCase3(int blindGroupNum, Control *model);
+    bool simCase4(int blindGroupNum, Control *model);
+    bool simCase5(int blindGroupNum, Control *model);
+    bool simCase6(int blindGroupNum, Control *model);
     bool uniqueGlazingMaterials(Control *model);
     bool testSimCase(Control *model);
     bool setSimCase(int setting, int simCase);

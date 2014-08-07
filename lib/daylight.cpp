@@ -36,59 +36,38 @@ bool Daylight::simDaylight(){
     for (int i=0;i<m_Model->windowGroups().size();i++){
         switch (m_SimCase[i]){
             case 1:
-                {
-                //Simulation Case 1 will be for window groups that do not contain BSDFs
-                //First simulate the base condition
-                RadFileData *baseRad=new RadFileData(m_RadFiles[i]);    //This used to be (m_RadFiles[i],this), but the program failed to build
-                baseRad->addRad(m_Model->projectFolder()+m_Model->geoFolder()+m_Model->windowGroups()[i]->baseGeometry());
-                QString wgBaseFile=m_Model->projectFolder()+m_Model->tmpFolder()+m_Model->projectName()+"_"+m_Model->windowGroups()[i]->objectName()+"_base.rad";
-                baseRad->writeRadFile(wgBaseFile);
-                QStringList files;
-                files.append(wgBaseFile);
-                files.append(m_Model->projectFolder()+m_Model->tmpFolder()+"sky_white1.rad");
-                QString outFileName;
-                outFileName=m_Model->projectFolder()+m_Model->tmpFolder()+m_Model->projectName()+"_"+m_Model->windowGroups()[i]->objectName()+"_base.oct";
-                if (!createOctree(files, outFileName)){
+                if (!simCase1(i,m_Model)){
                     return false;
-                }
-                //Call Standard Radiance run
-                if (!simStandard(i,-1,m_Model)){
-                    return false;
-                }
-
-
-
                 }
                 break;
             case 2:
-                {
-                //Simulation case 2 will be for window groups that contain BSDFs, but not in the base case
-
+                if (!simCase2(i, m_Model)){
+                    return false;
                 }
                 break;
             case 3:
-                {
+
                 //Simulation case 3 will be for window groups that contain BSDFs even in the base case, but the glazing layers are not BSDFs
 
-                }
+
                 break;
             case 4:
-                {
+
                 //Simulation case 4 will be for window groups that have shade materials in addition to the glazing layer
 
-                }
+
                 break;
             case 5:
-                {
+
                 //Simulation case 5 will be for window groups that have added geometry, but it is a proxy geometry
 
-                }
+
                 break;
             case 6:
-                {
+
                 //Simulation case 6 will be for window groups that only have the glazing layer as a BSDF
 
-                }
+
                 break;
 
         }
@@ -441,11 +420,361 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rlam->start();
     rcalc->start();
 
-
-
-
+    if(!rcalc->waitForFinished(-1)){
+        return false;
+    }
 
     return true;
+}
+
+bool Daylight::simCase1(int blindGroupNum, Control *model){
+    //Simulation Case 1 will be for window groups that do not contain BSDFs
+    //First simulate the base condition
+    RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]);    //This used to be (m_RadFiles[i],this), but the program failed to build
+    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->writeRadFile(wgBaseFile);
+    QStringList files;
+    files.append(wgBaseFile);
+    files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+    QString outFileName;
+    outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
+    if (!createOctree(files, outFileName)){
+        return false;
+    }
+    //Call Standard Radiance run
+    if (!simStandard(blindGroupNum,-1,model)){
+        return false;
+    }
+
+    //Loop through the shade settings
+    if (model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size()>0){
+        for (unsigned int i=0;i<model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size();i++){
+            RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
+            wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+            QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+            wgRad->writeRadFile(wgSetFile);
+            files.clear();
+            files.append(wgSetFile);
+            files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+            outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+            if (!createOctree(files, outFileName)){
+                return false;
+            }
+            //call Standard Radiance run
+            if (!simStandard(blindGroupNum,i,model)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool Daylight::simCase2(int blindGroupNum, Control *model){
+    //Simulation case 2 will be for window groups that contain BSDFs, but not in the base case
+    //First simulate the base condition
+    RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]);    //This used to be (m_RadFiles[i],this), but the program failed to build
+    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->writeRadFile(wgBaseFile);
+    QStringList files;
+    files.append(wgBaseFile);
+    files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+    QString outFileName;
+    outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
+    if (!createOctree(files, outFileName)){
+        return false;
+    }
+    //Call Standard Radiance run
+    if (!simStandard(blindGroupNum,-1,model)){
+        return false;
+    }
+
+    //Loop through the shade settings
+    if (model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size()>0){
+        for (unsigned int i=0;i<model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size();i++){
+            if (model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i].size()>0){
+                /*
+                RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
+                wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+                wgRad->split()
+                QString wgSetStandardFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+
+                wgRad->writeRadFile(wgSetFile);
+                files.clear();
+                files.append(wgSetFile);
+                files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+
+
+                if (!createOctree(files, outFileName)){
+                    return false;
+                }
+                //call Standard Radiance run
+                if (!simStandard(blindGroupNum,i,model)){
+                    return false;
+                }
+                */
+            }else{
+                RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
+                wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+                QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+                wgRad->writeRadFile(wgSetFile);
+                files.clear();
+                files.append(wgSetFile);
+                files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+                if (!createOctree(files, outFileName)){
+                    return false;
+                }
+                //call Standard Radiance run
+                if (!simStandard(blindGroupNum,i,model)){
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+
+    //BSDF Layer should be blacked out for this part of the calculation.
+    //STEP 1
+    //Add building (Main) geometry to setting geometry and call it setting_#_.rad
+    //STEP 2
+    //Take that rad file and black out the BSDF layers and call it setting_#_standard.rad
+    //STEP 3
+    //For the 5 phase calculation pull out the BSDF and also glazing into their own .rads
+
+    /*
+    File1=string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.rad";
+            cout<<"File1: "<<File1<<endl;
+            File2=string(project_directory)+string(BlindGroupGeometryInRadiance[0][i]);
+            cout<<"File2: "<<File2<<endl;
+            File3=string(project_directory)+"tmp/"+ string(project_name)+"_"+ string(BlindGroupName[i]) +"_base.rad";
+            AddTwoRadFiles(File1, File2, File3);
+
+            HeaFileIn.open(HeaderFileName);
+            HeaFileOut.open(string(project_directory)+"tmp/"+string(project_name)+"_"+ string(BlindGroupName[i]) +"_base.htmp");
+            ss<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_base.dc";
+            ss>>DCFileNames;
+            ss.clear();
+            ss<<"res/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_base.ill";
+            ss>>IllFileNames;
+            ss.clear();
+            //cout<<"I made it past the opening of the file."<<endl;
+            while (getline(HeaFileIn,PassString) && EndOfHeader==false){  //	Pulls each line out one by one
+                HeaFileOut<<endl;
+                PassString=PassString.substr(0,PassString.find_last_not_of(" ")+1);
+                ss << PassString;					//	Places the string into the string stream
+                if (EndOfHeader==false){
+                    while (!ss.eof()){				//	Checks to make sure that the string stream isn't empty
+                        ss>>PassString;
+                        HeaFileOut<<PassString<< " ";
+                        if (PassString=="geometry_file"){
+                            ss>>PassString;
+                            HeaFileOut<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_base.rad";
+                        }
+                        else if (PassString=="material"){
+                            HeaFileOut<<"tmp/empty.rad";
+                        }
+                        else if (PassString=="shading"){
+                            ss>>PassString;
+                            ss>>PassString;
+                            HeaFileOut<<"1"<<endl;
+                            HeaFileOut<<"static_system ";
+                            HeaFileOut<< DCFileNames<<" ";
+                            HeaFileOut<< IllFileNames<<endl<<endl;
+                            HeaFileOut<< "ab "<<abPARAM<<endl;
+                            HeaFileOut<< "ad "<<adPARAM<<endl;
+                            HeaFileOut<< "as "<<asPARAM<<endl;
+                            HeaFileOut<< "ar "<<arPARAM<<endl;
+                            HeaFileOut<< "aa "<<aaPARAM<<endl;
+                            HeaFileOut<< "lr "<<lrPARAM<<endl;
+                            HeaFileOut<< "st "<<stPARAM<<endl;
+                            HeaFileOut<< "sj "<<sjPARAM<<endl;
+                            HeaFileOut<< "lw "<<lwPARAM<<endl;
+                            HeaFileOut<< "dj "<<djPARAM<<endl;
+                            HeaFileOut<< "ds "<<dsPARAM<<endl;
+                            HeaFileOut<< "dr "<<drPARAM<<endl;
+                            HeaFileOut<< "dp "<<dpPARAM<<endl<<endl;
+                            HeaFileOut<< "DDS_sensor_file res/" +string(project_name)+"_base.dds"<<endl;
+                            HeaFileOut<< "DDS_file res/" +string(project_name)+"_base.sen"<<endl;
+                            ss.clear();
+                            EndOfHeader=true;
+                            PassString="";
+                        }
+                    }
+                    ss.clear();
+                }
+            }
+            HeaFileIn.close();
+            HeaFileOut.close();
+
+            //Add the previous entry to the main simulation batch file
+            BatchFileOut<<"gen_dc " << string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_base.htmp -dds"<<endl;
+            BatchFileOut<<"ds_illum " <<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_base.htmp -dds"<<endl<<endl;
+
+            #pragma endregion
+
+            #pragma region "Shade Settings"
+
+            for (int n=0;n<NumberOfSettingsInBlindgroup[i];n++){
+                if (NumBSDFMaterials[i][n+1]>0){
+                    for (int j=0;j<NumBSDFMaterials[i][n+1];j++){
+                        //BSDF Layer should be blacked out for this part of the calculation.
+                        //STEP 1
+                        //Add building (Main) geometry to setting geometry and call it setting_#_.rad
+                        //STEP 2
+                        //Take that rad file and black out the BSDF layers and call it setting_#_standard.rad
+                        //STEP 3
+                        //For the 5 phase calculation pull out the BSDF and also glazing into their own .rads
+
+                        //*********************** //
+                        //STEP 1//
+                        //*********************** //
+                        File1=string(project_directory)+"tmp/"+string(project_name)+"_"+string(BlindGroupName[i])+"_Main.rad";						//Main building geometry file
+                        File2=string(project_directory)+string(BlindGroupGeometryInRadiance[n+1][i]);												//Setting additional geometry
+
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<".rad";		//Setting final geometry
+                        ss>>FileName;
+                        ss.clear();
+                        AddTwoRadFiles(File1,File2,FileName);
+
+                        //*********************** //
+                        //STEP 2//
+                        //*********************** //
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_standard.rad";	//Geometry file for the standard radiance run
+                        ss>>File2;
+                        ss.clear();
+
+                        BlackOutLayer(FileName, File2,BSDFExchangeMaterials[i][n+1][0]);
+
+                        //*********************** //
+                        //STEP 3//
+                        //*********************** //
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_BSDF"<<j+1<<".rad";
+                        ss>>PassString2;
+                        ss.clear();
+
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_BSDF"<<j+1<<"_Room.tmp";
+                        ss>>PassString;
+                        ss.clear();
+
+                        RemoveLayerFunc(FileName, PassString, string(BSDFExchangeMaterials[i][n+1][0]), PassString2);
+
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_BSDF"<<j+1<<"_Room.rad";
+                        ss>>FileName;
+                        ss.clear();
+
+                        ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_Glass.rad";
+                        ss>>File2;
+                        ss.clear();
+
+                        RemoveLayerFunc(PassString,FileName, GlazingMaterials[i][0],File2);
+
+                        BatchFileOut<<"Call ";
+                        AddToBat=WriteBSDFBat(i,n, FileName,0, File2,PassString2,HeaderFileName);
+                        BatchFileOut<<AddToBat<<endl;
+
+
+
+                        ss<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_standard.rad";
+                        ss>>File2;
+                        ss.clear();
+                    }
+                }
+                EndOfHeader=false;
+                HeaFileIn.open(HeaderFileName);
+                ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<".htmp";
+                ss>>FileName;
+                ss.clear();
+                ss<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_standard.dc";
+                ss>>DCFileNames;
+                ss.clear();
+                ss<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<"_standard.ill";
+                ss>>IllFileNames;
+                ss.clear();
+                HeaFileOut.open(FileName);
+                while (getline(HeaFileIn,PassString) && EndOfHeader==false){  //	Pulls each line out one by one
+                    HeaFileOut<<endl;
+                    PassString=PassString.substr(0,PassString.find_last_not_of(" ")+1);
+                    ss << PassString;					//	Places the string into the string stream
+                    if (EndOfHeader==false){
+                        while (!ss.eof()){				//	Checks to make sure that the string stream isn't empty
+                            ss>>PassString;
+                            HeaFileOut<<PassString<< " ";
+                            if (PassString=="geometry_file"){
+                                ss>>PassString;
+                                HeaFileOut<<File2<<endl;
+                            }
+                            else if (PassString=="shading"){
+                                ss>>PassString;
+                                ss>>PassString;
+                                HeaFileOut<<"1"<<endl;
+                                HeaFileOut<<"static_system ";
+                                HeaFileOut<< DCFileNames<<" ";
+                                HeaFileOut<< IllFileNames<<endl<<endl;
+                                HeaFileOut<< "ab "<<abPARAM<<endl;
+                                HeaFileOut<< "ad "<<adPARAM<<endl;
+                                HeaFileOut<< "as "<<asPARAM<<endl;
+                                HeaFileOut<< "ar "<<arPARAM<<endl;
+                                HeaFileOut<< "aa "<<aaPARAM<<endl;
+                                HeaFileOut<< "lr "<<lrPARAM<<endl;
+                                HeaFileOut<< "st "<<stPARAM<<endl;
+                                HeaFileOut<< "sj "<<sjPARAM<<endl;
+                                HeaFileOut<< "lw "<<lwPARAM<<endl;
+                                HeaFileOut<< "dj "<<djPARAM<<endl;
+                                HeaFileOut<< "ds "<<dsPARAM<<endl;
+                                HeaFileOut<< "dr "<<drPARAM<<endl;
+                                HeaFileOut<< "dp "<<dpPARAM<<endl<<endl;
+                                FixString.clear();
+                                FixString<< "res/" <<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<".dds";
+                                DDSNewFileName="";
+                                FixString>>DDSNewFileName;
+                                FixString.clear();
+                                HeaFileOut<< "DDS_sensor_file "<<DDSNewFileName<<endl;
+                                FixString<<"res/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<".sen";
+                                DDSNewFileName="";
+                                FixString>>DDSNewFileName;
+                                FixString.clear();
+                                HeaFileOut<<"DDS_file "<< DDSNewFileName<<endl;
+                                DDSNewFileName="";
+                                ss.clear();
+                                EndOfHeader=true;
+                                PassString="";
+                            }
+                        }
+                        ss.clear();
+                    }
+                }
+                HeaFileIn.close();
+                HeaFileOut.close();
+
+                ss<<string(project_directory)<<"tmp/"<<string(project_name)<<"_"<<string(BlindGroupName[i])<<"_setting_"<<n+1<<".htmp";
+                ss>>FileName;
+                ss.clear();
+
+                //Add the previous entry to the main simulation batch file
+                BatchFileOut<<"gen_dc " << FileName<<" -dds"<<endl;
+                BatchFileOut<<"ds_illum "<< FileName<<" -dds"<<endl<<endl;
+            }
+
+    */
+}
+
+bool Daylight::simCase3(int blindGroupNum, Control *model){
+
+}
+
+bool Daylight::simCase4(int blindGroupNum, Control *model){
+
+}
+
+bool Daylight::simCase5(int blindGroupNum, Control *model){
+
+}
+
+bool Daylight::simCase6(int blindGroupNum, Control *model){
+
 }
 
 bool Daylight::uniqueGlazingMaterials(Control *model){
