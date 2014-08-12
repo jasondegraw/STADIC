@@ -75,7 +75,7 @@ static bool checkLayer(RadPrimitive *primitive, const QString &name)
     return false;
 }
 
-static bool checkLayer(RadPrimitive *primitive, const std::vector<QString> &names)
+static bool checkLayers(RadPrimitive *primitive, const std::vector<QString> &names)
 {
     for (int i=0;i<names.size();i++){
         if(primitive->isMaterial() && primitive->name() == names[i]) {

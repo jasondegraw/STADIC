@@ -473,7 +473,7 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
 bool Daylight::simCase2(int blindGroupNum, Control *model){
     //Simulation case 2 will be for window groups that contain BSDFs, but not in the base case
     //First simulate the base condition
-    RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]);    //This used to be (m_RadFiles[i],this), but the program failed to build
+    RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives(), this);    //This used to be (m_RadFiles[i],this), but the program failed to build
     baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
     QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
@@ -495,7 +495,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size();i++){
             if (model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i].size()>0){
                 /*
-                RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
+                RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum].primitives(), this);
                 wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
                 //The bsdf layers need to be looped through
                 //Each layer needs to have the rest of the geometry separate from itself
