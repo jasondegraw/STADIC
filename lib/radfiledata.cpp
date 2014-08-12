@@ -65,6 +65,38 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
     return QPair<RadFileData*,RadFileData*>(first,second);
 }
 
+QPair<RadFileData *, RadFileData *> RadFileData::split(const std::vector<QString> &vector)
+{
+    std::vector<RadPrimitive*> in, out;
+    for(RadPrimitive *primitive : m_Primitives) {
+        if(primitive->isMaterial()) {
+            if(std::find(vector.begin(),vector.end(),primitive->name()) != vector.end()) {
+                in.push_back(primitive);
+            } else {
+                out.push_back(primitive);
+            }
+        } else if(primitive->isGeometry()) {
+            if(std::find(vector.begin(),vector.end(),primitive->modifier()) != vector.end()) {
+                in.push_back(primitive);
+            } else {
+                out.push_back(primitive);
+            }
+        } else {
+            out.push_back(primitive);
+        }
+    }
+    // Account for 0 size vectors
+    RadFileData *first = nullptr;
+    RadFileData *second = nullptr;
+    if (in.size() > 0) {
+        first = new RadFileData(in, this->parent());
+    }
+    if (out.size() > 0) {
+        second = new RadFileData(out, this->parent());
+    }
+    return QPair<RadFileData*,RadFileData*>(first,second);
+}
+
 static bool checkLayer(RadPrimitive *primitive, const QString &name)
 {
     if(primitive->isMaterial() && primitive->name() == name) {

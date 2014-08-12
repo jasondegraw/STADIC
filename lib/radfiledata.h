@@ -33,6 +33,7 @@ public:
     template<class T> std::vector<T*> getPrimitives();
     QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
     template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
+    QPair<RadFileData *, RadFileData *> split(const std::vector<QString> &vector);
 
 private:
     std::vector<RadPrimitive *> m_Primitives;            //Vector to hold EVERYTHING

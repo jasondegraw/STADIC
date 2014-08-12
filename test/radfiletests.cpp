@@ -126,4 +126,14 @@ TEST(RadFileTests, SplitRadFile)
   ASSERT_NE(nullptr, splitName.second);
   ASSERT_EQ(17, splitName.first->primitives().size());
   ASSERT_EQ(25, splitName.second->primitives().size());
+  // Split based on layer names
+  std::vector<QString> names;
+  names.push_back("l_ceiling");
+  names.push_back("l_floor");
+  QPair<stadic::RadFileData*, stadic::RadFileData*> splitLayers = radData.split(names);
+  ASSERT_EQ(42, radData.primitives().size());
+  ASSERT_NE(nullptr, splitLayers.first);
+  ASSERT_NE(nullptr, splitLayers.second);
+  ASSERT_EQ(4, splitLayers.first->primitives().size());
+  ASSERT_EQ(38, splitLayers.second->primitives().size());
 }

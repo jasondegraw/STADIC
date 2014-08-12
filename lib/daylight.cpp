@@ -493,7 +493,33 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size();i++){
+            RadFileData *settingRad=new RadFileData(baseRad->primitives(),this);
+            settingRad->addRad(model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
             if (model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i].size()>0){
+                for (int j=0;j<model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i].size();j++){
+                    std::vector<QString> layers=model->windowGroups()[blindGroupNum]->glazingLayers();
+                    layers.push_back(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
+                    QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
+                    if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+                        ERROR("The program quit...");
+                        return false;
+                    }
+                    //splitGeo.first->writeRadFile();
+                    //splitGeo.second->writeRadFile();
+                }
+            }
+            delete settingRad;
+            /*
+            if (!createOctree(files, outFileName)){
+                return false;
+            }
+            //call Standard Radiance run
+            if (!simStandard(blindGroupNum,i,model)){
+                return false;
+            }
+            */
+        }
+
                 /*
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum].primitives(), this);
                 wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
@@ -512,37 +538,32 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 files.append(wgSetFile);
                 files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
                 outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
-
-
-                if (!createOctree(files, outFileName)){
-                    return false;
-                }
-                //call Standard Radiance run
-                if (!simStandard(blindGroupNum,i,model)){
-                    return false;
-                }
                 */
-            }else{
-                RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
-                wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
-                QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
-                wgRad->writeRadFile(wgSetFile);
-                files.clear();
-                files.append(wgSetFile);
-                files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
-                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
-                if (!createOctree(files, outFileName)){
-                    return false;
-                }
-                //call Standard Radiance run
-                if (!simStandard(blindGroupNum,i,model)){
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
 
+
+
+        }else{
+        /*
+            RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
+            wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+            QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+            wgRad->writeRadFile(wgSetFile);
+            files.clear();
+            files.append(wgSetFile);
+            files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+            outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+            if (!createOctree(files, outFileName)){
+                return false;
+            }
+            //call Standard Radiance run
+            if (!simStandard(blindGroupNum,i,model)){
+                return false;
+            }
+            */
+        }
+
+        return true;
+    }
     //BSDF Layer should be blacked out for this part of the calculation.
     //STEP 1
     //Add building (Main) geometry to setting geometry and call it setting_#_.rad
@@ -766,7 +787,6 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
             }
 
     */
-}
 
 bool Daylight::simCase3(int blindGroupNum, Control *model){
     return true;
