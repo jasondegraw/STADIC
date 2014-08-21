@@ -21,6 +21,7 @@ public:
     bool removeLayer(const QString &layer, const QString &removing, const QString &rest);                     //Function to remove a layer from the list to its own geometry file
     bool blackOutLayer(QString layer);
     bool writeRadFile(QString file);
+    std::vector<double> surfaceNormal(QString layer);
 
     bool addPrimitive(RadPrimitive *primitive);
 

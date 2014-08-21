@@ -191,6 +191,37 @@ bool RadFileData::writeRadFile(QString file){
     return true;
 }
 
+std::vector<double> RadFileData::surfaceNormal(QString layer){
+    std::vector<double> normalVector;
+
+    for(int i=0;i<m_Primitives.size();i++) {
+        if(m_Primitives[i]->modifier()==layer && QString(m_Primitives[i]->type())=="Polygon") {
+            std::vector<std::vector<double>> normalPoints;
+            for (int j=0;j<m_Primitives[i]->arg3().size();j++){
+                std::vector<double> temp;
+                for (int p=0;p<3;p++){
+                    temp.push_back(QString(m_Primitives[i]->arg3()[j]).toDouble());
+                    j++;
+                }
+                normalPoints.push_back(temp);
+            }
+            double x=(normalPoints[2][1]-normalPoints[1][1])*(normalPoints[0][2]-normalPoints[1][2])-(normalPoints[2][2]-normalPoints[1][2])*(normalPoints[0][1]-normalPoints[1][2]);
+            double y=(normalPoints[2][0]-normalPoints[1][0])*(normalPoints[0][2]-normalPoints[1][2])-(normalPoints[2][2]-normalPoints[1][2])*(normalPoints[0][0]-normalPoints[1][0]);
+            double z=(normalPoints[2][0]-normalPoints[1][0])*(normalPoints[0][1]-normalPoints[1][1])-(normalPoints[2][1]-normalPoints[1][1])*(normalPoints[0][0]-normalPoints[1][0]);
+            double length=sqrt(x*x+y*y+z*z);
+            x=x/length;
+            y=y/length;
+            z=z/length;
+            normalVector.push_back(x);
+            normalVector.push_back(y);
+            normalVector.push_back(z);
+            return normalVector;
+        }
+    }
+    return normalVector;
+}
+
+
 bool RadFileData::addPrimitive(RadPrimitive *primitive)
 {
     m_Primitives.push_back(primitive);

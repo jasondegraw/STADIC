@@ -18,7 +18,7 @@ public:
     bool simDaylight();
 
 private:
-    bool simBSDF(int blindGroupNum, int setting, int bsdfNum);
+    bool simBSDF(int blindGroupNum, int setting, int bsdfNum,QString bsdfRad,QString remainingRad,std::vector<double> normal,QString thickness,QString bsdfXML, QString bsdfLayer, Control *model);
     bool simStandard(int blindGroupNum, int setting, Control *model);
     bool simCase1(int blindGroupNum, Control *model);
     bool simCase2(int blindGroupNum, Control *model);
