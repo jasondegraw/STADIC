@@ -32,10 +32,12 @@ private:
     bool writeSky(Control *model);
     bool createBaseRadFiles(Control *model);
     bool createOctree(QStringList files, QString octreeName);
+    bool sumIlluminanceFiles(Control *model);
 
     std::vector<int> m_SimCase;
     Control *m_Model;
     std::vector<RadFileData* > m_RadFiles;
+
 signals:
 
 public slots:

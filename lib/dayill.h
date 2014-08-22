@@ -14,6 +14,9 @@ public:
     TemporalIlluminance();
     TemporalIlluminance(int month, int day, double hour, const std::vector<double> &illuminance);
 
+    bool add(std::vector<double> newIll);
+
+
     //Getters
     std::vector<double> illuminance();
     int month();
@@ -33,8 +36,11 @@ class STADIC_API DaylightIlluminanceData : public QObject
     Q_OBJECT
 public:
     explicit DaylightIlluminanceData(QObject *parent = 0);
-    bool parse(QString fileName);
-
+    bool parse(QString fileName,QString weaFile);
+    bool parseTimeBased(QString fileName);
+    bool addIllFile(QString fileName);
+    bool addTimeBasedIll(QString fileName);
+    bool writeIllFile(QString fileName);
     //Setters
     //void setIlluminance(double value);
 
