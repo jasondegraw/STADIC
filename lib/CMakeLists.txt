@@ -34,5 +34,5 @@ set(HDRS stadicapi.h
          materialprimitives.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
-
 target_link_libraries(stadic_core Qt5::Widgets)
+install(TARGETS stadic_core DESTINATION lib)
