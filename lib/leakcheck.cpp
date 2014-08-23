@@ -9,11 +9,40 @@ LeakCheck::LeakCheck(QObject *parent) :
 {
 }
 bool LeakCheck::isEnclosed(){
+    if (!unitePolygons()){
+        return false;
+    }
+
     if (!checkPoint()){
         return false;
     }
 
+    if (!writePTS()){
+        return false;
+    }
 
+    if (!writeExtraRad()){
+        return false;
+    }
+
+    if (!xformModifiers()){
+        return false;
+    }
+
+    if (!createOct()){
+        return false;
+    }
+
+    if (!runCalc()){
+        return false;
+    }
+    QString val;
+    m_Output2>>val;
+    if (val.toDouble()>0){
+        return false;
+    }
+
+    return true;
 }
 //Setters
 bool LeakCheck::setRadFile(QStringList files){
@@ -132,6 +161,29 @@ bool LeakCheck::setPoint(std::vector<double> point){
     return true;
 }
 
+bool LeakCheck::setReflectance(double ref){
+    if (ref!=0 || ref!=1){
+        ERROR("The reflectance needs to be either 0 or 1.");
+        return false;
+    }
+    m_Reflectance=ref;
+    return true;
+}
+
+bool LeakCheck::setWorkingDirectory(QString wDir){
+    QDir tempDir(wDir);
+    if (!tempDir.exists()){
+        ERROR("The working directory that was set does not exist.");
+        return false;
+    }
+    if (!m_Dir.setCurrent(wDir)){
+        ERROR("There was an error when setting the workig directory.");
+        return false;
+    }
+    return true;
+}
+
+//Private
 bool LeakCheck::unitePolygons(){
     //unite polygons that are the right layer name
     bool firstPolygon=true;
@@ -176,6 +228,141 @@ bool LeakCheck::checkPoint(){
     }
     ERROR("The point is not contained within the polygon.");
     return false;
+}
+
+bool LeakCheck::writePTS(){
+
+    return true;
+}
+
+bool LeakCheck::xformModifiers(){
+    QProcess *xform=new QProcess(this);
+    QString programName="xform.exe";
+    xform->setProgram(programName);
+    QStringList arguments;
+    arguments.append("-m");
+    arguments.append("modified");
+    for (int i=0;i<m_RadFiles.size();i++){
+        arguments.append(m_RadFiles[i]);
+    }
+    xform->setArguments(arguments);
+    xform->setStandardOutputFile(m_Dir.path()+"Mod.rad");
+    xform->setWorkingDirectory(m_Dir.path());
+    xform->start();
+
+    //There should be a test in here that if it doesn't finish it returns false
+    xform->waitForFinished();
+
+    return true;
+}
+
+bool LeakCheck::writeExtraRad(){
+
+    QFile oFile;
+    oFile.setFileName(m_Dir.path()+"Extra.rad");
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    out<<"void glow sky_glow"<<endl;
+    out<<"0"<<endl<<"0"<<endl<<"4 1 1 1 0"<<endl<<endl;
+    out<<"sky_glow source sky"<<endl;
+    out<<"0"<<endl<<"0"<<endl<<"4 0 0 1 180"<<endl<<endl;
+
+    out<<"void plastic modified"<<endl;
+    out<<"0"<<endl<<"0"<<endl;
+    out<<"5 "<<m_Reflectance<<" "<<m_Reflectance<<" "<<m_Reflectance<<" 0 0"<<endl;
+    oFile.close();
+
+    return true;
+}
+
+bool LeakCheck::createOct(){
+    m_Process=new QProcess(this);
+    QString programName="oconv.exe";
+    m_Process->setProgram(programName);
+    QStringList arguments;
+    arguments.append(m_Dir.path()+"Extra.rad");
+    arguments.append(m_Dir.path()+"Mod.rad");
+    m_Process->setStandardOutputFile(m_Dir.path()+"Test.oct");
+    m_Process->setArguments(arguments);
+    m_Process->setWorkingDirectory(m_Dir.path());
+    connect(m_Process,SIGNAL(readyReadStandardError()),this, SLOT(captureErros()));
+
+    m_Process->start();
+    m_Process->waitForFinished();
+
+    QString line;
+    while (!m_ErrorLog.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
+        line=m_ErrorLog.readLine();
+        ERROR(line);
+    }
+
+    return true;
+}
+
+bool LeakCheck::runCalc(){
+    m_Process=new QProcess(this);
+    m_Process->setProgram(QString("rtrace.exe"));
+    QStringList arguments;
+    arguments.append("-I");
+    arguments.append("-ab");
+    if (m_Reflectance<1){
+        arguments.append("0");
+    }else{
+        arguments.append("4");
+    }
+    arguments.append("-ad");
+    arguments.append("2000");
+    arguments.append("-as");
+    arguments.append("1000");
+    m_Process->setWorkingDirectory(m_Dir.path());
+    m_Process->setArguments(arguments);
+    connect(m_Process,SIGNAL(readyReadStandardError()),this,SLOT(captureErros()));
+
+
+    m_Process2=new QProcess(this);
+    m_Process2->setProgram(QString("rcalc.exe"));
+    m_Process->setStandardOutputProcess(m_Process2);
+    QStringList arguments2;
+    arguments2.append("-e");
+    arguments2.append("\"$1=179*($1*0.265+$2*0.670+$3*0.065)\"");
+    m_Process2->setArguments(arguments2);
+    m_Process2->setWorkingDirectory(m_Dir.path());
+    connect(m_Process2,SIGNAL(readyReadStandardError()),this,SLOT(captureErrors2()));
+    connect(m_Process2,SIGNAL(readyReadStandardOutput()),this,SLOT(captureOutput2()));
+
+    m_Process->start();
+    m_Process2->start();
+
+    m_Process2->waitForFinished(-1);
+    QString line;
+    while (!m_ErrorLog.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
+        line=m_ErrorLog.readLine();
+        ERROR(line);
+    }
+
+    while(!m_ErrorLog2.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
+        line=m_ErrorLog2.readLine();
+        ERROR(line);
+    }
+
+    return true;
+}
+
+
+//Slots
+void LeakCheck::captureErros(){
+    m_ErrorLog<<m_Process->readAllStandardError();
+}
+
+void LeakCheck::captureErrors2(){
+    m_ErrorLog2<<m_Process2->readAllStandardError();
+}
+
+void LeakCheck::captureOutput2(){
+    m_Output2<<m_Process2->readAllStandardOutput();
 }
 
 }
