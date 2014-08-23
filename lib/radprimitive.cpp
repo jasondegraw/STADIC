@@ -1,5 +1,6 @@
 #include "radprimitive.h"
 #include <QTextStream>
+#include "geometryprimitives.h"
 #include "materialprimitives.h"
 #include <iostream>
 
@@ -220,8 +221,14 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data, QObject *parent)
     }
 
     switch(typeFromString(list[1])) {
+    case Polygon:
+        rad = new PolygonGeometry(parent);
+        break;
     case Plastic:
         rad = new PlasticMaterial(parent);
+        break;
+    case BSDF:
+        rad = new BSDFMaterial(parent);
         break;
     default:
         rad = new RadPrimitive(parent);
