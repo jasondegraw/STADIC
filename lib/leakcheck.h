@@ -29,7 +29,7 @@ public:
     bool setY(double y);
     bool setZ(double z);
     bool setPoint(std::vector<double> point);
-    bool setReflectance(double ref);
+    bool setReflectance(int ref);
     bool setWorkingDirectory(QString wDir);
 
 private:

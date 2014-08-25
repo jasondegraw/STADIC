@@ -9,10 +9,6 @@ LeakCheck::LeakCheck(QObject *parent) :
 {
 }
 bool LeakCheck::isEnclosed(){
-    if (!unitePolygons()){
-        return false;
-    }
-
     if (!checkPoint()){
         return false;
     }
@@ -80,13 +76,14 @@ bool LeakCheck::setFloorLayers(QStringList layers){
         bool layerExists=false;
         for (int j=0;j<m_RadGeo.primitives().size();j++){
             if (layers[i]==m_RadGeo.primitives()[j]->modifier()){
-                layerExists==true;
+                layerExists=true;
             }
         }
         if (!layerExists){
             ERROR("The layer "+layers[i]+" does not exist in the model.");
             return false;
         }
+        m_FloorLayers.append(layers[i]);
     }
     if (!unitePolygons()){
         return false;
@@ -95,8 +92,25 @@ bool LeakCheck::setFloorLayers(QStringList layers){
 }
 
 bool LeakCheck::setX(double x){
-    if (x<m_UnitedPolygon.boundingRect().left() || x>m_UnitedPolygon.boundingRect().right()){
-        ERROR("The x coordinate is not within the min and max x coordinates.");
+    if (m_UnitedPolygon.isEmpty()){
+        if (!unitePolygons()){
+            return false;
+        }
+    }
+    if (m_UnitedPolygon.isEmpty()){
+        ERROR("The uniting of the polygons has failed.");
+        return false;
+    }
+
+    double minX=m_UnitedPolygon.boundingRect().left();
+    double maxX=m_UnitedPolygon.boundingRect().right();
+    if (minX>maxX){
+        maxX=m_UnitedPolygon.boundingRect().left();
+        minX=m_UnitedPolygon.boundingRect().right();
+    }
+
+    if (x<minX || x>maxX){
+        ERROR("The x coordinate is not within the "+QString().sprintf("%g",minX) +" to "+QString().sprintf("%g",maxX)+".");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -107,6 +121,15 @@ bool LeakCheck::setX(double x){
 }
 
 bool LeakCheck::setY(double y){
+    if (m_UnitedPolygon.isEmpty()){
+        if (!unitePolygons()){
+            return false;
+        }
+    }
+    if (m_UnitedPolygon.isEmpty()){
+        ERROR("The uniting of the polygons has failed.");
+        return false;
+    }
     double minY=m_UnitedPolygon.boundingRect().bottom();
     double maxY=m_UnitedPolygon.boundingRect().top();
     if (minY>maxY){
@@ -137,6 +160,12 @@ bool LeakCheck::setPoint(std::vector<double> point){
         ERROR("The vector of points does not contain 3 values.");
         return false;
     }
+    if (m_UnitedPolygon.isEmpty()){
+        if (!unitePolygons()){
+            return false;
+        }
+    }
+
     if (point[0]<m_UnitedPolygon.boundingRect().left() || point[0]>m_UnitedPolygon.boundingRect().right()){
         ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
@@ -161,10 +190,10 @@ bool LeakCheck::setPoint(std::vector<double> point){
     return true;
 }
 
-bool LeakCheck::setReflectance(double ref){
+bool LeakCheck::setReflectance(int ref){
     if (ref!=0 || ref!=1){
-        ERROR("The reflectance needs to be either 0 or 1.");
-        return false;
+        WARNING("The reflectance needs to be either 0 or 1.  It will take on a value of 1.");
+        ref=1;
     }
     m_Reflectance=ref;
     return true;
