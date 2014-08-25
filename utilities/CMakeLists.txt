@@ -13,3 +13,7 @@ target_link_libraries(dxmakewea stadic_core)
 add_executable(dxgridmaker dxgridmaker.cpp)
 
 target_link_libraries(dxgridmaker stadic_core)
+
+add_executable(dxleakcheck dxleakcheck.cpp)
+
+target_link_libraries(dxleakcheck stadic_core)

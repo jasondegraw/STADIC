@@ -23,3 +23,7 @@ target_link_libraries(primitivetests stadic_core gtest gtest_main)
 add_executable(radfiletests radfiletests.cpp ${QRCS})
 add_test(radfiletests radfiletests)
 target_link_libraries(radfiletests stadic_core gtest gtest_main)
+
+add_executable(leaktests leaktests.cpp ${QRCS})
+add_test(leaktests leaktests)
+target_link_libraries(leaktests stadic_core gtest gtest_main)

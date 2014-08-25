@@ -14,7 +14,7 @@
 
 namespace stadic{
 
-class LeakCheck : public QObject
+class STADIC_API LeakCheck : public QObject
 {
     Q_OBJECT
 public:
