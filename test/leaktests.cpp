@@ -8,8 +8,10 @@ TEST(LeakTests, EnclosedModel)
   stadic::LeakCheck leakChecker;
   QStringList radFiles;
   radFiles.clear();
-  radFiles.append(":/resources/Simple.rad");
-  radFiles.append(":/resources/material.rad");
+  //radFiles.append(":/resources/Simple.rad");
+  //radFiles.append(":/resources/material.rad");
+  radFiles.append("c:/CPrograms/STADIC/test/resources/Simple.rad");
+  radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
   QStringList layerNames;
   layerNames.clear();
@@ -19,7 +21,7 @@ TEST(LeakTests, EnclosedModel)
   ASSERT_TRUE(leakChecker.setY(120));
   ASSERT_TRUE(leakChecker.setZ(30));
   ASSERT_TRUE(leakChecker.setReflectance(1));
-  ASSERT_TRUE(leakChecker.setWorkingDirectory(":/tmp/"));
+  ASSERT_TRUE(leakChecker.setWorkingDirectory("c:/CPrograms/STADIC/test/tmp/"));
   ASSERT_TRUE(leakChecker.isEnclosed());
 }
 

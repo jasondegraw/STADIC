@@ -1,6 +1,8 @@
 #include "leakcheck.h"
 #include <QFile>
 #include "logging.h"
+#include <QByteArray>
+#include <iostream>
 
 namespace stadic{
 
@@ -32,9 +34,15 @@ bool LeakCheck::isEnclosed(){
     if (!runCalc()){
         return false;
     }
-    QString val;
-    m_Output2>>val;
-    if (val.toDouble()>0){
+    QString val1;
+    m_Output2>>val1;
+    QString val2;
+    m_Output2>>val2;
+    QString val3;
+    m_Output2>>val3;
+    std::cout<<"results "<<val1.toStdString()<<" "<<val2.toStdString()<<" "<<val3.toStdString()<<std::endl;
+
+    if (val1.toDouble()>0){
         return false;
     }
 
@@ -191,9 +199,9 @@ bool LeakCheck::setPoint(std::vector<double> point){
 }
 
 bool LeakCheck::setReflectance(int ref){
-    if (ref!=0 || ref!=1){
-        WARNING("The reflectance needs to be either 0 or 1.  It will take on a value of 1.");
-        ref=1;
+    if (ref!=0 && ref!=1){
+        ERROR("The reflectance needs to be either 0 or 1.");
+        return false;
     }
     m_Reflectance=ref;
     return true;
@@ -260,6 +268,15 @@ bool LeakCheck::checkPoint(){
 }
 
 bool LeakCheck::writePTS(){
+    QFile oFile;
+    oFile.setFileName("Test.pts");
+    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!oFile.exists()){
+        return false;
+    }
+    QTextStream out(&oFile);
+    out<<m_TestPoint[0]<<" "<<m_TestPoint[1]<<" "<<m_TestPoint[2]<<" 0 0 1";
+    oFile.close();
 
     return true;
 }
@@ -275,7 +292,7 @@ bool LeakCheck::xformModifiers(){
         arguments.append(m_RadFiles[i]);
     }
     xform->setArguments(arguments);
-    xform->setStandardOutputFile(m_Dir.path()+"Mod.rad");
+    xform->setStandardOutputFile("Mod.rad");
     xform->setWorkingDirectory(m_Dir.path());
     xform->start();
 
@@ -288,7 +305,7 @@ bool LeakCheck::xformModifiers(){
 bool LeakCheck::writeExtraRad(){
 
     QFile oFile;
-    oFile.setFileName(m_Dir.path()+"Extra.rad");
+    oFile.setFileName("Extra.rad");
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
         return false;
@@ -312,21 +329,22 @@ bool LeakCheck::createOct(){
     QString programName="oconv.exe";
     m_Process->setProgram(programName);
     QStringList arguments;
-    arguments.append(m_Dir.path()+"Extra.rad");
-    arguments.append(m_Dir.path()+"Mod.rad");
-    m_Process->setStandardOutputFile(m_Dir.path()+"Test.oct");
+    arguments.append("Extra.rad");
+    arguments.append("Mod.rad");
+    m_Process->setStandardOutputFile("Test.oct");
     m_Process->setArguments(arguments);
     m_Process->setWorkingDirectory(m_Dir.path());
-    connect(m_Process,SIGNAL(readyReadStandardError()),this, SLOT(captureErros()));
-
+    //QObject::connect(m_Process,SIGNAL(readyReadStandardError()),this, SLOT(captureErros()));
+    m_ErrorLog.reset();
     m_Process->start();
     m_Process->waitForFinished();
-
+    /*
     QString line;
     while (!m_ErrorLog.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
         line=m_ErrorLog.readLine();
         ERROR(line);
     }
+    */
 
     return true;
 }
@@ -336,6 +354,7 @@ bool LeakCheck::runCalc(){
     m_Process->setProgram(QString("rtrace.exe"));
     QStringList arguments;
     arguments.append("-I");
+    arguments.append("-h");
     arguments.append("-ab");
     if (m_Reflectance<1){
         arguments.append("0");
@@ -346,52 +365,73 @@ bool LeakCheck::runCalc(){
     arguments.append("2000");
     arguments.append("-as");
     arguments.append("1000");
+    arguments.append("Test.oct");
     m_Process->setWorkingDirectory(m_Dir.path());
     m_Process->setArguments(arguments);
-    connect(m_Process,SIGNAL(readyReadStandardError()),this,SLOT(captureErros()));
-
+    m_Process->setStandardInputFile("Test.pts");
+    //QObject::connect(m_Process,SIGNAL(readyReadStandardError()),this,SLOT(captureErros()));
+    m_Process->setStandardOutputFile("Test.tmp");
+    m_Process->start();
+    m_Process->waitForFinished(-1);
 
     m_Process2=new QProcess(this);
     m_Process2->setProgram(QString("rcalc.exe"));
-    m_Process->setStandardOutputProcess(m_Process2);
     QStringList arguments2;
     arguments2.append("-e");
     arguments2.append("\"$1=179*($1*0.265+$2*0.670+$3*0.065)\"");
+    //arguments2.append("Test.tmp");
+    m_Process2->setStandardInputFile("Test.tmp");
+    for (int i=0;i<arguments2.size();i++){
+        std::cout<<"arg"<<i<<" "<<arguments2[i].toStdString()<<std::endl;
+    }
     m_Process2->setArguments(arguments2);
     m_Process2->setWorkingDirectory(m_Dir.path());
-    connect(m_Process2,SIGNAL(readyReadStandardError()),this,SLOT(captureErrors2()));
-    connect(m_Process2,SIGNAL(readyReadStandardOutput()),this,SLOT(captureOutput2()));
-
-    m_Process->start();
+    m_Process2->setStandardOutputFile("Final.res");
     m_Process2->start();
-
     m_Process2->waitForFinished(-1);
-    QString line;
-    while (!m_ErrorLog.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
-        line=m_ErrorLog.readLine();
-        ERROR(line);
-    }
 
-    while(!m_ErrorLog2.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
-        line=m_ErrorLog2.readLine();
-        ERROR(line);
-    }
-
+    //QObject::connect(m_Process2,SIGNAL(readyReadStandardError()),this,SLOT(captureErrors2()));
+    //QObject::connect(m_Process2,SIGNAL(readyReadStandardOutput()),this,SLOT(captureOutput2()));
     return true;
 }
 
 
 //Slots
 void LeakCheck::captureErros(){
-    m_ErrorLog<<m_Process->readAllStandardError();
+    QByteArray byteArray=m_Process->readAllStandardError();
+    QStringList strLines=QString(byteArray).split("\n");
+    QString errOut;
+    for (int i=0;i<strLines.size();i++){
+        errOut=errOut+strLines[i]+"\n";
+    }
+    ERROR(errOut);
+    /*
+    foreach(QString line, strLines){
+        m_ErrorLog<<line<<endl;
+    }
+    */
 }
 
 void LeakCheck::captureErrors2(){
-    m_ErrorLog2<<m_Process2->readAllStandardError();
+    //QByteArray byteArray=m_Process2->readAllStandardError();
+    //QStringList strLines=QString(byteArray).split("\n");
+    QString tempString=QString(m_Process2->readAllStandardError()).toUtf8().constData();
+    QStringList strLines=tempString.split(" ");
+    foreach(QString line, strLines){
+        m_ErrorLog2<<line<<endl;
+    }
 }
 
 void LeakCheck::captureOutput2(){
-    m_Output2<<m_Process2->readAllStandardOutput();
+    std::cout<<"The captureOutput2 was called."<<std::endl;
+    //QByteArray byteArray=m_Process2->readAllStandardError();
+    //QStringList strLines=QString(byteArray).split("\n");
+    QString tempString=QString(m_Process2->readAllStandardOutput()).toUtf8().constData();
+    QStringList strLines=tempString.split(" ");
+    foreach(QString line, strLines){
+        m_Output2<<line<<endl;
+        std::cout<<"stdOutput: "<<line.toStdString()<<std::endl;
+    }
 }
 
 }
