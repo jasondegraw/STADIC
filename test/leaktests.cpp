@@ -19,14 +19,8 @@ TEST(LeakTests, EnclosedModel)
     std::cout<<"The program failed to move to the temporary directory."<<std::endl;
     EXIT_FAILURE;
   }
-  if (!QFile::copy(":/resources/Simple.rad",wDir.path()+"/Simple.rad")){
-    std::cout<<"The program failed to copy the geometry resource file."<<std::endl;
-    EXIT_FAILURE;
-  }
-  if (!QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad")){
-    std::cout<<"The program failed to copy the material resource file."<<std::endl;
-    EXIT_FAILURE;
-  }
+  QFile::copy(":/resources/Simple.rad",wDir.path()+"/Simple.rad");
+  QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad");
   radFiles.append(wDir.path()+"/Simple.rad");
   radFiles.append(wDir.path()+"/material.rad");
   //radFiles.append(":/resources/Simple.rad");
@@ -52,10 +46,22 @@ TEST(LeakTests, LeakModel)
   stadic::LeakCheck leakChecker;
   QStringList radFiles;
   radFiles.clear();
+  QDir wDir;
+  wDir=QDir::currentPath();
+  wDir.cdUp();
+  wDir.cdUp();
+  if (!wDir.cd("test/tmp/")){
+    std::cout<<"The program failed to move to the temporary directory."<<std::endl;
+    EXIT_FAILURE;
+  }
+  QFile::copy(":/resources/SimpleHole.rad",wDir.path()+"/SimpleHole.rad");
+  QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad");
+  radFiles.append(wDir.path()+"/SimpleHole.rad");
+  radFiles.append(wDir.path()+"/material.rad");
   //radFiles.append(":/resources/SimpleHole.rad");
   //radFiles.append(":/resources/material.rad");
-  radFiles.append("c:/CPrograms/STADIC/test/resources/SimpleHole.rad");
-  radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
+  //radFiles.append("c:/CPrograms/STADIC/test/resources/SimpleHole.rad");
+  //radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
   QStringList layerNames;
   layerNames.clear();
