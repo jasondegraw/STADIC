@@ -34,16 +34,28 @@ bool LeakCheck::isEnclosed(){
     if (!runCalc()){
         return false;
     }
-    QString val1;
-    m_Output2>>val1;
-    QString val2;
-    m_Output2>>val2;
-    QString val3;
-    m_Output2>>val3;
-    std::cout<<"results "<<val1.toStdString()<<" "<<val2.toStdString()<<" "<<val3.toStdString()<<std::endl;
 
-    if (val1.toDouble()>0){
+    QFile iFile;
+    iFile.setFileName("Final.res");
+    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!iFile.isOpen()){
+        ERROR("The opening of the results file failed.");
         return false;
+    }
+    if (iFile.atEnd()){
+        ERROR("The results file is empty.");
+        return false;
+    }
+    QString val1=iFile.readLine();
+    iFile.close();
+
+    if (val1.toDouble()>0&&val1.toDouble()<0.5){
+        WARNING("The illuminance value is greater than 0 at the analysis point, but less than 1.\n\tIt will be assumed that there is no light leak.");
+    }else if (val1.toDouble()>=0.5){
+        ERROR("The provided model either contains a leak or the provided point is outside the space.");
+        return false;
+    }else{
+        std::cout<<"The model is fully enclosed."<<std::endl;
     }
 
     return true;
@@ -362,33 +374,43 @@ bool LeakCheck::runCalc(){
         arguments.append("4");
     }
     arguments.append("-ad");
-    arguments.append("2000");
+    arguments.append("5000");
     arguments.append("-as");
-    arguments.append("1000");
+    arguments.append("3000");
+    arguments.append("-av");
+    arguments.append("0");
+    arguments.append("0");
+    arguments.append("0");
+    arguments.append("-aw");
+    arguments.append("0");
+    arguments.append("-aa");
+    arguments.append("0.15");
     arguments.append("Test.oct");
     m_Process->setWorkingDirectory(m_Dir.path());
     m_Process->setArguments(arguments);
     m_Process->setStandardInputFile("Test.pts");
     //QObject::connect(m_Process,SIGNAL(readyReadStandardError()),this,SLOT(captureErros()));
-    m_Process->setStandardOutputFile("Test.tmp");
-    m_Process->start();
-    m_Process->waitForFinished(-1);
+    //m_Process->setStandardOutputFile("Test.tmp");
+    //m_Process->start();
+    //m_Process->waitForFinished(-1);
 
     m_Process2=new QProcess(this);
-    m_Process2->setProgram(QString("rcalc.exe"));
+    m_Process2->setProgram(QString("rcalc"));
+    m_Process->setStandardOutputProcess(m_Process2);
     QStringList arguments2;
+    arguments2.clear();
     arguments2.append("-e");
-    arguments2.append("\"$1=179*($1*0.265+$2*0.670+$3*0.065)\"");
+    arguments2.append("$1=179*($1*0.265+$2*0.670+$3*0.065)");
     //arguments2.append("Test.tmp");
-    m_Process2->setStandardInputFile("Test.tmp");
-    for (int i=0;i<arguments2.size();i++){
-        std::cout<<"arg"<<i<<" "<<arguments2[i].toStdString()<<std::endl;
-    }
     m_Process2->setArguments(arguments2);
     m_Process2->setWorkingDirectory(m_Dir.path());
     m_Process2->setStandardOutputFile("Final.res");
+    //m_Process2->startDetached("rcalc",arguments2);
+    m_Process->start();
+    m_Process->waitForFinished(-1);
     m_Process2->start();
-    m_Process2->waitForFinished(-1);
+    m_Process2->waitForStarted();
+    m_Process2->waitForFinished();
 
     //QObject::connect(m_Process2,SIGNAL(readyReadStandardError()),this,SLOT(captureErrors2()));
     //QObject::connect(m_Process2,SIGNAL(readyReadStandardOutput()),this,SLOT(captureOutput2()));

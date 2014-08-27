@@ -93,11 +93,7 @@ int main (int argc, char *argv[])
     if(!leakChecker.setWorkingDirectory(wDirectory)){
         return EXIT_FAILURE;
     }
-    if (leakChecker.isEnclosed()){
-        std::cout<<"The provided model is a fully enclosed space."<<std::endl;
-    }else{
-        std::cout<<"The provided model either contains a leak or the provided point is outside the space."<<std::endl;
-    }
+    leakChecker.isEnclosed();
 
     return EXIT_SUCCESS;
 }
