@@ -50,7 +50,7 @@ bool LeakCheck::isEnclosed(){
     iFile.close();
 
     if (val1.toDouble()>0&&val1.toDouble()<0.5){
-        WARNING("The illuminance value is greater than 0 at the analysis point, but less than 1.\n\tIt will be assumed that there is no light leak.");
+        WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
     }else if (val1.toDouble()>=0.5){
         ERROR("The provided model either contains a leak or the provided point is outside the space.");
         return false;

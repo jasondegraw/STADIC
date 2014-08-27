@@ -590,11 +590,11 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rlam->setStandardOutputProcess(rcalc);
     arguments2.clear();
     arguments2.append("-e");
-    arguments2.append("\"r=$1-$4+7;g=$2-$5+$8;b=$3-$6+$9\"");
+    arguments2.append("r=$1-$4+7;g=$2-$5+$8;b=$3-$6+$9");
     arguments2.append("-e");
-    arguments2.append("\"ill=179*(.265*r+.670*g+.65*b)\"");
+    arguments2.append("ill=179*(.265*r+.670*g+.65*b)");
     arguments2.append("-e");
-    arguments2.append("\"$1=floor(ill+.5)\"");
+    arguments2.append("$1=floor(ill+.5)");
     rcalc->setArguments(arguments2);
 
     QStringList arguments3;
@@ -959,11 +959,11 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rlam->setStandardOutputProcess(rcalc);
     arguments2.clear();
     arguments2.append("-e");
-    arguments2.append("\"r=$1-$4+$7;g=$2-@5+8;b=$3-$6+$9\"");
+    arguments2.append("r=$1-$4+$7;g=$2-@5+8;b=$3-$6+$9");
     arguments2.append("-e");
-    arguments2.append("\"ill=179*(.265*r+.670*g+.065*b)\"");
+    arguments2.append("ill=179*(.265*r+.670*g+.065*b)");
     arguments2.append("-e");
-    arguments2.append("\"$1=floor(ill+.5)\"");
+    arguments2.append("$1=floor(ill+.5)");
     rcalc->setArguments(arguments2);
     QString finalIll;
     if (setting==-1){
@@ -1624,11 +1624,11 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rlam->setStandardOutputProcess(rcalc);
                     arguments2.clear();
                     arguments2.append("-e");
-                    arguments2.append("\"r=$1-$4+7;g=$2-$5+$8;b=$3-$6+$9\"");
+                    arguments2.append("r=$1-$4+7;g=$2-$5+$8;b=$3-$6+$9");
                     arguments2.append("-e");
-                    arguments2.append("\"ill=179*(.265*r+.670*g+.65*b)\"");
+                    arguments2.append("ill=179*(.265*r+.670*g+.65*b)");
                     arguments2.append("-e");
-                    arguments2.append("\"$1=floor(ill+.5)\"");
+                    arguments2.append("$1=floor(ill+.5)");
                     rcalc->setArguments(arguments2);
 
                     QStringList arguments3;
