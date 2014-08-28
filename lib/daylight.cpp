@@ -84,16 +84,16 @@ bool Daylight::simDaylight(){
 bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdfRad,QString remainingRad, std::vector<double> normal, QString thickness, QString bsdfXML, QString bsdfLayer, Control *model){
     QString mainFileName;
     if (setting==-1){
-        mainFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+bsdfNum;
+        mainFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+bsdfNum;
     }else{
-        mainFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+setting+"_bsdf"+bsdfNum;
+        mainFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+setting+"_bsdf"+bsdfNum;
     }
 
     //Create initial octrees
     QStringList files;
     files.append(remainingRad);
     files.append(bsdfRad);
-    files.append(QString(model->projectFolder()+model->tmpFolder()+"sky_white1.rad"));
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
     QString mainOct=mainFileName+".oct";
     if(!createOctree(files,mainOct)){
         return false;
@@ -110,7 +110,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back(remainingRad);
     QString blackRad=mainFileName+"_allblack.rad";
     xform->setStandardOutputFile(blackRad);
-    xform->setWorkingDirectory(model->projectFolder());
+    xform->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     xform->setArguments(arguments);
     xform->start();
     if (!xform->waitForFinished(-1)){
@@ -143,7 +143,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
         nSuns=5185;
     }
     QFile tempFile;
-    tempFile.setFileName(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
+    tempFile.setFileName(QString::fromStdString(model->tmpFolder()+model->projectName()+"_suns_m")+model->sunDivisions()+".rad");
     if (!tempFile.exists()){
         QProcess *cnt=new QProcess(this);
         QString cntProgram="cnt.exe";
@@ -165,8 +165,8 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
         arguments2.append("Rbin=recno");
         arguments2.append("-o");
         arguments2.append("\"solar source sun 0 0 4 ${ Dx } ${ Dy } ${ Dz } 0.533\"");
-        rcalc->setWorkingDirectory(model->projectFolder());
-        rcalc->setStandardOutputFile(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
+        rcalc->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+        rcalc->setStandardOutputFile(QString::fromStdString(model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
         rcalc->setArguments(arguments2);
 
         cnt->start();
@@ -184,9 +184,9 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     QString sunsOct;
     files.clear();
     files.append(blackRad);
-    files.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad"));
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
     files.append(bsdfRad);
-    files.append(QString(model->projectFolder()+model->tmpFolder()+"sky_white1.rad"));
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+"sky_white1.rad"));
     sunsOct=mainFileName+"_suns.oct";
     if(!createOctree(files,sunsOct)){
         return false;
@@ -219,8 +219,8 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back(mainOct);
     QString vmx=mainFileName+"_3PH.vmx";
     rcontrib->setStandardOutputFile(vmx);
-    rcontrib->setWorkingDirectory(model->projectFolder());
-    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
@@ -244,7 +244,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back("-vo");
     arguments.push_back(thickness);
     arguments.push_back(bsdfRad);
-    perl->setWorkingDirectory(model->projectFolder());
+    perl->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     perl->setArguments(arguments);
     perl->setStandardOutputProcess(rcontrib);
 
@@ -264,7 +264,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments2.push_back("-faa");
     arguments2.push_back(mainOct);
     rcontrib->setArguments(arguments2);
-    rcontrib->setWorkingDirectory(model->projectFolder());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     QString dmx=mainFileName+"_3PH.dmx";
     rcontrib->setStandardOutputFile(dmx);
 
@@ -291,11 +291,11 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back("1");
     arguments.push_back("1");
     arguments.push_back("1");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(QString::fromStdString(model->weaDataFile()));
     QString smx=mainFileName+"_3PH.smx";
     gendaymtx->setArguments(arguments);
     gendaymtx->setStandardOutputFile(smx);
-    gendaymtx->setWorkingDirectory(model->projectFolder());
+    gendaymtx->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
         ERROR("The gendaymtx run for the smx has failed with the following errors.");
@@ -314,7 +314,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back("-vo");
     arguments.push_back(thickness);
     arguments.push_back(bsdfRad);
-    perl->setWorkingDirectory(model->projectFolder());
+    perl->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     perl->setArguments(arguments);
     perl->setStandardOutputProcess(rcontrib);
 
@@ -334,7 +334,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments2.push_back("-faa");
     arguments2.push_back(blackOct);
     rcontrib->setArguments(arguments2);
-    rcontrib->setWorkingDirectory(model->projectFolder());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     QString dirDMX=mainFileName+"_3DIR.dmx";
     rcontrib->setStandardOutputFile(dirDMX);
     perl->start();
@@ -369,8 +369,8 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back(blackOct);
     QString dirVMX=mainFileName+"_3Dir.vmx";
     rcontrib->setStandardOutputFile(dirVMX);
-    rcontrib->setWorkingDirectory(model->projectFolder());
-    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
@@ -389,11 +389,11 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
         arguments.push_back(QString().sprintf("%g",(-1)*model->buildingRotation()));
     }
     arguments.push_back("-d");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(QString::fromStdString(model->weaDataFile()));
     QString dirSMX=mainFileName+"_3DIR.smx";
     gendaymtx->setArguments(arguments);
     gendaymtx->setStandardOutputFile(dirSMX);
-    gendaymtx->setWorkingDirectory(model->projectFolder());
+    gendaymtx->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
         ERROR("The gendaymtx run for the direct smx has failed with the following errors.");
@@ -411,11 +411,11 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     }
     arguments.push_back("-5");
     arguments.push_back("-d");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(QString::fromStdString(model->weaDataFile()));
     QString dir5PHsmx=mainFileName+"_5PH.smx";
     gendaymtx->setArguments(arguments);
     gendaymtx->setStandardOutputFile(dir5PHsmx);
-    gendaymtx->setWorkingDirectory(model->projectFolder());
+    gendaymtx->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
         ERROR("The gendaymtx run for the direct 5 phase smx has failed with the following errors.");
@@ -460,8 +460,8 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.push_back(sunsOct);
     QString dirDSMX=mainFileName+"_5PH.dsmx";
     rcontrib->setStandardOutputFile(dirDSMX);
-    rcontrib->setWorkingDirectory(model->projectFolder());
-    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
@@ -483,7 +483,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.append(bsdfXML);
     arguments.append(dmx);
     arguments.append(smx);
-    dctimestep->setWorkingDirectory(model->projectFolder());
+    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     QProcess *rcollate=new QProcess(this);
     QString rcollateProgram="rcollate.exe";
@@ -497,7 +497,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->setArguments(arguments2);
     QString threePhaseCollated=mainFileName+"_3ph.dat";
     rcollate->setStandardOutputFile(threePhaseCollated);
-    rcollate->setWorkingDirectory(model->projectFolder());
+    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->start();
     rcollate->start();
@@ -518,7 +518,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.append(bsdfXML);
     arguments.append(dirDMX);
     arguments.append(dirSMX);
-    dctimestep->setWorkingDirectory(model->projectFolder());
+    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->setStandardOutputProcess(rcollate);
     arguments2.clear();
@@ -529,7 +529,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->setArguments(arguments2);
     QString threePhaseDirectCollated=mainFileName+"_3Dir.dat";
     rcollate->setStandardOutputFile(threePhaseDirectCollated);
-    rcollate->setWorkingDirectory(model->projectFolder());
+    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->start();
     rcollate->start();
@@ -548,7 +548,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     arguments.append("8760");
     arguments.append(dirDSMX);
     arguments.append(dir5PHsmx);
-    dctimestep->setWorkingDirectory(model->projectFolder());
+    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->setStandardOutputProcess(rcollate);
     arguments2.clear();
@@ -559,7 +559,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->setArguments(arguments2);
     QString fivePhaseCollated=mainFileName+"_5PH.dat";
     rcollate->setStandardOutputFile(fivePhaseCollated);
-    rcollate->setWorkingDirectory(model->projectFolder());
+    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->start();
     rcollate->start();
@@ -576,7 +576,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     QProcess *rlam=new QProcess(this);
     QString rlamProgram="rlam.exe";
     rlam->setProgram(rlamProgram);
-    rlam->setWorkingDirectory(model->projectFolder());
+    rlam->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     arguments.clear();
     arguments.append(threePhaseCollated);
     arguments.append(threePhaseDirectCollated);
@@ -586,7 +586,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     QProcess *rcalc=new QProcess(this);
     QString rcalcProgram="rcalc.exe";
     rcalc->setProgram(rcalcProgram);
-    rcalc->setWorkingDirectory(model->projectFolder());
+    rcalc->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     rlam->setStandardOutputProcess(rcalc);
     arguments2.clear();
     arguments2.append("-e");
@@ -650,15 +650,15 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     QString skyDC;
     if (setting==-1){
         //This is the base case
-        arguments.push_back(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct");
-        skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1k.dc";
+        arguments.push_back(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct");
+        skyDC = QString::fromStdString(model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1k.dc";
     }else{
-        arguments.push_back(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_std.oct");
-        skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_1k_std.dc";
+        arguments.push_back(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_std.oct");
+        skyDC = QString::fromStdString(model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_1k_std.dc";
     }
     rcontrib->setStandardOutputFile(skyDC);
-    rcontrib->setWorkingDirectory(model->projectFolder());
-    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
@@ -685,7 +685,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         nSuns=5185;
     } 
     QFile tempFile;
-    tempFile.setFileName(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
+    tempFile.setFileName(QString::fromStdString(model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
     if (!tempFile.exists()){
         QProcess *cnt=new QProcess(this);
         QString cntProgram="cnt.exe";
@@ -707,8 +707,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments2.append("Rbin=recno");
         arguments2.append("-o");
         arguments2.append("\"solar source sun 0 0 4 ${ Dx } ${ Dy } ${ Dz } 0.533\"");
-        rcalc->setWorkingDirectory(model->projectFolder());
-        rcalc->setStandardOutputFile(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
+        rcalc->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+        rcalc->setStandardOutputFile(QString::fromStdString(model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
         rcalc->setArguments(arguments2);
 
         cnt->start();
@@ -726,14 +726,14 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     QStringList octFiles;
     QString sunsOct;
     if (setting==-1){
-        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad"));
-        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad"));
-        sunsOct=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_base.oct";
+        octFiles.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad");
+        octFiles.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
+        sunsOct = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_base.oct";
 
     }else{
-        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"set"+QString().sprintf("%g",(setting+1))+"_ste.rad"));
-        octFiles.append(QString(model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad"));
-        sunsOct=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_std"+QString().sprintf("%g",(setting+1))+"std.oct";
+        octFiles.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"set"+QString().sprintf("%g", (setting+1))+"_ste.rad");
+        octFiles.append(QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_suns_m"+model->sunDivisions()+".rad");
+        sunsOct = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_sun_std"+QString().sprintf("%g", (setting+1))+"std.oct";
 
     }
     if(!createOctree(octFiles,sunsOct)){
@@ -767,14 +767,14 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back(sunsOct);
     if (setting==-1){
         //This is the base case
-        sunDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1d.dc";
+        sunDC = QString::fromStdString(model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_1d.dc";
     }else{
         //This is for the settings
-        sunDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1)+"_1d_std.dc");
+        sunDC = QString::fromStdString(model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1)+"_1d_std.dc");
     }
     rcontrib->setStandardOutputFile(sunDC);
-    rcontrib->setWorkingDirectory(model->projectFolder());
-    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
     rcontrib->setArguments(arguments);
 
     rcontrib->start();
@@ -795,16 +795,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.append("-5");
     arguments.append("-d");
     arguments.append("-h");
-    arguments.append(model->weaDataFile());
+    arguments.append(QString::fromStdString(model->weaDataFile()));
     gendaymtx->setArguments(arguments);
     QString sunSMX;
     if (setting==-1){
-        sunSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_d.smx";
+        sunSMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_d.smx";
     }else{
-        sunSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1)+"_d_std.smx");
+        sunSMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1)+"_d_std.smx");
     }
     gendaymtx->setStandardOutputFile(sunSMX);
-    gendaymtx->setWorkingDirectory(model->projectFolder());
+    gendaymtx->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
         ERROR("The creation of the suns has failed with the following errors.");
@@ -822,13 +822,13 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.append("1");
     arguments.append("1");
     arguments.append("-h");
-    arguments.append(model->weaDataFile());
+    arguments.append(QString::fromStdString(model->weaDataFile()));
     gendaymtx->setArguments(arguments);
     QString skySMX;
     if (setting==-1){
-        skySMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_k.smx";
+        skySMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_k.smx";
     }else{
-        skySMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1)+"_k_std.smx");
+        skySMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1)+"_k_std.smx");
     }
     gendaymtx->setStandardOutputFile(skySMX);
     gendaymtx->start();
@@ -845,13 +845,13 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.append(QString().sprintf("%g", model->skyDivisions()));
     arguments.append("d");
     arguments.append("-h");
-    arguments.append(model->weaDataFile());
+    arguments.append(QString::fromStdString(model->weaDataFile()));
     gendaymtx->setArguments(arguments);
     QString sunPatchSMX;
     if (setting==-1){
-        sunPatchSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_kd.smx";
+        sunPatchSMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_kd.smx";
     }else{
-        sunPatchSMX=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_kd_std.smx";
+        sunPatchSMX = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_kd_std.smx";
     }
     gendaymtx->setStandardOutputFile(sunPatchSMX);
     gendaymtx->start();
@@ -870,7 +870,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.append("-n");
     arguments.append("8760");
     arguments.append(skySMX);
-    dctimestep->setWorkingDirectory(model->projectFolder());
+    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     dctimestep->setArguments(arguments);
 
     QProcess *rcollate=new QProcess(this);
@@ -884,12 +884,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate->setArguments(arguments2);
     QString skyCollated;
     if (setting==-1){
-        skyCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sky.txt";
+        skyCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sky.txt";
     }else{
-        skyCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_sky_std.txt";
+        skyCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_sky_std.txt";
     }
     rcollate->setStandardOutputFile(skyCollated);
-    rcollate->setWorkingDirectory(model->projectFolder());
+    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
     dctimestep->start();
     rcollate->start();
@@ -906,9 +906,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     dctimestep->setArguments(arguments);
     QString sunCollated;
     if (setting==-1){
-        sunCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sun.txt";
+        sunCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sun.txt";
     }else{
-        sunCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_sun_std.txt";
+        sunCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_sun_std.txt";
     }
     rcollate->setStandardOutputFile(sunCollated);
     dctimestep->start();
@@ -927,9 +927,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     dctimestep->setArguments(arguments);
     QString sunPatchCollated;
     if (setting==-1){
-        sunPatchCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sunPatch.txt";
+        sunPatchCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_sunPatch.txt";
     }else{
-        sunPatchCollated=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_sunPatch_std.txt";
+        sunPatchCollated = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_sunPatch_std.txt";
     }
     rcollate->setStandardOutputFile(sunPatchCollated);
     dctimestep->start();
@@ -967,9 +967,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcalc->setArguments(arguments2);
     QString finalIll;
     if (setting==-1){
-        finalIll=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_ill.tmp";
+        finalIll = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_ill.tmp";
     }else{
-        finalIll=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",(setting+1))+"_ill_std.tmp";
+        finalIll = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", (setting+1))+"_ill_std.tmp";
     }
 
     rcalc->setStandardOutputFile(finalIll);
@@ -988,14 +988,14 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
     //Simulation Case 1 will be for window groups that do not contain BSDFs
     //First simulate the base condition
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]);    //This used to be (m_RadFiles[i],this), but the program failed to build
-    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
-    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
     QStringList files;
     files.append(wgBaseFile);
-    files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
     QString outFileName;
-    outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
+    outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
     if (!createOctree(files, outFileName)){
         return false;
     }
@@ -1008,13 +1008,13 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
     if (model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum]->shadeSettingGeometry().size();i++){
             RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
-            wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
-            QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+"_std.rad";
+            wgRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+            QString wgSetFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+"_std.rad";
             wgRad->writeRadFile(wgSetFile);
             files.clear();
             files.append(wgSetFile);
-            files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
-            outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+"_std.oct";
+            files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
+            outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+"_std.oct";
             if (!createOctree(files, outFileName)){
                 return false;
             }
@@ -1031,14 +1031,14 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
     //Simulation case 2 will be for window groups that contain BSDFs, but not in the base case
     //First simulate the base condition
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives(), this);    //This used to be (m_RadFiles[i],this), but the program failed to build
-    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
-    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
     QStringList files;
     files.append(wgBaseFile);
-    files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
     QString outFileName;
-    outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
+    outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.oct";
     if (!createOctree(files, outFileName)){
         return false;
     }
@@ -1061,9 +1061,9 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                         return false;
                     }
                 }
-                QString wgSettingFileStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_std.rad";
+                QString wgSettingFileStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_std.rad";
                 files.replace(0,wgSettingFileStd);
-                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_std.oct";
+                outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_std.oct";
                 if (!createOctree(files, outFileName)){
                     return false;
                 }
@@ -1082,7 +1082,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                         ERROR("The program quit...");
                         return false;
                     }
-                    QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
+                    QString wgSettingFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+".rad";
                     splitGeo.first->writeRadFile(wgSettingFileBSDF);
                     std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QString thickness;
@@ -1093,7 +1093,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                             bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                         }
                     }
-                    QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+                    QString wgSettingFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
@@ -1102,13 +1102,13 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 }
             }else{
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
-                wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
-                QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+                wgRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+                QString wgSetFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+".rad";
                 wgRad->writeRadFile(wgSetFile);
                 files.clear();
                 files.append(wgSetFile);
-                files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
-                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+                files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
+                outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+".oct";
                 if (!createOctree(files, outFileName)){
                     return false;
                 }
@@ -1129,8 +1129,8 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
     //First simulate the base condition
     //Standard radiance run with all bsdfs blacked out
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives(), this);
-    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
-    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
 
     RadFileData *baseStdRad=new RadFileData(baseRad->primitives(),this);
@@ -1140,12 +1140,12 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
         }
     }
     //Create base standard octree
-    QString wgBaseFileStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_std.rad";
+    QString wgBaseFileStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_std.rad";
     QStringList files;
     files.append(wgBaseFileStd);
-    files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
+    files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
     QString outFileName;
-    outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_std.oct";
+    outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_std.oct";
     if (!createOctree(files, outFileName)){
         return false;
     }
@@ -1164,7 +1164,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                 ERROR("The program quit...");
                 return false;
             }
-            QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
+            QString wgBaseFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+".rad";
             splitGeo.first->writeRadFile(wgBaseFileBSDF);
             std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j]);
             QString thickness;
@@ -1175,7 +1175,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                 }
             }
-            QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+            QString wgBaseFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
@@ -1197,9 +1197,9 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                         return false;
                     }
                 }
-                QString wgSettingFileStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_std.rad";
+                QString wgSettingFileStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_std.rad";
                 files.replace(0,wgSettingFileStd);
-                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_std.oct";
+                outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_std.oct";
                 if (!createOctree(files, outFileName)){
                     return false;
                 }
@@ -1218,7 +1218,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                         ERROR("The program quit...");
                         return false;
                     }
-                    QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
+                    QString wgSettingFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+".rad";
                     splitGeo.first->writeRadFile(wgSettingFileBSDF);
                     std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QString thickness;
@@ -1229,7 +1229,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                             bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                         }
                     }
-                    QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+                    QString wgSettingFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
@@ -1238,13 +1238,13 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                 }
             }else{
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]);
-                wgRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
-                QString wgSetFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".rad";
+                wgRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->shadeSettingGeometry()[i]);
+                QString wgSetFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+".rad";
                 wgRad->writeRadFile(wgSetFile);
                 files.clear();
                 files.append(wgSetFile);
-                files.append(model->projectFolder()+model->tmpFolder()+"sky_white1.rad");
-                outFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%",i+1)+".oct";
+                files.append(QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad");
+                outFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g%", i+1)+".oct";
                 if (!createOctree(files, outFileName)){
                     return false;
                 }
@@ -1263,8 +1263,8 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
 bool Daylight::simCase4(int blindGroupNum, Control *model){
     //	Simulation case 4 will be for window groups that have shade materials in addition to the glazing layer which is a BSDF
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives(), this);
-    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
-    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
 
     //BSDF run for each of the BSDFs
@@ -1280,7 +1280,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                 ERROR("The program quit...");
                 return false;
             }
-            QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
+            QString wgBaseFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+".rad";
             splitGeo.first->writeRadFile(wgBaseFileBSDF);
             std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j]);
             QString thickness;
@@ -1291,7 +1291,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                 }
             }
-            QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+            QString wgBaseFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
@@ -1315,7 +1315,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                         ERROR("The program quit...");
                         return false;
                     }
-                    QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
+                    QString wgSettingFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+".rad";
                     splitGeo.first->writeRadFile(wgSettingFileBSDF);
                     std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QString thickness;
@@ -1326,7 +1326,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                             bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                         }
                     }
-                    QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+                    QString wgSettingFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
@@ -1352,8 +1352,8 @@ bool Daylight::simCase5(int blindGroupNum, Control *model){
 bool Daylight::simCase6(int blindGroupNum, Control *model){
     //	Simulation case 6 will be for window groups that only have the glazing layer as a BSDF
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives(), this);
-    baseRad->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[blindGroupNum]->baseGeometry());
-    QString wgBaseFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
+    baseRad->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[blindGroupNum]->baseGeometry());
+    QString wgBaseFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
 
     //BSDF run for each of the BSDFs
@@ -1369,7 +1369,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                 ERROR("The program quit...");
                 return false;
             }
-            QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
+            QString wgBaseFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+".rad";
             splitGeo.first->writeRadFile(wgBaseFileBSDF);
             std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j]);
             QString thickness;
@@ -1380,7 +1380,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                 }
             }
-            QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+            QString wgBaseFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
@@ -1403,7 +1403,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                         ERROR("The program quit...");
                         return false;
                     }
-                    QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
+                    QString wgSettingFileBSDF = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+".rad";
                     splitGeo.first->writeRadFile(wgSettingFileBSDF);
                     //std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QString thickness;
@@ -1414,7 +1414,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                             bsdfXML=splitGeo.first->primitives()[k]->getArg1(1);
                         }
                     }
-                    QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
+                    QString wgSettingFileBSDFStd = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g", i+1)+"_bsdf"+QString().sprintf("%g", j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     /*  This would be correct, but for time savings we don't have to run the entire calculation so the next steps are taken.
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
@@ -1423,8 +1423,8 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     }
                     */
                     //Create the blacked out rad file
-                    QString mainFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+i+"_bsdf"+j;
-                    QString baseFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+j;
+                    QString mainFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+i+"_bsdf"+j;
+                    QString baseFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+j;
                     QProcess *xform=new QProcess(this);
                     QString xformProgram="xform.exe";
                     xform->setProgram(xformProgram);
@@ -1434,7 +1434,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     arguments.push_back(wgSettingFileBSDFStd);
                     QString blackRad=mainFileName+"_allblack.rad";
                     xform->setStandardOutputFile(blackRad);
-                    xform->setWorkingDirectory(model->projectFolder());
+                    xform->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
                     xform->setArguments(arguments);
                     xform->start();
                     if (!xform->waitForFinished(-1)){
@@ -1486,8 +1486,8 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     QString dirDSMX=mainFileName+"_5PH.dsmx";
                     QProcess *rcontrib=new QProcess(this);
                     rcontrib->setStandardOutputFile(dirDSMX);
-                    rcontrib->setWorkingDirectory(model->projectFolder());
-                    rcontrib->setStandardInputFile(model->dataFolder()+model->ptsFile());
+                    rcontrib->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
+                    rcontrib->setStandardInputFile(QString::fromStdString(model->dataFolder()+model->ptsFile()));
                     rcontrib->setArguments(arguments);
 
                     rcontrib->start();
@@ -1518,7 +1518,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     arguments.append(bsdfXML);
                     arguments.append(dmx);
                     arguments.append(smx);
-                    dctimestep->setWorkingDirectory(model->projectFolder());
+                    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     QProcess *rcollate=new QProcess(this);
                     QString rcollateProgram="rcollate.exe";
@@ -1532,7 +1532,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->setArguments(arguments2);
                     QString threePhaseCollated=mainFileName+"_3ph.dat";
                     rcollate->setStandardOutputFile(threePhaseCollated);
-                    rcollate->setWorkingDirectory(model->projectFolder());
+                    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     dctimestep->start();
                     rcollate->start();
@@ -1553,7 +1553,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     arguments.append(bsdfXML);
                     arguments.append(dirDMX);
                     arguments.append(dirSMX);
-                    dctimestep->setWorkingDirectory(model->projectFolder());
+                    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     dctimestep->setStandardOutputProcess(rcollate);
                     arguments2.clear();
@@ -1564,7 +1564,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->setArguments(arguments2);
                     QString threePhaseDirectCollated=mainFileName+"_3Dir.dat";
                     rcollate->setStandardOutputFile(threePhaseDirectCollated);
-                    rcollate->setWorkingDirectory(model->projectFolder());
+                    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     dctimestep->start();
                     rcollate->start();
@@ -1583,7 +1583,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     arguments.append("8760");
                     arguments.append(dirDSMX);
                     arguments.append(dir5PHsmx);
-                    dctimestep->setWorkingDirectory(model->projectFolder());
+                    dctimestep->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     dctimestep->setStandardOutputProcess(rcollate);
                     arguments2.clear();
@@ -1594,7 +1594,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->setArguments(arguments2);
                     QString fivePhaseCollated=mainFileName+"_5PH.dat";
                     rcollate->setStandardOutputFile(fivePhaseCollated);
-                    rcollate->setWorkingDirectory(model->projectFolder());
+                    rcollate->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
 
                     dctimestep->start();
                     rcollate->start();
@@ -1610,7 +1610,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     QProcess *rlam=new QProcess(this);
                     QString rlamProgram="rlam.exe";
                     rlam->setProgram(rlamProgram);
-                    rlam->setWorkingDirectory(model->projectFolder());
+                    rlam->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
                     arguments.clear();
                     arguments.append(threePhaseCollated);
                     arguments.append(threePhaseDirectCollated);
@@ -1620,7 +1620,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     QProcess *rcalc=new QProcess(this);
                     QString rcalcProgram="rcalc.exe";
                     rcalc->setProgram(rcalcProgram);
-                    rcalc->setWorkingDirectory(model->projectFolder());
+                    rcalc->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
                     rlam->setStandardOutputProcess(rcalc);
                     arguments2.clear();
                     arguments2.append("-e");
@@ -1730,10 +1730,10 @@ bool Daylight::testSimCase(Control *model){
                     for (int j=0;j<model->windowGroups()[i]->shadeSettingGeometry().size();j++){
                         QString tempString;
                         QFile iFile;
-                        iFile.setFileName(QString(model->projectFolder()+model->windowGroups()[i]->shadeSettingGeometry()[j]));
+                        iFile.setFileName(QString::fromStdString(model->projectFolder())+model->windowGroups()[i]->shadeSettingGeometry()[j]);
                         iFile.open(QIODevice::ReadOnly | QIODevice::Text);
                         if (!iFile.exists()){
-                            ERROR("The opening of the geometry file " +QString(model->projectFolder()+model->windowGroups()[i]->shadeSettingGeometry()[j]+" has failed."));
+                            ERROR("The opening of the geometry file " +QString::fromStdString(model->projectFolder())+model->windowGroups()[i]->shadeSettingGeometry()[j]+" has failed.");
                             return false;
                         }
                         tempString=iFile.readLine();
@@ -1780,7 +1780,7 @@ bool Daylight::setSimCase(int setting, int simCase){
 
 bool Daylight::writeSky(Control *model){
     QFile oFile;
-    QString tmpFile=model->projectFolder()+model->tmpFolder()+"sky_white1.rad";
+    QString tmpFile = QString::fromStdString(model->projectFolder()+model->tmpFolder())+"sky_white1.rad";
     oFile.setFileName(tmpFile);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
@@ -1794,7 +1794,7 @@ bool Daylight::writeSky(Control *model){
     out<<"sky_glow source ground1"<<endl<<"0 0 4 0 0 -1 180"<<endl;
     oFile.close();
 
-    tmpFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns.rad";
+    tmpFile = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_suns.rad";
     oFile.setFileName(tmpFile);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
@@ -1810,11 +1810,11 @@ bool Daylight::writeSky(Control *model){
 bool Daylight::createBaseRadFiles(Control *model){
     RadFileData radModel;
     //Add the main material file to the primitive list
-    radModel.addRad(model->projectFolder()+model->geoFolder()+model->matFile());
+    radModel.addRad(QString::fromStdString(model->projectFolder()+model->geoFolder()+model->matFile()));
     RadPrimitive *black = new PlasticMaterial(&radModel);
     radModel.addPrimitive(black);
     //Add the main geometry file to the primitive list
-    radModel.addRad(model->projectFolder()+model->geoFolder()+model->geoFile());
+    radModel.addRad(QString::fromStdString(model->projectFolder()+model->geoFolder()+model->geoFile()));
 
     //Create main rad files for each of the window groups
         //The window group rad file will contain the base rad files and each of the other
@@ -1827,7 +1827,7 @@ bool Daylight::createBaseRadFiles(Control *model){
         //wgRadModel.addRad(tempFile);
         for (int j=0;j<model->windowGroups().size();j++){
             if (i!=j){
-                if(!wgRadModel->addRad(model->projectFolder()+model->geoFolder()+model->windowGroups()[j]->baseGeometry())){
+                if(!wgRadModel->addRad(QString::fromStdString(model->projectFolder()+model->geoFolder())+model->windowGroups()[j]->baseGeometry())){
                     return false;
                 }
                 for (int k=0;k<model->windowGroups()[j]->glazingLayers().size();k++){
@@ -1872,17 +1872,17 @@ bool Daylight::sumIlluminanceFiles(Control *model){
     QString tempFileName;
     for (int i=0;i<model->windowGroups().size();i++){
         //Base Illuminance files
-        FinalIllFileName=model->projectFolder()+model->resultsFolder()+model->projectName()+model->windowGroups()[i]->objectName()+"_base.ill";
-        tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_base_ill.tmp";
+        FinalIllFileName = QString::fromStdString(model->projectFolder()+model->resultsFolder()+model->projectName())+model->windowGroups()[i]->objectName()+"_base.ill";
+        tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_base_ill.tmp";
         DaylightIlluminanceData *baseIll=new DaylightIlluminanceData(this);
         QFile checkFile(tempFileName);
         if (checkFile.exists()){
-            if (!baseIll->parse(tempFileName,model->weaDataFile())){
+            if(!baseIll->parse(tempFileName, QString::fromStdString(model->weaDataFile()))){
                 return false;
             }
             if (model->windowGroups()[i]->bsdfBaseLayers().size()>0){
                 for (int j=0;j<model->windowGroups()[i]->bsdfBaseLayers().size();j++){
-                    tempFileName==model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf"+j+".ill";
+                    tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf"+j+".ill";
                     checkFile.setFileName(tempFileName);
                     if (checkFile.exists()){
                         if (!baseIll->addIllFile(tempFileName)){
@@ -1893,10 +1893,10 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
             baseIll->writeIllFile(FinalIllFileName);
         }else{
-            tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf0.ill";
+            tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf0.ill";
             checkFile.setFileName(tempFileName);
             if (checkFile.exists()){
-                if (!baseIll->parse(tempFileName, model->weaDataFile())){
+                if (!baseIll->parse(tempFileName, QString::fromStdString(model->weaDataFile()))){
                     return false;
                 }
             }else{
@@ -1905,7 +1905,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
             if (model->windowGroups()[i]->bsdfBaseLayers().size()>1){
                 for (int j=1;j<model->windowGroups()[i]->bsdfBaseLayers().size();j++){
-                    tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf"+j+".ill";
+                    tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_base_bsdf"+j+".ill";
                     if (!baseIll->addIllFile(tempFileName)){
                         return false;
                     }
@@ -1915,30 +1915,30 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         }
         for (int j=0;j<model->windowGroups()[i]->shadeSettingGeometry().size();j++){
             DaylightIlluminanceData *settingIll=new DaylightIlluminanceData(this);
-            tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_set"+QString().sprintf("%g",(j+1))+"_ill_std.tmp";
-            FinalIllFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_set"+QString().sprintf("%g",(j+1))+".ill";
+            tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_set"+QString().sprintf("%g", (j+1))+"_ill_std.tmp";
+            FinalIllFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_set"+QString().sprintf("%g", (j+1))+".ill";
             checkFile.setFileName(tempFileName);
             if (checkFile.exists()){
-                if (!settingIll->parse(tempFileName,model->weaDataFile())){
+                if(!settingIll->parse(tempFileName, QString::fromStdString(model->weaDataFile()))){
                     return false;
                 }
                 if (model->windowGroups()[i]->bsdfSettingLayers()[j].size()!=0){
                     for (int k=0;k<model->windowGroups()[i]->bsdfSettingLayers()[j].size();k++){
-                        tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf"+QString().sprintf("%g",k)+".ill";
+                        tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf"+QString().sprintf("%g", k)+".ill";
                         settingIll->addIllFile(tempFileName);
                     }
                 }
                 settingIll->writeIllFile(FinalIllFileName);
             }else{
-                tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf0.ill";
+                tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf0.ill";
                 checkFile.setFileName(tempFileName);
                 if (checkFile.exists()){
-                    if (!settingIll->parse(tempFileName,model->weaDataFile())){
+                    if(!settingIll->parse(tempFileName, QString::fromStdString(model->weaDataFile()))){
                         return false;
                     }
                     if (model->windowGroups()[i]->bsdfSettingLayers()[j].size()!=1){
                         for (int k=1;k<model->windowGroups()[i]->bsdfSettingLayers()[j].size();k++){
-                            tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf"+QString().sprintf("%g",k)+".ill";
+                            tempFileName = QString::fromStdString(model->projectFolder()+model->tmpFolder()+model->projectName())+"_"+model->windowGroups()[i]->objectName()+"_set"+j+"_bsdf"+QString().sprintf("%g", k)+".ill";
                             settingIll->addIllFile(tempFileName);
                         }
                     }

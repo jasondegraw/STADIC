@@ -18,7 +18,7 @@ int main (int argc, char *argv[]){
     }
     QString fileName=argv[1];
     stadic::Control model;
-    if (!model.parseJson(fileName)){
+    if (!model.parseJson(fileName.toStdString())){
         return EXIT_FAILURE;
     }
     stadic::Daylight sim(&model);

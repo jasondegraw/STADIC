@@ -5,42 +5,39 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QFile>
+#include <QString>
 #include <iostream>
 #include "logging.h"
 
 namespace stadic {
 
-Control::Control(QObject *parent) :
-    QObject(parent)
+Control::Control()
 {
-
-
-
 }
 
 //Setters
 //******************
 //Folder Information
 //******************
-void Control::setProjectName(QString name){
+void Control::setProjectName(std::string name){
     m_ProjectName=name;
 }
-void Control::setProjectFolder(QString folder){
+void Control::setProjectFolder(std::string folder){
     m_ProjectFolder=folder;
 }
-void Control::setTmpFolder(QString folder){
+void Control::setTmpFolder(std::string folder){
     m_TmpFolder=folder;
 }
-void Control::setGeoFolder(QString folder){
+void Control::setGeoFolder(std::string folder){
     m_GeoFolder=folder;
 }
-void Control::setIESFolder(QString folder){
+void Control::setIESFolder(std::string folder){
     m_IESFolder=folder;
 }
-void Control::setResultsFolder(QString folder){
+void Control::setResultsFolder(std::string folder){
     m_ResultsFolder=folder;
 }
-void Control::setDataFolder(QString folder){
+void Control::setDataFolder(std::string folder){
     m_DataFolder=folder;
 }
 
@@ -57,7 +54,7 @@ bool Control::setGroundReflect(double value){
     }
     return true;
 }
-void Control::setWeaDataFile(QString file){
+void Control::setWeaDataFile(std::string file){
     m_WeaDataFile=file;
 }
 bool Control::setFirstDay(int value){
@@ -73,10 +70,10 @@ bool Control::setFirstDay(int value){
 //******************
 //Geometry Information
 //******************
-void Control::setMatFile(QString file){
+void Control::setMatFile(std::string file){
     m_MatFile=file;
 }
-void Control::setGeoFile(QString file){
+void Control::setGeoFile(std::string file){
     m_GeoFile=file;
 }
 bool Control::setBuildingRotation(double value){
@@ -88,10 +85,10 @@ bool Control::setBuildingRotation(double value){
     }
     return true;
 }
-void Control::setPTSFile(QString file){
+void Control::setPTSFile(std::string file){
     m_PTSFile=file;
 }
-bool Control::setImportUnits(QString units){
+bool Control::setImportUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_ImportUnits=units;
     }else{
@@ -100,7 +97,7 @@ bool Control::setImportUnits(QString units){
     }
     return true;
 }
-bool Control::setIllumUnits(QString units){
+bool Control::setIllumUnits(std::string units){
     if (units=="lux" || units=="fc"){
         m_IllumUnits=units;
     }else{
@@ -109,7 +106,7 @@ bool Control::setIllumUnits(QString units){
     }
     return true;
 }
-bool Control::setDisplayUnits(QString units){
+bool Control::setDisplayUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_DisplayUnits=units;
     }else{
@@ -118,7 +115,7 @@ bool Control::setDisplayUnits(QString units){
     }
     return true;
 }
-void Control::setOccSchedule(QString file){
+void Control::setOccSchedule(std::string file){
     m_OccSchedule=file;
 }
 bool Control::setTargetIlluminance(double value){
@@ -353,25 +350,25 @@ bool Control::setUDI(bool run, double minIllum, double maxIllum){
 //******************
 //Folder Information
 //******************
-QString Control::projectName(){
+std::string Control::projectName(){
     return m_ProjectName;
 }
-QString Control::projectFolder(){
+std::string Control::projectFolder(){
     return m_ProjectFolder;
 }
-QString Control::tmpFolder(){
+std::string Control::tmpFolder(){
     return m_TmpFolder;
 }
-QString Control::geoFolder(){
+std::string Control::geoFolder(){
     return m_GeoFolder;
 }
-QString Control::iesFolder(){
+std::string Control::iesFolder(){
     return m_IESFolder;
 }
-QString Control::resultsFolder(){
+std::string Control::resultsFolder(){
     return m_ResultsFolder;
 }
-QString Control::dataFolder(){
+std::string Control::dataFolder(){
     return m_DataFolder;
 }
 
@@ -381,7 +378,7 @@ QString Control::dataFolder(){
 double Control::groundReflect(){
     return m_GroundReflect;
 }
-QString Control::weaDataFile(){
+std::string Control::weaDataFile(){
     return m_WeaDataFile;
 }
 int Control::firstDay(){
@@ -391,31 +388,31 @@ int Control::firstDay(){
 //******************
 //Geometry Information
 //******************
-QString Control::matFile(){
+std::string Control::matFile(){
     return m_MatFile;
 }
-QString Control::geoFile(){
+std::string Control::geoFile(){
     return m_GeoFile;
 }
 double Control::buildingRotation(){
     return m_BuildingRotation;
 }
-QString Control::ptsFile(){
+std::string Control::ptsFile(){
     return m_PTSFile;
 }
 std::vector<WindowGroup*> Control::windowGroups(){
     return m_WindowGroups;
 }
-QString Control::importUnits(){
+std::string Control::importUnits(){
     return m_ImportUnits;
 }
-QString Control::illumUnits(){
+std::string Control::illumUnits(){
     return m_IllumUnits;
 }
-QString Control::displayUnits(){
+std::string Control::displayUnits(){
     return m_DisplayUnits;
 }
-QString Control::occSchedule(){
+std::string Control::occSchedule(){
     return m_OccSchedule;
 }
 double Control::targetIlluminance(){
@@ -538,10 +535,10 @@ double Control::UDIMax(){
 //******************
 //PARSER
 //******************
-bool Control::parseJson(QString file){
+bool Control::parseJson(std::string file){
     QString data;
     QFile iFile;
-    iFile.setFileName(file);
+    iFile.setFileName(QString::fromStdString(file));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     data=iFile.readAll();
     iFile.close();
@@ -551,91 +548,91 @@ bool Control::parseJson(QString file){
     //******************
     //Folder Information
     //******************
-    QJsonValue val= jsonObj.value(QString("project_name"));
+    QJsonValue val= jsonObj.value("project_name");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"project_name\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setProjectName(val.toString());
+            setProjectName(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"project_name\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("project_folder"));
+    val=jsonObj.value("project_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"project_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setProjectFolder(val.toString());
+            setProjectFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"project_folder\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("tmp_folder"));
+    val=jsonObj.value("tmp_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"tmp_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setTmpFolder(val.toString());
+            setTmpFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"tmp_folder\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("geometry_folder"));
+    val=jsonObj.value("geometry_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"geometry_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setGeoFolder(val.toString());
+            setGeoFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"geometry_folder\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("ies_folder"));
+    val=jsonObj.value("ies_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"ies_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setIESFolder(val.toString());
+            setIESFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"ies_folder\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("results_folder"));
+    val=jsonObj.value("results_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"results_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setResultsFolder(val.toString());
+            setResultsFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"results_folder\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("data_folder"));
+    val=jsonObj.value("data_folder");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"data_folder\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setDataFolder(val.toString());
+            setDataFolder(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"data_folder\" is not a string."<<std::endl;
             return false;
@@ -645,7 +642,7 @@ bool Control::parseJson(QString file){
     //******************
     //Site Information
     //******************
-    val=jsonObj.value(QString("ground_reflectance"));
+    val=jsonObj.value("ground_reflectance");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"ground_reflectance\" does not appear in the STADIC Control File."<<std::endl;
         return false;
@@ -660,20 +657,20 @@ bool Control::parseJson(QString file){
         }
     }
 
-    val=jsonObj.value(QString("wea_data_file"));
+    val=jsonObj.value("wea_data_file");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"wea_data_file\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setWeaDataFile(val.toString());
+            setWeaDataFile(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"wea_data_file\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("first_day"));
+    val=jsonObj.value("first_day");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"first_day\" does not appear in the STADIC Control File."<<std::endl;
         return false;
@@ -693,33 +690,33 @@ bool Control::parseJson(QString file){
     //******************
     //Geometry Information
     //******************
-    val=jsonObj.value(QString("material_file"));
+    val=jsonObj.value("material_file");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"material_file\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setMatFile(val.toString());
+            setMatFile(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"material_file\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("geometry_file"));
+    val=jsonObj.value("geometry_file");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"geometry_file\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setGeoFile(val.toString());
+            setGeoFile(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"geometry_file\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("building_rotation"));
+    val=jsonObj.value("building_rotation");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"building_rotation\" does not appear in the STADIC Control File."<<std::endl;
         return false;
@@ -734,27 +731,27 @@ bool Control::parseJson(QString file){
         }
     }
 
-    val=jsonObj.value(QString("analysis_points"));
+    val=jsonObj.value("analysis_points");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"analysis_points\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setPTSFile(val.toString());
+            setPTSFile(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"analysis_points\" is not a string."<<std::endl;
             return false;
         }
     }
 
-    val=jsonObj.value(QString("window_groups"));
+    val=jsonObj.value("window_groups");
     QJsonArray array=val.toArray();
     if (val.isUndefined()){
         std::cerr<<"ERROR:  The key \"window_groups\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         for (int i=0;i<array.size();i++){
-            WindowGroup *WG=new WindowGroup(this);
+            WindowGroup *WG=new WindowGroup;
             if (array[i].isObject()){
                 if(WG->parseJson(array[i].toObject())){
                     m_WindowGroups.push_back(WG);
@@ -769,13 +766,13 @@ bool Control::parseJson(QString file){
     }
 
 
-    val=jsonObj.value(QString("import_units"));
+    val=jsonObj.value("import_units");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"import_units\" does not appear in the STADIC Control File."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            if (!setImportUnits(val.toString())){
+            if(!setImportUnits(val.toString().toStdString())){
                 return false;
             }
         }else{
@@ -790,7 +787,7 @@ bool Control::parseJson(QString file){
         return false;
     }else{
         if (val.isString()){
-            if (!setIllumUnits(val.toString())){
+            if (!setIllumUnits(val.toString().toStdString())){
                 return false;
             }
         }else{
@@ -805,7 +802,7 @@ bool Control::parseJson(QString file){
         return false;
     }else{
         if (val.isString()){
-            if (!setDisplayUnits(val.toString())){
+            if (!setDisplayUnits(val.toString().toStdString())){
                 return false;
             }
         }else{
@@ -820,7 +817,7 @@ bool Control::parseJson(QString file){
         return false;
     }else{
         if (val.isString()){
-            setOccSchedule(val.toString());
+            setOccSchedule(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The \"occupancy_schedule\" is not a string."<<std::endl;
             return false;
@@ -1167,7 +1164,7 @@ bool Control::parseJson(QString file){
         std::cerr<<"WARNING:  The key \"control_zones\" does not appear in the STADIC Control File."<<std::endl;
     }else{
         for (int i=0;i<array.size();i++){
-            ControlZone *zone=new ControlZone(this);
+            ControlZone *zone=new ControlZone;
             if (array[i].isObject()){
                 if(zone->parseJson(array[i].toObject())){
                     m_ControlZones.push_back(zone);
