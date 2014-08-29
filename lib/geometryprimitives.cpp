@@ -3,15 +3,14 @@
 
 namespace stadic {
 //Polygon
-PolygonGeometry::PolygonGeometry(QObject *parent) : RadPrimitive(parent)
+PolygonGeometry::PolygonGeometry() : RadPrimitive()
 {
     RadPrimitive::setType("polygon");
     std::vector<QString> arg3 = {};
     initArg(3,arg3);
 }
 
-PolygonGeometry::PolygonGeometry(std::vector<double> points, QObject *parent)
-    : RadPrimitive(parent)
+PolygonGeometry::PolygonGeometry(std::vector<double> points) : RadPrimitive()
 {
     RadPrimitive::setType("polygon");
     for (int i=0;i<points.size();i++){

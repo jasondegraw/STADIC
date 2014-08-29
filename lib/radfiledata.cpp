@@ -29,7 +29,7 @@ bool RadFileData::addRad(QString file){
     QTextStream data(&iFile);
     std::vector<RadPrimitive*> primitives;
     while (!data.atEnd()) {
-        RadPrimitive *primitive = RadPrimitive::fromRad(data,this->parent());
+        RadPrimitive *primitive = RadPrimitive::fromRad(data);
         if(primitive == nullptr) {
             break;
         }

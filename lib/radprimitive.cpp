@@ -17,8 +17,7 @@ std::array<QString,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubbl
                                                       "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
                                                       "mixpict", "mixtext", "unknown"};
 
-RadPrimitive::RadPrimitive(QObject *parent) :
-    QObject(parent)
+RadPrimitive::RadPrimitive()
 {
 }
 
@@ -207,7 +206,7 @@ static QString nextNonComment(QTextStream &data)
   return QString();
 }
 
-RadPrimitive* RadPrimitive::fromRad(QTextStream &data, QObject *parent)
+RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
 {
     RadPrimitive *rad;
 
@@ -222,16 +221,16 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data, QObject *parent)
 
     switch(typeFromString(list[1])) {
     case Polygon:
-        rad = new PolygonGeometry(parent);
+        rad = new PolygonGeometry();
         break;
     case Plastic:
-        rad = new PlasticMaterial(parent);
+        rad = new PlasticMaterial();
         break;
     case BSDF:
-        rad = new BSDFMaterial(parent);
+        rad = new BSDFMaterial();
         break;
     default:
-        rad = new RadPrimitive(parent);
+        rad = new RadPrimitive();
         rad->setType(list[1]);
         break;
     }

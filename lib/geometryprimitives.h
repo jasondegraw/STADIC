@@ -7,8 +7,8 @@ namespace stadic {
 class STADIC_API PolygonGeometry : public RadPrimitive
 {
 public:
-    explicit PolygonGeometry(QObject *parent=0);
-    PolygonGeometry(std::vector<double> points, QObject *parent=0);
+    PolygonGeometry();
+    PolygonGeometry(std::vector<double> points);
 
     // Setters
     bool setType(QString){return false;}

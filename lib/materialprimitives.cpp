@@ -2,15 +2,14 @@
 #include "logging.h"
 namespace stadic{
 //PLASTIC
-PlasticMaterial::PlasticMaterial(QObject *parent) : RadPrimitive(parent)
+PlasticMaterial::PlasticMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
     std::vector<QString> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
-    : RadPrimitive(parent)
+PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough) : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
     setArg(3,QString().sprintf("%g",red),0);
@@ -170,15 +169,15 @@ bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
 
 
 //METAL
-MetalMaterial::MetalMaterial(QObject *parent) : RadPrimitive(parent)
+MetalMaterial::MetalMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("metal");
     std::vector<QString> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-MetalMaterial::MetalMaterial(double red, double green, double blue, double spec, double rough, QObject *parent)
-    : RadPrimitive(parent)
+MetalMaterial::MetalMaterial(double red, double green, double blue, double spec, double rough)
+    : RadPrimitive()
 {
     RadPrimitive::setType("metal");
     setArg(3,QString().sprintf("%g",red),0);
@@ -336,15 +335,15 @@ bool MetalMaterial::validateArg(int number, std::vector<QString> arg) const
     return false;
 }
 //TRANS
-TransMaterial::TransMaterial(QObject *parent) : RadPrimitive(parent)
+TransMaterial::TransMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("metal");
     std::vector<QString> arg3 = {"0","0","0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough,double trans, double transpec, QObject *parent)
-    : RadPrimitive(parent)
+TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough,double trans, double transpec)
+    : RadPrimitive()
 {
     RadPrimitive::setType("metal");
     setArg(3,QString().sprintf("%g",red),0);
@@ -559,15 +558,15 @@ bool TransMaterial::validateArg(int number, std::vector<QString> arg) const
     return false;
 }
 //GLASS
-GlassMaterial::GlassMaterial(QObject *parent) : RadPrimitive(parent)
+GlassMaterial::GlassMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("glass");
     std::vector<QString> arg3 = {"0","0","0"};
     initArg(3,arg3);
 }
 
-GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, QObject *parent)
-    : RadPrimitive(parent)
+GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans)
+    : RadPrimitive()
 {
     RadPrimitive::setType("glass");
     setArg(3,QString().sprintf("%g",redTrans),0);
@@ -575,8 +574,8 @@ GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTran
     setArg(3,QString().sprintf("%g",blueTrans),2);
 }
 
-GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac, QObject *parent)
-    : RadPrimitive(parent)
+GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
+    : RadPrimitive()
 {
     RadPrimitive::setType("glass");
     setArg(3,QString().sprintf("%g",redTrans),0);
@@ -699,15 +698,15 @@ bool GlassMaterial::validateArg(int number, std::vector<QString> arg) const
     return false;
 }
 //BSDF
-BSDFMaterial::BSDFMaterial(QObject *parent) : RadPrimitive(parent)
+BSDFMaterial::BSDFMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("BSDF");
     std::vector<QString> arg1 = {"0","null","0","0","0","."};
     initArg(1,arg1);
 }
 
-BSDFMaterial::BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz, QObject *parent)
-    : RadPrimitive(parent)
+BSDFMaterial::BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz)
+    : RadPrimitive()
 {
     RadPrimitive::setType("BSDF");
     setArg(1,QString().sprintf("%g",thickness),0);

@@ -10,9 +10,8 @@
 
 namespace stadic {
 
-class STADIC_API RadPrimitive : public QObject
+class STADIC_API RadPrimitive
 {
-    Q_OBJECT
 public:
     enum Type {Source, Sphere, Bubble, Polygon, Cone, Cup, Cylinder, Tube, Ring, Instance,
                Mesh, Light, Illum, Glow, Spotlight, Mirror, Prism1, Prism2, Plastic, Metal,
@@ -20,7 +19,7 @@ public:
                Metfunc, Transfunc, BRTDfunc, Plasdata, Metdata, Transdata, BSDF, Antimatter,
                Texfunc, Texdata, Colorfunc, Brightfunc, Colordata, Brightdata, Colorpict, Colortext,
                Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext, Unknown};
-    explicit RadPrimitive(QObject *parent = 0);
+    RadPrimitive();
 
     bool isGeometry() const;
     bool isMaterial() const;
@@ -52,7 +51,7 @@ public:
     virtual QString getArg3(int position) const;
     virtual QString getArg(int number, int position) const;
 
-    static RadPrimitive *fromRad(QTextStream &data, QObject *parent = 0);
+    static RadPrimitive *fromRad(QTextStream &data);
 
 protected:
     void initArg(int number, std::vector<QString> arg);
@@ -69,10 +68,6 @@ private:
     std::vector<QString> m_Arg1;
     std::vector<QString> m_Arg2;
     std::vector<QString> m_Arg3;
-
-signals:
-
-public slots:
 
 };
 

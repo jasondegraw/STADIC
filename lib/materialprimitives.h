@@ -9,8 +9,8 @@ namespace stadic{
 class STADIC_API PlasticMaterial : public RadPrimitive
 {
 public:
-    explicit PlasticMaterial(QObject *parent=0);
-    PlasticMaterial(double red, double green, double blue, double spec, double rough, QObject *parent=0);
+    PlasticMaterial();
+    PlasticMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
     bool setType(QString){return false;}
@@ -33,8 +33,8 @@ private:
 class STADIC_API MetalMaterial : public RadPrimitive
 {
 public:
-    explicit MetalMaterial(QObject *parent=0);
-    MetalMaterial(double red, double green, double blue, double spec, double rough, QObject *parent=0);
+    MetalMaterial();
+    MetalMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
     bool setType(QString){return false;}
@@ -57,8 +57,8 @@ private:
 class STADIC_API TransMaterial : public RadPrimitive
 {
 public:
-    explicit TransMaterial(QObject *parent=0);
-    TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec, QObject *parent=0);
+    TransMaterial();
+    TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec);
 
     // Setters
     bool setType(QString){return false;}
@@ -88,9 +88,9 @@ private:
 class STADIC_API GlassMaterial : public RadPrimitive
 {
 public:
-    explicit GlassMaterial(QObject *parent=0);
-    GlassMaterial(double redTrans, double greenTrans, double blueTrans, QObject *parent);
-    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac, QObject *parent);
+    GlassMaterial();
+    GlassMaterial(double redTrans, double greenTrans, double blueTrans);
+    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac);
     // Setters
     bool setType(QString){return false;}
     bool setRedTrans(double value);
@@ -112,8 +112,8 @@ private:
 class STADIC_API BSDFMaterial : public RadPrimitive
 {
 public:
-    explicit BSDFMaterial(QObject *parent=0);
-    BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz, QObject *parent);
+    BSDFMaterial();
+    BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz);
 
     // Setters
     bool setType(QString){return false;}
