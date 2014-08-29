@@ -3,28 +3,28 @@
 #include <QFile>
 #include <QStringList>
 #include <iostream>
+#include <fstream>
 
 namespace stadic {
 
-WeatherData::WeatherData(QObject *parent) :
-    QObject(parent)
+WeatherData::WeatherData()
 {
 }
 
 //Setters
-void WeatherData::setPlace(QString place){
+void WeatherData::setPlace(std::string place){
     m_Place=place;
 }
-void WeatherData::setLatitude(QString lat){
+void WeatherData::setLatitude(std::string lat){
     m_Latitude=lat;
 }
-void WeatherData::setLongitude(QString lon){
+void WeatherData::setLongitude(std::string lon){
     m_Longitude=lon;
 }
-void WeatherData::setTimeZone(QString timeZone){
+void WeatherData::setTimeZone(std::string timeZone){
     m_TimeZone=timeZone;
 }
-void WeatherData::setElevation(QString elev){
+void WeatherData::setElevation(std::string elev){
     m_Elevation=elev;
 }
 
@@ -38,32 +38,32 @@ std::vector<int> WeatherData::day() const {
 std::vector<double> WeatherData::hour()const {
     return m_Hour;
 }
-std::vector<QString> WeatherData::directNormal() const {
+std::vector<std::string> WeatherData::directNormal() const {
     return m_DirectNormal;
 }
-std::vector<QString> WeatherData::directHorizontal() const{
+std::vector<std::string> WeatherData::directHorizontal() const{
     return m_DirectHorizontal;
 }
-QString WeatherData::place() const {
+std::string WeatherData::place() const {
     return m_Place;
 }
-QString WeatherData::latitude() const {
+std::string WeatherData::latitude() const {
     return m_Latitude;
 }
-QString WeatherData::longitude() const {
+std::string WeatherData::longitude() const {
     return m_Longitude;
 }
-QString WeatherData::timeZone() const {
+std::string WeatherData::timeZone() const {
     return m_TimeZone;
 }
-QString WeatherData::elevation() const {
+std::string WeatherData::elevation() const {
     return m_Elevation;
 }
 
 //Utilities
-bool WeatherData::parseWeather(QString file){
+bool WeatherData::parseWeather(std::string file){
     QFile iFile;
-    iFile.setFileName(file);
+    iFile.setFileName(QString::fromStdString(file));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream data(&iFile);
     QString string;
@@ -77,14 +77,11 @@ bool WeatherData::parseWeather(QString file){
 
     return true;
 }
-bool WeatherData::writeWea(QString file){
-    QFile oFile;
-    oFile.setFileName(file);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
+bool WeatherData::writeWea(std::string file){
+    std::ofstream out(file);
+    if (!out.is_open()){
         return false;
     }
-    QTextStream out(&oFile);
     out<<"place "<<place()<<endl;
     out<<"latitude "<<latitude()<<endl;
     out<<"longitude "<<longitude()<<endl;
@@ -94,20 +91,20 @@ bool WeatherData::writeWea(QString file){
     for (int i=0;i<month().size();i++){
         out<<month().at(i)<<" "<<day().at(i)<<" "<<hour().at(i)<<" "<<directNormal().at(i)<<" "<<directHorizontal().at(i)<<endl;
     }
-    oFile.close();
+    out.close();
     return true;
 }
-bool WeatherData::parseEPW(QString file){
+bool WeatherData::parseEPW(std::string file){
     QFile iFile;
-    iFile.setFileName(file);
+    iFile.setFileName(QString::fromStdString(file));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
-    setPlace(vals[1].trimmed());
-    setLatitude(vals[6].trimmed());
-    setLongitude(vals[7].trimmed());
-    setTimeZone(vals[8].trimmed());
-    setElevation(vals[9].trimmed());
+    setPlace(vals[1].trimmed().toStdString());
+    setLatitude(vals[6].trimmed().toStdString());
+    setLongitude(vals[7].trimmed().toStdString());
+    setTimeZone(vals[8].trimmed().toStdString());
+    setElevation(vals[9].trimmed().toStdString());
     while(!data.contains("DATA")){
         data=iFile.readLine();
     }
@@ -139,23 +136,23 @@ bool WeatherData::parseEPW(QString file){
         m_Month.push_back(month);
         m_Day.push_back(day);
         m_Hour.push_back(hour);
-        m_DirectHorizontal.push_back(vals[15]);
-        m_DirectNormal.push_back(vals[14]);
+        m_DirectHorizontal.push_back(vals[15].toStdString());
+        m_DirectNormal.push_back(vals[14].toStdString());
     }
     iFile.close();
     return true;
 }
-bool WeatherData::parseTMY(QString file){
+bool WeatherData::parseTMY(std::string file){
     QFile iFile;
-    iFile.setFileName(file);
+    iFile.setFileName(QString::fromStdString(file));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
-    setPlace(vals.at(1));
-    setLatitude(vals.at(4));
-    setLongitude(vals.at(5));
-    setTimeZone(vals.at(3));
-    setElevation(vals.at(6));
+    setPlace(vals.at(1).toStdString());
+    setLatitude(vals.at(4).toStdString());
+    setLongitude(vals.at(5).toStdString());
+    setTimeZone(vals.at(3).toStdString());
+    setElevation(vals.at(6).toStdString());
     data=iFile.readLine();
     QString tempString;
     QStringList parseDate;
@@ -174,8 +171,8 @@ bool WeatherData::parseTMY(QString file){
     //Determine time correction factor
     double correction=tempHour-0.5;
     m_Hour.push_back(tempHour-correction);
-    m_DirectNormal.push_back(vals.at(7));
-    m_DirectHorizontal.push_back(vals.at(10));
+    m_DirectNormal.push_back(vals.at(7).toStdString());
+    m_DirectHorizontal.push_back(vals.at(10).toStdString());
     while(!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
@@ -191,8 +188,8 @@ bool WeatherData::parseTMY(QString file){
         parseDate=tempString.split(':');
         double tempHour=parseDate.at(0).toDouble()+parseDate.at(1).toDouble()/60;
         m_Hour.push_back(tempHour-correction);
-        m_DirectNormal.push_back(vals.at(7));
-        m_DirectHorizontal.push_back(vals.at(10));
+        m_DirectNormal.push_back(vals.at(7).toStdString());
+        m_DirectHorizontal.push_back(vals.at(10).toStdString());
     }
 
     iFile.close();
