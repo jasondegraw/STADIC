@@ -193,10 +193,11 @@ bool GridMaker::writePTS(std::ostream& out){
     for (int i=0;i<m_TestPoints.size();i++){
         out<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
     }
+    return true;
 }
 
 bool GridMaker::writePTS(){
-    writePTS(std::cout);
+    return writePTS(std::cout);
 
     //for (int i=0;i<m_TestPoints.size();i++){
     //    std::cout<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
@@ -210,7 +211,7 @@ bool GridMaker::writePTS(std::string file){
         ERROR("The opening of the file "+QString::fromStdString(file)+" has failed.");
         return false;
     }
-    writePTS(oFile);
+    return writePTS(oFile);
 
     //for (int i=0;i<m_TestPoints.size();i++){
     //    oFile<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
