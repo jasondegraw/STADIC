@@ -1,7 +1,6 @@
 #ifndef GRIDMAKER_H
 #define GRIDMAKER_H
 
-#include <QObject>
 #include <QPointF>
 #include <QPolygonF>
 #include <vector>
@@ -12,11 +11,10 @@
 
 namespace stadic {
 
-class STADIC_API GridMaker : public QObject
+class STADIC_API GridMaker
 {
-    Q_OBJECT
 public:
-    explicit GridMaker(QObject *parent = 0);
+    GridMaker();
 
     //Setters
     //Points

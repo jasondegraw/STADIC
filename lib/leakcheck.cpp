@@ -1,7 +1,6 @@
 #include "leakcheck.h"
 #include <QFile>
 #include "logging.h"
-#include <QByteArray>
 #include <iostream>
 
 namespace stadic{
@@ -294,22 +293,22 @@ bool LeakCheck::writePTS(){
 }
 
 bool LeakCheck::xformModifiers(){
-    QProcess *xform=new QProcess(this);
-    QString programName="xform.exe";
-    xform->setProgram(programName);
+    QProcess xform;
+    QString programName="xform";
+    xform.setProgram(programName);
     QStringList arguments;
     arguments.append("-m");
     arguments.append("modified");
     for (int i=0;i<m_RadFiles.size();i++){
         arguments.append(QString().fromStdString(m_RadFiles[i]));
     }
-    xform->setArguments(arguments);
-    xform->setStandardOutputFile("Mod.rad");
-    xform->setWorkingDirectory(m_Dir.path());
-    xform->start();
+    xform.setArguments(arguments);
+    xform.setStandardOutputFile("Mod.rad");
+    xform.setWorkingDirectory(m_Dir.path());
+    xform.start();
 
     //There should be a test in here that if it doesn't finish it returns false
-    xform->waitForFinished();
+    xform.waitForFinished();
 
     return true;
 }
@@ -338,7 +337,7 @@ bool LeakCheck::writeExtraRad(){
 
 bool LeakCheck::createOct(){
     m_Process=new QProcess(this);
-    QString programName="oconv.exe";
+    QString programName="oconv";
     m_Process->setProgram(programName);
     QStringList arguments;
     arguments.append("Extra.rad");
@@ -353,7 +352,7 @@ bool LeakCheck::createOct(){
 
 bool LeakCheck::runCalc(){
     m_Process=new QProcess(this);
-    m_Process->setProgram(QString("rtrace.exe"));
+    m_Process->setProgram(QString("rtrace"));
     QStringList arguments;
     arguments.append("-I");
     arguments.append("-h");

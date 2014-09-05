@@ -6,13 +6,11 @@
 #include <iostream>
 #include <fstream>
 #include <QString>
-#include <QLineF>
 #include <radfiledata.h>
 
 namespace stadic {
 
-GridMaker::GridMaker(QObject *parent) :
-    QObject(parent)
+GridMaker::GridMaker()
 {
     m_TestPoints.clear();
 }
@@ -198,10 +196,6 @@ bool GridMaker::writePTS(std::ostream& out){
 
 bool GridMaker::writePTS(){
     return writePTS(std::cout);
-
-    //for (int i=0;i<m_TestPoints.size();i++){
-    //    std::cout<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
-    //}
 }
 
 bool GridMaker::writePTS(std::string file){
@@ -212,23 +206,6 @@ bool GridMaker::writePTS(std::string file){
         return false;
     }
     return writePTS(oFile);
-
-    //for (int i=0;i<m_TestPoints.size();i++){
-    //    oFile<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
-    //}
-
-    /*
-    QFile oFile;
-    oFile.setFileName(QString::fromStdString(file));
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        return false;
-    }
-    QTextStream out(&oFile);
-    for (int i=0;i<m_TestPoints.size();i++){
-        out<<m_TestPoints.at(i).rx()<<" "<<m_TestPoints.at(i).ry()<<" "<<m_ZHeight<<" 0 0 1"<<endl;
-    }
-    */
     oFile.close();
     return true;
 }

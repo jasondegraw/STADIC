@@ -279,7 +279,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     //Compute S Matrix
     //gendaymtx
     QProcess *gendaymtx=new QProcess(this);
-    QString gendaymtxProgram="gendaymtx.exe";
+    QString gendaymtxProgram="gendaymtx";
     gendaymtx->setProgram(gendaymtxProgram);
     arguments.clear();
     arguments.push_back("MF:"+QString().sprintf("%g",model->skyDivisions()));

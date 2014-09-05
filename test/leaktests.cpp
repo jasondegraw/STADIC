@@ -11,6 +11,7 @@ TEST(LeakTests, EnclosedModel)
   stadic::LeakCheck leakChecker;
   std::vector<std::string> radFiles;
   radFiles.clear();
+
   QDir wDir;
   wDir=QDir::currentPath();
   wDir.cdUp();

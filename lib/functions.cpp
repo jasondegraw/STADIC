@@ -1,5 +1,3 @@
-
-
 #include "functions.h"
 namespace stadic{
 //String splitting function based on a delimiter that returns a vector of standard strings
