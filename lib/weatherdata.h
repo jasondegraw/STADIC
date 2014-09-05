@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <vector>
-
+#include <string>
 #include "stadicapi.h"
 
 namespace stadic {
@@ -13,8 +13,8 @@ class STADIC_API WeatherData : public QObject
     Q_OBJECT
 public:
     explicit WeatherData(QObject *parent = 0);
-    bool parseWeather(QString file);
-    bool writeWea(QString file);
+    bool parseWeather(std::string file);
+    bool writeWea(std::string file);
 
     //Setters
     /*
@@ -24,38 +24,38 @@ public:
     void setDN(double dn);
     void setDH(double dh);
     */
-    void setPlace(QString place);
-    void setLatitude(QString lat);
-    void setLongitude(QString lon);
-    void setTimeZone(QString timeZone);
-    void setElevation(QString elev);
+    void setPlace(std::string place);
+    void setLatitude(std::string lat);
+    void setLongitude(std::string lon);
+    void setTimeZone(std::string timeZone);
+    void setElevation(std::string elev);
 
     //Getters
     std::vector<int> month() const;
     std::vector<int> day() const;
     std::vector<double> hour() const;
-    std::vector<QString> directNormal() const;
-    std::vector<QString> directHorizontal() const;
-    QString place() const;
-    QString latitude() const;
-    QString longitude() const;
-    QString timeZone() const;
-    QString elevation() const;
+    std::vector<std::string> directNormal() const;
+    std::vector<std::string> directHorizontal() const;
+    std::string place() const;
+    std::string latitude() const;
+    std::string longitude() const;
+    std::string timeZone() const;
+    std::string elevation() const;
 
 private:
-    bool parseEPW(QString file);
-    bool parseTMY(QString file);
+    bool parseEPW(std::string file);
+    bool parseTMY(std::string file);
 
     std::vector<int> m_Month;
     std::vector<int> m_Day;
     std::vector<double> m_Hour;
-    std::vector<QString> m_DirectNormal;
-    std::vector<QString> m_DirectHorizontal;
-    QString m_Place;
-    QString m_Latitude;
-    QString m_Longitude;
-    QString m_TimeZone;
-    QString m_Elevation;
+    std::vector<std::string> m_DirectNormal;
+    std::vector<std::string> m_DirectHorizontal;
+    std::string m_Place;
+    std::string m_Latitude;
+    std::string m_Longitude;
+    std::string m_TimeZone;
+    std::string m_Elevation;
 
 signals:
 
