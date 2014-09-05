@@ -16,7 +16,7 @@ PolygonGeometry::PolygonGeometry(std::vector<double> points, QObject *parent)
     RadPrimitive::setType("polygon");
     for (int i=0;i<points.size();i++){
         if (!setArg(3,QString().sprintf("%g",points[i]),i)){
-            ERROR("The setting of the polygon arguments has failed.");
+            ERROR(std::string("The setting of the polygon arguments has failed."));
         }
     }
 }
@@ -26,7 +26,7 @@ bool PolygonGeometry::setPoints(std::vector<double> points)
 {
     for (int i=0;i<points.size();i++){
         if (!setArg(3,QString().sprintf("%g",points[i]),i)){
-            ERROR("The setting of the polygon arguments has failed.");
+            ERROR(std::string("The setting of the polygon arguments has failed."));
             return false;
         }
     }

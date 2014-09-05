@@ -54,6 +54,7 @@ public:
     //Utilities
     bool parseRad(std::string file);
     bool makeGrid(std::string file);
+    bool writePTS(std::ostream& out);
     bool writePTS();
     bool writePTS(std::string file);
     bool writePTScsv(std::string file);

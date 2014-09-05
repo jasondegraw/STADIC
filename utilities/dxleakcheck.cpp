@@ -59,15 +59,15 @@ int main (int argc, char *argv[])
         }
     }
     if (radFiles.isEmpty()){
-        ERROR("At least one rad file name must be specified.\n\tSpecify with \"-f\".");
+        ERROR(std::string("At least one rad file name must be specified.\n\tSpecify with \"-f\"."));
         return EXIT_FAILURE;
     }
     if (floorLayers.isEmpty()){
-        ERROR("At least one floor layer name must be specified.\n\tSpecify with \"-t\".");
+        ERROR(std::string("At least one floor layer name must be specified.\n\tSpecify with \"-t\"."));
         return EXIT_FAILURE;
     }
     if (wDirectory.isEmpty()){
-        ERROR("The name of the directory where the temporary files should be placed must be specified.\n\tSpecify with \"-D\".");
+        ERROR(std::string("The name of the directory where the temporary files should be placed must be specified.\n\tSpecify with \"-D\"."));
         return EXIT_FAILURE;
     }
     //Instantiate GridMaker Object

@@ -21,7 +21,7 @@ TemporalIlluminance::TemporalIlluminance(int month, int day, double hour, const 
 
 bool TemporalIlluminance::add(std::vector<double> addIll){
     if (addIll.size()!=m_Illuminance.size()){
-        ERROR("The adding of the two illuminance vectors cannot be completed because they are not the same size.");
+        ERROR(std::string("The adding of the two illuminance vectors cannot be completed because they are not the same size."));
         return false;
     }
     for (int i=0;i<m_Illuminance.size();i++){
@@ -118,22 +118,22 @@ bool DaylightIlluminanceData::parse(QString fileName, QString weaFile){
         QStringList vals;
         vals=weaLine.split(" ");
         if(vals.size() < 5) {
-            ERROR("The number of items on each line of the wea file is less than 5.");
+            ERROR(std::string("The number of items on each line of the wea file is less than 5."));
             return false;
         }
         month = vals.at(0).toInt(&ok);
         if (!ok || month<1 || month>12){
-            ERROR("One of the month values is not acceptable.");
+            ERROR(std::string("One of the month values is not acceptable."));
             return false;
         }
         day=vals.at(1).toInt(&ok);
         if (!ok || day<1 || day>31){
-            ERROR("One of the day values is not acceptable.");
+            ERROR(std::string("One of the day values is not acceptable."));
             return false;
         }
         hour=vals.at(2).toDouble(&ok);
         if (!ok || hour<0 || hour>24){
-            ERROR("One of the hour values is not acceptable.");
+            ERROR(std::string("One of the hour values is not acceptable."));
             return false;
         }
         vals=line.split(" ");
@@ -173,17 +173,17 @@ bool DaylightIlluminanceData::parseTimeBased(QString fileName){
         }
         month = vals.at(0).toInt(&ok);
         if (!ok || month<1 || month>12){
-            ERROR("One of the month values is not acceptable.");
+            ERROR(std::string("One of the month values is not acceptable."));
             return false;
         }
         day=vals.at(1).toInt(&ok);
         if (!ok || day<1 || day>31){
-            ERROR("One of the day values is not acceptable.");
+            ERROR(std::string("One of the day values is not acceptable."));
             return false;
         }
         hour=vals.at(2).toDouble(&ok);
         if (!ok || hour<0 || hour>24){
-            ERROR("One of the hour values is not acceptable.");
+            ERROR(std::string("One of the hour values is not acceptable."));
             return false;
         }
         std::vector<double> ill;

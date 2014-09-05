@@ -189,10 +189,18 @@ bool GridMaker::makeGrid(std::string file){
     return true;
 }
 
-bool GridMaker::writePTS(){
+bool GridMaker::writePTS(std::ostream& out){
     for (int i=0;i<m_TestPoints.size();i++){
-        std::cout<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
+        out<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
     }
+}
+
+bool GridMaker::writePTS(){
+    writePTS(std::cout);
+
+    //for (int i=0;i<m_TestPoints.size();i++){
+    //    std::cout<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
+    //}
 }
 
 bool GridMaker::writePTS(std::string file){
@@ -202,9 +210,12 @@ bool GridMaker::writePTS(std::string file){
         ERROR("The opening of the file "+QString::fromStdString(file)+" has failed.");
         return false;
     }
-    for (int i=0;i<m_TestPoints.size();i++){
-        oFile<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
-    }
+    writePTS(oFile);
+
+    //for (int i=0;i<m_TestPoints.size();i++){
+    //    oFile<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
+    //}
+
     /*
     QFile oFile;
     oFile.setFileName(QString::fromStdString(file));

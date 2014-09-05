@@ -114,7 +114,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     xform->setArguments(arguments);
     xform->start();
     if (!xform->waitForFinished(-1)){
-        ERROR("The xform command failed to convert layers to black.");
+        ERROR(std::string("The xform command failed to convert layers to black."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -173,7 +173,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
         rcalc->start();
 
         if(!rcalc->waitForFinished(-1)){
-            ERROR("The running of rcalc for the suns has failed.");
+            ERROR(std::string("The running of rcalc for the suns has failed."));
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
@@ -225,7 +225,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the 3-phase vmx has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the 3-phase vmx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -271,7 +271,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     perl->start();
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the 3-phase dmx has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the 3-phase dmx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -298,8 +298,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     gendaymtx->setWorkingDirectory(model->projectFolder());
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The gendaymtx run for the smx has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
+        ERROR(std::string("The gendaymtx run for the smx has failed with the following errors."));        //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
 
@@ -340,7 +339,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     perl->start();
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the 3-phase direct dmx has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the 3-phase direct dmx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -375,7 +374,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the 3-phase direct vmx has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the 3-phase direct vmx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -396,7 +395,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     gendaymtx->setWorkingDirectory(model->projectFolder());
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The gendaymtx run for the direct smx has failed with the following errors.");
+        ERROR(std::string("The gendaymtx run for the direct smx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -418,7 +417,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     gendaymtx->setWorkingDirectory(model->projectFolder());
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The gendaymtx run for the direct 5 phase smx has failed with the following errors.");
+        ERROR(std::string("The gendaymtx run for the direct 5 phase smx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -466,7 +465,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the 5-phase direct smx has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -503,7 +502,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the 3-phase has failed.");
+        ERROR(std::string("The running of rcollate for the 3-phase has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -535,7 +534,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the 3-phase direct has failed.");
+        ERROR(std::string("The running of rcollate for the 3-phase direct has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -565,7 +564,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the 3-phase has failed.");
+        ERROR(std::string("The running of rcollate for the 3-phase has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -611,7 +610,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     rcalc->start();
     rcollate->start();
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for final illuminance has failed.");
+        ERROR(std::string("The running of rcollate for final illuminance has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -663,7 +662,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The rcontrib run for the sky has failed with the following errors.");
+        ERROR(std::string("The rcontrib run for the sky has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -715,7 +714,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcalc->start();
 
         if(!rcalc->waitForFinished(-1)){
-            ERROR("The running of rcalc for the suns has failed.");
+            ERROR(std::string("The running of rcalc for the suns has failed."));
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
@@ -779,7 +778,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
     rcontrib->start();
     if (!rcontrib->waitForFinished(-1)){
-        ERROR("The sun rcontrib run failed with the following errors.");
+        ERROR(std::string("The sun rcontrib run failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -807,7 +806,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx->setWorkingDirectory(model->projectFolder());
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The creation of the suns has failed with the following errors.");
+        ERROR(std::string("The creation of the suns has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -833,7 +832,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx->setStandardOutputFile(skySMX);
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The creation of the sky has failed with the following errors.");
+        ERROR(std::string("The creation of the sky has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -856,7 +855,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx->setStandardOutputFile(sunPatchSMX);
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The creation of the sun patches has failed with the following errors.");
+        ERROR(std::string("The creation of the sun patches has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -895,7 +894,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the sky has failed.");
+        ERROR(std::string("The running of rcollate for the sky has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -915,7 +914,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the sun has failed.");
+        ERROR(std::string("The running of rcollate for the sun has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -936,7 +935,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate->start();
 
     if(!rcollate->waitForFinished(-1)){
-        ERROR("The running of rcollate for the sun patches has failed.");
+        ERROR(std::string("The running of rcollate for the sun patches has failed."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -1079,7 +1078,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
                     if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                     QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1096,7 +1095,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                 }
@@ -1161,7 +1160,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
             layers.push_back(model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j]);
             QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
             if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
             QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1178,7 +1177,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
             QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
         }
@@ -1215,7 +1214,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
                     if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                     QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1232,7 +1231,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                 }
@@ -1277,7 +1276,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             }
             QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
             if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
             QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1294,7 +1293,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
         }
@@ -1312,7 +1311,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
                     if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                     QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1329,7 +1328,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     QString wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
                     splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                 }
@@ -1366,7 +1365,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             }
             QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
             if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
             QString wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1383,7 +1382,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             QString wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+QString().sprintf("%g",j+1)+"_std.rad";
             splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                ERROR(std::string("The program quit..."));
                 return false;
             }
         }
@@ -1400,7 +1399,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
                     if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
-                        ERROR("The program quit...");
+                        ERROR(std::string("The program quit..."));
                         return false;
                     }
                     QString wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+QString().sprintf("%g",i+1)+"_bsdf"+QString().sprintf("%g",j+1)+".rad";
@@ -1438,7 +1437,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     xform->setArguments(arguments);
                     xform->start();
                     if (!xform->waitForFinished(-1)){
-                        ERROR("The xform command failed to convert layers to black.");
+                        ERROR(std::string("The xform command failed to convert layers to black."));
                         //I want to display the errors here if the standard error has any errors to show.
                         return false;
                     }
@@ -1492,7 +1491,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
 
                     rcontrib->start();
                     if (!rcontrib->waitForFinished(-1)){
-                        ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
+                        ERROR(std::string("The rcontrib run for the 5-phase direct smx has failed with the following errors."));
                         //I want to display the errors here if the standard error has any errors to show.
                         return false;
                     }
@@ -1538,7 +1537,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->start();
 
                     if(!rcollate->waitForFinished(-1)){
-                        ERROR("The running of rcollate for the 3-phase has failed.");
+                        ERROR(std::string("The running of rcollate for the 3-phase has failed."));
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1570,7 +1569,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->start();
 
                     if(!rcollate->waitForFinished(-1)){
-                        ERROR("The running of rcollate for the 3-phase direct has failed.");
+                        ERROR(std::string("The running of rcollate for the 3-phase direct has failed."));
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1600,7 +1599,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate->start();
 
                     if(!rcollate->waitForFinished(-1)){
-                        ERROR("The running of rcollate for the 3-phase has failed.");
+                        ERROR(std::string("The running of rcollate for the 3-phase has failed."));
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1645,7 +1644,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcalc->start();
                     rcollate->start();
                     if(!rcollate->waitForFinished(-1)){
-                        ERROR("The running of rcollate for final illuminance has failed.");
+                        ERROR(std::string("The running of rcollate for final illuminance has failed."));
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1771,7 +1770,7 @@ bool Daylight::setSimCase(int setting, int simCase){
     if (setting>(m_SimCase.size()-1)){
         m_SimCase.reserve(setting+1);
     }else if (setting<0){
-        ERROR("The setting of the simulation case failed.");
+        ERROR(std::string("The setting of the simulation case failed."));
         return false;
     }
     m_SimCase.at(setting)=simCase;
@@ -1859,7 +1858,7 @@ bool Daylight::createOctree(QStringList files, QString octreeName){
     oconv->start();
 
     if (!oconv->waitForFinished(-1)){
-        ERROR("The creation of the octree has failed with the following errors.");
+        ERROR(std::string("The creation of the octree has failed with the following errors."));
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;

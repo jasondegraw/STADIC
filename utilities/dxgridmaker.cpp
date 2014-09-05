@@ -75,11 +75,11 @@ int main (int argc, char *argv[])
         }
     }
     if (sx==0 ||sy==0){
-        ERROR("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-sx\" and \"-sy\".");
+        ERROR(std::string("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-sx\" and \"-sy\"."));
         return EXIT_FAILURE;
     }
     if (fileName.empty()){
-        ERROR("The rad file name must be specified.\n\tSpecify with \"-f\".");
+        ERROR(std::string("The rad file name must be specified.\n\tSpecify with \"-f\"."));
         return EXIT_FAILURE;
     }
 
@@ -94,21 +94,21 @@ int main (int argc, char *argv[])
     grid.setOffsetY(oy);
     grid.setZHeight(z);
     if (!grid.parseRad(fileName)){
-        ERROR("The parsing of the rad file failed.");
+        ERROR(std::string("The parsing of the rad file failed."));
         return EXIT_FAILURE;
     }
     if (!grid.makeGrid(fileName)){
-        ERROR(QString("The creation of the grid failed."));
+        ERROR(std::string("The creation of the grid failed."));
         EXIT_FAILURE;
     }
     if (resultFile.empty()){
         if(!grid.writePTS()){
-            ERROR("The writing of the points file to the standard output has failed.");
+            ERROR(std::string("The writing of the points file to the standard output has failed."));
             return EXIT_FAILURE;
         }
     }else{
         if (!grid.writePTS(resultFile)){
-            ERROR("The writing of the points file failed.");
+            ERROR(std::string("The writing of the points file failed."));
             return EXIT_FAILURE;
         }
     }
