@@ -39,20 +39,20 @@ bool LeakCheck::isEnclosed(){
     iFile.setFileName("Final.res");
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.isOpen()){
-        ERROR(std::string("The opening of the results file failed."));
+        ERROR("The opening of the results file failed.");
         return false;
     }
     if (iFile.atEnd()){
-        ERROR(std::string("The results file is empty."));
+        ERROR("The results file is empty.");
         return false;
     }
     QString val1=iFile.readLine();
     iFile.close();
 
     if (val1.toDouble()>0&&val1.toDouble()<0.5){
-        WARNING(std::string("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak."));
+        WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
     }else if (val1.toDouble()>=0.5){
-        ERROR(std::string("The provided model either contains a leak or the provided point is outside the space."));
+        ERROR("The provided model either contains a leak or the provided point is outside the space.");
         return false;
     }else{
         std::cout<<"The model is fully enclosed."<<std::endl;
@@ -74,7 +74,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
         }
     }
     if (m_RadGeo.geometry().empty()){
-        ERROR(std::string("There are no polygons in the rad files."));
+        ERROR("There are no polygons in the rad files.");
         return false;
     }
     for (int i=0;i<m_RadGeo.geometry().size();i++){
@@ -89,7 +89,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
 
 bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
     if (m_RadGeo.primitives().empty()){
-        ERROR(std::string("No radiance geometry or materials have been specified."));
+        ERROR("No radiance geometry or materials have been specified.");
         return false;
     }
     for (int i=0;i<layers.size();i++){
@@ -118,7 +118,7 @@ bool LeakCheck::setX(double x){
         }
     }
     if (m_UnitedPolygon.isEmpty()){
-        ERROR(std::string("The uniting of the polygons has failed."));
+        ERROR("The uniting of the polygons has failed.");
         return false;
     }
 
@@ -147,7 +147,7 @@ bool LeakCheck::setY(double y){
         }
     }
     if (m_UnitedPolygon.isEmpty()){
-        ERROR(std::string("The uniting of the polygons has failed."));
+        ERROR("The uniting of the polygons has failed.");
         return false;
     }
     double minY=m_UnitedPolygon.boundingRect().bottom();
@@ -157,7 +157,7 @@ bool LeakCheck::setY(double y){
         maxY=m_UnitedPolygon.boundingRect().bottom();
     }
     if (y<minY|| y>maxY){
-        ERROR(std::string("The x coordinate is not within the min and max x coordinates."));
+        ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -177,7 +177,7 @@ bool LeakCheck::setZ(double z){
 
 bool LeakCheck::setPoint(std::vector<double> point){
     if (point.size()!=3){
-        ERROR(std::string("The vector of points does not contain 3 values."));
+        ERROR("The vector of points does not contain 3 values.");
         return false;
     }
     if (m_UnitedPolygon.isEmpty()){
@@ -187,7 +187,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
     }
 
     if (point[0]<m_UnitedPolygon.boundingRect().left() || point[0]>m_UnitedPolygon.boundingRect().right()){
-        ERROR(std::string("The x coordinate is not within the min and max x coordinates."));
+        ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -202,7 +202,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
         maxY=m_UnitedPolygon.boundingRect().bottom();
     }
     if (point[1]<minY|| point[1]>maxY){
-        ERROR(std::string("The x coordinate is not within the min and max x coordinates."));
+        ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     m_TestPoint[1]=point[1];
@@ -212,7 +212,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
 
 bool LeakCheck::setReflectance(int ref){
     if (ref!=0 && ref!=1){
-        ERROR(std::string("The reflectance needs to be either 0 or 1."));
+        ERROR("The reflectance needs to be either 0 or 1.");
         return false;
     }
     m_Reflectance=ref;
@@ -222,11 +222,11 @@ bool LeakCheck::setReflectance(int ref){
 bool LeakCheck::setWorkingDirectory(std::string wDir){
     QDir tempDir(QString().fromStdString(wDir));
     if (!tempDir.exists()){
-        ERROR(std::string("The working directory that was set does not exist."));
+        ERROR("The working directory that was set does not exist.");
         return false;
     }
     if (!m_Dir.setCurrent(QString().fromStdString(wDir))){
-        ERROR(std::string("There was an error when setting the workig directory."));
+        ERROR("There was an error when setting the working directory.");
         return false;
     }
     return true;
@@ -271,11 +271,11 @@ bool LeakCheck::checkPoint(){
         if (surroundIn==true){
             return true;
         }else{
-            WARNING(std::string("The point is on the boundary and may result in an incorrect analysis."));
+            WARNING("The point is on the boundary and may result in an incorrect analysis.");
             return true;
         }
     }
-    ERROR(std::string("The point is not contained within the polygon."));
+    ERROR("The point is not contained within the polygon.");
     return false;
 }
 

@@ -27,3 +27,15 @@ void WARNING(std::string mesg)
     std::string string="WARNING: "+mesg;
     std::cerr << string << std::endl;
 }
+
+void ERROR(const char mesg[])
+{
+  std::string string = "ERROR: " + std::string(mesg);
+  std::cerr << string << std::endl;
+}
+
+void WARNING(const char mesg[])
+{
+  std::string string = "WARNING: " + std::string(mesg);
+  std::cerr << string << std::endl;
+}
