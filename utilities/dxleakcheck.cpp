@@ -5,12 +5,12 @@
 void usage(){
     std::cout<<"dxleakcheck tests a radiance model for whether the space is or is not fully enclosed.  The program allows any number of polygons and any number of layer names to be used for the placement of the analysis point.  dxleakcheck will then test to ensure that point is within the bouding area of the polygons for the specified layers.  The program will then simulate the model with a uniform sky to determine if any light enters the model."<<std::endl;
     std::cout<<std::endl<<"-f name\tSet the rad file name. This file contains the radiance polygons that will be used for creating the analysis points.  Multiple files may be added with each preceded by a \"-f\".  This is a mandatory option."<<std::endl;
-    std::cout<<"-X val\tSet the x position for the analysis point.  This is a mandatory option. "<<std::endl;
-    std::cout<<"-Y val\tSet the y position for the analysis point.  This is a mandatory option."<<std::endl;
-    std::cout<<"-Z val\tSet the z position for the analysis point.  This is a mandatory option."<<std::endl;
+    std::cout<<"-x val\tSet the x position for the analysis point.  This is a mandatory option. "<<std::endl;
+    std::cout<<"-y val\tSet the y position for the analysis point.  This is a mandatory option."<<std::endl;
+    std::cout<<"-z val\tSet the z position for the analysis point.  This is a mandatory option."<<std::endl;
     std::cout<<"-l name\tSet the layer name that will be used to find the polygons for use in testint the analysis point location.  Multiple layer names can be added with each preceded by a  \"-l\".  This is a mandatory option."<<std::endl;
-    std::cout<<"-D path\tSet the working directory location.  This is a mandatory option"<<std::endl;
-    std::cout<<"-R val\tSet the reflectance value to use for the analysis.  This can either be 0 or 1."<<std::endl;
+    std::cout<<"-d path\tSet the working directory location.  This is a mandatory option"<<std::endl;
+    std::cout<<"-r val\tSet the reflectance value to use for the analysis.  This can either be 0 or 1."<<std::endl;
 
 }
 
@@ -35,22 +35,22 @@ int main (int argc, char *argv[])
         if (QString(argv[i])=="-f"){
             i++;
             radFiles.append(argv[i]);
-        }else if (QString(argv[i])=="-X"){
+        }else if (QString(argv[i])=="-x"){
             i++;
             xPt=atof(argv[i]);
-        }else if (QString(argv[i])=="-Y"){
+        }else if (QString(argv[i])=="-y"){
             i++;
             yPt=atof(argv[i]);
-        }else if (QString(argv[i])=="-Z"){
+        }else if (QString(argv[i])=="-z"){
             i++;
             zPt=atof(argv[i]);
         }else if(QString(argv[i])=="-l"){
             i++;
             floorLayers.append(QString(argv[i]));
-        }else if(QString(argv[i])=="-D"){
+        }else if(QString(argv[i])=="-d"){
             i++;
             wDirectory=argv[i];
-        }else if(QString(argv[i])=="-R"){
+        }else if(QString(argv[i])=="-r"){
             i++;
             reflectance=atof(argv[i]);
         }else{

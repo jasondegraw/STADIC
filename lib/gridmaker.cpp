@@ -207,7 +207,7 @@ bool GridMaker::writePTS(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+QString::fromStdString(file)+" has failed.");
+        ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     writePTS(oFile);
@@ -236,7 +236,7 @@ bool GridMaker::writePTScsv(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+QString::fromStdString(file)+" has failed.");
+        ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     for (int i=0;i<m_TestPoints.size();i++){
@@ -262,7 +262,7 @@ bool GridMaker::writeRadPoly(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+QString::fromStdString(file)+" has failed.");
+        ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     oFile<<"floor\tpolygon\tfloor1"<<std::endl;
