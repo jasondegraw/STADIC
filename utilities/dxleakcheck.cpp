@@ -19,54 +19,54 @@ int main (int argc, char *argv[])
     if(argc == 1) {
         usage();
     }
-    QStringList radFiles;                   //  Variable holding the radiance geometry/material file names
+    std::vector<std::string> radFiles;                   //  Variable holding the radiance geometry/material file names
     radFiles.clear();
-    QStringList floorLayers;                //  Variable holding the floor layer names for testing whether the given point is in the polygons
+    std::vector<std::string> floorLayers;                //  Variable holding the floor layer names for testing whether the given point is in the polygons
     floorLayers.clear();
     double xPt;                             //  Variable holding the x coordinate of the test point
     double yPt;                             //  Variable holding the y coordinate of the test point
     double zPt;                             //  Variable holding the z coordinate of the test point
     double reflectance=1;                   //  Variable holding the reflectance
-    QString wDirectory;                     //  Variable holding the working directory for the creation of files
+    std::string wDirectory;                     //  Variable holding the working directory for the creation of files
     wDirectory.clear();
 
 
     for (int i=1;i<argc;i++){
-        if (QString(argv[i])=="-f"){
+        if (argv[i]=="-f"){
             i++;
-            radFiles.append(argv[i]);
-        }else if (QString(argv[i])=="-x"){
+            radFiles.push_back(argv[i]);
+        }else if (argv[i]=="-x"){
             i++;
             xPt=atof(argv[i]);
-        }else if (QString(argv[i])=="-y"){
+        }else if (argv[i]=="-y"){
             i++;
             yPt=atof(argv[i]);
-        }else if (QString(argv[i])=="-z"){
+        }else if (argv[i]=="-z"){
             i++;
             zPt=atof(argv[i]);
-        }else if(QString(argv[i])=="-l"){
+        }else if(argv[i]=="-l"){
             i++;
-            floorLayers.append(QString(argv[i]));
-        }else if(QString(argv[i])=="-d"){
+            floorLayers.push_back(argv[i]);
+        }else if(argv[i]=="-d"){
             i++;
             wDirectory=argv[i];
-        }else if(QString(argv[i])=="-r"){
+        }else if(argv[i]=="-r"){
             i++;
             reflectance=atof(argv[i]);
         }else{
-            QString temp=argv[i];
+            std::string temp=argv[i];
             WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
-    if (radFiles.isEmpty()){
+    if (radFiles.empty()){
         ERROR(std::string("At least one rad file name must be specified.\n\tSpecify with \"-f\"."));
         return EXIT_FAILURE;
     }
-    if (floorLayers.isEmpty()){
+    if (floorLayers.empty()){
         ERROR(std::string("At least one floor layer name must be specified.\n\tSpecify with \"-t\"."));
         return EXIT_FAILURE;
     }
-    if (wDirectory.isEmpty()){
+    if (wDirectory.empty()){
         ERROR(std::string("The name of the directory where the temporary files should be placed must be specified.\n\tSpecify with \"-D\"."));
         return EXIT_FAILURE;
     }
