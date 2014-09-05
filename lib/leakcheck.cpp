@@ -61,15 +61,15 @@ bool LeakCheck::isEnclosed(){
     return true;
 }
 //Setters
-bool LeakCheck::setRadFile(QStringList files){
+bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<files.size();i++){
-        QFile radFile(files[i]);
+        QFile radFile(QString().fromStdString(files[i]));
         if (!radFile.exists()){
             ERROR("The rad file named "+files[i]+" does not exist.");
             return false;
         }
         m_RadFiles.push_back(files[i]);
-        if (!m_RadGeo.addRad(files[i])){
+        if (!m_RadGeo.addRad(QString().fromStdString(files[i]))){
             return false;
         }
     }
@@ -87,7 +87,7 @@ bool LeakCheck::setRadFile(QStringList files){
     return true;
 }
 
-bool LeakCheck::setFloorLayers(QStringList layers){
+bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
     if (m_RadGeo.primitives().empty()){
         ERROR("No radiance geometry or materials have been specified.");
         return false;
@@ -95,7 +95,7 @@ bool LeakCheck::setFloorLayers(QStringList layers){
     for (int i=0;i<layers.size();i++){
         bool layerExists=false;
         for (int j=0;j<m_RadGeo.primitives().size();j++){
-            if (layers[i]==m_RadGeo.primitives()[j]->modifier()){
+            if (QString().fromStdString(layers[i])==m_RadGeo.primitives()[j]->modifier()){
                 layerExists=true;
             }
         }
@@ -103,7 +103,7 @@ bool LeakCheck::setFloorLayers(QStringList layers){
             ERROR("The layer "+layers[i]+" does not exist in the model.");
             return false;
         }
-        m_FloorLayers.append(layers[i]);
+        m_FloorLayers.push_back(layers[i]);
     }
     if (!unitePolygons()){
         return false;
@@ -219,14 +219,14 @@ bool LeakCheck::setReflectance(int ref){
     return true;
 }
 
-bool LeakCheck::setWorkingDirectory(QString wDir){
-    QDir tempDir(wDir);
+bool LeakCheck::setWorkingDirectory(std::string wDir){
+    QDir tempDir(QString().fromStdString(wDir));
     if (!tempDir.exists()){
         ERROR("The working directory that was set does not exist.");
         return false;
     }
-    if (!m_Dir.setCurrent(wDir)){
-        ERROR("There was an error when setting the workig directory.");
+    if (!m_Dir.setCurrent(QString().fromStdString(wDir))){
+        ERROR("There was an error when setting the working directory.");
         return false;
     }
     return true;
@@ -239,7 +239,7 @@ bool LeakCheck::unitePolygons(){
     for (int i=0;i<m_RadGeo.geometry().size();i++){
         bool properName=false;
         for (int j=0;j<m_FloorLayers.size();j++){
-            if (m_RadGeo.geometry()[i]->modifier()==m_FloorLayers[j]){
+            if (m_RadGeo.geometry()[i]->modifier()==QString().fromStdString(m_FloorLayers[j])){
                 properName=true;
             }
         }
@@ -301,7 +301,7 @@ bool LeakCheck::xformModifiers(){
     arguments.append("-m");
     arguments.append("modified");
     for (int i=0;i<m_RadFiles.size();i++){
-        arguments.append(m_RadFiles[i]);
+        arguments.append(QString().fromStdString(m_RadFiles[i]));
     }
     xform->setArguments(arguments);
     xform->setStandardOutputFile("Mod.rad");
@@ -346,18 +346,8 @@ bool LeakCheck::createOct(){
     m_Process->setStandardOutputFile("Test.oct");
     m_Process->setArguments(arguments);
     m_Process->setWorkingDirectory(m_Dir.path());
-    //QObject::connect(m_Process,SIGNAL(readyReadStandardError()),this, SLOT(captureErros()));
-    m_ErrorLog.reset();
     m_Process->start();
     m_Process->waitForFinished();
-    /*
-    QString line;
-    while (!m_ErrorLog.atEnd()){        //If this contains an error maybe it should return false after writing out the errors.
-        line=m_ErrorLog.readLine();
-        ERROR(line);
-    }
-    */
-
     return true;
 }
 
@@ -389,10 +379,6 @@ bool LeakCheck::runCalc(){
     m_Process->setWorkingDirectory(m_Dir.path());
     m_Process->setArguments(arguments);
     m_Process->setStandardInputFile("Test.pts");
-    //QObject::connect(m_Process,SIGNAL(readyReadStandardError()),this,SLOT(captureErros()));
-    //m_Process->setStandardOutputFile("Test.tmp");
-    //m_Process->start();
-    //m_Process->waitForFinished(-1);
 
     m_Process2=new QProcess(this);
     m_Process2->setProgram(QString("rcalc"));
@@ -401,59 +387,15 @@ bool LeakCheck::runCalc(){
     arguments2.clear();
     arguments2.append("-e");
     arguments2.append("$1=179*($1*0.265+$2*0.670+$3*0.065)");
-    //arguments2.append("Test.tmp");
     m_Process2->setArguments(arguments2);
     m_Process2->setWorkingDirectory(m_Dir.path());
     m_Process2->setStandardOutputFile("Final.res");
-    //m_Process2->startDetached("rcalc",arguments2);
     m_Process->start();
     m_Process->waitForFinished(-1);
     m_Process2->start();
     m_Process2->waitForStarted();
     m_Process2->waitForFinished();
-
-    //QObject::connect(m_Process2,SIGNAL(readyReadStandardError()),this,SLOT(captureErrors2()));
-    //QObject::connect(m_Process2,SIGNAL(readyReadStandardOutput()),this,SLOT(captureOutput2()));
     return true;
-}
-
-
-//Slots
-void LeakCheck::captureErros(){
-    QByteArray byteArray=m_Process->readAllStandardError();
-    QStringList strLines=QString(byteArray).split("\n");
-    QString errOut;
-    for (int i=0;i<strLines.size();i++){
-        errOut=errOut+strLines[i]+"\n";
-    }
-    ERROR(errOut);
-    /*
-    foreach(QString line, strLines){
-        m_ErrorLog<<line<<endl;
-    }
-    */
-}
-
-void LeakCheck::captureErrors2(){
-    //QByteArray byteArray=m_Process2->readAllStandardError();
-    //QStringList strLines=QString(byteArray).split("\n");
-    QString tempString=QString(m_Process2->readAllStandardError()).toUtf8().constData();
-    QStringList strLines=tempString.split(" ");
-    foreach(QString line, strLines){
-        m_ErrorLog2<<line<<endl;
-    }
-}
-
-void LeakCheck::captureOutput2(){
-    std::cout<<"The captureOutput2 was called."<<std::endl;
-    //QByteArray byteArray=m_Process2->readAllStandardError();
-    //QStringList strLines=QString(byteArray).split("\n");
-    QString tempString=QString(m_Process2->readAllStandardOutput()).toUtf8().constData();
-    QStringList strLines=tempString.split(" ");
-    foreach(QString line, strLines){
-        m_Output2<<line<<endl;
-        std::cout<<"stdOutput: "<<line.toStdString()<<std::endl;
-    }
 }
 
 }

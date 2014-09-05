@@ -9,7 +9,7 @@ TEST(LeakTests, EnclosedModel)
 {
   //This model should be fully enclosed
   stadic::LeakCheck leakChecker;
-  QStringList radFiles;
+  std::vector<std::string> radFiles;
   radFiles.clear();
   QDir wDir;
   wDir=QDir::currentPath();
@@ -21,16 +21,16 @@ TEST(LeakTests, EnclosedModel)
   }
   QFile::copy(":/resources/Simple.rad",wDir.path()+"/Simple.rad");
   QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad");
-  radFiles.append(wDir.path()+"/Simple.rad");
-  radFiles.append(wDir.path()+"/material.rad");
+  radFiles.push_back(wDir.path().toStdString()+"/Simple.rad");
+  radFiles.push_back(wDir.path().toStdString()+"/material.rad");
   //radFiles.append(":/resources/Simple.rad");
   //radFiles.append(":/resources/material.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/Simple.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
-  QStringList layerNames;
+  std::vector<std::string> layerNames;
   layerNames.clear();
-  layerNames.append("l_floor");
+  layerNames.push_back("l_floor");
   ASSERT_TRUE(leakChecker.setFloorLayers(layerNames));
   ASSERT_TRUE(leakChecker.setX(120));
   ASSERT_TRUE(leakChecker.setY(120));
@@ -44,7 +44,7 @@ TEST(LeakTests, LeakModel)
 {
   //This model should contain a 10" x 10" square hole along the east side of the ceiling
   stadic::LeakCheck leakChecker;
-  QStringList radFiles;
+  std::vector<std::string> radFiles;
   radFiles.clear();
   QDir wDir;
   wDir=QDir::currentPath();
@@ -56,16 +56,16 @@ TEST(LeakTests, LeakModel)
   }
   QFile::copy(":/resources/SimpleHole.rad",wDir.path()+"/SimpleHole.rad");
   QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad");
-  radFiles.append(wDir.path()+"/SimpleHole.rad");
-  radFiles.append(wDir.path()+"/material.rad");
+  radFiles.push_back(wDir.path().toStdString()+"/SimpleHole.rad");
+  radFiles.push_back(wDir.path().toStdString()+"/material.rad");
   //radFiles.append(":/resources/SimpleHole.rad");
   //radFiles.append(":/resources/material.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/SimpleHole.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
-  QStringList layerNames;
+  std::vector<std::string> layerNames;
   layerNames.clear();
-  layerNames.append("l_floor");
+  layerNames.push_back("l_floor");
   ASSERT_TRUE(leakChecker.setFloorLayers(layerNames));
   ASSERT_TRUE(leakChecker.setX(120));
   ASSERT_TRUE(leakChecker.setY(120));
