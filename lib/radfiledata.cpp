@@ -25,13 +25,13 @@ bool RadFileData::addRad(QString file){
     }
 
     QTextStream data(&iFile);
-    std::vector<RadPrimitive*> primitives;
+    shared_vector<RadPrimitive> primitives;
     while (!data.atEnd()) {
         RadPrimitive *primitive = RadPrimitive::fromRad(data);
         if(primitive == nullptr) {
             break;
         }
-        primitives.push_back(primitive);
+        primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
     }
     iFile.close();
     if(primitives.size() == 0) {
@@ -97,6 +97,7 @@ QPair<RadFileData *, RadFileData *> RadFileData::split(const std::vector<QString
 }
 */
 
+/*
 static bool checkLayer(RadPrimitive *primitive, const QString &name)
 {
     if(primitive->isMaterial() && primitive->name() == name) {
@@ -118,7 +119,8 @@ static bool checkLayers(RadPrimitive *primitive, const std::vector<QString> &nam
     }
     return false;
 }
-
+*/
+/*
 bool RadFileData::removeLayer(const QString &layer, const QString &removing, const QString &rest)
 {
     QFile oFile1;
@@ -137,7 +139,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
         return false;
     }
 
-    QPair<RadFileData*,RadFileData*> results = split(checkLayer,layer);
+    //QPair<RadFileData*,RadFileData*> results = split(checkLayer,layer);
 
     // Write out the two files
 
@@ -146,6 +148,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 
     return false;
 }
+*/
 
 bool RadFileData::blackOutLayer(QString layer){
     for(int i=0;i<m_Primitives.size();i++) {
@@ -161,12 +164,11 @@ bool RadFileData::writeRadFile(QString file){
     oFile.setFileName(file);
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
-        ERROR("The opening of the rad file named "+file + " has failed.");
+        ERROR("The opening of the rad file named " + file + " has failed.");
         return false;
     }
     QTextStream out(&oFile);
-    std::vector<RadPrimitive*> primitives;
-    primitives=materials();
+    shared_vector<RadPrimitive> primitives=materials();
     for (int i=0;i<primitives.size();i++){
         out<<endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<endl;
         out<<primitives[i]->arg1().size();
@@ -190,12 +192,12 @@ bool RadFileData::writeRadFile(QString file){
         out<<endl;
     }
     oFile.close();
+
     return true;
 }
 
 std::vector<double> RadFileData::surfaceNormal(QString layer){
     std::vector<double> normalVector;
-
     for(int i=0;i<m_Primitives.size();i++) {
         if(m_Primitives[i]->modifier()==layer && QString(m_Primitives[i]->type())=="Polygon") {
             std::vector<std::vector<double>> normalPoints;
@@ -225,7 +227,7 @@ std::vector<double> RadFileData::surfaceNormal(QString layer){
 
 bool RadFileData::addPrimitive(RadPrimitive *primitive)
 {
-    m_Primitives.push_back(std::make_shared<RadPrimitive>(primitive));
+    m_Primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
     return true;
 }
 

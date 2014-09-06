@@ -78,7 +78,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg3().at(4).toDouble());
 
   //Test getting primitives by type
-  std::vector<stadic::PlasticMaterial*> plastic = radData.getPrimitives<stadic::PlasticMaterial>();
+  shared_vector<stadic::PlasticMaterial> plastic = radData.getPrimitives<stadic::PlasticMaterial>();
   ASSERT_EQ(5,plastic.size());
 
   //Testing second plastic for contents
@@ -102,6 +102,8 @@ bool nameStartsWith(stadic::RadPrimitive* primitive, const QString &name)
 
 TEST(RadFileTests, SplitRadFile)
 {
+    // All of the split stuff needs to be reworked, so this test will fail until that happens
+    /*
   stadic::RadFileData radData;
   ASSERT_TRUE(radData.addRad(":/resources/Simple.rad"));
   ASSERT_EQ(36, radData.primitives().size());
@@ -136,4 +138,6 @@ TEST(RadFileTests, SplitRadFile)
   ASSERT_NE(nullptr, splitLayers.second);
   ASSERT_EQ(4, splitLayers.first->primitives().size());
   ASSERT_EQ(38, splitLayers.second->primitives().size());
+  */
+    ASSERT_TRUE(false);
 }

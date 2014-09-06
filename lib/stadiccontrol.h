@@ -107,7 +107,7 @@ public:
     std::string geoFile();
     double buildingRotation();
     std::string ptsFile();
-    std::vector<WindowGroup*> windowGroups();
+    std::vector<WindowGroup> windowGroups();
     std::string importUnits();
     std::string illumUnits();
     std::string displayUnits();

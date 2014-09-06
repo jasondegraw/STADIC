@@ -5,6 +5,7 @@
 #include "radprimitive.h"
 #include "objects.h"
 #include <vector>
+#include <memory>
 
 #include "stadicapi.h"
 
@@ -31,16 +32,13 @@ public:
 
 
     template<class T> shared_vector<T> getPrimitives();
+    // Splitting is officially broken
     //QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
     //template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
-    //QPair<RadFileData *, RadFileData *> split(const std::vector<QString> &vector);
+    //QPair<RadFileData *, RadFileData *> split(const std::vector<std::string> &vector);
 
 private:
     shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING
-
-signals:
-
-public slots:
 
 };
 
@@ -48,7 +46,7 @@ template<class T> shared_vector<T> RadFileData::getPrimitives()
 {
     shared_vector<T> primitives;
     for(auto primitive : m_Primitives) {
-        auto cast = dynamic_pointer_cast<T>(primitive);
+        auto cast = std::dynamic_pointer_cast<T>(primitive);
         if(cast) {
             primitives.push_back(cast);
         }
