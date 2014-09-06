@@ -22,7 +22,7 @@ TEST(FunctionTests, SplitTrim)
   std::string testString = "This, is , only,a ,     test";
   std::vector<std::string> testList;
   testList.clear();
-  testList=stadic::split(testString, ',');
+  testList=stadic::trimmedSplit(testString, ',');
   ASSERT_EQ(5,testList.size());
   EXPECT_EQ("This",testList[0]);
   EXPECT_EQ("is",testList[1]);
