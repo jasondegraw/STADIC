@@ -400,7 +400,7 @@ double Control::buildingRotation(){
 std::string Control::ptsFile(){
     return m_PTSFile;
 }
-std::vector<WindowGroup*> Control::windowGroups(){
+std::vector<WindowGroup> Control::windowGroups(){
     return m_WindowGroups;
 }
 std::string Control::importUnits(){
@@ -751,9 +751,9 @@ bool Control::parseJson(std::string file){
         return false;
     }else{
         for (int i=0;i<array.size();i++){
-            WindowGroup *WG=new WindowGroup;
+            WindowGroup WG;
             if (array[i].isObject()){
-                if(WG->parseJson(array[i].toObject())){
+                if(WG.parseJson(array[i].toObject())){
                     m_WindowGroups.push_back(WG);
                 }else{
                     return false;

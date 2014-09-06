@@ -14,7 +14,7 @@ set(SRCS stadiccontrol.cpp
          weatherdata.cpp
          dayill.cpp
          elecill.cpp
-         daylight.cpp
+         #daylight.cpp
          materialprimitives.cpp
          leakcheck.cpp
          functions.cpp
@@ -33,7 +33,7 @@ set(HDRS stadicapi.h
          weatherdata.h
          dayill.h
          elecill.h
-         daylight.h
+         #daylight.h
          materialprimitives.h
          leakcheck.h
          functions.h

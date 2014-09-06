@@ -1,4 +1,5 @@
 #include "shadecontrol.h"
+#include "logging.h"
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -6,42 +7,45 @@
 
 namespace stadic {
 
-ShadeControl::ShadeControl(QObject *parent) :
-    QObject(parent)
+ShadeControl::ShadeControl()
 {
 }
 
 
 //Setters
-bool ShadeControl::setMethod(QString method){
+bool ShadeControl::setMethod(std::string method)
+{
     if (method=="automated_profile_angle" || method=="automated_signal" || method=="automated_profile_angle_signal"){
         m_Method=method;
     }else{
-        std::cerr<<"ERROR: The shade control method is not an approved name."<<std::endl;
-        std::cerr<<"\tThe name must be one of the following:"<<std::endl;
-        std::cerr<<"\t\t\"automated_profile_angle\", \"automated_signal\", \"automated_profile_angle_signal\""<<std::endl;
+        ERROR(std::string("The shade control method is not an approved name.")+"\n"
+            + "\tThe name must be one of the following:"+"\n"
+            + "\t\t\"automated_profile_angle\", \"automated_signal\", \"automated_profile_angle_signal\"");
         return false;
     }
     return true;
 }
+
 bool ShadeControl::setElevationAzimuth(double value){
     if (value<360 && value>-360){
         m_ElevationAzimuth=value;
     }else{
-        std::cerr<<"ERROR: The shade control elevation azimuth has to be between -360 and 360."<<std::endl;
+        ERROR("The shade control elevation azimuth has to be between -360 and 360.");
         return false;
     }
     return true;
 }
+
 bool ShadeControl::setAngleSettings(double value){
     if (value>0){
         m_AngleSettings.push_back(value);
     }else{
-        std::cerr<<"ERROR: The shade control angle setting has to be greater than 0."<<std::endl;
+        ERROR("The shade control angle setting has to be greater than 0.");
         return false;
     }
     return true;
 }
+
 bool ShadeControl::setLocation(double x, double y, double z, double xd, double yd, double zd, double spin){
     m_Location.push_back(x);
     m_Location.push_back(y);
@@ -50,38 +54,40 @@ bool ShadeControl::setLocation(double x, double y, double z, double xd, double y
     m_Location.push_back(yd);
     m_Location.push_back(zd);
     if (spin>360 || spin<-360){
-        std::cerr<<"ERROR: The key \"spin_ccw\" within location must be between -360 and 360."<<std::endl;
+        ERROR("The key \"spin_ccw\" within location must be between -360 and 360.");
         return false;
     }
     m_Location.push_back(spin);
     return true;
 }
+
 bool ShadeControl::setSignalSettings(double value){
     if (value>0){
         m_SignalSettings.push_back(value);
     }else{
-        std::cerr<<"ERROR: The shade control angle setting has to be greater than 0."<<std::endl;
+        ERROR("The shade control angle setting has to be greater than 0.");
         return false;
     }
     return true;
 }
-bool ShadeControl::setSensorType(QString type){
+
+bool ShadeControl::setSensorType(std::string type){
     if (type=="sensitivity_file"){
         m_SensorType=type;
     }else{
-        std::cerr<<"ERROR: The key \"sensor_type\" does not contain an acceptable type."<<std::endl;
-        std::cerr<<"\tThe acceptable type is as follows: \"sensitivity_file\""<<std::endl;
+        ERROR(std::string("The key \"sensor_type\" does not contain an acceptable type.")+"\n"
+            + "\tThe acceptable type is as follows: \"sensitivity_file\"");
         return false;
     }
     return true;
 }
-void ShadeControl::setSensorFile(QString file){
+void ShadeControl::setSensorFile(std::string file){
     m_SensorFile=file;
 }
 
 
 //Getters
-QString ShadeControl::controlMethod(){
+std::string ShadeControl::controlMethod(){
     return m_Method;
 }
 double ShadeControl::elevationAzimuth(){
@@ -96,10 +102,10 @@ std::vector<double> ShadeControl::location(){
 std::vector<double> ShadeControl::signalSettings(){
     return m_SignalSettings;
 }
-QString ShadeControl::sensorType(){
+std::string ShadeControl::sensorType(){
     return m_SensorType;
 }
-QString ShadeControl::sensorFile(){
+std::string ShadeControl::sensorFile(){
     return m_SensorFile;
 }
 
@@ -107,17 +113,17 @@ QString ShadeControl::sensorFile(){
 bool ShadeControl::parseJson(const QJsonObject &object){
     QJsonValue val=object.value(QString("method"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"method\" within shade_control does not appear in the STADIC Control File."<<std::endl;
+        ERROR("The key \"method\" within shade_control does not appear in the STADIC Control File.");
         return false;
     }else{
         if(val.isString()){
-            if (!setMethod(val.toString())){
+            if (!setMethod(val.toString().toStdString())){
                 return false;
             }else{
                 if (controlMethod()=="automated_profile_angle"){
                     val=object.value(QString("elevation_azimuth"));
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"elevation_azimuth\" was not found with control method \"automated_profile_angle\""<<std::endl;
+                        ERROR("The key \"elevation_azimuth\" was not found with control method \"automated_profile_angle\"");
                         return false;
                     }else{
                         if (val.isDouble()){
@@ -125,14 +131,14 @@ bool ShadeControl::parseJson(const QJsonObject &object){
                                 return false;
                             }
                         }else{
-                            std::cerr<<"ERROR: The key \"elevation_azimuth\" does not contain a number."<<std::endl;
+                            ERROR("The key \"elevation_azimuth\" does not contain a number.");
                             return false;
                         }
                     }
 
                     val=object.value("angle_settings");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"angle_settings\" was not found with control method \"automated_profile_angle\""<<std::endl;
+                        ERROR("The key \"angle_settings\" was not found with control method \"automated_profile_angle\"");
                         return false;
                     }else{
                         if (val.isArray()){
@@ -143,51 +149,51 @@ bool ShadeControl::parseJson(const QJsonObject &object){
                                         return false;
                                     }
                                 }else{
-                                    std::cerr<<"ERROR: The key \"angle_settings\" does not contain a number."<<std::endl;
+                                    ERROR("The key \"angle_settings\" does not contain a number.");
                                     return false;
                                 }
                             }
                         }else{
-                            std::cerr<<"ERROR: The key \"angle_settings\" is not an array."<<std::endl;
+                            ERROR("The key \"angle_settings\" is not an array.");
                             return false;
                         }
                     }
                 }else if (controlMethod()=="automated_signal"){
                     val=object.value("sensor");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"sensor\" was not found witin \"shade_control\""<<std::endl;
+                        ERROR("The key \"sensor\" was not found witin \"shade_control\"");
                         return false;
                     }else{
                         if (val.isObject()){
                             QJsonObject object1=val.toObject();
                             val=object1.value("sensor_type");
                             if (val.isUndefined()){
-                                std::cerr<<"ERROR: The key \"sensor_type\" is not found within \"sensor\" in one of the window groups."<<std::endl;
+                                ERROR("The key \"sensor_type\" is not found within \"sensor\" in one of the window groups.");
                                 return false;
                             }else{
                                 if (val.isString()){
-                                    setSensorType(val.toString());
+                                    setSensorType(val.toString().toStdString());
                                 }else{
-                                    std::cerr<<"The key \"sensor_type\" does not contain a string in one of the window groups."<<std::endl;
+                                    ERROR("The key \"sensor_type\" does not contain a string in one of the window groups.");
                                     return false;
                                 }
                             }
 
                             val=object1.value("sensor_file");
                             if (val.isUndefined()){
-                                std::cerr<<"ERROR: The key \"sensor_file\" is not found within \"sensor\" in one of the window groups."<<std::endl;
+                                ERROR("The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.");
                                 return false;
                             }else{
                                 if (val.isString()){
-                                    setSensorFile(val.toString());
+                                    setSensorFile(val.toString().toStdString());
                                 }else{
-                                    std::cerr<<"The key \"sensor_file\" does not contain a string in one of the window groups."<<std::endl;
+                                    ERROR("The key \"sensor_file\" does not contain a string in one of the window groups.");
                                     return false;
                                 }
                             }
                             val=object1.value("location");
                             if (val.isUndefined()){
-                                std::cerr<<"ERROR: The key \"location\" was not found with control method\"automated_signal\"."<<std::endl;
+                                ERROR("The key \"location\" was not found with control method\"automated_signal\".");
                                 return false;
                             }else{
                                 if (val.isObject()){
@@ -197,68 +203,68 @@ bool ShadeControl::parseJson(const QJsonObject &object){
                                     if (val.isDouble()){
                                         x=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"x\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"x\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("y");
                                     if (val.isDouble()){
                                         y=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"y\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"y\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("z");
                                     if (val.isDouble()){
                                         z=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"z\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"z\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("xd");
                                     if (val.isDouble()){
                                         xd=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"xd\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"xd\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("yd");
                                     if (val.isDouble()){
                                         yd=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"yd\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"yd\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("zd");
                                     if (val.isDouble()){
                                         zd=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"zd\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"zd\" was not found with \"location\".");
                                         return false;
                                     }
                                     val=tempObject.value("spin_ccw");
                                     if (val.isDouble()){
                                         spin=val.toDouble();
                                     }else{
-                                        std::cerr<<"ERROR: The key \"spin\" was not found with \"location\"."<<std::endl;
+                                        ERROR("The key \"spin\" was not found with \"location\".");
                                         return false;
                                     }
                                     if (!setLocation(x, y, z, xd, yd, zd, spin)){
                                         return false;
                                     }
                                 }else{
-                                    std::cerr<<"ERROR: The key\"location\" within \"sensor\" is not an object."<<std::endl;
+                                    ERROR("The key\"location\" within \"sensor\" is not an object.");
                                     return false;
                                 }
                             }
                         }else{
-                            std::cerr<<"ERROR: The key \"sensor\" is not an object."<<std::endl;
+                            ERROR("The key \"sensor\" is not an object.");
                             return false;
                         }
                     }
 
                     val=object.value("signal_settings");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"signal_settings\" does not appear within \"control_method\"."<<std::endl;
+                        ERROR("The key \"signal_settings\" does not appear within \"control_method\".");
                         return false;
                     }else{
                         if (val.isArray()){
@@ -269,12 +275,12 @@ bool ShadeControl::parseJson(const QJsonObject &object){
                                         return false;
                                     }
                                 }else{
-                                    std::cerr<<"ERROR: The key\"signal_settings\" does not contain an array of numbers."<<std::endl;
+                                    ERROR("The key\"signal_settings\" does not contain an array of numbers.");
                                     return false;
                                 }
                             }
                         }else{
-                            std::cerr<<"ERROR: The key \"signal_settings\" does not contain an array."<<std::endl;
+                            ERROR("The key \"signal_settings\" does not contain an array.");
                             return false;
                         }
                     }
@@ -287,7 +293,7 @@ bool ShadeControl::parseJson(const QJsonObject &object){
 
             }
         }else{
-            std::cerr<<"ERROR: The key \"method\" within window_groups is not a string."<<std::endl;
+            ERROR("The key \"method\" within window_groups is not a string.");
             return false;
         }
     }

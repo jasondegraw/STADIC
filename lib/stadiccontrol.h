@@ -190,7 +190,7 @@ private:
     std::string m_DisplayUnits;                         //  Variable holding the distance units for display
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
-    std::vector<WindowGroup*> m_WindowGroups;
+    std::vector<WindowGroup> m_WindowGroups;
 
     //******************
     //Simulation Settings
