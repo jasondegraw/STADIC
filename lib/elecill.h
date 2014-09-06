@@ -2,7 +2,6 @@
 #define ELECILL_H
 
 #include <QObject>
-#include <QVector>
 
 #include "stadicapi.h"
 

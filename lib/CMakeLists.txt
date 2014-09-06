@@ -16,7 +16,9 @@ set(SRCS stadiccontrol.cpp
          elecill.cpp
          daylight.cpp
          materialprimitives.cpp
-         leakcheck.cpp)
+         leakcheck.cpp
+         functions.cpp
+         objects.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -33,7 +35,9 @@ set(HDRS stadicapi.h
          elecill.h
          daylight.h
          materialprimitives.h
-         leakcheck.h)
+         leakcheck.h
+         functions.h
+         objects.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 

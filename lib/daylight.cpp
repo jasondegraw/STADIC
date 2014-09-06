@@ -279,7 +279,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     //Compute S Matrix
     //gendaymtx
     QProcess *gendaymtx=new QProcess(this);
-    QString gendaymtxProgram="gendaymtx.exe";
+    QString gendaymtxProgram="gendaymtx";
     gendaymtx->setProgram(gendaymtxProgram);
     arguments.clear();
     arguments.push_back("MF:"+QString().sprintf("%g",model->skyDivisions()));
@@ -298,8 +298,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     gendaymtx->setWorkingDirectory(QString::fromStdString(model->projectFolder()));
     gendaymtx->start();
     if (!gendaymtx->waitForFinished(-1)){
-        ERROR("The gendaymtx run for the smx has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
+        ERROR("The gendaymtx run for the smx has failed with the following errors.");        //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
 

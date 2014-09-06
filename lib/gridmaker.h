@@ -1,27 +1,26 @@
 #ifndef GRIDMAKER_H
 #define GRIDMAKER_H
 
-#include <QObject>
 #include <QPointF>
 #include <QPolygonF>
 #include <vector>
+#include <string>
 #include "radprimitive.h"
 
 #include "stadicapi.h"
 
 namespace stadic {
 
-class STADIC_API GridMaker : public QObject
+class STADIC_API GridMaker
 {
-    Q_OBJECT
 public:
-    explicit GridMaker(QObject *parent = 0);
+    GridMaker();
 
     //Setters
     //Points
     void setTestPoints(double x, double y);
     //InputData  These functions must be used before the utilities can be used.
-    void setLayerNames(QString string);
+    void setLayerNames(std::string string);
     void setSpaceX(double x);
     void setSpaceY(double y);
     void setOffsetX(double x);
@@ -38,7 +37,7 @@ public:
     //Points
     std::vector<QPointF> testPoints();
     //InputData
-    std::vector<QString> layerNames();
+    std::vector<std::string> layerNames();
     double spaceX();
     double spaceY();
     double offsetX();
@@ -51,11 +50,13 @@ public:
     double maxY();
 
     //Utilities
-    bool parseRad(QString file);
-    bool makeGrid(QString file);
-    bool writePTS(QString file);
-    bool writePTScsv(QString file);
-    bool writeRadPoly(QString file);
+    bool parseRad(std::string file);
+    bool makeGrid(std::string file);
+    bool writePTS(std::ostream& out);
+    bool writePTS();
+    bool writePTS(std::string file);
+    bool writePTScsv(std::string file);
+    bool writeRadPoly(std::string file);
 
 private:
     //Points
@@ -66,7 +67,7 @@ private:
     QPolygonF m_UnitedPolygon;
 
     //InputData
-    std::vector<QString> m_LayerNames;
+    std::vector<std::string> m_LayerNames;
     std::vector<RadPrimitive *> m_RadGeo;
     double m_SpaceX;
     double m_SpaceY;

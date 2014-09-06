@@ -89,7 +89,7 @@ bool WeatherData::writeWea(std::string file){
     out<<"site_elevation "<<elevation()<<endl;
     out<<"weather_data_file_units 1"<<endl;
     for (int i=0;i<month().size();i++){
-        out<<month().at(i)<<" "<<day().at(i)<<" "<<hour().at(i)<<" "<<directNormal().at(i)<<" "<<directHorizontal().at(i)<<endl;
+        out<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<QString().fromStdString(directNormal()[i])<<" "<<QString().fromStdString(directHorizontal()[i])<<endl;
     }
     out.close();
     return true;
@@ -148,18 +148,18 @@ bool WeatherData::parseTMY(std::string file){
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QString data=iFile.readLine();
     QStringList vals=data.split(',');
-    setPlace(vals.at(1).toStdString());
-    setLatitude(vals.at(4).toStdString());
-    setLongitude(vals.at(5).toStdString());
-    setTimeZone(vals.at(3).toStdString());
-    setElevation(vals.at(6).toStdString());
+    setPlace(vals[1].toStdString());
+    setLatitude(vals[4].toStdString());
+    setLongitude(vals[5].toStdString());
+    setTimeZone(vals[3].toStdString());
+    setElevation(vals[6].toStdString());
     data=iFile.readLine();
     QString tempString;
     QStringList parseDate;
     data=iFile.readLine();
     vals=data.split(',');
     //Read Date String
-    tempString=vals.at(0);
+    tempString=vals[0];
     parseDate=tempString.split('/');
     m_Month.push_back(parseDate.at(0).toInt());
     m_Day.push_back(parseDate.at(1).toInt());
@@ -171,8 +171,8 @@ bool WeatherData::parseTMY(std::string file){
     //Determine time correction factor
     double correction=tempHour-0.5;
     m_Hour.push_back(tempHour-correction);
-    m_DirectNormal.push_back(vals.at(7).toStdString());
-    m_DirectHorizontal.push_back(vals.at(10).toStdString());
+    m_DirectNormal.push_back(vals[7].toStdString());
+    m_DirectHorizontal.push_back(vals[10].toStdString());
     while(!iFile.atEnd()){
         data=iFile.readLine();
         vals.clear();
@@ -188,8 +188,8 @@ bool WeatherData::parseTMY(std::string file){
         parseDate=tempString.split(':');
         double tempHour=parseDate.at(0).toDouble()+parseDate.at(1).toDouble()/60;
         m_Hour.push_back(tempHour-correction);
-        m_DirectNormal.push_back(vals.at(7).toStdString());
-        m_DirectHorizontal.push_back(vals.at(10).toStdString());
+        m_DirectNormal.push_back(vals[7].toStdString());
+        m_DirectHorizontal.push_back(vals[10].toStdString());
     }
 
     iFile.close();

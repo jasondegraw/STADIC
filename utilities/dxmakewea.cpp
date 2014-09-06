@@ -2,6 +2,7 @@
 #include "logging.h"
 
 #include <iostream>
+#include <string>
 
 void usage()
 {
@@ -14,11 +15,13 @@ int main (int argc, char *argv[]){
         usage();
         return EXIT_FAILURE;
     }
+    std::string fileName=argv[1];
+    std::string resultsFile=argv[2];
     stadic::WeatherData wea;
-    if (!wea.parseWeather(argv[1])) {
+    if (!wea.parseWeather(fileName)){
         return EXIT_FAILURE;
     }
-    if (!wea.writeWea(argv[2])) {
+    if (!wea.writeWea(resultsFile)){
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

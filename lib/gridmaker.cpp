@@ -1,17 +1,16 @@
 #include "gridmaker.h"
 #include "radprimitive.h"
-//#include "logging.h"
+#include "logging.h"
 #include <QFile>
 #include <QTextStream>
 #include <iostream>
+#include <fstream>
 #include <QString>
-#include <QLineF>
 #include <radfiledata.h>
 
 namespace stadic {
 
-GridMaker::GridMaker(QObject *parent) :
-    QObject(parent)
+GridMaker::GridMaker()
 {
     m_TestPoints.clear();
 }
@@ -25,7 +24,7 @@ void GridMaker::setTestPoints(double x, double y){
     m_TestPoints.push_back(tempPoint);
 }
 //InputData
-void GridMaker::setLayerNames(QString string){
+void GridMaker::setLayerNames(std::string string){
     m_LayerNames.push_back(string);
 }
 void GridMaker::setSpaceX(double x){
@@ -64,7 +63,7 @@ std::vector<QPointF> GridMaker::testPoints(){
     return m_TestPoints;
 }
 //InputData
-std::vector<QString> GridMaker::layerNames(){
+std::vector<std::string> GridMaker::layerNames(){
     return m_LayerNames;
 }
 double GridMaker::spaceX(){
@@ -98,9 +97,9 @@ double GridMaker::maxY(){
 
 
 //Utilities
-bool GridMaker::parseRad(QString file){
+bool GridMaker::parseRad(std::string file){
     stadic::RadFileData radGeo;
-    radGeo.addRad(file);
+    radGeo.addRad(QString::fromStdString(file));
     //set polygons
     if (radGeo.geometry().empty()){
         std::cerr<<"There are no polygons."<<std::endl;
@@ -113,133 +112,18 @@ bool GridMaker::parseRad(QString file){
         }
         m_Polygons.push_back(tempPolygon);
     }
-    /*
-    QFile iFile;
-    iFile.setFileName(file);
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.exists()){
-        std::cerr<<"The opening of the rad file failed."<<std::endl;
-        return false;
-    }
-
-    QTextStream data(&iFile);
-    //data<<iFile.readAll();
-    while (!data.atEnd()){
-        QString string;
-        QString string2;
-        data>>string;
-        if (string.contains('#')){
-            QString tempString;
-            tempString=data.readLine();
-        }else{
-            if (string.contains("void")){
-                data>>string;   //reads type
-                data>>string;   //reads name
-                data>>string;   //Reads number of arguments from first line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                    }
-                }
-                data>>string;   //Reads number of arguments from second line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                    }
-                }
-                data>>string;   //Reads number of arguments from third line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                    }
-                }
-            }else{
-                data>>string2;
-                if (string2=="polygon"){
-                    RadGeometry *rad=new RadGeometry(this);
-                    rad->setModifier(string);
-                    rad->setType(string2);
-                    data>>string;
-                    rad->setName(string);
-                    data>>string;               //Read number of arguments from first line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from second line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg2(args);
-                    }
-                    data>>string;               //Read number of arguments from third line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg3(args);
-                    }
-                    m_RadGeo.push_back(rad);
-                }else{                          //If it isn't a polygon, the info still needs to be read in
-                    data>>string;   //reads name
-                    data>>string;   //Reads number of arguments from first line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from second line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from third line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    iFile.close();
-
-    //set polygons
-    if (m_RadGeo.empty()){
-        std::cerr<<"There are no polygons."<<std::endl;
-        return false;
-    }
-    for (int i=0;i<m_RadGeo.size();i++){
-        QPolygonF tempPolygon;
-        for (int j=0;j<m_RadGeo.at(i)->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(m_RadGeo.at(i)->arg3()[j*3].toDouble(), m_RadGeo.at(i)->arg3()[j*3+1].toDouble()));
-        }
-        m_Polygons.push_back(tempPolygon);
-    }
-    */
     return true;
 }
 
-bool GridMaker::makeGrid(QString file){
+bool GridMaker::makeGrid(std::string file){
     stadic::RadFileData radGeo;
-    radGeo.addRad(file);
+    radGeo.addRad(QString::fromStdString(file));
     //unite polygons that are the right layer name
     bool firstPolygon=true;
     for (int i=0;i<radGeo.geometry().size();i++){
         bool properName=false;
         for (int j=0;j<m_LayerNames.size();j++){
-            if (radGeo.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+            if (radGeo.geometry().at(i)->modifier()==QString::fromStdString(m_LayerNames.at(j))){
                 properName=true;
             }
         }
@@ -260,10 +144,6 @@ bool GridMaker::makeGrid(QString file){
         //The previous two functions for the polygon bounding rectangle I think are backwards
         setMinY(m_UnitedPolygon.boundingRect().top());
         setMaxY(m_UnitedPolygon.boundingRect().bottom());
-    }
-    std::cout<<"Points:"<<std::endl;
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        std::cout<<"\t"<<m_UnitedPolygon.at(i).x()<<" "<<m_UnitedPolygon.at(i).y()<<std::endl;
     }
     //Create vector of test points
     double x=minX()+offsetX();
@@ -295,38 +175,6 @@ bool GridMaker::makeGrid(QString file){
                 if (surroundIn==true){
                     setTestPoints(x,y);
                 }
-
-                //Old code that tested to see if a point was on a line using QLineF::intersect
-                /*
-                bool onLine=false;
-                for (int i=0;i<m_UnitedPolygon.size()-1;i++){
-                    QLineF line;
-                    QLineF line1;
-                    line1.setP1(tempPoint);
-                    line1.setP2(QPointF(0,0));
-                    line.setP1(m_UnitedPolygon.at(i));
-                    line.setP2(m_UnitedPolygon.at(i+1));
-                    if (line.intersect(line1, &interPoint)==1){
-                        if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
-                            onLine=true;
-                        }
-                    }
-                }
-                QLineF line;
-                QLineF line1;
-                line1.setP1(tempPoint);
-                line1.setP2(QPointF(0,0));
-                line.setP1(m_UnitedPolygon.at(m_UnitedPolygon.size()-1));
-                line.setP2(m_UnitedPolygon.at(0));
-                if (line.intersect(line1, &interPoint)==1){
-                    if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
-                    //if (interPoint==tempPoint){
-                        onLine=true;
-                    }
-                }
-                if (!onLine){
-                    setTestPoints(x,y);
-                }*/
             }
             y=y+spaceY();
         }
@@ -339,24 +187,42 @@ bool GridMaker::makeGrid(QString file){
     return true;
 }
 
-bool GridMaker::writePTS(QString file){
-    QFile oFile;
-    oFile.setFileName(file);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
+bool GridMaker::writePTS(std::ostream& out){
+    for (int i=0;i<m_TestPoints.size();i++){
+        out<<m_TestPoints[i].rx()<<" "<<m_TestPoints[i].ry()<<" "<<m_ZHeight<<" 0 0 1"<<std::endl;
+    }
+    return true;
+}
+
+bool GridMaker::writePTS(){
+    return writePTS(std::cout);
+}
+
+bool GridMaker::writePTS(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
-    QTextStream out(&oFile);
-    for (int i=0;i<m_TestPoints.size();i++){
-        out<<m_TestPoints.at(i).rx()<<" "<<m_TestPoints.at(i).ry()<<" "<<m_ZHeight<<" 0 0 1"<<endl;
-    }
+    return writePTS(oFile);
     oFile.close();
     return true;
 }
 
-bool GridMaker::writePTScsv(QString file){
+bool GridMaker::writePTScsv(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    for (int i=0;i<m_TestPoints.size();i++){
+        oFile<<m_TestPoints[i].rx()<<","<<m_TestPoints[i].ry()<<","<<m_ZHeight<<",0,0,1"<<std::endl;
+    }
+    /*
     QFile oFile;
-    oFile.setFileName(file);
+    oFile.setFileName(QString::fromStdString(file));
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
         return false;
@@ -365,13 +231,26 @@ bool GridMaker::writePTScsv(QString file){
     for (int i=0;i<m_TestPoints.size();i++){
         out<<m_TestPoints.at(i).rx()<<","<<m_TestPoints.at(i).ry()<<","<<m_ZHeight<<",0,0,1"<<endl;
     }
+    */
     oFile.close();
     return true;
 }
 
-bool GridMaker::writeRadPoly(QString file){
- QFile oFile;
-    oFile.setFileName(file);
+bool GridMaker::writeRadPoly(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    oFile<<"floor\tpolygon\tfloor1"<<std::endl;
+    oFile<<"0\t0\t"<<m_UnitedPolygon.size()*3;
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        oFile<<endl<<m_UnitedPolygon[i].x()<<"\t"<<m_UnitedPolygon[i].y()<<"\t0";
+    }
+    /*
+    QFile oFile;
+    oFile.setFileName(QString::fromStdString(file));
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
         return false;
@@ -382,6 +261,7 @@ bool GridMaker::writeRadPoly(QString file){
     for (int i=0;i<m_UnitedPolygon.size();i++){
         out<<endl<<m_UnitedPolygon.at(i).x()<<"\t"<<m_UnitedPolygon.at(i).y()<<"\t0";
     }
+    */
     oFile.close();
     return true;
 }
