@@ -1,24 +1,23 @@
-#ifndef PARSERAD_H
-#define PARSERAD_H
+#ifndef RADFILEDATA_H
+#define RADFILEDATA_H
 
-#include <QObject>
 #include <QPair>
 #include "radprimitive.h"
+#include "objects.h"
 #include <vector>
 
 #include "stadicapi.h"
 
 namespace stadic {
 
-class STADIC_API RadFileData : public QObject
+class STADIC_API RadFileData
 {
-    Q_OBJECT
 public:
-    explicit RadFileData(QObject *parent = 0);
-    RadFileData(const std::vector<RadPrimitive *> &primitives, QObject *parent = 0);
+    explicit RadFileData();
+    RadFileData(const shared_vector<RadPrimitive> &primitives);
 
     bool addRad(QString file); 
-    bool removeLayer(const QString &layer, const QString &removing, const QString &rest);                     //Function to remove a layer from the list to its own geometry file
+    bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
     bool blackOutLayer(QString layer);
     bool writeRadFile(QString file);
     std::vector<double> surfaceNormal(QString layer);
@@ -26,18 +25,18 @@ public:
     bool addPrimitive(RadPrimitive *primitive);
 
     //Getters
-    std::vector<RadPrimitive *> geometry() const;
-    std::vector<RadPrimitive *> materials() const;
-    std::vector<RadPrimitive *> primitives() const;
+    shared_vector<RadPrimitive> geometry() const;
+    shared_vector<RadPrimitive> materials() const;
+    shared_vector<RadPrimitive> primitives() const;
 
 
-    template<class T> std::vector<T*> getPrimitives();
-    QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
-    template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
-    QPair<RadFileData *, RadFileData *> split(const std::vector<QString> &vector);
+    template<class T> shared_vector<T> getPrimitives();
+    //QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
+    //template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
+    //QPair<RadFileData *, RadFileData *> split(const std::vector<QString> &vector);
 
 private:
-    std::vector<RadPrimitive *> m_Primitives;            //Vector to hold EVERYTHING
+    shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING
 
 signals:
 
@@ -45,11 +44,11 @@ public slots:
 
 };
 
-template<class T> std::vector<T*> RadFileData::getPrimitives()
+template<class T> shared_vector<T> RadFileData::getPrimitives()
 {
-    std::vector<T*> primitives;
-    for(RadPrimitive *primitive : m_Primitives) {
-        T* cast = dynamic_cast<T*>(primitive);
+    shared_vector<T> primitives;
+    for(auto primitive : m_Primitives) {
+        auto cast = dynamic_pointer_cast<T>(primitive);
         if(cast) {
             primitives.push_back(cast);
         }
@@ -57,6 +56,7 @@ template<class T> std::vector<T*> RadFileData::getPrimitives()
     return primitives;
 }
 
+/*
 template <class T> QPair<RadFileData*, RadFileData*> RadFileData::split(bool(*f)(RadPrimitive*, const T&), const T &label)
 {
     std::vector<RadPrimitive*> in, out;
@@ -78,7 +78,8 @@ template <class T> QPair<RadFileData*, RadFileData*> RadFileData::split(bool(*f)
     }
     return QPair<RadFileData*, RadFileData*>(first, second);
 }
+*/
 
 }
 
-#endif // PARSERAD_H
+#endif // RADFILEDATA_H

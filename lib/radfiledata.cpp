@@ -6,14 +6,12 @@
 
 namespace stadic {
 
-RadFileData::RadFileData(QObject *parent) :
-    QObject(parent)
+RadFileData::RadFileData()
 {
 }
 
-RadFileData::RadFileData(const std::vector<RadPrimitive *> &primitives, QObject *parent) : QObject(parent)
+RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_Primitives(primitives)
 {
-    m_Primitives = primitives;
 }
 
 //Setters
@@ -43,6 +41,7 @@ bool RadFileData::addRad(QString file){
     return true;
 }
 
+/*
 QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
 {
     std::vector<RadPrimitive*> in, out;
@@ -96,6 +95,7 @@ QPair<RadFileData *, RadFileData *> RadFileData::split(const std::vector<QString
     }
     return QPair<RadFileData*,RadFileData*>(first,second);
 }
+*/
 
 static bool checkLayer(RadPrimitive *primitive, const QString &name)
 {
@@ -146,6 +146,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 
     return false;
 }
+
 bool RadFileData::blackOutLayer(QString layer){
     for(int i=0;i<m_Primitives.size();i++) {
         if(m_Primitives[i]->modifier()==layer) {
@@ -154,6 +155,7 @@ bool RadFileData::blackOutLayer(QString layer){
     }
     return true;
 }
+
 bool RadFileData::writeRadFile(QString file){
     QFile oFile;
     oFile.setFileName(file);
@@ -221,28 +223,28 @@ std::vector<double> RadFileData::surfaceNormal(QString layer){
     return normalVector;
 }
 
-
 bool RadFileData::addPrimitive(RadPrimitive *primitive)
 {
-    m_Primitives.push_back(primitive);
+    m_Primitives.push_back(std::make_shared<RadPrimitive>(primitive));
     return true;
 }
 
 //Getters
-std::vector<RadPrimitive *> RadFileData::geometry() const
+shared_vector<RadPrimitive> RadFileData::geometry() const
 {
-    std::vector<RadPrimitive*> primitives;
-    for(RadPrimitive *primitive : m_Primitives) {
+    shared_vector<RadPrimitive> primitives;
+    for(auto primitive : m_Primitives) {
         if(primitive->isGeometry()) {
             primitives.push_back(primitive);
         }
     }
     return primitives;
 }
-std::vector<RadPrimitive *> RadFileData::materials() const
+
+shared_vector<RadPrimitive> RadFileData::materials() const
 {
-    std::vector<RadPrimitive*> primitives;
-    for(RadPrimitive *primitive : m_Primitives) {
+    shared_vector<RadPrimitive> primitives;
+    for(auto primitive : m_Primitives) {
         if(primitive->isMaterial()) {
             primitives.push_back(primitive);
         }
@@ -250,7 +252,7 @@ std::vector<RadPrimitive *> RadFileData::materials() const
     return primitives;
 }
 
-std::vector<RadPrimitive *> RadFileData::primitives() const
+shared_vector<RadPrimitive> RadFileData::primitives() const
 {
     return m_Primitives;
 }

@@ -89,7 +89,7 @@ bool WeatherData::writeWea(std::string file){
     out<<"site_elevation "<<elevation()<<endl;
     out<<"weather_data_file_units 1"<<endl;
     for (int i=0;i<month().size();i++){
-        out<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<QString().fromStdString(directNormal()[i])<<" "<<QString().fromStdString(directHorizontal()[i])<<endl;
+        out<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<directNormal()[i]<<" "<<directHorizontal()[i]<<endl;
     }
     out.close();
     return true;
