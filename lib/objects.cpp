@@ -4,8 +4,8 @@
 #include "logging.h"
 
 // Hack to get stuff compiling
-#define S_ISDIR(a) true
-#define S_ISREG(a) true
+//#define S_ISDIR(a) true
+//#define S_ISREG(a) true
 
 namespace stadic{
 
