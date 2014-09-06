@@ -18,23 +18,21 @@ namespace stadic{
 class STADIC_API Process
 {
 public:
-  Process();
+    Process(std::string program, std::vector<std::string> args);
 
-  void start();
-  void setProgram(std::string prog);
-  void setArguments(std::vector<std::string> args);
-  bool waitForFinished(int msecs=30000); // Yuck.
+    void start();
+    bool wait();
 
-  std::string error();
-  std::string output();
+    std::string error();
+    std::string output();
 
-  void setStandardOutputProcess(Process *destination);
-  void setStandardErrorFile(const std::string &fileName);
-  void setStandardInputFile(const std::string &fileName);
-  void setStandardOutputFile(const std::string &fileName);
+    void setStandardOutputProcess(Process *destination);
+    void setStandardErrorFile(const std::string &fileName);
+    void setStandardInputFile(const std::string &fileName);
+    void setStandardOutputFile(const std::string &fileName);
 
 private:
-  QProcess m_process;
+    QProcess m_process;
 
 };
 

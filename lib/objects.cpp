@@ -2,22 +2,9 @@
 
 namespace stadic{
 
-Process::Process()
+Process::Process(std::string program, std::vector<std::string> args)
 {
-}
-
-void Process::start()
-{
-    m_process.start();
-}
-
-void Process::setProgram(std::string prog)
-{
-    m_process.setProgram(QString::fromStdString(prog));
-}
-
-void Process::setArguments(std::vector<std::string> args)
-{
+    m_process.setProgram(QString::fromStdString(program));
     QStringList arguments;
     for(std::string arg : args) {
         arguments << QString::fromStdString(arg);
@@ -25,9 +12,14 @@ void Process::setArguments(std::vector<std::string> args)
     m_process.setArguments(arguments);
 }
 
-bool Process::waitForFinished(int msecs)
+void Process::start()
 {
-    return m_process.waitForFinished(msecs);
+    m_process.start();
+}
+
+bool Process::wait()
+{
+    return m_process.waitForFinished(-1);
 }
 
 std::string Process::error()
