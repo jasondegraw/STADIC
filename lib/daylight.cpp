@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QProcess>
 #include "materialprimitives.h"
+#include "objects.h"
 
 namespace stadic {
 Daylight::Daylight(Control *model, QObject *parent) :
@@ -81,12 +82,14 @@ bool Daylight::simDaylight(){
 }
 
 //Private
-bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdfRad,QString remainingRad, std::vector<double> normal, QString thickness, QString bsdfXML, QString bsdfLayer, Control *model){
+bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdfRad, QString remainingRad, std::vector<double> normal, QString thickness, 
+    QString bsdfXML, QString bsdfLayer, Control *model)
+{
     QString mainFileName;
-    if (setting==-1){
-        mainFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+bsdfNum;
-    }else{
-        mainFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+setting+"_bsdf"+bsdfNum;
+    if(setting==-1){
+        mainFileName = model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_base_bsdf"+bsdfNum;
+    } else{
+        mainFileName = model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum]->objectName()+"_set"+setting+"_bsdf"+bsdfNum;
     }
 
     //Create initial octrees
@@ -94,26 +97,26 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
     files.append(remainingRad);
     files.append(bsdfRad);
     files.append(QString(model->projectFolder()+model->tmpFolder()+"sky_white1.rad"));
-    QString mainOct=mainFileName+".oct";
-    if(!createOctree(files,mainOct)){
+    QString mainOct = mainFileName+".oct";
+    if(!createOctree(files, mainOct)){
         return false;
     }
 
     //FivePhaseOut<<endl<<"xform -m black "<<RadFileName<<" > "<<string(project_directory)<<"tmp/black.rad"<<endl;
     //Black out the remainingRad file
-    QProcess *xform=new QProcess(this);
-    QString xformProgram="xform.exe";
-    xform->setProgram(xformProgram);
-    QStringList arguments;
+    stadic::Process xform;
+    xform.setProgram("xform");
+    std::vector<std::string> arguments;
     arguments.push_back("-m");
     arguments.push_back("black");
-    arguments.push_back(remainingRad);
-    QString blackRad=mainFileName+"_allblack.rad";
-    xform->setStandardOutputFile(blackRad);
-    xform->setWorkingDirectory(model->projectFolder());
-    xform->setArguments(arguments);
-    xform->start();
-    if (!xform->waitForFinished(-1)){
+    arguments.push_back(remainingRad.toStdString());
+    // Should use the directory class to get this right
+    std::string blackRad = model->projectFolder().toStdString() + "\\" + mainFileName.toStdString() + "_allblack.rad";
+    xform.setStandardOutputFile(blackRad);
+    xform.setArguments(arguments);
+    xform.start();
+    if (!xform.waitForFinished(-1))
+    {
         ERROR("The xform command failed to convert layers to black.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
@@ -143,6 +146,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, QString bsdf
         nSuns=5185;
     }
     QFile tempFile;
+    QStringList arguments; //Blech. Multiple use of same object
     tempFile.setFileName(model->tmpFolder()+model->projectName()+"_suns_m"+model->sunDivisions()+".rad");
     if (!tempFile.exists()){
         QProcess *cnt=new QProcess(this);
