@@ -31,3 +31,7 @@ target_link_libraries(leaktests stadic_core gtest gtest_main)
 add_executable(functiontests functiontests.cpp ${QRCS})
 add_test(functiontests functiontests)
 target_link_libraries(functiontests stadic_core gtest gtest_main)
+
+add_executable(objectstests objectstests.cpp ${QRCS})
+add_test(objectstests objectstests)
+target_link_libraries(objectstests stadic_core gtest gtest_main)
