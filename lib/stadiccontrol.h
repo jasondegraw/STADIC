@@ -109,7 +109,7 @@ public:
     QString geoFile();
     double buildingRotation();
     QString ptsFile();
-    std::vector<WindowGroup*> windowGroups();
+    std::vector<WindowGroup> windowGroups();
     QString importUnits();
     QString illumUnits();
     QString displayUnits();
@@ -192,7 +192,7 @@ private:
     QString m_DisplayUnits;                             //  Variable holding the distance units for display
     QString m_OccSchedule;                              //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
-    std::vector<WindowGroup*> m_WindowGroups;
+    std::vector<WindowGroup> m_WindowGroups;
 
     //******************
     //Simulation Settings
