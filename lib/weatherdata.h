@@ -8,11 +8,10 @@
 
 namespace stadic {
 
-class STADIC_API WeatherData : public QObject
+class STADIC_API WeatherData
 {
-    Q_OBJECT
 public:
-    explicit WeatherData(QObject *parent = 0);
+    WeatherData();
     bool parseWeather(std::string file);
     bool writeWea(std::string file);
 
