@@ -543,6 +543,9 @@ bool Control::parseJson(QString file){
     QFile iFile;
     iFile.setFileName(file);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(!iFile.isOpen()) {
+        return false;
+    }
     data=iFile.readAll();
     iFile.close();
     QJsonDocument json= QJsonDocument::fromJson(data.toUtf8());
