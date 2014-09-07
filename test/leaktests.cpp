@@ -9,7 +9,8 @@ TEST(LeakTests, EnclosedModel)
 {
   //This model should be fully enclosed
   stadic::LeakCheck leakChecker;
-  std::vector<std::string> radFiles;
+  std::vector<std::string> radFiles = { "Simple.rad", "material.rad" };
+  /*
   radFiles.clear();
 
   QDir wDir;
@@ -23,15 +24,13 @@ TEST(LeakTests, EnclosedModel)
   QFile::copy(":/resources/Simple.rad",wDir.path()+"/Simple.rad");
   QFile::copy(":/resources/material.rad",wDir.path()+"/material.rad");
   radFiles.push_back(wDir.path().toStdString()+"/Simple.rad");
-  radFiles.push_back(wDir.path().toStdString()+"/material.rad");
-  //radFiles.append(":/resources/Simple.rad");
-  //radFiles.append(":/resources/material.rad");
+  radFiles.push_back(wDir.path().toStdString()+"/material.rad");*/
+  //radFiles.append("Simple.rad");
+  //radFiles.append("material.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/Simple.rad");
   //radFiles.append("c:/CPrograms/STADIC/test/resources/material.rad");
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
-  std::vector<std::string> layerNames;
-  layerNames.clear();
-  layerNames.push_back("l_floor");
+  std::vector<std::string> layerNames = { "l_floor" };
   ASSERT_TRUE(leakChecker.setFloorLayers(layerNames));
   ASSERT_TRUE(leakChecker.setX(120));
   ASSERT_TRUE(leakChecker.setY(120));
