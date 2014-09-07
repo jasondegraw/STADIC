@@ -6,18 +6,45 @@
 
 
 namespace stadic{
-class STADIC_API FileSystem
+
+class STADIC_API Dir
 {
 public:
-    FileSystem();
+    Dir();
+
+    //Setters
+    bool setPath(std::string path);
+
+    //Getters
+    std::string toString();
+
+    //Utilities
+    bool isDir();
+    bool exists();
+    bool cdUp();
+    bool cd();
+
+
+private:
+    std::string m_Path;
+
+
+};
+
+class STADIC_API File
+{
+public:
+    File();
 
     // Setters
     void setPath(std::string path);
     // Getters
+    Dir dir();
+    std::string toString();
+    std::string name();
 
     //Utilities
     bool exists();
-    bool isDir();
     bool isFile();
     bool isUpdated();
     bool lastMod();
@@ -28,9 +55,6 @@ private:
 
 
 };
-
-
-
 
 }
 #endif // OBJECTS_H
