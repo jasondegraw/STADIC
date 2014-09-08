@@ -6,11 +6,11 @@
 TEST(RadFileTests, ParseRadFile)
 {
   stadic::RadFileData radData;
-  ASSERT_TRUE(radData.addRad(":/resources/Simple.rad"));
+  ASSERT_TRUE(radData.addRad("Simple.rad"));
   ASSERT_EQ(36, radData.primitives().size());
   ASSERT_EQ(36, radData.geometry().size());
   ASSERT_EQ(0, radData.materials().size());
-  ASSERT_TRUE(radData.addRad(":/resources/material.rad"));
+  ASSERT_TRUE(radData.addRad("material.rad"));
   //Testing to ensure all of the primitives are read in
   ASSERT_EQ(42, radData.primitives().size());
   ASSERT_EQ(36, radData.geometry().size());
@@ -105,11 +105,11 @@ TEST(RadFileTests, SplitRadFile)
     // All of the split stuff needs to be reworked, so this test will fail until that happens
     /*
   stadic::RadFileData radData;
-  ASSERT_TRUE(radData.addRad(":/resources/Simple.rad"));
+  ASSERT_TRUE(radData.addRad("Simple.rad"));
   ASSERT_EQ(36, radData.primitives().size());
   ASSERT_EQ(36, radData.geometry().size());
   ASSERT_EQ(0, radData.materials().size());
-  ASSERT_TRUE(radData.addRad(":/resources/material.rad"));
+  ASSERT_TRUE(radData.addRad("material.rad"));
   //Testing to ensure all of the primitives are read in
   ASSERT_EQ(42, radData.primitives().size());
   ASSERT_EQ(36, radData.geometry().size());

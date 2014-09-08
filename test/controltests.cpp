@@ -4,23 +4,23 @@
 
 TEST(ControlTests, ReadJson)
 {
-    stadic::Control controlFile;
-    ASSERT_TRUE(controlFile.parseJson(":/resources/TestSControl.json"));
-    EXPECT_EQ("prj1", controlFile.projectName());
-    EXPECT_EQ("c:/example/", controlFile.projectFolder());
-    EXPECT_EQ("tmp/", controlFile.tmpFolder());
-    EXPECT_EQ("rad/", controlFile.geoFolder());
-    EXPECT_EQ("ies/", controlFile.iesFolder());
-    EXPECT_EQ("res/", controlFile.resultsFolder());
-    EXPECT_EQ("data/", controlFile.dataFolder());
-    EXPECT_EQ(0.2, controlFile.groundReflect());
-    EXPECT_EQ("c:/weaData/state_college.wea", controlFile.weaDataFile());
-    EXPECT_EQ(1, controlFile.firstDay());
-    EXPECT_EQ("main_mat.rad", controlFile.matFile());
-    EXPECT_EQ("main_geo.rad", controlFile.geoFile());
-    EXPECT_EQ(0, controlFile.buildingRotation());
-    EXPECT_EQ("calc_grid.pts", controlFile.ptsFile());
-    EXPECT_EQ(2, controlFile.windowGroups().size());
+  stadic::Control controlFile;
+  ASSERT_TRUE(controlFile.parseJson("TestSControl.json"));
+  EXPECT_EQ("prj1",controlFile.projectName());
+  EXPECT_EQ("c:/example/", controlFile.projectFolder());
+  EXPECT_EQ("tmp/", controlFile.tmpFolder());
+  EXPECT_EQ("rad/", controlFile.geoFolder());
+  EXPECT_EQ("ies/", controlFile.iesFolder());
+  EXPECT_EQ("res/", controlFile.resultsFolder());
+  EXPECT_EQ("data/", controlFile.dataFolder());
+  EXPECT_EQ(0.2, controlFile.groundReflect());
+  EXPECT_EQ("c:/weaData/state_college.wea", controlFile.weaDataFile());
+  EXPECT_EQ(1, controlFile.firstDay());
+  EXPECT_EQ("main_mat.rad", controlFile.matFile());
+  EXPECT_EQ("main_geo.rad", controlFile.geoFile());
+  EXPECT_EQ(0, controlFile.buildingRotation());
+  EXPECT_EQ("calc_grid.pts", controlFile.ptsFile());
+  EXPECT_EQ(2,controlFile.windowGroups().size());
 
     //Window Group 1
     EXPECT_EQ("WG1", controlFile.windowGroups()[0].name());
