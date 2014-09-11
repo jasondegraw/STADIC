@@ -1033,14 +1033,14 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-					QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo = settingRad->split(layers);
+                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo = settingRad->split(layers);
                     if (splitGeo.first.size() == 0 || splitGeo.second.size() == 0){
                         ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
-					RadFileData first(splitGeo.first);
-					first.writeRadFile(wgSettingFileBSDF);
+                    RadFileData first(splitGeo.first);
+                    first.writeRadFile(wgSettingFileBSDF);
                     std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     std::string thickness;
                     std::string bsdfXML;
@@ -1051,8 +1051,8 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
-					RadFileData second(splitGeo.second);
-					second.writeRadFile(wgSettingFileBSDFStd);
+                    RadFileData second(splitGeo.second);
+                    second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
                         return false;
