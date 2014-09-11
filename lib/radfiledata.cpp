@@ -15,12 +15,12 @@ RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_Prim
 }
 
 //Setters
-bool RadFileData::addRad(QString file){
+bool RadFileData::addRad(std::string file){
     QFile iFile;
-    iFile.setFileName(file);
+    iFile.setFileName(QString().fromStdString(file));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.exists()){
-        ERROR(QString("The opening of the rad file '%1' failed.").arg(file));
+        ERROR(QString("The opening of the rad file '%1' failed.").arg(QString().fromStdString(file)));
         return false;
     }
 
@@ -64,7 +64,7 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
     return QPair<RadFileData*,RadFileData*>(first,second);
 }
 
-QPair<RadFileData *, RadFileData *> RadFileData::split(const std::vector<QString> &vector)
+QPair<RadFileData*, RadFileData*> RadFileData::split(const std::vector<QString> &vector)
 {
     std::vector<RadPrimitive*> in, out;
     for(RadPrimitive *primitive : m_Primitives) {
@@ -150,18 +150,18 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 }
 */
 
-bool RadFileData::blackOutLayer(QString layer){
+bool RadFileData::blackOutLayer(std::string layer){
     for(int i=0;i<m_Primitives.size();i++) {
-        if(m_Primitives[i]->modifier()==layer) {
+        if(m_Primitives[i]->modifier()==QString().fromStdString(layer)) {
             m_Primitives[i]->setModifier("black");
         }
     }
     return true;
 }
 
-bool RadFileData::writeRadFile(QString file){
+bool RadFileData::writeRadFile(std::string file){
     QFile oFile;
-    oFile.setFileName(file);
+    oFile.setFileName(QString().fromStdString(file));
     oFile.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile.exists()){
         ERROR("The opening of the rad file named " + file + " has failed.");
@@ -196,10 +196,10 @@ bool RadFileData::writeRadFile(QString file){
     return true;
 }
 
-std::vector<double> RadFileData::surfaceNormal(QString layer){
+std::vector<double> RadFileData::surfaceNormal(std::string layer){
     std::vector<double> normalVector;
     for(int i=0;i<m_Primitives.size();i++) {
-        if(m_Primitives[i]->modifier()==layer && QString(m_Primitives[i]->type())=="Polygon") {
+        if(m_Primitives[i]->modifier()==QString().fromStdString(layer) && QString(m_Primitives[i]->type())=="Polygon") {
             std::vector<std::vector<double>> normalPoints;
             for (int j=0;j<m_Primitives[i]->arg3().size();j++){
                 std::vector<double> temp;

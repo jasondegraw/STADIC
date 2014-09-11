@@ -1,145 +1,73 @@
 #include "objects.h"
 //#include <sys/types.h>
+#ifdef _MSVC
+
+#else
 #include <sys/stat.h>
+#endif
+
 #include "logging.h"
 #include <iostream>
 
-// Hack to get stuff compiling
-//#define S_ISDIR(a) true
-//#define S_ISREG(a) true
-
 namespace stadic{
 //*************************
-//Dir
+//FilePath
 //*************************
-Dir::Dir()
+FilePath::FilePath(std::string path)
 {
-
+    m_Path=path;
+    if (isFile()){
+        lastMod();
+    }
 }
 //Setters
-bool Dir::setPath(std::string path){
-    if (path.find_last_of('/')==path.length()-1){
-        m_Path=path;
-        return true;
-    }
-    if (path.find_last_of('\\')==path.length()-1){
-        m_Path=path;
-        return true;
-    }
-    std::cout<<path<<std::endl;
-    ERROR("The path must end in a separator (ex. '/', '\\', etc.");
-    return false;
-}
+
 
 //Getters
-std::string Dir::toString(){
+std::string FilePath::toString(){
     return m_Path;
 }
 
 //Utilities
-bool Dir::isDir(){
+bool FilePath::isDir(){
+#ifdef __MSVC
+
+#else //POSIC
     struct stat path;
 
     if (stat(m_Path.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
         return true;
     }
     return false;
-}
-bool Dir::exists(){
-    if (isDir()){
-        return true;
-    }
-    return false;
+#endif
 }
 
-bool Dir::cdUp(){
-    std::string tempPath=m_Path.erase(m_Path.length()-1);
-    std::size_t found=tempPath.find_last_of('/');
-    if (found!=m_Path.npos){
-        m_Path.erase(m_Path.begin()+found+1,m_Path.end());
-    }else{
-        found=tempPath.find_last_of('\\');
-        if (found!=m_Path.npos){
-            m_Path.erase(m_Path.begin()+found+1,m_Path.end());
-        }else{
-            ERROR("There are no more directories up from the current directory.");
-            return false;
-        }
-    }
-    return true;
-}
-bool Dir::cd(){
+bool FilePath::isFile(){
+#ifdef _MSVC
 
-    return true;
-}
-//*************************
-//File
-//*************************
-File::File()
-{
-
-}
-//Setters
-void File::setPath(std::string path){
-    m_Path=path;
-}
-
-//Getters
-Dir File::dir(){
-    Dir tempDir;
-    std::string tempPath=m_Path;
-    std::size_t found=tempPath.find_last_of('/');
-    if (found!=tempPath.npos){
-        tempPath.erase(tempPath.begin()+found+1,tempPath.end());
-    }else{
-        found=tempPath.find_last_of('\\');
-        if (found!=tempPath.npos){
-            tempPath.erase(tempPath.begin()+found+1,tempPath.end());
-        }else{
-            ERROR("There are no more directories up from the current directory.");
-            return tempDir;
-        }
-    }
-    tempDir.setPath(tempPath);
-    return tempDir;
-}
-std::string File::toString(){
-    return m_Path;
-}
-std::string File::name(){
-    std::string tempName=m_Path;
-    std::size_t found=tempName.find_last_of('/');
-    if (found!=tempName.npos){
-        tempName.erase(tempName.begin(),tempName.begin()+found+1);
-    }else{
-        found=tempName.find_last_of('\\');
-        if (found!=tempName.npos){
-            tempName.erase(tempName.begin(),tempName.begin()+found+1);
-        }else{
-            ERROR("The file name cannot be obtained.");
-            tempName.clear();
-            return tempName;
-        }
-    }
-    return tempName;
-}
-
-//Utilities
-bool File::exists(){
-    if (isFile()){
-        return true;
-    }
-    return false;
-}
-bool File::isFile(){
+#else //POSIX
     struct stat path;
 
     if (stat(m_Path.c_str(), &path)==0 && S_ISREG(path.st_mode)){
         return true;
     }
     return false;
+#endif
 }
-bool File::isUpdated(){
+bool FilePath::exists(){
+    if (isDir()){
+        return true;
+    }
+    if (isFile()){
+        return true;
+    }
+    return false;
+}
+
+bool FilePath::isUpdated(){
+#ifdef _MSVC
+
+#else //POSIX
     struct tm* originalMod=m_LastMod;
     if (!lastMod()){
         ERROR("There was an error checking the file.");
@@ -149,22 +77,21 @@ bool File::isUpdated(){
         return true;
     }
     return false;
+#endif
 }
-bool File::lastMod(){
+
+//Private
+void File::lastMod(){
     struct stat path;
     if (isFile()){
         stat(m_Path.c_str(),&path);
         m_LastMod=localtime(&path.st_mtime);
-    }else{
-        ERROR("The path provided is not a file.");
-        return false;
     }
-    return true;
 }
-//Private
 
-
-
+//*************************
+//Process
+//*************************
 Process::Process(std::string program, std::vector<std::string> args)
 {
     m_process.setProgram(QString::fromStdString(program));

@@ -17,11 +17,11 @@ public:
     explicit RadFileData();
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
-    bool addRad(QString file); 
+    bool addRad(std::string file);
     bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
-    bool blackOutLayer(QString layer);
-    bool writeRadFile(QString file);
-    std::vector<double> surfaceNormal(QString layer);
+    bool blackOutLayer(std::string layer);
+    bool writeRadFile(std::string file);
+    std::vector<double> surfaceNormal(std::string layer);
 
     bool addPrimitive(RadPrimitive *primitive);
 

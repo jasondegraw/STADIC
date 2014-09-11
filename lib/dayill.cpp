@@ -1,5 +1,7 @@
 #include "dayill.h"
 #include "logging.h"
+#include <fstream>
+#include "functions.h"
 #include <QFile>
 #include <QStringList>
 #include <QTextStream>
@@ -90,57 +92,53 @@ bool DayIll::setHour(QString hour){
 }
 */
 
-bool DaylightIlluminanceData::parse(QString fileName, QString weaFile){
-    QFile iFile;
-    iFile.setFileName(fileName);
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.isOpen()){
+bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
+    std::ifstream iFile;
+    iFile.open(fileName);
+    if (!iFile.is_open()){
         ERROR("The opening of the illuminance file "+fileName+" failed.");
         return false;
     }
 
-    QFile weaInFile;
-    weaInFile.setFileName(weaFile);
-    weaInFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!weaInFile.isOpen()){
+    std::ifstream weaInFile;
+    weaInFile.open(weaFile);
+    if (!weaInFile.is_open()){
         ERROR("The opening of the wea file " +weaFile+" failed.");
         return false;
     }
 
-    QString line;
-    QString weaLine;
-    while (!iFile.atEnd()){
-        bool ok;
+    std::string line;
+    std::string weaLine;
+    while (std::getline(iFile,line)){
         int month,day;
         double hour;
-        line=iFile.readLine();
-        weaLine=weaInFile.readLine();
-        QStringList vals;
-        vals=weaLine.split(" ");
+        std::getline(weaInFile,weaLine);
+        std::vector<std::string> vals;
+        vals=split(weaLine,' ');
         if(vals.size() < 5) {
             ERROR("The number of items on each line of the wea file is less than 5.");
             return false;
         }
-        month = vals.at(0).toInt(&ok);
-        if (!ok || month<1 || month>12){
+        month =atoi(vals[0].c_str());
+        if (month<1 || month>12){
             ERROR("One of the month values is not acceptable.");
             return false;
         }
-        day=vals.at(1).toInt(&ok);
-        if (!ok || day<1 || day>31){
+        day=atoi(vals[1].c_str());
+        if (day<1 || day>31){
             ERROR("One of the day values is not acceptable.");
             return false;
         }
-        hour=vals.at(2).toDouble(&ok);
-        if (!ok || hour<0 || hour>24){
+        hour=atof(vals[2].c_str());
+        if (hour<0 || hour>24){
             ERROR("One of the hour values is not acceptable.");
             return false;
         }
-        vals=line.split(" ");
+        vals=split(line,' ');
         std::vector<double> ill;
 
         for (int i=0;i<vals.size();i++){
-            ill.push_back(vals.at(i).toDouble());
+            ill.push_back(atof(vals[i].c_str()));
         }
 
         TemporalIlluminance datapoint(month,day,hour,ill);
@@ -152,44 +150,41 @@ bool DaylightIlluminanceData::parse(QString fileName, QString weaFile){
 }
 
 
-bool DaylightIlluminanceData::parseTimeBased(QString fileName){
-    QFile iFile;
-    iFile.setFileName(fileName);
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.isOpen()){
+bool DaylightIlluminanceData::parseTimeBased(std::string fileName){
+    std::ifstream iFile;
+    iFile.open(fileName);
+    if (!iFile.is_open()){
         ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
         return false;
     }
-    QString line;
-    while (!iFile.atEnd()){
-        bool ok;
+    std::string line;
+    while (std::getline(iFile,line)){
         int month,day;
         double hour;
-        line=iFile.readLine();
-        QStringList vals;
-        vals=line.split(" ");
+        std::vector<std::string> vals;
+        vals=split(line,' ');
         if(vals.size() < 4) {
             //ERROR!
         }
-        month = vals.at(0).toInt(&ok);
-        if (!ok || month<1 || month>12){
+        month = atoi(vals[0].c_str());
+        if (month<1 || month>12){
             ERROR("One of the month values is not acceptable.");
             return false;
         }
-        day=vals.at(1).toInt(&ok);
-        if (!ok || day<1 || day>31){
+        day=atoi(vals[1].c_str());
+        if (day<1 || day>31){
             ERROR("One of the day values is not acceptable.");
             return false;
         }
-        hour=vals.at(2).toDouble(&ok);
-        if (!ok || hour<0 || hour>24){
+        hour=atof(vals[2].c_str());
+        if (hour<0 || hour>24){
             ERROR("One of the hour values is not acceptable.");
             return false;
         }
         std::vector<double> ill;
 
         for (int i=3;i<vals.size()-3;i++){
-            ill.push_back(vals.at(i).toDouble());
+            ill.push_back(atof(vals[i].c_str()));
         }
 
         TemporalIlluminance datapoint(month,day,hour,ill);
@@ -199,27 +194,24 @@ bool DaylightIlluminanceData::parseTimeBased(QString fileName){
     return true;
 }
 
-bool DaylightIlluminanceData::addIllFile(QString fileName){
-    QFile iFile;
-    iFile.setFileName(fileName);
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.isOpen()){
+bool DaylightIlluminanceData::addIllFile(std::string fileName){
+    std::ifstream iFile;
+    iFile.open(fileName);
+    if (!iFile.is_open()){
         ERROR("The opening of the illuminance file "+fileName+" failed.");
         return false;
     }
-    QString line;
+    std::string line;
     int i;
-    while (!iFile.atEnd()){
+    while (std::getline(iFile,line)){
         i=0;
-        bool ok;
-        line=iFile.readLine();
-        QStringList vals;
+        std::vector<std::string> vals;
 
-        vals=line.split(" ");
+        vals=split(line,' ');
         std::vector<double> ill;
 
         for (int i=0;i<vals.size();i++){
-            ill.push_back(vals.at(i).toDouble());
+            ill.push_back(atof(vals[i].c_str()));
         }
         m_data[i].add(ill);
         i++;
@@ -228,25 +220,23 @@ bool DaylightIlluminanceData::addIllFile(QString fileName){
     return true;
 }
 
-bool DaylightIlluminanceData::addTimeBasedIll(QString fileName){
+bool DaylightIlluminanceData::addTimeBasedIll(std::string fileName){
 
     return true;
 }
 
-bool DaylightIlluminanceData::writeIllFile(QString fileName){
-    QFile oFile;
-    oFile.setFileName(fileName);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
+bool DaylightIlluminanceData::writeIllFile(std::string fileName){
+    std::ofstream oFile;
+    oFile.open(fileName);
+    if (!oFile.is_open()){
         return false;
     }
-    QTextStream out(&oFile);
     for (int i=0;i<m_data.size();i++){
-        out<<m_data[i].month()<<" "<<m_data[i].day()<<" "<<m_data[i].hour();
+        oFile<<m_data[i].month()<<" "<<m_data[i].day()<<" "<<m_data[i].hour();
         for (int j=0;j<m_data[i].illuminance().size();j++){
-            out<<" "<<m_data[i].illuminance()[j];
+            oFile<<" "<<m_data[i].illuminance()[j];
         }
-        out<<endl;
+        oFile<<std::endl;
     }
     oFile.close();
     return true;

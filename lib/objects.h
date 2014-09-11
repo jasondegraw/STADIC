@@ -41,53 +41,27 @@ private:
 
 };
 
-class STADIC_API Dir
+class STADIC_API FilePath
 {
 public:
-    Dir();
+    FilePath(std::string path);
 
     //Setters
-    bool setPath(std::string path);
 
     //Getters
     std::string toString();
 
     //Utilities
     bool isDir();
-    bool exists();
-    bool cdUp();
-    bool cd();
-
-
-private:
-    std::string m_Path;
-
-
-};
-
-class STADIC_API File
-{
-public:
-    File();
-
-    // Setters
-    void setPath(std::string path);
-    // Getters
-    Dir dir();
-    std::string toString();
-    std::string name();
-
-    //Utilities
-    bool exists();
     bool isFile();
+    bool exists();
     bool isUpdated();
-    bool lastMod();
+
 
 private:
     std::string m_Path;
     struct tm *m_LastMod;
-
-
+    void lastMod();
 
 };
 

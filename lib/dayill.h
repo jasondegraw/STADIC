@@ -36,11 +36,11 @@ class STADIC_API DaylightIlluminanceData : public QObject
     Q_OBJECT
 public:
     explicit DaylightIlluminanceData(QObject *parent = 0);
-    bool parse(QString fileName,QString weaFile);
-    bool parseTimeBased(QString fileName);
-    bool addIllFile(QString fileName);
-    bool addTimeBasedIll(QString fileName);
-    bool writeIllFile(QString fileName);
+    bool parse(std::string fileName,std::string weaFile);
+    bool parseTimeBased(std::string fileName);
+    bool addIllFile(std::string fileName);
+    bool addTimeBasedIll(std::string fileName);
+    bool writeIllFile(std::string fileName);
     //Setters
     //void setIlluminance(double value);
 

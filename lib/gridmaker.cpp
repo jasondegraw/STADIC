@@ -99,7 +99,7 @@ double GridMaker::maxY(){
 //Utilities
 bool GridMaker::parseRad(std::string file){
     stadic::RadFileData radGeo;
-    radGeo.addRad(QString::fromStdString(file));
+    radGeo.addRad(file);
     //set polygons
     if (radGeo.geometry().empty()){
         std::cerr<<"There are no polygons."<<std::endl;
@@ -117,7 +117,7 @@ bool GridMaker::parseRad(std::string file){
 
 bool GridMaker::makeGrid(std::string file){
     stadic::RadFileData radGeo;
-    radGeo.addRad(QString::fromStdString(file));
+    radGeo.addRad(file);
     //unite polygons that are the right layer name
     bool firstPolygon=true;
     for (int i=0;i<radGeo.geometry().size();i++){
