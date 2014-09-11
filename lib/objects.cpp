@@ -69,10 +69,7 @@ bool FilePath::isUpdated(){
 
 #else //POSIX
     struct tm* originalMod=m_LastMod;
-    if (!lastMod()){
-        ERROR("There was an error checking the file.");
-        return false;
-    }
+    lastMod();
     if (difftime(mktime(m_LastMod),mktime(originalMod))>0){
         return true;
     }

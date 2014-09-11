@@ -70,13 +70,13 @@ QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::s
 	shared_vector<RadPrimitive> in, out;
     for(std::shared_ptr<RadPrimitive> primitive : m_Primitives) {
         if(primitive->isMaterial()) {
-            if(std::find(vector.begin(),vector.end(),primitive->name()) != vector.end()) {
+            if(std::find(vector.begin(),vector.end(),primitive->name().toStdString()) != vector.end()) {
                 in.push_back(primitive);
             } else {
                 out.push_back(primitive);
             }
         } else if(primitive->isGeometry()) {
-            if(std::find(vector.begin(),vector.end(),primitive->modifier()) != vector.end()) {
+            if(std::find(vector.begin(),vector.end(),primitive->modifier().toStdString()) != vector.end()) {
                 in.push_back(primitive);
             } else {
                 out.push_back(primitive);

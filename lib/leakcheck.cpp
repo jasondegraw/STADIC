@@ -68,7 +68,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
             return false;
         }
         m_RadFiles.push_back(files[i]);
-        if (!m_RadGeo.addRad(QString().fromStdString(files[i]))){
+        if (!m_RadGeo.addRad(files[i])){
             return false;
         }
     }

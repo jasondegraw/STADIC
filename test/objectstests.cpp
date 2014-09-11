@@ -3,32 +3,25 @@
 #include "gtest/gtest.h"
 #include <string>
 
-TEST(ObjectsTests, Directory)
+TEST(ObjectsTests, FilePathDirectory)
 {
   std::string testString = "c:/CPrograms/STADIC/";
-  stadic::Dir dir;
-  dir.setPath(testString);
+  stadic::FilePath dir(testString);
   EXPECT_TRUE(dir.exists());
   EXPECT_TRUE(dir.isDir());
   testString = "c:/DOESNOTEXIST/";
-  dir.setPath(testString);
-  EXPECT_FALSE(dir.exists());
-  testString="c:/CPrograms/STADIC";
-  EXPECT_FALSE(dir.setPath(testString));
+  stadic::FilePath dir2(testString);
+  EXPECT_FALSE(dir2.exists());
 }
 
-TEST(ObjectsTests, File)
+TEST(ObjectsTests, FilePathFile)
 {
     std::string testString = "c:/CPrograms/STADIC/README.md";
-    stadic::File file;
-    file.setPath(testString);
+    stadic::FilePath file(testString);
     EXPECT_TRUE(file.exists());
     EXPECT_TRUE(file.isFile());
-    EXPECT_TRUE(file.lastMod());
     EXPECT_FALSE(file.isUpdated());
-    EXPECT_EQ("README.md",file.name());
-    EXPECT_EQ("c:/CPrograms/STADIC/",file.dir().toString());
     testString = "c:/CPrograms/STADIC/DOESNOTEXIST.txt";
-    file.setPath(testString);
-    EXPECT_FALSE(file.exists());
+    stadic::FilePath file2(testString);
+    EXPECT_FALSE(file2.exists());
 }

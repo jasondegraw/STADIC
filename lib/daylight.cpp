@@ -1117,24 +1117,26 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
         for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfBaseLayers().size();j++){
             std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
             layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
-            QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
-            if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+            QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
-            splitGeo.first->writeRadFile(wgBaseFileBSDF);
-            std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
+            RadFileData first(splitGeo.first);
+            first.writeRadFile(wgBaseFileBSDF);
+            std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             std::string thickness;
             std::string bsdfXML;
-            for (int k=0;k<splitGeo.first->primitives().size();k++){
-                if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+            for (int k=0;k<first.primitives().size();k++){
+                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
+                    thickness=first.primitives()[k]->getArg1(0).toStdString();
+                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
-            splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
+            RadFileData second(splitGeo.second);
+            second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
                 return false;
@@ -1171,24 +1173,26 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
-                    if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+                    QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
-                    splitGeo.first->writeRadFile(wgSettingFileBSDF);
-                    std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
+                    RadFileData first(splitGeo.first);
+                    first.writeRadFile(wgSettingFileBSDF);
+                    std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     std::string thickness;
                     std::string bsdfXML;
-                    for (int k=0;k<splitGeo.first->primitives().size();k++){
-                        if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+                    for (int k=0;k<first.primitives().size();k++){
+                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
+                            thickness=first.primitives()[k]->getArg1(0).toStdString();
+                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
-                    splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
+                    RadFileData second(splitGeo.second);
+                    second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
                         return false;
@@ -1233,24 +1237,26 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             if (std::find(layers.begin(),layers.end(),model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])==layers.end()){
                 layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             }
-            QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
-            if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+            QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
-            splitGeo.first->writeRadFile(wgBaseFileBSDF);
-            std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
+            RadFileData first(splitGeo.first);
+            first.writeRadFile(wgBaseFileBSDF);
+            std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             std::string thickness;
             std::string bsdfXML;
-            for (int k=0;k<splitGeo.first->primitives().size();k++){
-                if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+            for (int k=0;k<first.primitives().size();k++){
+                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
+                    thickness=first.primitives()[k]->getArg1(0).toStdString();
+                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
-            splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
+            RadFileData second(splitGeo.second);
+            second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
                 return false;
@@ -1268,24 +1274,26 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
-                    if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
-                    splitGeo.first->writeRadFile(wgSettingFileBSDF);
-                    std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
+                    RadFileData first(splitGeo.first);
+                    first.writeRadFile(wgSettingFileBSDF);
+                    std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     std::string thickness;
                     std::string bsdfXML;
-                    for (int k=0;k<splitGeo.first->primitives().size();k++){
-                        if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+                    for (int k=0;k<first.primitives().size();k++){
+                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
+                            thickness=first.primitives()[k]->getArg1(0).toStdString();
+                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
-                    splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
+                    RadFileData second(splitGeo.second);
+                    second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
                         return false;
@@ -1322,24 +1330,26 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             if (std::find(layers.begin(),layers.end(),model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])==layers.end()){
                 layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             }
-            QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=baseRad->split(layers);
-            if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+            QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
-            splitGeo.first->writeRadFile(wgBaseFileBSDF);
-            std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
+            RadFileData first(splitGeo.first);
+            first.writeRadFile(wgBaseFileBSDF);
+            std::vector<double> normal=first.surfaceNormal(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             std::string thickness;
             std::string bsdfXML;
-            for (int k=0;k<splitGeo.first->primitives().size();k++){
-                if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+            for (int k=0;k<first.primitives().size();k++){
+                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
+                    thickness=first.primitives()[k]->getArg1(0).toStdString();
+                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
-            splitGeo.second->writeRadFile(wgBaseFileBSDFStd);
+            RadFileData second(splitGeo.second);
+            second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
                 ERROR("The program quit...");
                 return false;
@@ -1356,24 +1366,26 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<stadic::RadFileData*, stadic::RadFileData*> splitGeo=settingRad->split(layers);
-                    if (splitGeo.first==nullptr|| splitGeo.second==nullptr){
+                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
-                    splitGeo.first->writeRadFile(wgSettingFileBSDF);
+                    RadFileData first(splitGeo.first);
+                    first.writeRadFile(wgSettingFileBSDF);
                     //std::vector<double> normal=splitGeo.first->surfaceNormal(model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j]);
                     std::string thickness;
                     std::string bsdfXML;
-                    for (int k=0;k<splitGeo.first->primitives().size();k++){
-                        if (splitGeo.first->primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=splitGeo.first->primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=splitGeo.first->primitives()[k]->getArg1(1).toStdString();
+                    for (int k=0;k<first.primitives().size();k++){
+                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
+                            thickness=first.primitives()[k]->getArg1(0).toStdString();
+                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
-                    splitGeo.second->writeRadFile(wgSettingFileBSDFStd);
+                    RadFileData second;
+                    second.writeRadFile(wgSettingFileBSDFStd);
                     /*  This would be correct, but for time savings we don't have to run the entire calculation so the next steps are taken.
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
                         ERROR("The program quit...");
