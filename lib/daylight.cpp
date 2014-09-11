@@ -1045,9 +1045,9 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     std::string thickness;
                     std::string bsdfXML;
                     for (int k=0;k<first.primitives().size();k++){
-                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=first.primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                        if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]){
+                            thickness=first.primitives()[k]->getArg1(0);
+                            bsdfXML=first.primitives()[k]->getArg1(1);
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1129,9 +1129,9 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
             std::string thickness;
             std::string bsdfXML;
             for (int k=0;k<first.primitives().size();k++){
-                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=first.primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]){
+                    thickness=first.primitives()[k]->getArg1(0);
+                    bsdfXML=first.primitives()[k]->getArg1(1);
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1185,9 +1185,9 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     std::string thickness;
                     std::string bsdfXML;
                     for (int k=0;k<first.primitives().size();k++){
-                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=first.primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                        if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]){
+                            thickness=first.primitives()[k]->getArg1(0);
+                            bsdfXML=first.primitives()[k]->getArg1(1);
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1249,9 +1249,9 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             std::string thickness;
             std::string bsdfXML;
             for (int k=0;k<first.primitives().size();k++){
-                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=first.primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]){
+                    thickness=first.primitives()[k]->getArg1(0);
+                    bsdfXML=first.primitives()[k]->getArg1(1);
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1286,9 +1286,9 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     std::string thickness;
                     std::string bsdfXML;
                     for (int k=0;k<first.primitives().size();k++){
-                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=first.primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                        if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]){
+                            thickness=first.primitives()[k]->getArg1(0);
+                            bsdfXML=first.primitives()[k]->getArg1(1);
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1342,9 +1342,9 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             std::string thickness;
             std::string bsdfXML;
             for (int k=0;k<first.primitives().size();k++){
-                if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-                    thickness=first.primitives()[k]->getArg1(0).toStdString();
-                    bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]){
+                    thickness=first.primitives()[k]->getArg1(0);
+                    bsdfXML=first.primitives()[k]->getArg1(1);
                 }
             }
             std::string wgBaseFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+"_std.rad";
@@ -1378,9 +1378,9 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     std::string thickness;
                     std::string bsdfXML;
                     for (int k=0;k<first.primitives().size();k++){
-                        if (first.primitives()[k]->name()==QString().fromStdString(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                            thickness=first.primitives()[k]->getArg1(0).toStdString();
-                            bsdfXML=first.primitives()[k]->getArg1(1).toStdString();
+                        if (first.primitives()[k]->name()==model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]){
+                            thickness=first.primitives()[k]->getArg1(0);
+                            bsdfXML=first.primitives()[k]->getArg1(1);
                         }
                     }
                     std::string wgSettingFileBSDFStd=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+"_std.rad";

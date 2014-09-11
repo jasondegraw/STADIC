@@ -13,7 +13,7 @@ public:
     PlasticMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
@@ -26,8 +26,8 @@ public:
     double specularity() const;
     double roughness() const;
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 //METAL
 class STADIC_API MetalMaterial : public RadPrimitive
@@ -37,7 +37,7 @@ public:
     MetalMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
@@ -50,8 +50,8 @@ public:
     double specularity() const;
     double roughness() const;
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 //TRANS
 class STADIC_API TransMaterial : public RadPrimitive
@@ -61,7 +61,7 @@ public:
     TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec);
 
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
@@ -81,8 +81,8 @@ public:
     double transSpecular() const;
 
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 //GLASS
 class STADIC_API GlassMaterial : public RadPrimitive
@@ -92,7 +92,7 @@ public:
     GlassMaterial(double redTrans, double greenTrans, double blueTrans);
     GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac);
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setRedTrans(double value);
     bool setGreenTrans(double value);
     bool setBlueTrans(double value);
@@ -105,32 +105,32 @@ public:
     double refraction() const;
 
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 //BSDF
 class STADIC_API BSDFMaterial : public RadPrimitive
 {
 public:
     BSDFMaterial();
-    BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz);
+    BSDFMaterial(double thickness, std::string BSDFfile, double ux, double uy, double uz);
 
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setThickness(double value);
-    bool setBSDFfile(QString name);
+    bool setBSDFfile(std::string name);
     bool setUX(double value);
     bool setUY(double value);
     bool setUZ(double value);
     // Getters
     double thickness() const;
-    QString bsdfFile() const;
+    std::string bsdfFile() const;
     double ux() const;
     double uy() const;
     double uz() const;
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 }
 #endif // MATERIALPRIMITIVES_H

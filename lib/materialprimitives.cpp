@@ -5,124 +5,134 @@ namespace stadic{
 PlasticMaterial::PlasticMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
-    std::vector<QString> arg3 = {"0","0","0","0","0"};
+    std::vector<std::string> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
 PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough) : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
-    setArg(3,QString().sprintf("%g",red),0);
-    setArg(3,QString().sprintf("%g",green),1);
-    setArg(3,QString().sprintf("%g",blue),2);
-    setArg(3,QString().sprintf("%g",spec),3);
-    setArg(3,QString().sprintf("%g",rough),4);
+    setArg(3,std::to_string(red),0);
+    setArg(3,std::to_string(green),1);
+    setArg(3,std::to_string(blue),2);
+    setArg(3,std::to_string(spec),3);
+    setArg(3,std::to_string(rough),4);
 }
 
 // Setters
 bool PlasticMaterial::setRed(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),0);
+    return setArg(3,std::to_string(value),0);
 }
 
 bool PlasticMaterial::setGreen(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),1);
+    return setArg(3,std::to_string(value),1);
 }
 
 bool PlasticMaterial::setBlue(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),2);
+    return setArg(3,std::to_string(value),2);
 }
 
 bool PlasticMaterial::setSpecularity(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),3);
+    return setArg(3,std::to_string(value),3);
 }
 
 bool PlasticMaterial::setRoughness(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),4);
+    return setArg(3,std::to_string(value),4);
 }
 
 // Getters
 double PlasticMaterial::red() const
 {
-    bool ok;
-    double value = getArg3(0).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(0).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double PlasticMaterial::green() const
 {
-    bool ok;
-    double value = getArg3(1).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(1).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double PlasticMaterial::blue() const
 {
-    bool ok;
-    double value = getArg3(2).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(2).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double PlasticMaterial::specularity() const
 {
-    bool ok;
-    double value = getArg3(3).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(3).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double PlasticMaterial::roughness() const
 {
-    bool ok;
-    double value = getArg3(4).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(4).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-bool PlasticMaterial::validateArg(int number, QString value, int position) const
+bool PlasticMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = value.toDouble(&ok);
+        //bool ok;
+        double dval = atof(value.c_str());
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a plastic must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 && dval <=0.07){
+                if (/*ok && */dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07&&dval<1){
                     WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
@@ -134,7 +144,7 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 && dval <=0.02){
+                if (/*ok && */dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a plastic cannot be less than 0.");
@@ -150,16 +160,16 @@ bool PlasticMaterial::validateArg(int number, QString value, int position) const
     return false;
 }
 
-bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
+bool PlasticMaterial::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
         if(arg.size() != 5) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            if(/*ok && */dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -172,7 +182,7 @@ bool PlasticMaterial::validateArg(int number, std::vector<QString> arg) const
 MetalMaterial::MetalMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("metal");
-    std::vector<QString> arg3 = {"0","0","0","0","0"};
+    std::vector<std::string> arg3 = {"0","0","0","0","0"};
     initArg(3,arg3);
 }
 
@@ -180,117 +190,127 @@ MetalMaterial::MetalMaterial(double red, double green, double blue, double spec,
     : RadPrimitive()
 {
     RadPrimitive::setType("metal");
-    setArg(3,QString().sprintf("%g",red),0);
-    setArg(3,QString().sprintf("%g",green),1);
-    setArg(3,QString().sprintf("%g",blue),2);
-    setArg(3,QString().sprintf("%g",spec),3);
-    setArg(3,QString().sprintf("%g",rough),4);
+    setArg(3,std::to_string(red),0);
+    setArg(3,std::to_string(green),1);
+    setArg(3,std::to_string(blue),2);
+    setArg(3,std::to_string(spec),3);
+    setArg(3,std::to_string(rough),4);
 }
 
 // Setters
 bool MetalMaterial::setRed(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),0);
+    return setArg(3,std::to_string(value),0);
 }
 
 bool MetalMaterial::setGreen(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),1);
+    return setArg(3,std::to_string(value),1);
 }
 
 bool MetalMaterial::setBlue(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),2);
+    return setArg(3,std::to_string(value),2);
 }
 
 bool MetalMaterial::setSpecularity(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),3);
+    return setArg(3,std::to_string(value),3);
 }
 
 bool MetalMaterial::setRoughness(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),4);
+    return setArg(3,std::to_string(value),4);
 }
 
 // Getters
 double MetalMaterial::red() const
 {
-    bool ok;
-    double value = getArg3(0).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(0).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double MetalMaterial::green() const
 {
-    bool ok;
-    double value = getArg3(1).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(1).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double MetalMaterial::blue() const
 {
-    bool ok;
-    double value = getArg3(2).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(2).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double MetalMaterial::specularity() const
 {
-    bool ok;
-    double value = getArg3(3).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(3).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double MetalMaterial::roughness() const
 {
-    bool ok;
-    double value = getArg3(4).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(4).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-bool MetalMaterial::validateArg(int number, QString value, int position) const
+bool MetalMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = value.toDouble(&ok);
+        //bool ok;
+        double dval = atof(value.c_str());
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a metal must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=.5 && dval <=1){
+                if (/*ok && */dval >=.5 && dval <=1){
                     return true;
                 }else if (dval<.5&&dval>=0){
                     WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
@@ -302,7 +322,7 @@ bool MetalMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 && dval <=0.5){
+                if (/*ok && */dval >=0 && dval <=0.5){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a metal cannot be less than 0.");
@@ -318,16 +338,16 @@ bool MetalMaterial::validateArg(int number, QString value, int position) const
     return false;
 }
 
-bool MetalMaterial::validateArg(int number, std::vector<QString> arg) const
+bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
         if(arg.size() != 5) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            if(/*ok && */dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -338,7 +358,7 @@ bool MetalMaterial::validateArg(int number, std::vector<QString> arg) const
 TransMaterial::TransMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("metal");
-    std::vector<QString> arg3 = {"0","0","0","0","0","0","0"};
+    std::vector<std::string> arg3 = {"0","0","0","0","0","0","0"};
     initArg(3,arg3);
 }
 
@@ -346,160 +366,174 @@ TransMaterial::TransMaterial(double red, double green, double blue, double spec,
     : RadPrimitive()
 {
     RadPrimitive::setType("metal");
-    setArg(3,QString().sprintf("%g",red),0);
-    setArg(3,QString().sprintf("%g",green),1);
-    setArg(3,QString().sprintf("%g",blue),2);
-    setArg(3,QString().sprintf("%g",spec),3);
-    setArg(3,QString().sprintf("%g",rough),4);
-    setArg(3,QString().sprintf("%g",trans),5);
-    setArg(3,QString().sprintf("%g",transpec),6);
+    setArg(3,std::to_string(red),0);
+    setArg(3,std::to_string(green),1);
+    setArg(3,std::to_string(blue),2);
+    setArg(3,std::to_string(spec),3);
+    setArg(3,std::to_string(rough),4);
+    setArg(3,std::to_string(trans),5);
+    setArg(3,std::to_string(transpec),6);
 
 }
 
 // Setters
 bool TransMaterial::setRed(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),0);
+    return setArg(3,std::to_string(value),0);
 }
 
 bool TransMaterial::setGreen(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),1);
+    return setArg(3,std::to_string(value),1);
 }
 
 bool TransMaterial::setBlue(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),2);
+    return setArg(3,std::to_string(value),2);
 }
 
 bool TransMaterial::setSpecularity(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),3);
+    return setArg(3,std::to_string(value),3);
 }
 
 bool TransMaterial::setRoughness(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),4);
+    return setArg(3,std::to_string(value),4);
 }
 
 bool TransMaterial::setTransmission(double value)
 {
     //This needs to convert transmission into transmissivity
-    return setArg(3,QString().sprintf("%g",value),5);
+    return setArg(3,std::to_string(value),5);
 }
 
 bool TransMaterial::setTransmissivity(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),5);
+    return setArg(3,std::to_string(value),5);
 }
 
 bool TransMaterial::setTransSpecular(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),6);
+    return setArg(3,std::to_string(value),6);
 }
 
 // Getters
 double TransMaterial::red() const
 {
-    bool ok;
-    double value = getArg3(0).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(0).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::green() const
 {
-    bool ok;
-    double value = getArg3(1).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(1).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::blue() const
 {
-    bool ok;
-    double value = getArg3(2).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(2).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::specularity() const
 {
-    bool ok;
-    double value = getArg3(3).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(3).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::roughness() const
 {
-    bool ok;
-    double value = getArg3(4).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(4).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::transmissivity() const
 {
-    bool ok;
-    double value = getArg3(5).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(5).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double TransMaterial::transSpecular() const
 {
-    bool ok;
-    double value = getArg3(6).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(6).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-bool TransMaterial::validateArg(int number, QString value, int position) const
+bool TransMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = value.toDouble(&ok);
+        //bool ok;
+        double dval = atof(value.c_str());
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B values for a trans must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 && dval <=0.07){
+                if (/*ok && */dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07 && dval<1){
                     WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
@@ -511,7 +545,7 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 4:
-                if (ok && dval >=0 && dval <=0.02){
+                if (/*ok && */dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     ERROR("The roughness for a trans cannot be less than 0.");
@@ -523,14 +557,14 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
                 }
                 break;
             case 5:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The transmissivity value for a trans must be between 0 and 1.");
                 }
                 break;
             case 6:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
@@ -541,16 +575,16 @@ bool TransMaterial::validateArg(int number, QString value, int position) const
     return false;
 }
 
-bool TransMaterial::validateArg(int number, std::vector<QString> arg) const
+bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
         if(arg.size() != 7) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            if(/*ok &&*/ dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -561,7 +595,7 @@ bool TransMaterial::validateArg(int number, std::vector<QString> arg) const
 GlassMaterial::GlassMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    std::vector<QString> arg3 = {"0","0","0"};
+    std::vector<std::string> arg3 = {"0","0","0"};
     initArg(3,arg3);
 }
 
@@ -569,108 +603,116 @@ GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTran
     : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    setArg(3,QString().sprintf("%g",redTrans),0);
-    setArg(3,QString().sprintf("%g",greenTrans),1);
-    setArg(3,QString().sprintf("%g",blueTrans),2);
+    setArg(3,std::to_string(redTrans),0);
+    setArg(3,std::to_string(greenTrans),1);
+    setArg(3,std::to_string(blueTrans),2);
 }
 
 GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
     : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    setArg(3,QString().sprintf("%g",redTrans),0);
-    setArg(3,QString().sprintf("%g",greenTrans),1);
-    setArg(3,QString().sprintf("%g",blueTrans),2);
-    setArg(3, QString().sprintf("%g", refrac),3);
+    setArg(3,std::to_string(redTrans),0);
+    setArg(3,std::to_string(greenTrans),1);
+    setArg(3,std::to_string(blueTrans),2);
+    setArg(3, std::to_string( refrac),3);
 }
 
 // Setters
 bool GlassMaterial::setRedTrans(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),0);
+    return setArg(3,std::to_string(value),0);
 }
 
 bool GlassMaterial::setGreenTrans(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),1);
+    return setArg(3,std::to_string(value),1);
 }
 
 bool GlassMaterial::setBlueTrans(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),2);
+    return setArg(3,std::to_string(value),2);
 }
 
 bool GlassMaterial::setRefraction(double value)
 {
-    return setArg(3,QString().sprintf("%g",value),3);
+    return setArg(3,std::to_string(value),3);
 }
 
 // Getters
 double GlassMaterial::redTrans() const
 {
-    bool ok;
-    double value = getArg3(0).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(0).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double GlassMaterial::greenTrans() const
 {
-    bool ok;
-    double value = getArg3(1).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(1).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double GlassMaterial::blueTrans() const
 {
-    bool ok;
-    double value = getArg3(2).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(2).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double GlassMaterial::refraction() const
 {
-    bool ok;
-    double value = getArg3(3).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg3(3).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-bool GlassMaterial::validateArg(int number, QString value, int position) const
+bool GlassMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = value.toDouble(&ok);
+        //bool ok;
+        double dval = atof(value.c_str());
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
+                if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (ok && dval >=0 && dval <=5){
+                if (/*ok && */dval >=0 && dval <=5){
                     return true;
                 }else {
                     ERROR("The index of refraction value for glass must be between 0 and 5.");
@@ -681,16 +723,16 @@ bool GlassMaterial::validateArg(int number, QString value, int position) const
     return false;
 }
 
-bool GlassMaterial::validateArg(int number, std::vector<QString> arg) const
+bool GlassMaterial::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
         if(arg.size() != 4 || arg.size() !=3) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            if(/*ok && */dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -701,113 +743,119 @@ bool GlassMaterial::validateArg(int number, std::vector<QString> arg) const
 BSDFMaterial::BSDFMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("BSDF");
-    std::vector<QString> arg1 = {"0","null","0","0","0","."};
+    std::vector<std::string> arg1 = {"0","null","0","0","0","."};
     initArg(1,arg1);
 }
 
-BSDFMaterial::BSDFMaterial(double thickness, QString BSDFfile, double ux, double uy, double uz)
+BSDFMaterial::BSDFMaterial(double thickness, std::string BSDFfile, double ux, double uy, double uz)
     : RadPrimitive()
 {
     RadPrimitive::setType("BSDF");
-    setArg(1,QString().sprintf("%g",thickness),0);
+    setArg(1,std::to_string(thickness),0);
     setArg(1,BSDFfile,1);
-    setArg(1,QString().sprintf("%g",ux),2);
-    setArg(1,QString().sprintf("%g",uy),3);
-    setArg(1,QString().sprintf("%g",uz),4);
+    setArg(1,std::to_string(ux),2);
+    setArg(1,std::to_string(uy),3);
+    setArg(1,std::to_string(uz),4);
     setArg(1,".",5);
 }
 
 // Setters
 bool BSDFMaterial::setThickness(double value)
 {
-    return setArg(1,QString().sprintf("%g",value),0);
+    return setArg(1,std::to_string(value),0);
 }
 
-bool BSDFMaterial::setBSDFfile(QString name)
+bool BSDFMaterial::setBSDFfile(std::string name)
 {
     return setArg(1,name,1);
 }
 
 bool BSDFMaterial::setUX(double value)
 {
-    return setArg(1,QString().sprintf("%g",value),2);
+    return setArg(1,std::to_string(value),2);
 }
 
 bool BSDFMaterial::setUY(double value)
 {
-    return setArg(1,QString().sprintf("%g",value),3);
+    return setArg(1,std::to_string(value),3);
 }
 
 bool BSDFMaterial::setUZ(double value)
 {
-    return setArg(1,QString().sprintf("%g",value),4);
+    return setArg(1,std::to_string(value),4);
 }
 
 // Getters
 double BSDFMaterial::thickness() const
 {
-    bool ok;
-    double value = getArg1(0).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg1(0).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-QString BSDFMaterial::bsdfFile() const
+std::string BSDFMaterial::bsdfFile() const
 {
-
-    QString name = getArg1(1);
-    return name;
+    return getArg1(1);
 }
 
 double BSDFMaterial::ux() const
 {
-    bool ok;
-    double value = getArg1(2).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg1(2).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double BSDFMaterial::uy() const
 {
-    bool ok;
-    double value = getArg1(3).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg1(3).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
 double BSDFMaterial::uz() const
 {
-    bool ok;
-    double value = getArg1(4).toDouble(&ok);
+    //bool ok;
+    double value = atof(getArg1(4).c_str());
+    /*
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
+    */
     return value;
 }
 
-bool BSDFMaterial::validateArg(int number, QString value, int position) const
+bool BSDFMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==1) {
-        bool ok;
+        //bool ok;
         double dval = 0;
-        if (position!=1){dval=value.toDouble(&ok);}
+        if (position!=1){dval=atof(value.c_str());}
         switch (position){
             case 0:
-                if (ok&&dval>=0){
+                if (/*ok&&*/dval>=0){
                     return true;
                 }
                 break;
@@ -816,25 +864,34 @@ bool BSDFMaterial::validateArg(int number, QString value, int position) const
                 return true;
                 break;
             case 2:
+                return true;
+                /*
                 if(ok) {
                     return true;
                 }else{
                     ERROR("There was an error in the x vector for the BSDF material.");
                 }
+                */
                 break;
             case 3:
+                return true;
+                /*
                 if (ok){
                     return true;
                 }else{
                     ERROR("There was an error in the y vector for the BSDF material.");
                 }
+                */
                 break;
             case 4:
-                if (ok ){
+                return true;
+                /*
+                if (ok){
                     return true;
                 }else{
                     ERROR("There was an error in the z vector for the BSDF material.");
                 }
+                */
                 break;
             case 5:
                 if (value=="."){
@@ -848,16 +905,16 @@ bool BSDFMaterial::validateArg(int number, QString value, int position) const
     return false;
 }
 
-bool BSDFMaterial::validateArg(int number, std::vector<QString> arg) const
+bool BSDFMaterial::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==1) {
         if(arg.size() != 6) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            if(/*ok && */dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }

@@ -5,7 +5,7 @@ TEST(PrimitiveTests, Plastic)
 {
   stadic::PlasticMaterial rad(0.2,0.8,0.1,0.5,0.75);
   EXPECT_EQ(stadic::RadPrimitive::Plastic,rad.type());
-  EXPECT_EQ("plastic",rad.typeString().toStdString());
+  EXPECT_EQ("plastic",rad.typeString());
   // Arg checks
   EXPECT_EQ(0,rad.arg1().size());
   EXPECT_EQ(0,rad.arg2().size());

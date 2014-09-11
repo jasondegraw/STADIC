@@ -11,7 +11,7 @@ public:
     PolygonGeometry(std::vector<double> points);
 
     // Setters
-    bool setType(QString){return false;}
+    bool setType(std::string){return false;}
     bool setPoints(std::vector<double> points);
 
     // Getters
@@ -19,8 +19,8 @@ public:
 
 
 private:
-   virtual bool validateArg(int number, QString value, int position) const;
-   virtual bool validateArg(int number, std::vector<QString> value) const;
+   virtual bool validateArg(int number, std::string value, int position) const;
+   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 
 

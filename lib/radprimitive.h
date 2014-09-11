@@ -4,6 +4,9 @@
 #include <QFile>
 #include <QTextStream>
 #include<array>
+#include <vector>
+#include <string>
+#include <sstream>
 
 #include "stadicapi.h"
 
@@ -24,49 +27,49 @@ public:
     bool isMaterial() const;
 
     //Setters
-    void setModifier(QString modifier);
-    virtual bool setType(QString type);
-    void setName(QString name);
-    bool setArg1(std::vector<QString> vals);
-    bool setArg1(QString arg, int position);
-    bool setArg2(std::vector<QString> vals);
-    bool setArg2(QString arg, int position);
-    bool setArg3(std::vector<QString> vals);
-    bool setArg3(QString arg, int position);
+    void setModifier(std::string modifier);
+    virtual bool setType(std::string type);
+    void setName(std::string name);
+    bool setArg1(std::vector<std::string> vals);
+    bool setArg1(std::string arg, int position);
+    bool setArg2(std::vector<std::string> vals);
+    bool setArg2(std::string arg, int position);
+    bool setArg3(std::vector<std::string> vals);
+    bool setArg3(std::string arg, int position);
 
-    virtual bool setArg(int number, QString value, int position);
+    virtual bool setArg(int number, std::string value, int position);
 
     //Getters
-    QString modifier() const;
+    std::string modifier() const;
     Type type() const;
-    QString typeString() const;
-    QString name() const;
-    std::vector<QString> arg1() const;
-    std::vector<QString> arg2() const;
-    std::vector<QString> arg3() const;
+    std::string typeString() const;
+    std::string name() const;
+    std::vector<std::string> arg1() const;
+    std::vector<std::string> arg2() const;
+    std::vector<std::string> arg3() const;
 
-    virtual QString getArg1(int position) const;
-    virtual QString getArg2(int position) const;
-    virtual QString getArg3(int position) const;
-    virtual QString getArg(int number, int position) const;
+    virtual std::string getArg1(int position) const;
+    virtual std::string getArg2(int position) const;
+    virtual std::string getArg3(int position) const;
+    virtual std::string getArg(int number, int position) const;
 
-    static RadPrimitive *fromRad(QTextStream &data);
+    static RadPrimitive *fromRad(std::stringstream &data);
 
 protected:
-    void initArg(int number, std::vector<QString> arg);
+    void initArg(int number, std::vector<std::string> arg);
 
 private:
-    virtual bool validateArg(int number, QString value, int position) const {return true;}
-    virtual bool validateArg(int number, std::vector<QString> value) const {return true;}
-    static std::array<QString,51> s_typeStrings;
-    static Type typeFromString(QString string);
+    virtual bool validateArg(int number, std::string value, int position) const {return true;}
+    virtual bool validateArg(int number, std::vector<std::string> value) const {return true;}
+    static std::array<std::string,51> s_typeStrings;
+    static Type typeFromString(std::string string);
 
-    QString m_Modifier;
-    QString m_TypeString;
-    QString m_Name;
-    std::vector<QString> m_Arg1;
-    std::vector<QString> m_Arg2;
-    std::vector<QString> m_Arg3;
+    std::string m_Modifier;
+    std::string m_TypeString;
+    std::string m_Name;
+    std::vector<std::string> m_Arg1;
+    std::vector<std::string> m_Arg2;
+    std::vector<std::string> m_Arg3;
 
 };
 

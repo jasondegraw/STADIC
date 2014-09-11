@@ -78,7 +78,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<m_RadGeo.geometry().size();i++){
         QPolygonF tempPolygon;
         for (int j=0;j<m_RadGeo.geometry()[i]->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(m_RadGeo.geometry()[i]->arg3()[j*3].toDouble(), m_RadGeo.geometry()[i]->arg3()[j*3+1].toDouble()));
+            tempPolygon.append(QPointF(atof(m_RadGeo.geometry()[i]->arg3()[j*3].c_str()), atof(m_RadGeo.geometry()[i]->arg3()[j*3+1].c_str())));
         }
         m_Polygons.push_back(tempPolygon);
     }
@@ -93,7 +93,7 @@ bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
     for (int i=0;i<layers.size();i++){
         bool layerExists=false;
         for (int j=0;j<m_RadGeo.primitives().size();j++){
-            if (QString().fromStdString(layers[i])==m_RadGeo.primitives()[j]->modifier()){
+            if (layers[i]==m_RadGeo.primitives()[j]->modifier()){
                 layerExists=true;
             }
         }
@@ -224,7 +224,7 @@ bool LeakCheck::unitePolygons(){
     for (int i=0;i<m_RadGeo.geometry().size();i++){
         bool properName=false;
         for (int j=0;j<m_FloorLayers.size();j++){
-            if (m_RadGeo.geometry()[i]->modifier()==QString().fromStdString(m_FloorLayers[j])){
+            if (m_RadGeo.geometry()[i]->modifier()==m_FloorLayers[j]){
                 properName=true;
             }
         }

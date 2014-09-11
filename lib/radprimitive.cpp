@@ -3,10 +3,12 @@
 #include "geometryprimitives.h"
 #include "materialprimitives.h"
 #include <iostream>
+#include "functions.h"
+#include <sstream>
 
 namespace stadic {
 
-std::array<QString,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
+std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
                                                       "cylinder", "tube", "ring", "instance", "mesh", "light",
                                                       "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
                                                       "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
@@ -75,26 +77,26 @@ bool RadPrimitive::isMaterial() const
 }
 
 //Setters
-void RadPrimitive::setModifier(QString modifier){
+void RadPrimitive::setModifier(std::string modifier){
     m_Modifier=modifier;
 }
 
-bool RadPrimitive::setType(QString type){
+bool RadPrimitive::setType(std::string type){
     m_TypeString=type;
     return true;
 }
-void RadPrimitive::setName(QString name){
+void RadPrimitive::setName(std::string name){
     m_Name=name;
 }
 
-bool RadPrimitive::setArg1(std::vector<QString> vals){
+bool RadPrimitive::setArg1(std::vector<std::string> vals){
     if(validateArg(1,vals)) {
       m_Arg1=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg1(QString arg, int position) {
+bool RadPrimitive::setArg1(std::string arg, int position) {
     if(position<m_Arg1.size()) {
         if(!validateArg(1,arg,position)) {
             return false;
@@ -104,14 +106,14 @@ bool RadPrimitive::setArg1(QString arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg2(std::vector<QString> vals){
+bool RadPrimitive::setArg2(std::vector<std::string> vals){
     if(validateArg(2,vals)) {
       m_Arg2=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg2(QString arg, int position) {
+bool RadPrimitive::setArg2(std::string arg, int position) {
     if(position<m_Arg2.size()) {
         if(!validateArg(2,arg,position)) {
             return false;
@@ -121,14 +123,14 @@ bool RadPrimitive::setArg2(QString arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg3(std::vector<QString> vals){
+bool RadPrimitive::setArg3(std::vector<std::string> vals){
     if(validateArg(3,vals)) {
       m_Arg3=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg3(QString arg, int position) {
+bool RadPrimitive::setArg3(std::string arg, int position) {
     if(position<m_Arg3.size()) {
         if(!validateArg(3,arg,position)) {
             return false;
@@ -139,9 +141,9 @@ bool RadPrimitive::setArg3(QString arg, int position) {
     return false;
 }
 
-bool RadPrimitive::setArg(int number, QString value, int position)
+bool RadPrimitive::setArg(int number, std::string value, int position)
 {
-    std::vector<QString> *arg;
+    std::vector<std::string> *arg;
     switch(number) {
     case 1:
         arg = &m_Arg1;
@@ -169,52 +171,54 @@ bool RadPrimitive::setArg(int number, QString value, int position)
 }
 
 //Getters
-QString RadPrimitive::modifier() const {
+std::string RadPrimitive::modifier() const {
     return m_Modifier;
 }
 RadPrimitive::Type RadPrimitive::type() const{
     return typeFromString(m_TypeString);
 }
-QString RadPrimitive::typeString() const {
+std::string RadPrimitive::typeString() const {
     return m_TypeString;
 }
-QString RadPrimitive::name() const {
+std::string RadPrimitive::name() const {
     return m_Name;
 }
-std::vector<QString> RadPrimitive::arg1() const {
+std::vector<std::string> RadPrimitive::arg1() const {
     return m_Arg1;
 }
-std::vector<QString> RadPrimitive::arg2() const {
+std::vector<std::string> RadPrimitive::arg2() const {
     return m_Arg2;
 }
-std::vector<QString> RadPrimitive::arg3() const{
+std::vector<std::string> RadPrimitive::arg3() const{
     return m_Arg3;
 }
 
-static QString nextNonComment(QTextStream &data)
+static std::string nextNonComment(std::stringstream &data)
 {
-  QString string;
-  while(!data.atEnd()) {
-    string = data.readLine().trimmed();
+  std::string string;
+  while(!data.eof()) {
+    std::getline(data,string);
+    string = trim(string);
     //std::cout << "### " << string.toStdString() << std::endl;
-    if(!string.isEmpty()) {
-      if(!string.startsWith('#')) {
-        return string;
-      }
+    if(!string.empty()) {
+        if(string.find('#')==string.npos){
+            return string;
+        }
     }
   }
-  return QString();
+  std::string empty;
+  return empty;
 }
 
-RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
+RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
 {
     RadPrimitive *rad;
 
-    QString string = nextNonComment(data);
-    if(string.isEmpty()) {
+    std::string string = nextNonComment(data);
+    if (string.empty()){
         return nullptr;
     }
-    QStringList list = string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
+    std::vector<std::string> list =trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
     if(list.size() != 3) {
         return nullptr;
     }
@@ -239,9 +243,9 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
 
     int nargs;
     data>>string;   //Reads number of arguments from first line
-    nargs = string.toInt();
+    nargs = atoi(string.c_str());
     if (nargs>0){
-        std::vector<QString> args;
+        std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
@@ -250,9 +254,9 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
     }
 
     data>>string;   //Reads number of arguments from second line
-    nargs = string.toInt();
+    nargs = atoi(string.c_str());
     if (nargs>0){
-        std::vector<QString> args;
+        std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
@@ -261,9 +265,9 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
     }
 
     data>>string;   //Reads number of arguments from third line
-    nargs = string.toInt();
+    nargs = atoi(string.c_str());
     if (nargs>0){
-        std::vector<QString> args;
+        std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
@@ -273,7 +277,7 @@ RadPrimitive* RadPrimitive::fromRad(QTextStream &data)
     return rad;
 }
 
-RadPrimitive::Type RadPrimitive::typeFromString(QString string)
+RadPrimitive::Type RadPrimitive::typeFromString(std::string string)
 {
     for(unsigned i=0;i<s_typeStrings.size();i++) {
         if(s_typeStrings[i] == string) {
@@ -283,33 +287,36 @@ RadPrimitive::Type RadPrimitive::typeFromString(QString string)
     return Unknown;
 }
 
-QString RadPrimitive::getArg1(int position) const
+std::string RadPrimitive::getArg1(int position) const
 {
     if(position<0 || position>=m_Arg1.size()) {
-        return QString();
+        std::string empty;
+        return empty;
     }
     return m_Arg1[position];
 }
 
-QString RadPrimitive::getArg2(int position) const
+std::string RadPrimitive::getArg2(int position) const
 {
     if(position<0 || position>=m_Arg2.size()) {
-        return QString();
+        std::string empty;
+        return empty;
     }
     return m_Arg2[position];
 }
 
-QString RadPrimitive::getArg3(int position) const
+std::string RadPrimitive::getArg3(int position) const
 {
     if(position<0 || position>=m_Arg3.size()) {
-        return QString();
+        std::string empty;
+        return empty;
     }
     return m_Arg3[position];
 }
 
-QString RadPrimitive::getArg(int number, int position) const
+std::string RadPrimitive::getArg(int number, int position) const
 {
-    std::vector<QString> *arg;
+    std::vector<std::string> *arg;
     switch(number) {
     case 1:
         return getArg1(position);
@@ -319,10 +326,11 @@ QString RadPrimitive::getArg(int number, int position) const
         return getArg3(position);
     }
     // Error/warning message?
-    return QString();
+    std::string empty;
+    return empty;
 }
 
-void RadPrimitive::initArg(int number, std::vector<QString> arg)
+void RadPrimitive::initArg(int number, std::vector<std::string> arg)
 {
     switch(number) {
     case 1:

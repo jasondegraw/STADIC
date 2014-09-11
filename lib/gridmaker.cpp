@@ -108,7 +108,7 @@ bool GridMaker::parseRad(std::string file){
     for (int i=0;i<radGeo.geometry().size();i++){
         QPolygonF tempPolygon;
         for (int j=0;j<radGeo.geometry().at(i)->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(radGeo.geometry().at(i)->arg3()[j*3].toDouble(), radGeo.geometry().at(i)->arg3()[j*3+1].toDouble()));
+            tempPolygon.append(QPointF(atof(radGeo.geometry().at(i)->arg3()[j*3].c_str()), atof(radGeo.geometry().at(i)->arg3()[j*3+1].c_str())));
         }
         m_Polygons.push_back(tempPolygon);
     }
@@ -123,7 +123,7 @@ bool GridMaker::makeGrid(std::string file){
     for (int i=0;i<radGeo.geometry().size();i++){
         bool properName=false;
         for (int j=0;j<m_LayerNames.size();j++){
-            if (radGeo.geometry().at(i)->modifier()==QString::fromStdString(m_LayerNames.at(j))){
+            if (radGeo.geometry().at(i)->modifier()==m_LayerNames.at(j)){
                 properName=true;
             }
         }

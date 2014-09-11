@@ -23,10 +23,10 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
   EXPECT_EQ(12, radData.geometry().at(0)->arg3().size());
-  EXPECT_EQ(0, radData.geometry().at(0)->arg3().at(0).toDouble());
-  EXPECT_EQ(240, radData.geometry().at(0)->arg3().at(3).toDouble());
-  EXPECT_EQ(240, radData.geometry().at(0)->arg3().at(6).toDouble());
-  EXPECT_EQ(240, radData.geometry().at(0)->arg3().at(10).toDouble());
+  EXPECT_EQ(0, atof(radData.geometry().at(0)->arg3().at(0).c_str()));
+  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(3).c_str()));
+  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(6).c_str()));
+  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(10).c_str()));
 
   //Testing Last Polygon for contents
   EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifier());
@@ -35,10 +35,10 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg2().size());
   ASSERT_EQ(12, radData.geometry().at(radData.geometry().size()-1)->arg3().size());
-  EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg3().at(0).toDouble());
-  EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg3().at(3).toDouble());
-  EXPECT_EQ(240, radData.geometry().at(radData.geometry().size()-1)->arg3().at(6).toDouble());
-  EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg3().at(10).toDouble());
+  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(0).c_str()));
+  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(3).c_str()));
+  EXPECT_EQ(240, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(6).c_str()));
+  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(10).c_str()));
 
   //Testing first material for contents
   EXPECT_EQ("void", radData.materials().at(0)->modifier());
@@ -47,11 +47,11 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(0)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(0)->arg2().size());
   ASSERT_EQ(5, radData.materials().at(0)->arg3().size());
-  EXPECT_EQ(.5, radData.materials().at(0)->arg3().at(0).toDouble());
-  EXPECT_EQ(.5, radData.materials().at(0)->arg3().at(1).toDouble());
-  EXPECT_EQ(.5, radData.materials().at(0)->arg3().at(2).toDouble());
-  EXPECT_EQ(0, radData.materials().at(0)->arg3().at(3).toDouble());
-  EXPECT_EQ(0, radData.materials().at(0)->arg3().at(4).toDouble());
+  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(0).c_str()));
+  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(1).c_str()));
+  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(2).c_str()));
+  EXPECT_EQ(0, atof(radData.materials().at(0)->arg3().at(3).c_str()));
+  EXPECT_EQ(0, atof(radData.materials().at(0)->arg3().at(4).c_str()));
 
   //Testing second material for contents
   EXPECT_EQ("void", radData.materials().at(1)->modifier());
@@ -60,9 +60,9 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(1)->arg2().size());
   ASSERT_EQ(3, radData.materials().at(1)->arg3().size());
-  EXPECT_EQ(.65, radData.materials().at(1)->arg3().at(0).toDouble());
-  EXPECT_EQ(.65, radData.materials().at(1)->arg3().at(1).toDouble());
-  EXPECT_EQ(.65, radData.materials().at(1)->arg3().at(2).toDouble());
+  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(0).c_str()));
+  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(1).c_str()));
+  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(2).c_str()));
 
   //Testing last material for contents
   EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifier());
@@ -71,11 +71,11 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg2().size());
   ASSERT_EQ(5, radData.materials().at(radData.materials().size()-1)->arg3().size());
-  EXPECT_EQ(.8, radData.materials().at(radData.materials().size()-1)->arg3().at(0).toDouble());
-  EXPECT_EQ(.8, radData.materials().at(radData.materials().size()-1)->arg3().at(1).toDouble());
-  EXPECT_EQ(.8, radData.materials().at(radData.materials().size()-1)->arg3().at(2).toDouble());
-  EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg3().at(3).toDouble());
-  EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg3().at(4).toDouble());
+  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(0).c_str()));
+  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(1).c_str()));
+  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(2).c_str()));
+  EXPECT_EQ(0, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(3).c_str()));
+  EXPECT_EQ(0, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(4).c_str()));
 
   //Test getting primitives by type
   shared_vector<stadic::PlasticMaterial> plastic = radData.getPrimitives<stadic::PlasticMaterial>();
@@ -94,10 +94,13 @@ bool isGlass(stadic::RadPrimitive* primitive)
 {
     return primitive->type() == stadic::RadPrimitive::Glass;
 }
-
-bool nameStartsWith(stadic::RadPrimitive* primitive, const QString &name)
+bool nameStartsWith(stadic::RadPrimitive* primitive, const std::string &name)
 {
-  return primitive->name().startsWith(name);
+    if (primitive->name().compare(0,name.length(),name)==0){
+        return true;
+    }
+    false;
+  //return primitive->name().startsWith(name);
 }
 
 TEST(RadFileTests, SplitRadFile)

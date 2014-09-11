@@ -6,7 +6,7 @@ namespace stadic {
 PolygonGeometry::PolygonGeometry() : RadPrimitive()
 {
     RadPrimitive::setType("polygon");
-    std::vector<QString> arg3 = {};
+    std::vector<std::string> arg3 = {};
     initArg(3,arg3);
 }
 
@@ -14,7 +14,7 @@ PolygonGeometry::PolygonGeometry(std::vector<double> points) : RadPrimitive()
 {
     RadPrimitive::setType("polygon");
     for (int i=0;i<points.size();i++){
-        if (!setArg(3,QString().sprintf("%g",points[i]),i)){
+        if (!setArg(3,std::to_string(points[i]),i)){
             ERROR("The setting of the polygon arguments has failed.");
         }
     }
@@ -24,7 +24,7 @@ PolygonGeometry::PolygonGeometry(std::vector<double> points) : RadPrimitive()
 bool PolygonGeometry::setPoints(std::vector<double> points)
 {
     for (int i=0;i<points.size();i++){
-        if (!setArg(3,QString().sprintf("%g",points[i]),i)){
+        if (!setArg(3,std::to_string(points[i]),i)){
             ERROR("The setting of the polygon arguments has failed.");
             return false;
         }
@@ -36,37 +36,43 @@ bool PolygonGeometry::setPoints(std::vector<double> points)
 std::vector<double> PolygonGeometry::points() const{
     std::vector<double> points;
     for (int i=0;i<arg3().size();i++){
-        points.push_back(QString(arg3()[i]).toDouble());
+        points.push_back(atof(arg3()[i].c_str()));
     }
     return points;
 }
 
 
 //Private
-bool PolygonGeometry::validateArg(int number, QString value, int position) const
+bool PolygonGeometry::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = value.toDouble(&ok);
+        //bool ok;
+        double dval = atof(value.c_str());
+        return true;
+        /*
         if (ok){
             return true;
         }
+        */
     }
     return false;
 }
 
-bool PolygonGeometry::validateArg(int number, std::vector<QString> arg) const
+bool PolygonGeometry::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
         if(arg.size()%3 != 0) {
             return false;
         }
-        for(QString value : arg) {
-            bool ok;
-            double dval = value.toDouble(&ok);
+        for(std::string value : arg) {
+            //bool ok;
+            double dval = atof(value.c_str());
+            return true;
+            /*
             if(ok) {
                 return true;
             }
+            */
         }
     }
     return false;
