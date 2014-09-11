@@ -63,11 +63,12 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
     }
     return QPair<RadFileData*,RadFileData*>(first,second);
 }
+*/
 
-QPair<RadFileData*, RadFileData*> RadFileData::split(const std::vector<QString> &vector)
+QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::split(const std::vector<std::string> &vector)
 {
-    std::vector<RadPrimitive*> in, out;
-    for(RadPrimitive *primitive : m_Primitives) {
+	shared_vector<RadPrimitive> in, out;
+    for(std::shared_ptr<RadPrimitive> primitive : m_Primitives) {
         if(primitive->isMaterial()) {
             if(std::find(vector.begin(),vector.end(),primitive->name()) != vector.end()) {
                 in.push_back(primitive);
@@ -84,18 +85,9 @@ QPair<RadFileData*, RadFileData*> RadFileData::split(const std::vector<QString> 
             out.push_back(primitive);
         }
     }
-    // Account for 0 size vectors
-    RadFileData *first = nullptr;
-    RadFileData *second = nullptr;
-    if (in.size() > 0) {
-        first = new RadFileData(in, this->parent());
-    }
-    if (out.size() > 0) {
-        second = new RadFileData(out, this->parent());
-    }
-    return QPair<RadFileData*,RadFileData*>(first,second);
+    // In this new version, the caller is responsible for checking that the vectors actually contain something
+	return QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
 }
-*/
 
 /*
 static bool checkLayer(RadPrimitive *primitive, const QString &name)

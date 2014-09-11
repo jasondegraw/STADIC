@@ -35,7 +35,8 @@ public:
     // Splitting is officially broken
     //QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
     //template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
-    //QPair<RadFileData *, RadFileData *> split(const std::vector<std::string> &vector);
+	// This one is the one that is most critical, but it needs to be redone
+	QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
 
 private:
     shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING

@@ -30,9 +30,9 @@ std::string FilePath::toString(){
 
 //Utilities
 bool FilePath::isDir(){
-#ifdef __MSVC
+#ifdef _MSVC
 
-#else //POSIC
+#else //POSIX
     struct stat path;
 
     if (stat(m_Path.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
@@ -81,7 +81,7 @@ bool FilePath::isUpdated(){
 }
 
 //Private
-void File::lastMod(){
+void FilePath::lastMod(){
     struct stat path;
     if (isFile()){
         stat(m_Path.c_str(),&path);
