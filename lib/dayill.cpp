@@ -210,8 +210,8 @@ bool DaylightIlluminanceData::addIllFile(std::string fileName){
         vals=split(line,' ');
         std::vector<double> ill;
 
-        for (int i=0;i<vals.size();i++){
-            ill.push_back(atof(vals[i].c_str()));
+        for (int j=0;j<vals.size();j++){
+            ill.push_back(atof(vals[j].c_str()));
         }
         m_data[i].add(ill);
         i++;
