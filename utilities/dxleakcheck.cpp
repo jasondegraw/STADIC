@@ -9,7 +9,6 @@ void usage(){
     std::cout<<"-y val\tSet the y position for the analysis point.  This is a mandatory option."<<std::endl;
     std::cout<<"-z val\tSet the z position for the analysis point.  This is a mandatory option."<<std::endl;
     std::cout<<"-l name\tSet the layer name that will be used to find the polygons for use in testint the analysis point location.  Multiple layer names can be added with each preceded by a  \"-l\".  This is a mandatory option."<<std::endl;
-    std::cout<<"-d path\tSet the working directory location.  This is a mandatory option"<<std::endl;
     std::cout<<"-r val\tSet the reflectance value to use for the analysis.  This can either be 0 or 1."<<std::endl;
 
 }
@@ -27,8 +26,6 @@ int main (int argc, char *argv[])
     double yPt;                             //  Variable holding the y coordinate of the test point
     double zPt;                             //  Variable holding the z coordinate of the test point
     double reflectance=1;                   //  Variable holding the reflectance
-    std::string wDirectory;                     //  Variable holding the working directory for the creation of files
-    wDirectory.clear();
 
 
     for (int i=1;i<argc;i++){
@@ -47,9 +44,6 @@ int main (int argc, char *argv[])
         }else if(argv[i]=="-l"){
             i++;
             floorLayers.push_back(argv[i]);
-        }else if(argv[i]=="-d"){
-            i++;
-            wDirectory=argv[i];
         }else if(argv[i]=="-r"){
             i++;
             reflectance=atof(argv[i]);
@@ -64,10 +58,6 @@ int main (int argc, char *argv[])
     }
     if (floorLayers.empty()){
         ERROR(std::string("At least one floor layer name must be specified.\n\tSpecify with \"-t\"."));
-        return EXIT_FAILURE;
-    }
-    if (wDirectory.empty()){
-        ERROR(std::string("The name of the directory where the temporary files should be placed must be specified.\n\tSpecify with \"-D\"."));
         return EXIT_FAILURE;
     }
     //Instantiate GridMaker Object
@@ -88,9 +78,6 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
     }
     if(!leakChecker.setReflectance(reflectance)){
-        return EXIT_FAILURE;
-    }
-    if(!leakChecker.setWorkingDirectory(wDirectory)){
         return EXIT_FAILURE;
     }
     leakChecker.isEnclosed();

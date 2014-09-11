@@ -4,13 +4,12 @@
 #include <QObject>
 #include <QPolygonF>
 #include <QPointF>
-#include <QDir>
-#include <QProcess>
 #include <vector>
 #include <string>
 #include "stadicapi.h"
 #include "radfiledata.h"
 #include "radprimitive.h"
+
 
 namespace stadic{
 
@@ -30,7 +29,6 @@ public:
     bool setZ(double z);
     bool setPoint(std::vector<double> point);
     bool setReflectance(int ref);
-    bool setWorkingDirectory(std::string wDir);
 
 private:
     std::vector<std::string> m_RadFiles;
@@ -40,9 +38,6 @@ private:
     std::vector<QPolygonF> m_Polygons;
     QPolygonF m_UnitedPolygon;
     double m_Reflectance;
-    QDir m_Dir;
-    QProcess *m_Process;
-    QProcess *m_Process2;
 
     bool unitePolygons();
     bool checkPoint();

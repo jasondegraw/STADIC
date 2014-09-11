@@ -1,7 +1,8 @@
 #include "leakcheck.h"
-#include <QFile>
 #include "logging.h"
 #include <iostream>
+#include <fstream>
+#include "objects.h"
 
 namespace stadic{
 
@@ -33,24 +34,22 @@ bool LeakCheck::isEnclosed(){
     if (!runCalc()){
         return false;
     }
-
-    QFile iFile;
-    iFile.setFileName("Final.res");
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.isOpen()){
+    std::ifstream iFile;
+    iFile.open("Final.res");
+    if (!iFile.is_open()){
         ERROR("The opening of the results file failed.");
         return false;
     }
-    if (iFile.atEnd()){
+    std::string val;
+    if (!getline(iFile,val)){
         ERROR("The results file is empty.");
         return false;
     }
-    QString val1=iFile.readLine();
     iFile.close();
 
-    if (val1.toDouble()>0&&val1.toDouble()<0.5){
+    if (atof(val.c_str())>0&&atof(val.c_str())<0.5){
         WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
-    }else if (val1.toDouble()>=0.5){
+    }else if (atof(val.c_str())>=0.5){
         ERROR("The provided model either contains a leak or the provided point is outside the space.");
         return false;
     }else{
@@ -62,7 +61,7 @@ bool LeakCheck::isEnclosed(){
 //Setters
 bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<files.size();i++){
-        QFile radFile(QString().fromStdString(files[i]));
+        FilePath radFile(files[i]);
         if (!radFile.exists()){
             ERROR("The rad file named "+files[i]+" does not exist.");
             return false;
@@ -129,7 +128,7 @@ bool LeakCheck::setX(double x){
     }
 
     if (x<minX || x>maxX){
-        ERROR("The x coordinate is not within the "+QString().sprintf("%g",minX) +" to "+QString().sprintf("%g",maxX)+".");
+        ERROR("The x coordinate is not within the "+std::to_string(minX) +" to "+std::to_string(maxX)+".");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -218,19 +217,6 @@ bool LeakCheck::setReflectance(int ref){
     return true;
 }
 
-bool LeakCheck::setWorkingDirectory(std::string wDir){
-    QDir tempDir(QString().fromStdString(wDir));
-    if (!tempDir.exists()){
-        ERROR("The working directory that was set does not exist.");
-        return false;
-    }
-    if (!m_Dir.setCurrent(QString().fromStdString(wDir))){
-        ERROR("There was an error when setting the working directory.");
-        return false;
-    }
-    return true;
-}
-
 //Private
 bool LeakCheck::unitePolygons(){
     //unite polygons that are the right layer name
@@ -279,121 +265,118 @@ bool LeakCheck::checkPoint(){
 }
 
 bool LeakCheck::writePTS(){
-    QFile oFile;
-    oFile.setFileName("Test.pts");
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
+    std::ofstream oFile;
+    oFile.open("Test.pts");
+    if (!oFile.is_open()){
         return false;
     }
-    QTextStream out(&oFile);
-    out<<m_TestPoint[0]<<" "<<m_TestPoint[1]<<" "<<m_TestPoint[2]<<" 0 0 1";
+    oFile<<m_TestPoint[0]<<" "<<m_TestPoint[1]<<" "<<m_TestPoint[2]<<" 0 0 1";
     oFile.close();
 
     return true;
 }
 
 bool LeakCheck::xformModifiers(){
-    QProcess xform;
-    QString programName="xform";
-    xform.setProgram(programName);
-    QStringList arguments;
-    arguments.append("-m");
-    arguments.append("modified");
+    std::vector<std::string> arguments;
+    arguments.push_back("-m");
+    arguments.push_back("modified");
     for (int i=0;i<m_RadFiles.size();i++){
-        arguments.append(QString().fromStdString(m_RadFiles[i]));
+        arguments.push_back(m_RadFiles[i]);
     }
-    xform.setArguments(arguments);
+    std::string programName="xform";
+    Process xform(programName,arguments);
     xform.setStandardOutputFile("Mod.rad");
-    xform.setWorkingDirectory(m_Dir.path());
     xform.start();
 
     //There should be a test in here that if it doesn't finish it returns false
-    xform.waitForFinished();
+    if (!xform.wait()){
+        ERROR("The xform of the modifiers has failed.");
+        return false;
+    }
 
     return true;
 }
 
 bool LeakCheck::writeExtraRad(){
-
-    QFile oFile;
-    oFile.setFileName("Extra.rad");
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
+    std::ofstream oFile;
+    oFile.open("Extra.rad");
+    if (!oFile.is_open()){
         return false;
     }
-    QTextStream out(&oFile);
-    out<<"void glow sky_glow"<<endl;
-    out<<"0"<<endl<<"0"<<endl<<"4 1 1 1 0"<<endl<<endl;
-    out<<"sky_glow source sky"<<endl;
-    out<<"0"<<endl<<"0"<<endl<<"4 0 0 1 180"<<endl<<endl;
+    oFile<<"void glow sky_glow"<<std::endl;
+    oFile<<"0"<<std::endl<<"0"<<std::endl<<"4 1 1 1 0"<<std::endl<<std::endl;
+    oFile<<"sky_glow source sky"<<std::endl;
+    oFile<<"0"<<std::endl<<"0"<<std::endl<<"4 0 0 1 180"<<std::endl<<std::endl;
 
-    out<<"void plastic modified"<<endl;
-    out<<"0"<<endl<<"0"<<endl;
-    out<<"5 "<<m_Reflectance<<" "<<m_Reflectance<<" "<<m_Reflectance<<" 0 0"<<endl;
+    oFile<<"void plastic modified"<<std::endl;
+    oFile<<"0"<<std::endl<<"0"<<std::endl;
+    oFile<<"5 "<<m_Reflectance<<" "<<m_Reflectance<<" "<<m_Reflectance<<" 0 0"<<std::endl;
     oFile.close();
 
     return true;
 }
 
 bool LeakCheck::createOct(){
-    m_Process=new QProcess(this);
-    QString programName="oconv";
-    m_Process->setProgram(programName);
-    QStringList arguments;
-    arguments.append("Extra.rad");
-    arguments.append("Mod.rad");
-    m_Process->setStandardOutputFile("Test.oct");
-    m_Process->setArguments(arguments);
-    m_Process->setWorkingDirectory(m_Dir.path());
-    m_Process->start();
-    m_Process->waitForFinished();
+    std::vector<std::string> arguments;
+    arguments.push_back("Extra.rad");
+    arguments.push_back("Mod.rad");
+    std::string programName="oconv";
+    Process oconv(programName,arguments);
+
+    oconv.setStandardOutputFile("Test.oct");
+    oconv.start();
+    if(!oconv.wait()){
+        ERROR("There was a problem creating the octree.");
+        return false;
+    }
     return true;
 }
 
 bool LeakCheck::runCalc(){
-    m_Process=new QProcess(this);
-    m_Process->setProgram(QString("rtrace"));
-    QStringList arguments;
-    arguments.append("-I");
-    arguments.append("-h");
-    arguments.append("-ab");
+    std::vector<std::string> arguments;
+    arguments.push_back("-I");
+    arguments.push_back("-h");
+    arguments.push_back("-ab");
     if (m_Reflectance<1){
-        arguments.append("0");
+        arguments.push_back("0");
     }else{
-        arguments.append("4");
+        arguments.push_back("4");
     }
-    arguments.append("-ad");
-    arguments.append("5000");
-    arguments.append("-as");
-    arguments.append("3000");
-    arguments.append("-av");
-    arguments.append("0");
-    arguments.append("0");
-    arguments.append("0");
-    arguments.append("-aw");
-    arguments.append("0");
-    arguments.append("-aa");
-    arguments.append("0.15");
-    arguments.append("Test.oct");
-    m_Process->setWorkingDirectory(m_Dir.path());
-    m_Process->setArguments(arguments);
-    m_Process->setStandardInputFile("Test.pts");
+    arguments.push_back("-ad");
+    arguments.push_back("5000");
+    arguments.push_back("-as");
+    arguments.push_back("3000");
+    arguments.push_back("-av");
+    arguments.push_back("0");
+    arguments.push_back("0");
+    arguments.push_back("0");
+    arguments.push_back("-aw");
+    arguments.push_back("0");
+    arguments.push_back("-aa");
+    arguments.push_back("0.15");
+    arguments.push_back("Test.oct");
+    std::string programName="rtrace";
+    Process rtrace(programName,arguments);
+    rtrace.setStandardInputFile("Test.pts");
 
-    m_Process2=new QProcess(this);
-    m_Process2->setProgram(QString("rcalc"));
-    m_Process->setStandardOutputProcess(m_Process2);
-    QStringList arguments2;
+    std::vector<std::string> arguments2;
     arguments2.clear();
-    arguments2.append("-e");
-    arguments2.append("$1=179*($1*0.265+$2*0.670+$3*0.065)");
-    m_Process2->setArguments(arguments2);
-    m_Process2->setWorkingDirectory(m_Dir.path());
-    m_Process2->setStandardOutputFile("Final.res");
-    m_Process->start();
-    m_Process->waitForFinished(-1);
-    m_Process2->start();
-    m_Process2->waitForStarted();
-    m_Process2->waitForFinished();
+    arguments2.push_back("-e");
+    arguments2.push_back("$1=179*($1*0.265+$2*0.670+$3*0.065)");
+    programName="rcalc";
+    Process rcalc(programName,arguments2);
+    rtrace.setStandardOutputProcess(&rcalc);
+    rcalc.setStandardOutputFile("Final.res");
+    rtrace.start();
+    if(!rtrace.wait()){
+        ERROR("The running of rtrace has failed.");
+        return false;
+    }
+    rcalc.start();
+    if(!rcalc.wait()){
+        ERROR("The running of rcalc has failed.");
+        return false;
+    }
     return true;
 }
 
