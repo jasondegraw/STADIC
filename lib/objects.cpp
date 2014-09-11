@@ -1,6 +1,6 @@
 #include "objects.h"
 //#include <sys/types.h>
-#ifdef _MSVC
+#ifdef _MSC_VER
 
 #else
 #include <sys/stat.h>
@@ -30,8 +30,8 @@ std::string FilePath::toString(){
 
 //Utilities
 bool FilePath::isDir(){
-#ifdef _MSVC
-
+#ifdef _MSC_VER
+    return false;
 #else //POSIX
     struct stat path;
 
@@ -43,8 +43,8 @@ bool FilePath::isDir(){
 }
 
 bool FilePath::isFile(){
-#ifdef _MSVC
-
+#ifdef _MSC_VER
+    return false;
 #else //POSIX
     struct stat path;
 
@@ -65,8 +65,8 @@ bool FilePath::exists(){
 }
 
 bool FilePath::isUpdated(){
-#ifdef _MSVC
-
+#ifdef _MSC_VER
+    return false;
 #else //POSIX
     struct tm* originalMod=m_LastMod;
     lastMod();
@@ -79,11 +79,15 @@ bool FilePath::isUpdated(){
 
 //Private
 void FilePath::lastMod(){
+#ifdef _MSC_VER
+
+#else
     struct stat path;
     if (isFile()){
         stat(m_Path.c_str(),&path);
         m_LastMod=localtime(&path.st_mtime);
     }
+#endif
 }
 
 //*************************
