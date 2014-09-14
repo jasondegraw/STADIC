@@ -1,7 +1,4 @@
 #include "objects.h"
-//#include <sys/types.h>
-
-
 #include "logging.h"
 
 #ifdef _MSC_VER
@@ -9,8 +6,6 @@
 #else
 #include <sys/stat.h>
 #endif
-
-#include <iostream>
 
 namespace stadic{
 //*************************
@@ -84,16 +79,21 @@ bool FilePath::exists(){
     if (isDir()){
         return true;
     }
-    if (isFile()){
-        return true;
-    }
+    return isFile();
     return false;
 }
 
 bool FilePath::isUpdated(){
 #ifdef _MSC_VER
+    FILETIME lastTime = m_fileAttr->ftLastWriteTime;
+    if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr)) {
+        return CompareFileTime(&(m_fileAttr->ftLastWriteTime), &lastTime) > 0;
+    }
     return false;
 #else //POSIX
+    if(isDir()) {
+        return false;
+    }
     struct tm* originalMod=m_LastMod;
     lastMod();
     if (difftime(mktime(m_LastMod),mktime(originalMod))>0){
@@ -106,7 +106,7 @@ bool FilePath::isUpdated(){
 //Private
 void FilePath::lastMod(){
 #ifdef _MSC_VER
-
+    // On Windows, this function is not needed.
 #else
     struct stat path;
     if (isFile()){
@@ -134,9 +134,6 @@ void Process::start()
 {
     m_process.start();
 }
-
-
-
 
 bool Process::wait()
 {

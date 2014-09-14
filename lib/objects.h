@@ -19,6 +19,7 @@ using shared_vector = std::vector<std::shared_ptr<T> >;
 #ifdef _MSC_VER
 //struct WIN32_FILE_ATTRIBUTE_DATA;
 typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;
+//typedef struct _FILETIME FILETIME, *PFILETIME;
 #endif
 
 namespace stadic{
@@ -64,10 +65,10 @@ public:
 
 
 private:
-  std::string m_Path;
+    std::string m_Path;
 #ifdef _MSC_VER
-    //std::unique_ptr<WIN32_FILE_ATTRIBUTE_DATA> m_fileAttr;
-    WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;
+    // This may be too much data - maybe just store a FILETIME?
+    WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;  // Use a pointer to avoid including Windows.h here
 #else
     struct tm *m_LastMod;
 #endif
