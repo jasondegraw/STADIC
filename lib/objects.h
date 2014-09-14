@@ -4,7 +4,6 @@
 #include <time.h>
 #include "stadicapi.h"
 
-
 #include <memory>
 #include <vector>
 #include <QProcess>
@@ -16,6 +15,11 @@
 // at a define or some other horrifying construct
 template<typename T>
 using shared_vector = std::vector<std::shared_ptr<T> >;
+
+#ifdef _MSC_VER
+//struct WIN32_FILE_ATTRIBUTE_DATA;
+typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;
+#endif
 
 namespace stadic{
 
@@ -45,6 +49,7 @@ class STADIC_API FilePath
 {
 public:
     FilePath(std::string path);
+    ~FilePath();
 
     //Setters
 
@@ -59,8 +64,13 @@ public:
 
 
 private:
-    std::string m_Path;
+  std::string m_Path;
+#ifdef _MSC_VER
+    //std::unique_ptr<WIN32_FILE_ATTRIBUTE_DATA> m_fileAttr;
+    WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;
+#else
     struct tm *m_LastMod;
+#endif
     void lastMod();
 
 };

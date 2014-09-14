@@ -1,12 +1,15 @@
 #include "objects.h"
 //#include <sys/types.h>
-#ifdef _MSC_VER
 
+
+#include "logging.h"
+
+#ifdef _MSC_VER
+#include <Windows.h>
 #else
 #include <sys/stat.h>
 #endif
 
-#include "logging.h"
 #include <iostream>
 
 namespace stadic{
@@ -16,12 +19,22 @@ namespace stadic{
 FilePath::FilePath(std::string path)
 {
     m_Path=path;
+#ifdef _MSC_VER
+    m_fileAttr = new WIN32_FILE_ATTRIBUTE_DATA;
+    GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr);
+#else
     if (isFile()){
         lastMod();
     }
+#endif
 }
-//Setters
 
+FilePath::~FilePath()
+{
+#ifdef _MSC_VER
+    delete m_fileAttr;
+#endif
+}
 
 //Getters
 std::string FilePath::toString(){
@@ -31,6 +44,14 @@ std::string FilePath::toString(){
 //Utilities
 bool FilePath::isDir(){
 #ifdef _MSC_VER
+    //WIN32_FILE_ATTRIBUTE_DATA fileAttr;
+    //if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, &fileAttr)) {
+    //    return fileAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+    //}
+    DWORD result = GetFileAttributes(m_Path.c_str());
+    if(result != INVALID_FILE_ATTRIBUTES) {
+        return result & FILE_ATTRIBUTE_DIRECTORY;
+    }
     return false;
 #else //POSIX
     struct stat path;
@@ -44,6 +65,10 @@ bool FilePath::isDir(){
 
 bool FilePath::isFile(){
 #ifdef _MSC_VER
+    DWORD result = GetFileAttributes(m_Path.c_str());
+    if(result != INVALID_FILE_ATTRIBUTES) {
+      return !(result & FILE_ATTRIBUTE_DIRECTORY);
+    }
     return false;
 #else //POSIX
     struct stat path;
@@ -54,6 +79,7 @@ bool FilePath::isFile(){
     return false;
 #endif
 }
+
 bool FilePath::exists(){
     if (isDir()){
         return true;
