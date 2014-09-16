@@ -1,7 +1,10 @@
 #include "objects.h"
+#include "functions.h"
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
+//#include <sstream>
+//#include <iostream>
 
 TEST(ObjectsTests, FilePathDirectory)
 {
@@ -56,4 +59,19 @@ TEST(ObjectsTests, FilePathFile)
     EXPECT_TRUE(file.isFile());
     EXPECT_TRUE(file.isUpdated());
 
+}
+
+#ifdef _WIN32
+#define PROGRAM "testprogram"
+#else
+#define PROGRAM "./testprogram"
+#endif
+TEST(ObjectsTests, ProcessCaptureOutErr)
+{
+    std::stringstream stream;
+    stadic::Process proc(PROGRAM);
+    proc.start();
+    proc.wait();
+    EXPECT_EQ("This is the standard output", stadic::trim(proc.output()));
+    EXPECT_EQ("This is the standard error", stadic::trim(proc.error()));
 }

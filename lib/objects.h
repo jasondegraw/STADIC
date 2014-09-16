@@ -9,6 +9,8 @@
 #include <QProcess>
 #include <QStringList>
 
+#include <boost/process.hpp>
+
 #include "stadicapi.h"
 
 // This is a C++11 thing - if we can't use this then we're looking
@@ -28,6 +30,7 @@ namespace stadic{
 class STADIC_API Process
 {
 public:
+    Process(std::string program);
     Process(std::string program, std::vector<std::string> args);
 
     void start();

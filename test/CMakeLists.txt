@@ -55,6 +55,8 @@ add_executable(objectstests objectstests.cpp)
 add_test(objectstests objectstests)
 target_link_libraries(objectstests stadic_core gtest gtest_main)
 
+add_executable(testprogram testprogram.cpp)
+
 set(RESOURCES resources/SimpleHole.rad
 			  resources/standard/SimpleStd.json
 			  resources/standard/data/Lancaster.wea

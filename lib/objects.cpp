@@ -119,6 +119,11 @@ void FilePath::lastMod(){
 //*************************
 //Process
 //*************************
+Process::Process(std::string program)
+{
+    m_process.setProgram(QString::fromStdString(program));
+}
+
 Process::Process(std::string program, std::vector<std::string> args)
 {
     m_process.setProgram(QString::fromStdString(program));
