@@ -49,6 +49,7 @@ TEST(ObjectsTests, FilePathFile)
 
     EXPECT_TRUE(file.exists());
     EXPECT_TRUE(file.isFile());
+    EXPECT_FALSE(file.isDir());
     EXPECT_FALSE(file.isUpdated());
 
     std::ofstream reWrite(testString);
@@ -57,6 +58,7 @@ TEST(ObjectsTests, FilePathFile)
 
     EXPECT_TRUE(file.exists());
     EXPECT_TRUE(file.isFile());
+    EXPECT_FALSE(file.isDir());
     EXPECT_TRUE(file.isUpdated());
 
 }
