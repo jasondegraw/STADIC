@@ -15,7 +15,7 @@ PolygonGeometry::PolygonGeometry(std::vector<double> points) : RadPrimitive()
     RadPrimitive::setType("polygon");
     for (int i=0;i<points.size();i++){
         if (!setArg(3,std::to_string(points[i]),i)){
-            ERROR("The setting of the polygon arguments has failed.");
+            STADIC_ERROR("The setting of the polygon arguments has failed.");
         }
     }
 }
@@ -25,7 +25,7 @@ bool PolygonGeometry::setPoints(std::vector<double> points)
 {
     for (int i=0;i<points.size();i++){
         if (!setArg(3,std::to_string(points[i]),i)){
-            ERROR("The setting of the polygon arguments has failed.");
+            STADIC_ERROR("The setting of the polygon arguments has failed.");
             return false;
         }
     }

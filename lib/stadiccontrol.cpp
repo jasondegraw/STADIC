@@ -46,7 +46,7 @@ void Control::setDataFolder(std::string folder){
 //******************
 bool Control::setGroundReflect(double value){
     if (value>1 || value<0){
-        WARNING(std::string("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."));
+        STADIC_WARNING(std::string("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."));
         //std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
         m_GroundReflect=0.2;
     }else{

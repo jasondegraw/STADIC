@@ -44,7 +44,7 @@ bool ElecIll::parseIll(QString fileName){
     iFile.setFileName(fileName);
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.isOpen()){
-        ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
         return false;
     }
     QString line;

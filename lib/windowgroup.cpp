@@ -64,13 +64,13 @@ ShadeControl* WindowGroup::shadeControl()
 bool WindowGroup::parseJson(const QJsonObject &object){
     QJsonValue val=object.value(QString("name"));
     if (val.isUndefined()){
-        ERROR("The key \"name\" within window_groups does not appear in the STADIC Control File.");
+        STADIC_ERROR("The key \"name\" within window_groups does not appear in the STADIC Control File.");
         return false;
     }else{
         if(val.isString()){
             setName(val.toString().toStdString());
         }else{
-            ERROR("The key \"name\" within window_groups is not a string.");
+            STADIC_ERROR("The key \"name\" within window_groups is not a string.");
             return false;
         }
     }
@@ -82,7 +82,7 @@ bool WindowGroup::parseJson(const QJsonObject &object){
         if (val.isBool()){
             setBSDF(val.toBool());
         }else{
-            ERROR("The key \"BSDF\" within window group " + name() + " is not a bool.");
+            STADIC_ERROR("The key \"BSDF\" within window group " + name() + " is not a bool.");
             return false;
         }
     }
@@ -94,7 +94,7 @@ bool WindowGroup::parseJson(const QJsonObject &object){
         if (val.isString()){
             setBaseGeometry(val.toString().toStdString());
         }else{
-            ERROR("The key \"base_geometry\" within window group " + name() + " is not a bool.");
+            STADIC_ERROR("The key \"base_geometry\" within window group " + name() + " is not a bool.");
             return false;
         }
     }
@@ -107,12 +107,12 @@ bool WindowGroup::parseJson(const QJsonObject &object){
                 if (array[i].isString()){
                     m_BSDFBaseLayers.push_back(array[i].toString().toStdString());
                 }else{
-                    ERROR("The key \"bsdf_base_layers\" within window group " + name() + " does not contain a string.");
+                    STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            ERROR("The key \"bsdf_base_layers\" within window group " + name() + " is not an array.");
+            STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " is not an array.");
             return false;
         }
     }
@@ -125,12 +125,12 @@ bool WindowGroup::parseJson(const QJsonObject &object){
                 if (array[i].isString()){
                     m_GlazingLayers.push_back(array[i].toString().toStdString());
                 }else{
-                    ERROR("The key \"glazing_layers\" withinwindow group " + name() + " does not contain a string.");
+                    STADIC_ERROR("The key \"glazing_layers\" withinwindow group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            ERROR("The key \"glazing_layers\" within window group " + name() + " is not an array.");
+            STADIC_ERROR("The key \"glazing_layers\" within window group " + name() + " is not an array.");
             return false;
         }
     }
@@ -142,11 +142,11 @@ bool WindowGroup::parseJson(const QJsonObject &object){
                 return false;
             }
         }else{
-            ERROR("The key \"shade_control\" within window group " + name() + " is not an object.");
+            STADIC_ERROR("The key \"shade_control\" within window group " + name() + " is not an object.");
             return false;
         }
     }else{
-        WARNING("There are no \"shade_controls\" listed for window group " + name());
+        STADIC_WARNING("There are no \"shade_controls\" listed for window group " + name());
     }
 
     val=object.value(QString("shade_settings"));
@@ -157,16 +157,16 @@ bool WindowGroup::parseJson(const QJsonObject &object){
                 if (array[i].isString()){
                     m_ShadeSettingGeometry.push_back(array[i].toString().toStdString());
                 }else{
-                    ERROR("The key \"shade_settings\" within window group " + name() + " does not contain a string.");
+                    STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            ERROR("The key \"shade_settings\" within window group " + name() + " is not an array.");
+            STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " is not an array.");
             return false;
         }
     }else{
-        WARNING("There are no \"shade_settings\" listed for window group " + name());
+        STADIC_WARNING("There are no \"shade_settings\" listed for window group " + name());
     }
 
     val=object.value(QString("bsdf_setting_layers"));
@@ -181,18 +181,18 @@ bool WindowGroup::parseJson(const QJsonObject &object){
                         if (array[i].isString()){
                             tempVector.push_back(array[i].toString().toStdString());
                         }else{
-                            ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " does not contain a string.");
+                            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " does not contain a string.");
                             return false;
                         }
                     }
                     m_BSDFSettingLayers.push_back(tempVector);
                 }else{
-                    ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
+                    STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
                     return false;
                 }
             }
         }else{
-            ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
+            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
         }
     }
 

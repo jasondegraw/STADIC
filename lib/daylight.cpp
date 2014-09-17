@@ -113,7 +113,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     xform.setStandardOutputFile(blackRad);
     xform.start();
     if (!xform.wait()){
-        ERROR("The xform command failed to convert layers to black.");
+        STADIC_ERROR("The xform command failed to convert layers to black.");
         //DISPLAY ERRORS HERE
         return false;
     }
@@ -167,7 +167,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
         rcalc.start();
 
         if(!rcalc.wait()){
-            ERROR("The running of rcalc for the suns has failed.");
+            STADIC_ERROR("The running of rcalc for the suns has failed.");
             //I want to display the errors here if the standard error has any errors to show.
             return false;
         }
@@ -217,7 +217,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 
     rcontrib.start();
     if (!rcontrib.wait()){
-        ERROR("The rcontrib run for the 3-phase vmx has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the 3-phase vmx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -260,7 +260,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     perl.start();
     rcontrib2.start();
     if (!rcontrib2.wait()){
-        ERROR("The rcontrib run for the 3-phase dmx has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the 3-phase dmx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -284,7 +284,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     gendaymtx.setStandardOutputFile(smx);
     gendaymtx.start();
     if (!gendaymtx.wait()){
-        ERROR("The gendaymtx run for the smx has failed with the following errors.");        //I want to display the errors here if the standard error has any errors to show.
+        STADIC_ERROR("The gendaymtx run for the smx has failed with the following errors.");        //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
 
@@ -323,7 +323,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     perl2.start();
     rcontrib3.start();
     if (!rcontrib3.wait()){
-        ERROR("The rcontrib run for the 3-phase direct dmx has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the 3-phase direct dmx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -357,7 +357,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 
     rcontrib4.start();
     if (!rcontrib4.wait()){
-        ERROR("The rcontrib run for the 3-phase direct vmx has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the 3-phase direct vmx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -377,7 +377,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     gendaymtx2.setStandardOutputFile(dirSMX);
     gendaymtx2.start();
     if (!gendaymtx2.wait()){
-        ERROR("The gendaymtx run for the direct smx has failed with the following errors.");
+        STADIC_ERROR("The gendaymtx run for the direct smx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -398,7 +398,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     gendaymtx3.setStandardOutputFile(dir5PHsmx);
     gendaymtx3.start();
     if (!gendaymtx3.wait()){
-        ERROR("The gendaymtx run for the direct 5 phase smx has failed with the following errors.");
+        STADIC_ERROR("The gendaymtx run for the direct 5 phase smx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -445,7 +445,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 
     rcontrib5.start();
     if (!rcontrib5.wait()){
-        ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         return false;
     }
@@ -478,7 +478,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     rcollate.start();
 
     if(!rcollate.wait()){
-        ERROR("The running of rcollate for the 3-phase has failed.");
+        STADIC_ERROR("The running of rcollate for the 3-phase has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -510,7 +510,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     rcollate2.start();
 
     if(!rcollate2.wait()){
-        ERROR("The running of rcollate for the 3-phase direct has failed.");
+        STADIC_ERROR("The running of rcollate for the 3-phase direct has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -540,7 +540,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     rcollate3.start();
 
     if(!rcollate3.wait()){
-        ERROR("The running of rcollate for the 3-phase has failed.");
+        STADIC_ERROR("The running of rcollate for the 3-phase has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -580,7 +580,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     rcalc.start();
     rcollate4.start();
     if(!rcollate4.wait()){
-        ERROR("The running of rcollate for final illuminance has failed.");
+        STADIC_ERROR("The running of rcollate for final illuminance has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -630,7 +630,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
     rcontrib.start();
     if (!rcontrib.wait()){
-        ERROR("The rcontrib run for the sky has failed with the following errors.");
+        STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -676,7 +676,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcalc.start();
 
         if(!rcalc.wait()){
-            ERROR("The running of rcalc for the suns has failed.");
+            STADIC_ERROR("The running of rcalc for the suns has failed.");
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
@@ -739,7 +739,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
     rcontrib2.start();
     if (!rcontrib2.wait()){
-        ERROR("The sun rcontrib run failed with the following errors.");
+        STADIC_ERROR("The sun rcontrib run failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -765,7 +765,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx.setStandardOutputFile(sunSMX);
     gendaymtx.start();
     if (!gendaymtx.wait()){
-        ERROR("The creation of the suns has failed with the following errors.");
+        STADIC_ERROR("The creation of the suns has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -792,7 +792,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx2.setStandardOutputFile(skySMX);
     gendaymtx2.start();
     if (!gendaymtx2.wait()){
-        ERROR("The creation of the sky has failed with the following errors.");
+        STADIC_ERROR("The creation of the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -816,7 +816,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx3.setStandardOutputFile(sunPatchSMX);
     gendaymtx3.start();
     if (!gendaymtx3.wait()){
-        ERROR("The creation of the sun patches has failed with the following errors.");
+        STADIC_ERROR("The creation of the sun patches has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -850,7 +850,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate.start();
 
     if(!rcollate.wait()){
-        ERROR("The running of rcollate for the sky has failed.");
+        STADIC_ERROR("The running of rcollate for the sky has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -873,7 +873,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate2.start();
 
     if(!rcollate2.wait()){
-        ERROR("The running of rcollate for the sun has failed.");
+        STADIC_ERROR("The running of rcollate for the sun has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -896,7 +896,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     rcollate3.start();
 
     if(!rcollate3.wait()){
-        ERROR("The running of rcollate for the sun patches has failed.");
+        STADIC_ERROR("The running of rcollate for the sun patches has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -1035,7 +1035,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo = settingRad->split(layers);
                     if (splitGeo.first.size() == 0 || splitGeo.second.size() == 0){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
@@ -1054,7 +1054,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     RadFileData second(splitGeo.second);
                     second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                 }
@@ -1119,7 +1119,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
             layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
@@ -1138,7 +1138,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
             RadFileData second(splitGeo.second);
             second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
         }
@@ -1175,7 +1175,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
@@ -1194,7 +1194,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     RadFileData second(splitGeo.second);
                     second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                 }
@@ -1239,7 +1239,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             }
             QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
@@ -1258,7 +1258,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             RadFileData second(splitGeo.second);
             second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
         }
@@ -1276,7 +1276,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
@@ -1295,12 +1295,12 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                     RadFileData second(splitGeo.second);
                     second.writeRadFile(wgSettingFileBSDFStd);
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                 }
             }else{
-                ERROR("Blind Group "+std::to_string(blindGroupNum)+" setting "+std::to_string(i)+ " does not contain a bsdf layer.");
+                STADIC_ERROR("Blind Group "+std::to_string(blindGroupNum)+" setting "+std::to_string(i)+ " does not contain a bsdf layer.");
                 return false;
             }
             delete settingRad;
@@ -1332,7 +1332,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             }
             QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
             std::string wgBaseFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_bsdf"+std::to_string(j+1)+".rad";
@@ -1351,7 +1351,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             RadFileData second(splitGeo.second);
             second.writeRadFile(wgBaseFileBSDFStd);
             if (!simBSDF(blindGroupNum,-1,j,wgBaseFileBSDF,wgBaseFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j],model)){
-                ERROR("The program quit...");
+                STADIC_ERROR("The program quit...");
                 return false;
             }
         }
@@ -1368,7 +1368,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
                     QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                     std::string wgSettingFileBSDF=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_bsdf"+std::to_string(j+1)+".rad";
@@ -1388,7 +1388,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     second.writeRadFile(wgSettingFileBSDFStd);
                     /*  This would be correct, but for time savings we don't have to run the entire calculation so the next steps are taken.
                     if (!simBSDF(blindGroupNum,i,j,wgSettingFileBSDF,wgSettingFileBSDFStd,normal,thickness,bsdfXML,model->windowGroups()[blindGroupNum]->bsdfSettingLayers()[i][j],model)){
-                        ERROR("The program quit...");
+                        STADIC_ERROR("The program quit...");
                         return false;
                     }
                     */
@@ -1405,7 +1405,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     xform.setStandardOutputFile(blackRad);
                     xform.start();
                     if (!xform.wait()){
-                        ERROR("The xform command failed to convert layers to black.");
+                        STADIC_ERROR("The xform command failed to convert layers to black.");
                         //I want to display the errors here if the standard error has any errors to show.
                         return false;
                     }
@@ -1458,7 +1458,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
 
                     rcontrib.start();
                     if (!rcontrib.wait()){
-                        ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
+                        STADIC_ERROR("The rcontrib run for the 5-phase direct smx has failed with the following errors.");
                         //I want to display the errors here if the standard error has any errors to show.
                         return false;
                     }
@@ -1500,7 +1500,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate.start();
 
                     if(!rcollate.wait()){
-                        ERROR("The running of rcollate for the 3-phase has failed.");
+                        STADIC_ERROR("The running of rcollate for the 3-phase has failed.");
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1532,7 +1532,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate2.start();
 
                     if(!rcollate2.wait()){
-                        ERROR("The running of rcollate for the 3-phase direct has failed.");
+                        STADIC_ERROR("The running of rcollate for the 3-phase direct has failed.");
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1562,7 +1562,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcollate3.start();
 
                     if(!rcollate3.wait()){
-                        ERROR("The running of rcollate for the 3-phase has failed.");
+                        STADIC_ERROR("The running of rcollate for the 3-phase has failed.");
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
@@ -1604,14 +1604,14 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     rcalc.start();
                     rcollate4.start();
                     if(!rcollate4.wait()){
-                        ERROR("The running of rcollate for final illuminance has failed.");
+                        STADIC_ERROR("The running of rcollate for final illuminance has failed.");
                         //I want to display the errors here if the standard error has any errors to show.
 
                         return false;
                     }
                 }
             }else{
-                ERROR("Blind Group "+std::to_string(blindGroupNum)+" setting "+std::to_string(i)+ " does not contain a bsdf layer.");
+                STADIC_ERROR("Blind Group "+std::to_string(blindGroupNum)+" setting "+std::to_string(i)+ " does not contain a bsdf layer.");
                 return false;
             }
             delete settingRad;
@@ -1626,7 +1626,7 @@ bool Daylight::uniqueGlazingMaterials(Control *model){
             for (int n=i;n<model->windowGroups().size();n++){
                 for (int m=j+1;m<model->windowGroups()[n].glazingLayers().size();m++){
                     if (model->windowGroups()[i].glazingLayers()[j]==model->windowGroups()[n].glazingLayers()[m]){
-                        ERROR("The calculation cannot be performed because "+model->windowGroups()[i].name()
+                        STADIC_ERROR("The calculation cannot be performed because "+model->windowGroups()[i].name()
                             +"\n\tcontains the same glazing layer as "+model->windowGroups()[n].name()+".");
                         return false;
                     }
@@ -1692,7 +1692,7 @@ bool Daylight::testSimCase(Control *model){
                         std::ifstream iFile;
                         iFile.open(model->projectFolder()+model->windowGroups()[i].shadeSettingGeometry()[j]);
                         if (!iFile.is_open()){
-                            ERROR("The opening of the geometry file " +model->projectFolder()+model->windowGroups()[i].shadeSettingGeometry()[j]+" has failed.");
+                            STADIC_ERROR("The opening of the geometry file " +model->projectFolder()+model->windowGroups()[i].shadeSettingGeometry()[j]+" has failed.");
                             return false;
                         }
                         std::getline(iFile,tempString);
@@ -1730,7 +1730,7 @@ bool Daylight::setSimCase(int setting, int simCase){
     if (setting>(m_SimCase.size()-1)){
         m_SimCase.reserve(setting+1);
     }else if (setting<0){
-        ERROR("The setting of the simulation case failed.");
+        STADIC_ERROR("The setting of the simulation case failed.");
         return false;
     }
     m_SimCase.at(setting)=simCase;
@@ -1742,7 +1742,7 @@ bool Daylight::writeSky(Control *model){
     std::string tmpFile=model->projectFolder()+model->tmpFolder()+"sky_white1.rad";
     oFile.open(tmpFile);
     if (!oFile.is_open()){
-        ERROR("The opning of the file "+tmpFile +" has failed.");
+        STADIC_ERROR("The opning of the file "+tmpFile +" has failed.");
         return false;
     }
 
@@ -1754,7 +1754,7 @@ bool Daylight::writeSky(Control *model){
     tmpFile=model->projectFolder()+model->tmpFolder()+model->projectName()+"_suns.rad";
     oFile.open(tmpFile);
     if (!oFile.is_open()){
-        ERROR("The opning of the file "+tmpFile +" has failed.");
+        STADIC_ERROR("The opning of the file "+tmpFile +" has failed.");
         return false;
     }
     oFile<<"void light solar 0 0 3 1.00e+06 1.00e+06 1.00e+06";
@@ -1812,7 +1812,7 @@ bool Daylight::createOctree(std::vector<std::string> files, std::string octreeNa
     oconv.start();
 
     if (!oconv.wait()){
-        ERROR("The creation of the octree has failed with the following errors.");
+        STADIC_ERROR("The creation of the octree has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
         return false;
@@ -1853,7 +1853,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     return false;
                 }
             }else{
-                ERROR("The illuminance file "+tempFileName+" does not exist.");
+                STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                 return false;
             }
             if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
@@ -1897,7 +1897,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                     settingIll->writeIllFile(FinalIllFileName);
                 }else{
-                    ERROR("The illuminance file "+tempFileName+" does not exist.");
+                    STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                     return false;
                 }
             }

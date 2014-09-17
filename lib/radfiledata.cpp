@@ -22,7 +22,7 @@ bool RadFileData::addRad(std::string file){
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        ERROR(QString("The opening of the rad file '%1' failed.").arg(QString().fromStdString(file)));
+        STADIC_ERROR(QString("The opening of the rad file '%1' failed.").arg(QString().fromStdString(file)));
         return false;
     }
     std::stringstream data;
@@ -121,7 +121,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
     oFile1.setFileName(removing);
     oFile1.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile1.exists()){
-        ERROR("The opening of the rad file named " + removing +" has failed.");
+        STADIC_ERROR("The opening of the rad file named " + removing +" has failed.");
         return false;
     }
 
@@ -129,7 +129,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
     oFile2.setFileName(rest);
     oFile2.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!oFile2.exists()){
-        ERROR("The opening of the rad file named " + rest +" has failed.");
+        STADIC_ERROR("The opening of the rad file named " + rest +" has failed.");
         return false;
     }
 
@@ -157,7 +157,7 @@ bool RadFileData::writeRadFile(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the rad file named " + file + " has failed.");
+        STADIC_ERROR("The opening of the rad file named " + file + " has failed.");
         return false;
     }
     shared_vector<RadPrimitive> primitives=materials();

@@ -128,31 +128,31 @@ bool PlasticMaterial::validateArg(int number, std::string value, int position) c
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The R G B values for a plastic must be between 0 and 1.");
+                    STADIC_ERROR("The R G B values for a plastic must be between 0 and 1.");
                 }
                 break;
             case 3:
                 if (/*ok && */dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07&&dval<1){
-                    WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
+                    STADIC_WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The specularity value for a plastic cannot be greater than 1.");
+                    STADIC_ERROR("The specularity value for a plastic cannot be greater than 1.");
                 }else if (dval<0){
-                    ERROR("The specularity value for a plastic cannot be less than 0.");
+                    STADIC_ERROR("The specularity value for a plastic cannot be less than 0.");
                 }
                 break;
             case 4:
                 if (/*ok && */dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
-                    ERROR("The roughness for a plastic cannot be less than 0.");
+                    STADIC_ERROR("The roughness for a plastic cannot be less than 0.");
                 }else if (dval>0.02 && dval<1){
-                    WARNING("The roughness value for a plastic is suggested to be 0 and 0.02.");
+                    STADIC_WARNING("The roughness value for a plastic is suggested to be 0 and 0.02.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The roughness for a plastic cannot be greater than 1.");
+                    STADIC_ERROR("The roughness for a plastic cannot be greater than 1.");
                 }
                 break;
         }
@@ -306,31 +306,31 @@ bool MetalMaterial::validateArg(int number, std::string value, int position) con
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The R G B values for a metal must be between 0 and 1.");
+                    STADIC_ERROR("The R G B values for a metal must be between 0 and 1.");
                 }
                 break;
             case 3:
                 if (/*ok && */dval >=.5 && dval <=1){
                     return true;
                 }else if (dval<.5&&dval>=0){
-                    WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
+                    STADIC_WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The specularity value for a metal cannot be greater than 1.");
+                    STADIC_ERROR("The specularity value for a metal cannot be greater than 1.");
                 }else if (dval<0){
-                    ERROR("The specularity value for a metal cannot be less than 0.");
+                    STADIC_ERROR("The specularity value for a metal cannot be less than 0.");
                 }
                 break;
             case 4:
                 if (/*ok && */dval >=0 && dval <=0.5){
                     return true;
                 }else if (dval<0){
-                    ERROR("The roughness for a metal cannot be less than 0.");
+                    STADIC_ERROR("The roughness for a metal cannot be less than 0.");
                 }else if (dval>0.5 && dval<1){
-                    WARNING("The roughness value for a metal is suggested to be 0 and 0.5.");
+                    STADIC_WARNING("The roughness value for a metal is suggested to be 0 and 0.5.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The roughness for a metal cannot be greater than 1.");
+                    STADIC_ERROR("The roughness for a metal cannot be greater than 1.");
                 }
                 break;
         }
@@ -529,45 +529,45 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The R G B values for a trans must be between 0 and 1.");
+                    STADIC_ERROR("The R G B values for a trans must be between 0 and 1.");
                 }
                 break;
             case 3:
                 if (/*ok && */dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07 && dval<1){
-                    WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
+                    STADIC_WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The specularity value for a trans cannot be greater than 1.");
+                    STADIC_ERROR("The specularity value for a trans cannot be greater than 1.");
                 }else if (dval<0){
-                    ERROR("The specularity value for a trans cannot be less than 0.");
+                    STADIC_ERROR("The specularity value for a trans cannot be less than 0.");
                 }
                 break;
             case 4:
                 if (/*ok && */dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
-                    ERROR("The roughness for a trans cannot be less than 0.");
+                    STADIC_ERROR("The roughness for a trans cannot be less than 0.");
                 }else if (dval>0.02 && dval<1){
-                    WARNING("The roughness value for a trans is suggested to be 0 and 0.02.");
+                    STADIC_WARNING("The roughness value for a trans is suggested to be 0 and 0.02.");
                     return true;
                 }else if (dval>1){
-                    ERROR("The roughness for a trans cannot be greater than 1.");
+                    STADIC_ERROR("The roughness for a trans cannot be greater than 1.");
                 }
                 break;
             case 5:
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The transmissivity value for a trans must be between 0 and 1.");
+                    STADIC_ERROR("The transmissivity value for a trans must be between 0 and 1.");
                 }
                 break;
             case 6:
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
+                    STADIC_ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
                 }
                 break;
         }
@@ -708,14 +708,14 @@ bool GlassMaterial::validateArg(int number, std::string value, int position) con
                 if(/*ok && */dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
+                    STADIC_ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
                 }
                 break;
             case 3:
                 if (/*ok && */dval >=0 && dval <=5){
                     return true;
                 }else {
-                    ERROR("The index of refraction value for glass must be between 0 and 5.");
+                    STADIC_ERROR("The index of refraction value for glass must be between 0 and 5.");
                 }
                 break;
         }
@@ -869,7 +869,7 @@ bool BSDFMaterial::validateArg(int number, std::string value, int position) cons
                 if(ok) {
                     return true;
                 }else{
-                    ERROR("There was an error in the x vector for the BSDF material.");
+                    STADIC_ERROR("There was an error in the x vector for the BSDF material.");
                 }
                 */
                 break;
@@ -879,7 +879,7 @@ bool BSDFMaterial::validateArg(int number, std::string value, int position) cons
                 if (ok){
                     return true;
                 }else{
-                    ERROR("There was an error in the y vector for the BSDF material.");
+                    STADIC_ERROR("There was an error in the y vector for the BSDF material.");
                 }
                 */
                 break;
@@ -889,7 +889,7 @@ bool BSDFMaterial::validateArg(int number, std::string value, int position) cons
                 if (ok){
                     return true;
                 }else{
-                    ERROR("There was an error in the z vector for the BSDF material.");
+                    STADIC_ERROR("There was an error in the z vector for the BSDF material.");
                 }
                 */
                 break;
@@ -897,7 +897,7 @@ bool BSDFMaterial::validateArg(int number, std::string value, int position) cons
                 if (value=="."){
                     return true;
                 }else{
-                    ERROR("The last argument on the first line of the BSDF material\n\tshould be a period \".\".");
+                    STADIC_ERROR("The last argument on the first line of the BSDF material\n\tshould be a period \".\".");
                 }
                 break;
         }

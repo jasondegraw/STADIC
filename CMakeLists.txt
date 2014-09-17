@@ -22,6 +22,15 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+if(WIN32)
+  set(Boost_USE_STATIC_LIBS ON)
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+endif()
+
+find_package(Boost 1.55 COMPONENTS system filesystem REQUIRED)
+
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+
 # Find includes in the build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

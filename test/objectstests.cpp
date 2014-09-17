@@ -63,11 +63,11 @@ TEST(ObjectsTests, FilePathFile)
 
 }
 
-#ifdef _WIN32
+//#ifdef _WIN32
 #define PROGRAM "testprogram"
-#else
-#define PROGRAM "./testprogram"
-#endif
+//#else
+//#define PROGRAM "./testprogram"
+//#endif
 TEST(ObjectsTests, ProcessCaptureOutErr)
 {
     std::stringstream stream;

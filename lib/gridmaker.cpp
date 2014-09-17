@@ -1,6 +1,6 @@
+#include "logging.h"
 #include "gridmaker.h"
 #include "radprimitive.h"
-#include "logging.h"
 #include <QFile>
 #include <QTextStream>
 #include <iostream>
@@ -202,7 +202,7 @@ bool GridMaker::writePTS(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+file+" has failed.");
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     return writePTS(oFile);
@@ -214,7 +214,7 @@ bool GridMaker::writePTScsv(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+file+" has failed.");
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     for (int i=0;i<m_TestPoints.size();i++){
@@ -240,7 +240,7 @@ bool GridMaker::writeRadPoly(std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        ERROR("The opening of the file "+file+" has failed.");
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
     oFile<<"floor\tpolygon\tfloor1"<<std::endl;

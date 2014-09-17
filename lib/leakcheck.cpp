@@ -37,20 +37,20 @@ bool LeakCheck::isEnclosed(){
     std::ifstream iFile;
     iFile.open("Final.res");
     if (!iFile.is_open()){
-        ERROR("The opening of the results file failed.");
+        STADIC_ERROR("The opening of the results file failed.");
         return false;
     }
     std::string val;
     if (!getline(iFile,val)){
-        ERROR("The results file is empty.");
+        STADIC_ERROR("The results file is empty.");
         return false;
     }
     iFile.close();
 
     if (atof(val.c_str())>0&&atof(val.c_str())<0.5){
-        WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
+        STADIC_WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
     }else if (atof(val.c_str())>=0.5){
-        ERROR("The provided model either contains a leak or the provided point is outside the space.");
+        STADIC_ERROR("The provided model either contains a leak or the provided point is outside the space.");
         return false;
     }else{
         std::cout<<"The model is fully enclosed."<<std::endl;
@@ -63,7 +63,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<files.size();i++){
         FilePath radFile(files[i]);
         if (!radFile.exists()){
-            ERROR("The rad file named "+files[i]+" does not exist.");
+            STADIC_ERROR("The rad file named "+files[i]+" does not exist.");
             return false;
         }
         m_RadFiles.push_back(files[i]);
@@ -72,7 +72,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
         }
     }
     if (m_RadGeo.geometry().empty()){
-        ERROR("There are no polygons in the rad files.");
+        STADIC_ERROR("There are no polygons in the rad files.");
         return false;
     }
     for (int i=0;i<m_RadGeo.geometry().size();i++){
@@ -87,7 +87,7 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
 
 bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
     if (m_RadGeo.primitives().empty()){
-        ERROR("No radiance geometry or materials have been specified.");
+        STADIC_ERROR("No radiance geometry or materials have been specified.");
         return false;
     }
     for (int i=0;i<layers.size();i++){
@@ -98,7 +98,7 @@ bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
             }
         }
         if (!layerExists){
-            ERROR("The layer "+layers[i]+" does not exist in the model.");
+            STADIC_ERROR("The layer "+layers[i]+" does not exist in the model.");
             return false;
         }
         m_FloorLayers.push_back(layers[i]);
@@ -116,7 +116,7 @@ bool LeakCheck::setX(double x){
         }
     }
     if (m_UnitedPolygon.isEmpty()){
-        ERROR("The uniting of the polygons has failed.");
+        STADIC_ERROR("The uniting of the polygons has failed.");
         return false;
     }
 
@@ -128,7 +128,7 @@ bool LeakCheck::setX(double x){
     }
 
     if (x<minX || x>maxX){
-        ERROR("The x coordinate is not within the "+std::to_string(minX) +" to "+std::to_string(maxX)+".");
+        STADIC_ERROR("The x coordinate is not within the "+std::to_string(minX) +" to "+std::to_string(maxX)+".");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -145,7 +145,7 @@ bool LeakCheck::setY(double y){
         }
     }
     if (m_UnitedPolygon.isEmpty()){
-        ERROR("The uniting of the polygons has failed.");
+        STADIC_ERROR("The uniting of the polygons has failed.");
         return false;
     }
     double minY=m_UnitedPolygon.boundingRect().bottom();
@@ -155,7 +155,7 @@ bool LeakCheck::setY(double y){
         maxY=m_UnitedPolygon.boundingRect().bottom();
     }
     if (y<minY|| y>maxY){
-        ERROR("The x coordinate is not within the min and max x coordinates.");
+        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -175,7 +175,7 @@ bool LeakCheck::setZ(double z){
 
 bool LeakCheck::setPoint(std::vector<double> point){
     if (point.size()!=3){
-        ERROR("The vector of points does not contain 3 values.");
+        STADIC_ERROR("The vector of points does not contain 3 values.");
         return false;
     }
     if (m_UnitedPolygon.isEmpty()){
@@ -185,7 +185,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
     }
 
     if (point[0]<m_UnitedPolygon.boundingRect().left() || point[0]>m_UnitedPolygon.boundingRect().right()){
-        ERROR("The x coordinate is not within the min and max x coordinates.");
+        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     if (m_TestPoint.size()<3){
@@ -200,7 +200,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
         maxY=m_UnitedPolygon.boundingRect().bottom();
     }
     if (point[1]<minY|| point[1]>maxY){
-        ERROR("The x coordinate is not within the min and max x coordinates.");
+        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
         return false;
     }
     m_TestPoint[1]=point[1];
@@ -210,7 +210,7 @@ bool LeakCheck::setPoint(std::vector<double> point){
 
 bool LeakCheck::setReflectance(int ref){
     if (ref!=0 && ref!=1){
-        ERROR("The reflectance needs to be either 0 or 1.");
+        STADIC_ERROR("The reflectance needs to be either 0 or 1.");
         return false;
     }
     m_Reflectance=ref;
@@ -256,11 +256,11 @@ bool LeakCheck::checkPoint(){
         if (surroundIn==true){
             return true;
         }else{
-            WARNING("The point is on the boundary and may result in an incorrect analysis.");
+            STADIC_WARNING("The point is on the boundary and may result in an incorrect analysis.");
             return true;
         }
     }
-    ERROR("The point is not contained within the polygon.");
+    STADIC_ERROR("The point is not contained within the polygon.");
     return false;
 }
 
@@ -290,7 +290,7 @@ bool LeakCheck::xformModifiers(){
 
     //There should be a test in here that if it doesn't finish it returns false
     if (!xform.wait()){
-        ERROR("The xform of the modifiers has failed.");
+        STADIC_ERROR("The xform of the modifiers has failed.");
         return false;
     }
 
@@ -326,7 +326,7 @@ bool LeakCheck::createOct(){
     oconv.setStandardOutputFile("Test.oct");
     oconv.start();
     if(!oconv.wait()){
-        ERROR("There was a problem creating the octree.");
+        STADIC_ERROR("There was a problem creating the octree.");
         return false;
     }
     return true;
@@ -369,12 +369,12 @@ bool LeakCheck::runCalc(){
     rcalc.setStandardOutputFile("Final.res");
     rtrace.start();
     if(!rtrace.wait()){
-        ERROR("The running of rtrace has failed.");
+        STADIC_ERROR("The running of rtrace has failed.");
         return false;
     }
     rcalc.start();
     if(!rcalc.wait()){
-        ERROR("The running of rcalc has failed.");
+        STADIC_ERROR("The running of rcalc has failed.");
         return false;
     }
     return true;

@@ -93,7 +93,7 @@ bool WeatherData::parseWeather(std::string file)
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        ERROR("The opening of the weather file "+file+" has failed.");
+        STADIC_ERROR("The opening of the weather file "+file+" has failed.");
         return false;
     }
     std::string line;
@@ -112,7 +112,7 @@ bool WeatherData::writeWea(std::string file)
     std::ofstream oFile;
     oFile.open(file);
     if(!oFile.is_open()){
-        ERROR("The opening of the output weather file \""+file+"\" has failed.");
+        STADIC_ERROR("The opening of the output weather file \""+file+"\" has failed.");
         return false;
     }
     oFile<<"place "<<place()<<std::endl;
@@ -133,7 +133,7 @@ bool WeatherData::parseEPW(std::string file)
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        ERROR("The opening of the weather file "+file+" has failed.");
+        STADIC_ERROR("The opening of the weather file "+file+" has failed.");
         return false;
     }
     std::string line;
@@ -142,7 +142,7 @@ bool WeatherData::parseEPW(std::string file)
     std::getline(iFile,line);
     vals=stadic::trimmedSplit(line,',');
     if(vals.size() < 10) {
-        ERROR("Weather file " + file + " first line is missing information.");
+        STADIC_ERROR("Weather file " + file + " first line is missing information.");
         return false;
     }
     setPlace(vals[1]);
@@ -156,7 +156,7 @@ bool WeatherData::parseEPW(std::string file)
     //This is where the number of periods per hour should be read in.
     vals=trimmedSplit(line,',');
     if(vals.size() < 7) {
-        ERROR("Weather file " + file + " DATA PERIODS line is missing information.");
+        STADIC_ERROR("Weather file " + file + " DATA PERIODS line is missing information.");
         return false;
     }
     int intervals=atoi(vals[2].c_str());
@@ -166,7 +166,7 @@ bool WeatherData::parseEPW(std::string file)
         vals.clear();
         vals=trimmedSplit(line,',');
         if(vals.size() < 35) {
-            ERROR("Weather file " + file + " contains incomplete data lines.");
+            STADIC_ERROR("Weather file " + file + " contains incomplete data lines.");
             if(vals.size() < 16) {
                 continue;
             }
@@ -199,7 +199,7 @@ bool WeatherData::parseTMY(std::string file){
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        ERROR("The opening of the weather file "+file+" has failed.");
+        STADIC_ERROR("The opening of the weather file "+file+" has failed.");
         return false;
     }
     std::string line;

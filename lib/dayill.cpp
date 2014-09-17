@@ -23,7 +23,7 @@ TemporalIlluminance::TemporalIlluminance(int month, int day, double hour, const 
 
 bool TemporalIlluminance::add(std::vector<double> addIll){
     if (addIll.size()!=m_Illuminance.size()){
-        ERROR("The adding of the two illuminance vectors cannot be completed because they are not the same size.");
+        STADIC_ERROR("The adding of the two illuminance vectors cannot be completed because they are not the same size.");
         return false;
     }
     for (int i=0;i<m_Illuminance.size();i++){
@@ -96,14 +96,14 @@ bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
     std::ifstream iFile;
     iFile.open(fileName);
     if (!iFile.is_open()){
-        ERROR("The opening of the illuminance file "+fileName+" failed.");
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" failed.");
         return false;
     }
 
     std::ifstream weaInFile;
     weaInFile.open(weaFile);
     if (!weaInFile.is_open()){
-        ERROR("The opening of the wea file " +weaFile+" failed.");
+        STADIC_ERROR("The opening of the wea file " +weaFile+" failed.");
         return false;
     }
 
@@ -116,22 +116,22 @@ bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
         std::vector<std::string> vals;
         vals=split(weaLine,' ');
         if(vals.size() < 5) {
-            ERROR("The number of items on each line of the wea file is less than 5.");
+            STADIC_ERROR("The number of items on each line of the wea file is less than 5.");
             return false;
         }
         month =atoi(vals[0].c_str());
         if (month<1 || month>12){
-            ERROR("One of the month values is not acceptable.");
+            STADIC_ERROR("One of the month values is not acceptable.");
             return false;
         }
         day=atoi(vals[1].c_str());
         if (day<1 || day>31){
-            ERROR("One of the day values is not acceptable.");
+            STADIC_ERROR("One of the day values is not acceptable.");
             return false;
         }
         hour=atof(vals[2].c_str());
         if (hour<0 || hour>24){
-            ERROR("One of the hour values is not acceptable.");
+            STADIC_ERROR("One of the hour values is not acceptable.");
             return false;
         }
         vals=split(line,' ');
@@ -154,7 +154,7 @@ bool DaylightIlluminanceData::parseTimeBased(std::string fileName){
     std::ifstream iFile;
     iFile.open(fileName);
     if (!iFile.is_open()){
-        ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
         return false;
     }
     std::string line;
@@ -168,17 +168,17 @@ bool DaylightIlluminanceData::parseTimeBased(std::string fileName){
         }
         month = atoi(vals[0].c_str());
         if (month<1 || month>12){
-            ERROR("One of the month values is not acceptable.");
+            STADIC_ERROR("One of the month values is not acceptable.");
             return false;
         }
         day=atoi(vals[1].c_str());
         if (day<1 || day>31){
-            ERROR("One of the day values is not acceptable.");
+            STADIC_ERROR("One of the day values is not acceptable.");
             return false;
         }
         hour=atof(vals[2].c_str());
         if (hour<0 || hour>24){
-            ERROR("One of the hour values is not acceptable.");
+            STADIC_ERROR("One of the hour values is not acceptable.");
             return false;
         }
         std::vector<double> ill;
@@ -198,7 +198,7 @@ bool DaylightIlluminanceData::addIllFile(std::string fileName){
     std::ifstream iFile;
     iFile.open(fileName);
     if (!iFile.is_open()){
-        ERROR("The opening of the illuminance file "+fileName+" failed.");
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" failed.");
         return false;
     }
     std::string line;

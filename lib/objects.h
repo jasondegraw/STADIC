@@ -6,10 +6,11 @@
 
 #include <memory>
 #include <vector>
+#ifdef USE_QT
 #include <QProcess>
-#include <QStringList>
-
+#else
 #include <boost/process.hpp>
+#endif
 
 #include "stadicapi.h"
 
@@ -40,13 +41,26 @@ public:
     std::string output();
 
     void setStandardOutputProcess(Process *destination);
-    void setStandardErrorFile(const std::string &fileName);
-    void setStandardInputFile(const std::string &fileName);
-    void setStandardOutputFile(const std::string &fileName);
+    bool setStandardErrorFile(const std::string &fileName);
+    bool setStandardInputFile(const std::string &fileName);
+    bool setStandardOutputFile(const std::string &fileName);
 
 private:
+#ifdef USE_QT
     QProcess m_process;
-
+#else
+    enum ProcessState {Initialized, ReadyToRun, Running, RunCompleted, RunFailed};
+    ProcessState m_state;
+    Process *m_upstream;
+    Process *m_downstream;
+    std::string m_program;
+    std::vector<std::string> m_args;
+    boost::process::children m_children;
+    std::string m_inputFile;
+    std::string m_outputFile;
+    std::string m_errorFile;
+    unsigned m_index;
+#endif
 };
 
 class STADIC_API FilePath

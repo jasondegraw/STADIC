@@ -49,15 +49,15 @@ int main (int argc, char *argv[])
             reflectance=atof(argv[i]);
         }else{
             std::string temp=argv[i];
-            WARNING("The argument "+temp+" is an unkown argument.");
+            STADIC_WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
     if (radFiles.empty()){
-        ERROR(std::string("At least one rad file name must be specified.\n\tSpecify with \"-f\"."));
+        STADIC_ERROR(std::string("At least one rad file name must be specified.\n\tSpecify with \"-f\"."));
         return EXIT_FAILURE;
     }
     if (floorLayers.empty()){
-        ERROR(std::string("At least one floor layer name must be specified.\n\tSpecify with \"-t\"."));
+        STADIC_ERROR(std::string("At least one floor layer name must be specified.\n\tSpecify with \"-t\"."));
         return EXIT_FAILURE;
     }
     //Instantiate GridMaker Object
