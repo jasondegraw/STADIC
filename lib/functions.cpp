@@ -58,4 +58,24 @@ std::string trim(std::string string)
     return string;
 }
 
+// Generic convert string to double function, mainly in case we need to drop C++11
+double toDouble(const std::string &string, bool *ok)
+{
+    double value;
+    try {
+        value = std::stod(string);
+        if(ok != nullptr) {
+            *ok = true;
+        }
+    }
+    catch(std::exception&)
+    {
+        value = 0;
+        if(ok != nullptr) {
+            *ok = false;
+        }
+    }
+    return value;
+}
+
 }
