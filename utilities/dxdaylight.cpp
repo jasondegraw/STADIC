@@ -1,6 +1,5 @@
 #include "daylight.h"
 #include "logging.h"
-#include "control.h"
 
 #include <iostream>
 

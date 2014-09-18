@@ -47,14 +47,14 @@ std::vector<std::string> trimmedSplit(std::string line, char delimiter)
 //String trimming function that clears the white space from the beginning or the end of a string
 std::string trim(std::string string)
 {
-        std::size_t found=string.find_first_not_of(" \t\f\v\n\r");
-        if (found!=string.npos){
-            string.erase(string.begin(),string.begin()+found);
-        }
-        found=string.find_last_not_of(" \t\f\v\n\r");
-        if (found!=string.npos){
-            string.erase(string.begin()+found+1,string.end());
-        }
+    std::size_t found=string.find_first_not_of(" \t\f\v\n\r");
+    if (found!=string.npos){
+        string.erase(string.begin(),string.begin()+found);
+    }
+    found=string.find_last_not_of(" \t\f\v\n\r");
+    if (found!=string.npos){
+        string.erase(string.begin()+found+1,string.end());
+    }
     return string;
 }
 

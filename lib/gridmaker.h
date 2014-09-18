@@ -1,12 +1,14 @@
 #ifndef GRIDMAKER_H
 #define GRIDMAKER_H
 
-#include <QPointF>
-#include <QPolygonF>
 #include <vector>
 #include <string>
 #include "radprimitive.h"
-
+#include "radfiledata.h"
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/multi_polygon.hpp>
+#include <boost/geometry/core/cs.hpp>
 #include "stadicapi.h"
 
 namespace stadic {
@@ -14,28 +16,26 @@ namespace stadic {
 class STADIC_API GridMaker
 {
 public:
-    GridMaker();
+    GridMaker(std::vector<std::string> fileList);
 
     //Setters
     //Points
-    void setTestPoints(double x, double y);
+
     //InputData  These functions must be used before the utilities can be used.
-    void setLayerNames(std::string string);
+    void setLayerNames(std::vector<std::string> layerList);
+    void addLayerName(std::string string);
     void setSpaceX(double x);
     void setSpaceY(double y);
+    void setOffset(double val);
     void setOffsetX(double x);
     void setOffsetY(double y);
+    void setOffsetZ(double z);
     void setZHeight(double z);
-    //Dimensional
-    void setMinX(double x);
-    void setMaxX(double x);
-    void setMinY(double y);
-    void setMaxY(double y);
+
 
 
     //Getters
     //Points
-    std::vector<QPointF> testPoints();
     //InputData
     std::vector<std::string> layerNames();
     double spaceX();
@@ -43,43 +43,60 @@ public:
     double offsetX();
     double offsetY();
     double zHeight();
-    //Dimensional
-    double minX();
-    double minY();
-    double maxX();
-    double maxY();
 
     //Utilities
-    bool parseRad(std::string file);
-    bool makeGrid(std::string file);
+    bool makeGrid();
     bool writePTS(std::ostream& out);
     bool writePTS();
     bool writePTS(std::string file);
     bool writePTScsv(std::string file);
-    bool writeRadPoly(std::string file);
+    //bool writeRadPoly(std::string file);
 
 private:
     //Points
-    std::vector<QPointF> m_TestPoints;
-
+    std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> m_PointSet;
+    std::vector<std::vector<double>> m_FinalPoints;
     //Polygons
-    std::vector<QPolygonF> m_Polygons;
-    QPolygonF m_UnitedPolygon;
+    std::vector<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> m_Polygons;
+    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> m_UnitedPolygon;
+
 
     //InputData
     std::vector<std::string> m_LayerNames;
-    std::vector<RadPrimitive *> m_RadGeo;
+    RadFileData m_RadFile;
     double m_SpaceX;
     double m_SpaceY;
     double m_OffsetX;
     double m_OffsetY;
     double m_ZHeight;
+    double m_OffsetZ;
+    bool m_useZOffset;
+    double m_Offset;
 
     //Dimensional
     double m_MinX;
     double m_MinY;
     double m_MaxX;
     double m_MaxY;
+
+    //Functions
+    bool parseRad();
+    //Dimensional
+    void setMinX(double x);
+    void setMaxX(double x);
+    void setMinY(double y);
+    void setMaxY(double y);
+
+    bool unitePolygons();
+    bool insetPolygons();
+    void boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet);
+    bool testPoints();
+    void addTestPoints(double x, double y);
+    void zHeights();
+
+signals:
+
+public slots:
 
 };
 

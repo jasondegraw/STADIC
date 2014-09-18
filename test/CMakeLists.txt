@@ -43,9 +43,6 @@ target_link_libraries(leaktests stadic_core gtest gtest_main)
 add_custom_command(TARGET leaktests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/SimpleHole.rad $<TARGET_FILE_DIR:leaktests>)
-add_custom_command(TARGET leaktests POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/test/resources/material.rad $<TARGET_FILE_DIR:leaktests>)
 
 add_executable(functiontests functiontests.cpp)
 add_test(functiontests functiontests)
