@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
     if(argc == 1) {
         usage();
     }
-    std::string fileName;
+    std::vector<std::string> fileName;
     fileName.clear();
     std::string resultFile;
     resultFile.clear();
@@ -41,7 +41,7 @@ int main (int argc, char *argv[])
     for (int i=1;i<argc;i++){
         if (argv[i]=="-f"){
             i++;
-            fileName=argv[i];
+            fileName.push_back(argv[i]);
         }else if (argv[i]=="-sx"){
             i++;
             sx=atof(argv[i]);
@@ -84,22 +84,15 @@ int main (int argc, char *argv[])
     }
 
     //Instantiate GridMaker Object
-    stadic::GridMaker grid;
-    for (int i=0;i<layerNames.size();i++){
-        grid.setLayerNames(layerNames.at(i));
-    }
+    stadic::GridMaker grid(fileName);
+    grid.setLayerNames(layerNames);
     grid.setSpaceX(sx);
     grid.setSpaceY(sy);
     grid.setOffsetX(ox);
     grid.setOffsetY(oy);
     grid.setZHeight(z);
-    if (!grid.parseRad(fileName)){
-        ERROR(std::string("The parsing of the rad file failed."));
+    if (!grid.makeGrid()){
         return EXIT_FAILURE;
-    }
-    if (!grid.makeGrid(fileName)){
-        ERROR(std::string("The creation of the grid failed."));
-        EXIT_FAILURE;
     }
     if (resultFile.empty()){
         if(!grid.writePTS()){
@@ -112,11 +105,13 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
+    /*
     if (!polyFile.empty()){
         if (!grid.writeRadPoly(polyFile)){
             return EXIT_FAILURE;
         }
     }
+    */
     if (!csvFile.empty()){
         if (!grid.writePTScsv(csvFile)){
             return EXIT_FAILURE;

@@ -47,7 +47,7 @@ TEST(ObjectsTests, FilePathFile)
     EXPECT_TRUE(file.exists());
     EXPECT_TRUE(file.isFile());
     EXPECT_FALSE(file.isUpdated());
-
+    //There may need to be a delay inserted here so the updated time actually changes
     std::ofstream reWrite(testString);
     reWrite << "I'm doing this as hard as I can";
     reWrite.close();
