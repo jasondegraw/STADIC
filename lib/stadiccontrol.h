@@ -236,11 +236,6 @@ private:
     bool m_UDI;                                         //  Variable holding whether the UDI analysis shoud be completed
     double m_UDIMin;                                    //  Variable holding the minimum illuminance for UDI
     double m_UDIMax;                                    //  Variable holding the maximum illuminance for UDI
-
-
-signals:
-    
-public slots:
     
 };
 

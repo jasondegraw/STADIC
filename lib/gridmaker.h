@@ -81,13 +81,6 @@ private:
     double m_MaxX;
     double m_MaxY;
 
-
-
-
-signals:
-
-public slots:
-
 };
 
 }
