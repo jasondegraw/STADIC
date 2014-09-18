@@ -316,7 +316,6 @@ std::string RadPrimitive::getArg3(int position) const
 
 std::string RadPrimitive::getArg(int number, int position) const
 {
-    std::vector<std::string> *arg;
     switch(number) {
     case 1:
         return getArg1(position);

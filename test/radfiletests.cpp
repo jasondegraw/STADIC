@@ -99,7 +99,7 @@ bool nameStartsWith(stadic::RadPrimitive* primitive, const std::string &name)
     if (primitive->name().compare(0,name.length(),name)==0){
         return true;
     }
-    false;
+    return false;
   //return primitive->name().startsWith(name);
 }
 

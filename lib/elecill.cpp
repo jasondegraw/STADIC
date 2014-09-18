@@ -59,6 +59,7 @@ bool ElectricIlluminance::parseIlluminance(std::string fileName){
         m_Illuminance.push_back(vals.at(3).toDouble());
     }
     iFile.close();
+    return true;
 }
 
 }

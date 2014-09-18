@@ -1724,6 +1724,7 @@ bool Daylight::testSimCase(Control *model){
             }
         }
     }
+    return true;
 }
 
 bool Daylight::setSimCase(int setting, int simCase){
@@ -1759,7 +1760,7 @@ bool Daylight::writeSky(Control *model){
     }
     oFile<<"void light solar 0 0 3 1.00e+06 1.00e+06 1.00e+06";
     oFile.close();
-
+    return true;
 }
 
 bool Daylight::createBaseRadFiles(Control *model){
