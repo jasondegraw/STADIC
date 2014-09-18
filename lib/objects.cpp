@@ -12,6 +12,7 @@
 //#include <boost/process.hpp>
 //namespace bp = ::boost::process;
 #include <boost/filesystem.hpp>
+#include <thread>
 #endif
 
 
@@ -137,6 +138,7 @@ Process::Process(std::string program)
     m_upstream = nullptr;
     m_downstream = nullptr;
     m_program = boost::process::find_executable_in_path(program);
+    m_args.push_back(program);
 #endif
 }
 
@@ -155,10 +157,24 @@ Process::Process(std::string program, std::vector<std::string> args)
     m_upstream = nullptr;
     m_downstream = nullptr;
     m_program = boost::process::find_executable_in_path(program);
-    m_args = args;
+    m_args.push_back(program);
+    m_args.insert(m_args.end(), args.begin(), args.end());
 #endif
 }
 
+#ifndef USE_QT
+static void processStreamToFile(boost::process::pistream &stream, const std::string &fileName)
+{
+    std::ofstream output(fileName);
+    if(output.is_open()) {
+        std::string line;
+        while(std::getline(stream, line)) {
+            output << line << std::endl;
+        }
+        output.close();
+    }
+}
+#endif
 
 void Process::start()
 {
@@ -171,6 +187,9 @@ void Process::start()
             boost::process::context ctx;
             ctx.stdout_behavior = boost::process::capture_stream();
             ctx.stderr_behavior = boost::process::capture_stream();
+            if(!m_inputFile.empty()) {
+                ctx.stdin_behavior = boost::process::capture_stream();
+            }
             try {
                 m_children.push_back(boost::process::launch(m_program, m_args, ctx));
             }
@@ -178,7 +197,26 @@ void Process::start()
                 STADIC_ERROR(ex.what());
                 m_state = RunFailed;
             }
-            // Launch threads here to handle stdin, stdout, stderr
+            // Launch threads here to handle stdout, stderr
+            if(!m_outputFile.empty()) {
+                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stdout()), std::ref(m_outputFile));
+                thread.detach(); // This could be very unwise
+            }
+            if(!m_errorFile.empty()) {
+                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stderr()), std::ref(m_errorFile));
+                thread.detach(); // This could be very unwise
+            }
+            // Handle input
+            if(!m_inputFile.empty()) {
+                std::ifstream input(m_inputFile);
+                boost::process::postream &stream = m_children[0].get_stdin();
+                if(input.is_open()) { // Should this cause the whole thing to fail?
+                    std::string line;
+                    while(std::getline(input, line)) {
+                        stream << line << std::endl;
+                    }
+                }
+            }
         } else { // This is a pipeline situation, so we'll only run if all children are ready
             m_state = ReadyToRun;
             //std::vector<boost::process::pipeline_entry> entries;
@@ -214,7 +252,7 @@ void Process::start()
 
             // Now check the upstream direction - rather than get tricky, add the current process again
             Process *first = this;
-            while(first != nullptr) {
+            while(first->m_upstream != nullptr) {
                 if(first->m_upstream->m_state == ReadyToRun) {
                     upstream.push_front(boost::process::pipeline_entry(first->m_program, first->m_args, ctxout));
                     first = first->m_upstream;
@@ -224,17 +262,61 @@ void Process::start()
             }
             // If we made it to here, all of the upstream processes are ready to go
             // We still need to set up the first one so that input can be handled
-            upstream.push_back(boost::process::pipeline_entry(first->m_program, first->m_args, ctxin));
-            // Combine the two lists, skipping the first downstream element (it is double counted to save logic)
-            upstream.insert(upstream.end(), downstream.begin()+1, downstream.end());
-            boost::process::children subprocesses = boost::process::launch_pipeline(upstream);
-            // Finish up by giving everyone a copy of the children and assigning indices
+            upstream.push_front(boost::process::pipeline_entry(first->m_program, first->m_args, ctxin));
+            // Combine the two lists, keeping in mind that the element we started with is in both (it is double counted to save logic)
+            if(upstream.size() < 2) {
+                downstream.pop_front();
+                upstream.insert(upstream.end(), downstream.begin(), downstream.end());
+            } else {
+                upstream.pop_back();
+                upstream.insert(upstream.end(), downstream.begin(), downstream.end());
+            }
+            boost::process::children subprocesses;
+            try {
+                subprocesses = boost::process::launch_pipeline(upstream);
+            }
+            catch(boost::system::system_error &ex) { // Something has gone wrong!
+                STADIC_ERROR(ex.what());
+                Process *current = first;
+                while(current != nullptr) {
+                    current->m_state = RunFailed;
+                }
+            }
+            // Give everyone a copy of the children, assign indices, set state
             unsigned index = 0;
             Process *current = first;
             while(current != nullptr) {
                 current->m_index = index;
                 current->m_children = subprocesses;
+                current->m_state = Running;
+                current = current->m_downstream;
                 index++;
+            }
+            index--; // This the index of the last child
+            // Launch threads here to handle stdout, stderr
+            if(!last->m_outputFile.empty()) {
+                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[index].get_stdout()), std::ref(m_outputFile));
+                thread.detach(); // This could be very unwise
+            }
+            // Need to loop through the whole list for this
+            current = first;
+            while(current != nullptr) {
+                if(!current->m_errorFile.empty()) {
+                    std::thread thread = std::thread(processStreamToFile, std::ref(m_children[current->m_index].get_stderr()), std::ref(current->m_errorFile));
+                    thread.detach(); // This could be very unwise
+                }
+                current = current->m_downstream;
+            }
+            // Handle input
+            if(!first->m_inputFile.empty()) {
+                std::ifstream input(first->m_inputFile);
+                boost::process::postream &stream = m_children[0].get_stdin();
+                if(input.is_open()) { // Should this cause the whole thing to fail?
+                    std::string line;
+                    while(std::getline(input, line)) {
+                        stream << line << std::endl;
+                    }
+                }
             }
         }
     }
@@ -262,9 +344,26 @@ bool Process::wait()
     } else {
         boost::process::status result = boost::process::wait_children(m_children);
         // Figure out what happened
+        m_state = RunFailed;
         if(result.exited()) {
-            return result.exit_status() == 0; // Hopefully this is correct
+            if(result.exit_status() == 0) { // Hopefully this is correct
+                m_state = RunCompleted;
+            }
         }
+        // Propagate this result to all of the other processes
+        // Upstream first
+        Process *current = m_upstream;
+        while(current != nullptr) {
+            current->m_state = m_state;
+            current = current->m_upstream;
+        }
+        // Now downstream
+        current = m_downstream;
+        while(current != nullptr) {
+            current->m_state = m_state;
+            current = current->m_downstream;
+        }
+        return m_state == RunCompleted;
     }
     return false;
 #endif
