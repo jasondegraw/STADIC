@@ -204,7 +204,7 @@ bool GridMaker::parseRad(){
         }
         boost::geometry::correct(tempPolygon);
         if (!boost::geometry::is_valid(tempPolygon)){
-            ERROR("The creation of the boost polygon has failed.");
+            STADIC_ERROR("The creation of the boost polygon has failed.");
             return false;
         }
         m_Polygons.push_back(tempPolygon);
@@ -251,7 +251,7 @@ bool GridMaker::unitePolygons(){
     if (boost::geometry::is_valid(m_UnitedPolygon)){
         return true;
     }else{
-        ERROR("There was a problem uniting the polygons.");
+        STADIC_ERROR("There was a problem uniting the polygons.");
         return false;
     }
 }
@@ -266,7 +266,7 @@ bool GridMaker::insetPolygons(){
     boost::geometry::buffer(m_UnitedPolygon,tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,circle_strategy);
     m_UnitedPolygon=tempPolygon;
     if (!boost::geometry::is_valid(m_UnitedPolygon)){
-        ERROR("Creating the offset failed to create a valid polygon.");
+        STADIC_ERROR("Creating the offset failed to create a valid polygon.");
         return false;
     }
     return true;

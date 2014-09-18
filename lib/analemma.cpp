@@ -72,13 +72,13 @@ bool Analemma::getSunPos(){
     std::ofstream matFile;
     matFile.open(m_MatFile);
     if (!matFile.is_open()){
-        ERROR("There was a problem opening the output material file \""+m_MatFile+"\".");
+        STADIC_ERROR("There was a problem opening the output material file \""+m_MatFile+"\".");
         return false;
     }
     std::ofstream geoFile;
     geoFile.open(m_GeoFile);
     if (!geoFile.is_open()){
-        ERROR("There was a problem opening the output geometry file \""+m_GeoFile+"\".");
+        STADIC_ERROR("There was a problem opening the output geometry file \""+m_GeoFile+"\".");
         return false;
     }
 
@@ -157,6 +157,7 @@ bool Analemma::getSunPos(){
     geoFile.close();
     return true;
 }
+
 std::vector<double> Analemma::pos(double altitude, double azimuth){
     std::vector<double> tempVec;
     tempVec.clear();
@@ -165,24 +166,31 @@ std::vector<double> Analemma::pos(double altitude, double azimuth){
     tempVec.push_back(sin(altitude));
     return tempVec;
 }
+
 double Analemma::degToRad(double val){
     return val*PI/180.0;
 }
+
 double Analemma::solarDec(int julianDate){
     return 0.4093*sin((2*PI/368)*(julianDate-81));
 }
+
 double Analemma::solarTimeAdj(int julianDate){
     return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(atof(m_WeaData.timeZone().c_str()))-degToRad(atof(m_WeaData.longitude().c_str())))/PI;
 }
+
 double Analemma::solarAlt(double solarDeclination, double time){
     return asin(sin(degToRad(atof(m_WeaData.latitude().c_str())))*sin(solarDeclination)-cos(degToRad(atof(m_WeaData.latitude().c_str())))*cos(solarDeclination)*cos(PI*time/12));
 }
+
 double Analemma::solarAz(double solarDeclination, double time){
     return -atan2(cos(solarDeclination)*sin(time*(PI/12)),-cos(degToRad(atof(m_WeaData.latitude().c_str())))*sin(solarDeclination)-sin(degToRad(atof(m_WeaData.latitude().c_str())))*cos(solarDeclination)*cos(time*(PI/12)));
 }
+
 double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2){
     return vec1[0]*vec2[0]+vec1[1]*vec2[1]+vec1[2]*vec2[2];
 }
+
 bool Analemma::closestSun(){
     int hr_count=0;
     int hr=0;
@@ -223,7 +231,9 @@ bool Analemma::closestSun(){
             }
         }
     }
+    return true;
 }
+
 bool Analemma::genSunMtx(){
     m_SunVal.reserve(8760);
     for (int i=0;i<8760;i++){
