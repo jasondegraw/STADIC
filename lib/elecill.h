@@ -1,40 +1,36 @@
 #ifndef ELECILL_H
 #define ELECILL_H
 
-#include <QObject>
+#include <string>
+#include <vector>
 
 #include "stadicapi.h"
 
 namespace stadic {
 
-class STADIC_API ElecIll : public QObject
+class STADIC_API ElectricIlluminance
 {
-    Q_OBJECT
 public:
-    explicit ElecIll(QObject *parent = 0);
-    bool parseIll(QString fileName);
+    ElectricIlluminance();
+    bool parseIlluminance(std::string fileName);
 
     //Setters
-    void setIlluminance(double value);
-    void setX(QString x);
-    void setY(QString y);
-    void setZ(QString z);
+    //void setIlluminance(double value);
+    //void setX(std::string x);
+    //void setY(std::string y);
+    //void setZ(std::string z);
 
     //Getters
     std::vector<double> illuminance();
-    std::vector<QString> x();
-    std::vector<QString> y();
-    std::vector<QString> z();
+    std::vector<std::string> x();
+    std::vector<std::string> y();
+    std::vector<std::string> z();
 
 private:
-    std::vector<double> m_Illuminace;
-    std::vector<QString> m_X;
-    std::vector<QString> m_Y;
-    std::vector<QString> m_Z;
-
-signals:
-
-public slots:
+    std::vector<double> m_Illuminance;
+    std::vector<std::string> m_X;
+    std::vector<std::string> m_Y;
+    std::vector<std::string> m_Z;
 
 };
 
