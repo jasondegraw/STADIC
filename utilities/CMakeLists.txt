@@ -17,3 +17,6 @@ target_link_libraries(dxleakcheck stadic_core)
 
 add_executable(dxdaylight dxdaylight.cpp)
 target_link_libraries(dxdaylight stadic_core)
+
+add_executable(dxanalemma dxanalemma.cpp)
+target_link_libraries(dxanalemma stadic_core)

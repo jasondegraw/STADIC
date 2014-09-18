@@ -48,6 +48,7 @@ public:
     std::string longitude() const;
     std::string timeZone() const;
     std::string elevation() const;
+    //std::vector<int> julianDate() const;
 
 private:
     bool parseEPW(std::string file);
@@ -56,6 +57,7 @@ private:
     std::vector<int> m_Month;
     std::vector<int> m_Day;
     std::vector<double> m_Hour;
+    //std::vector<int> m_JulianDate;
     std::vector<std::string> m_DirectNormal;
     std::vector<std::string> m_DirectHorizontal;
     std::string m_Place;

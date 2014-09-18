@@ -61,6 +61,11 @@ std::vector<std::string> WeatherData::directNormal() const {
 std::vector<std::string> WeatherData::directHorizontal() const{
     return m_DirectHorizontal;
 }
+/*
+std::vector<int> WeatherData::julianDate() const{
+    return m_JulianDate;
+}
+*/
 
 std::string WeatherData::place() const
 {
@@ -86,6 +91,7 @@ std::string WeatherData::elevation() const
 {
     return m_Elevation;
 }
+
 
 //Utilities
 bool WeatherData::parseWeather(std::string file)
@@ -148,7 +154,7 @@ bool WeatherData::parseEPW(std::string file)
     setPlace(vals[1]);
     setLatitude(vals[6]);
     setLongitude(vals[7]);
-    setTimeZone(vals[8]);
+    setTimeZone(std::to_string(atof(vals[8].c_str())*15));
     setElevation(vals[9]);
     for(int i = 1; i<8; i++){
         std::getline(iFile, line);

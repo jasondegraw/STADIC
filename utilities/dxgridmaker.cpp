@@ -11,6 +11,8 @@ void usage(){
     std::cerr<<"-sy val\tSet the spacing in the y direction between the analysis points to val.  This is a mandatory option."<<std::endl;
     std::cerr<<"-ox val\tSet the offset in the x direction from the left side of the bounding rectangle to val."<<std::endl;
     std::cerr<<"-oy val\tSet the offset in the y direction from the lower side of the bounding rectangle to val."<<std::endl;
+    std::cerr<<"-oz val\tSet the offset in the z direction from the average height of the floor polygons to val."<<std::endl;
+    std::cerr<<"-o val\tSet the offset for both the x and y direction from the perimeter of the floor polygons to val."<<std::endl;
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
@@ -32,46 +34,58 @@ int main (int argc, char *argv[])
     std::string polyFile;
     polyFile.clear();
     std::vector<std::string> layerNames;
-    double sx, sy, ox, oy, z;
+    bool useZOffset=false;
+    bool useOffset=false;
+    double sx, sy, ox, oy, oz, offset,z;
     sx=0;
     sy=0;
     ox=0;
     oy=0;
+    oz=0;
+    offset=0;
     z=0;
     for (int i=1;i<argc;i++){
-        if (argv[i]=="-f"){
+        if (std::strcmp(argv[i],"-f")==0){
             i++;
             fileName.push_back(argv[i]);
-        }else if (argv[i]=="-sx"){
+        }else if (std::strcmp(argv[i],"-sx")==0){
             i++;
             sx=atof(argv[i]);
-        }else if (argv[i]=="-sy"){
+        }else if (std::strcmp(argv[i],"-sy")==0){
             i++;
             sy=atof(argv[i]);
-        }else if (argv[i]=="-ox"){
+        }else if (std::strcmp(argv[i],"-ox")==0){
             i++;
             ox=atof(argv[i]);
-        }else if (argv[i]=="-oy"){
+        }else if (std::strcmp(argv[i],"-oy")==0){
             i++;
             oy=atof(argv[i]);
-        }else if (argv[i]=="-z"){
+        }else if (std::strcmp(argv[i],"-oz")==0){
+            i++;
+            useZOffset=true;
+            oz=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-o")==0){
+            i++;
+            useOffset=true;
+            offset=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-z")==0){
             i++;
             z=atof(argv[i]);
-        }else if (argv[i]=="-r"){
+        }else if (std::strcmp(argv[i],"-r")==0){
             i++;
             resultFile=argv[i];
-        }else if(argv[i]=="-l"){
+        }else if(std::strcmp(argv[i],"-l")==0){
             i++;
             layerNames.push_back(argv[i]);
-        }else if(argv[i]=="-p"){
+        }else if(std::strcmp(argv[i],"-p")==0){
             i++;
             polyFile=argv[i];
-        }else if(argv[i]=="-csv"){
+        }else if(std::strcmp(argv[i],"-csv")==0){
             i++;
             csvFile=argv[i];
         }else{
             std::string temp=argv[i];
-            WARNING("The argument "+QString::fromStdString(temp)+" is an unkown argument.");
+            WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
     if (sx==0 ||sy==0){
@@ -88,9 +102,17 @@ int main (int argc, char *argv[])
     grid.setLayerNames(layerNames);
     grid.setSpaceX(sx);
     grid.setSpaceY(sy);
-    grid.setOffsetX(ox);
-    grid.setOffsetY(oy);
-    grid.setZHeight(z);
+    if (useOffset){
+        grid.setOffset(offset);
+    }else{
+        grid.setOffsetX(ox);
+        grid.setOffsetY(oy);
+    }
+    if (useZOffset){
+        grid.setOffsetZ(oz);
+    }else{
+        grid.setZHeight(z);
+    }
     if (!grid.makeGrid()){
         return EXIT_FAILURE;
     }

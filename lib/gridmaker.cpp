@@ -93,15 +93,22 @@ double GridMaker::zHeight(){
 
 //Utilities
 bool GridMaker::makeGrid(){
+    if (!parseRad()){
+        return false;
+    }
+
+    std::clog<<"About to unite the polygons."<<std::endl;
     if (!unitePolygons()){
         return false;
     }
 
     //If doing an offset all the way around
     if (m_Offset>0){
+        std::clog<<"Insetting the polygons."<<std::endl;
         if (!insetPolygons()){
             return false;
         }
+        std::clog<<"Creating the bounding box."<<std::endl;
         boundingBox(m_UnitedPolygon);
     }else if (m_OffsetX>0 || m_OffsetY>0){
         //Offset x and y from bounding rectangle given m_OffsetX and m_OffsetY
@@ -113,11 +120,13 @@ bool GridMaker::makeGrid(){
         //if the result is not an integer multiply the remainder by the spacing and divide by two for the offset
         //reset min and max x and y
     }
+    std::clog<<"Getting the points in the polygons."<<std::endl;
     if (!testPoints()){
         return false;
     }
 
     if (m_useZOffset){
+        std::clog<<"Getting the z heights from the polygons."<<std::endl;
         zHeights();
     }
     //Finish this code for when the program is ran with absolute z
@@ -224,9 +233,13 @@ bool GridMaker::unitePolygons(){
                 properName=true;
             }
         }
+
         if (firstPolygon==true && properName==true){
+            std::clog<<"The first polygon has been found."<<std::endl;
             firstPolygon=false;
+            //the next line of code is failing
             m_UnitedPolygon.push_back(m_Polygons[i]);
+            std::clog<<"The first polygon has been added to the multi-polygon."<<std::endl;
             //boost::geometry::append(m_UnitedPolygon,m_Polygons[i]);
         }else if (properName==true){
             boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
