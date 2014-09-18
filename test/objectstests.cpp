@@ -3,8 +3,11 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
-//#include <sstream>
-//#include <iostream>
+#ifdef _MSC_VER
+#define UNLINK _unlink
+#else
+#define UNLINK unlink
+#endif
 
 TEST(ObjectsTests, FilePathDirectory)
 {
@@ -38,7 +41,7 @@ TEST(ObjectsTests, FilePathDirectory)
 TEST(ObjectsTests, FilePathFile)
 {
     std::string testString = "testfile.txt";
-    unlink(testString.c_str());
+    UNLINK(testString.c_str());
 
     stadic::FilePath file(testString);
     EXPECT_FALSE(file.exists());
@@ -88,11 +91,11 @@ TEST(ObjectsTests, ProcessOutErrFiles)
     std::ifstream err("error.txt");
     std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
     err.close();
-    unlink("error.txt");
+    UNLINK("error.txt");
     std::ifstream out("output.txt");
     std::string outputString((std::istreambuf_iterator<char>(out)), std::istreambuf_iterator<char>());
     out.close();
-    unlink("output.txt");
+    UNLINK("output.txt");
     EXPECT_EQ("This is the standard output", stadic::trim(outputString));
     EXPECT_EQ("This is the standard error", stadic::trim(errorString));
 }
@@ -110,11 +113,11 @@ TEST(ObjectsTests, ProcessArgsOutErrFiles)
     std::ifstream err("error.txt");
     std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
     err.close();
-    unlink("error.txt");
+    UNLINK("error.txt");
     std::ifstream out("output.txt");
     std::string outputString((std::istreambuf_iterator<char>(out)), std::istreambuf_iterator<char>());
     out.close();
-    unlink("output.txt");
+    UNLINK("output.txt");
     EXPECT_EQ("Here are some standard output letters: xxxxxxxxx", stadic::trim(outputString));
     EXPECT_EQ("Here are some standard error letters: xxxxxxxxx", stadic::trim(errorString));
 }
@@ -138,7 +141,7 @@ TEST(ObjectsTests, ProcessInputFile)
     output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
     EXPECT_EQ("Input:This is line 1Input:This is line 2Input:STOP", output);
     EXPECT_TRUE(stadic::trim(proc.error()).empty());
-    unlink("input.txt");
+    UNLINK("input.txt");
 }
 
 TEST(ObjectsTests, ProcessMultiples1)
@@ -171,7 +174,7 @@ TEST(ObjectsTests, ProcessMultiples1)
     output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
     EXPECT_EQ("Input:Input:This is the first lineInput:Input:There's not much moreInput:Input:STOP", output);
     //EXPECT_TRUE(stadic::trim(proc.error()).empty());
-    unlink("input.txt");
+    UNLINK("input.txt");
 }
 
 TEST(ObjectsTests, ProcessMultiples2)
@@ -204,7 +207,7 @@ TEST(ObjectsTests, ProcessMultiples2)
     output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
     EXPECT_EQ("Input:Input:This is the first lineInput:Input:There's not much moreInput:Input:STOP", output);
     //EXPECT_TRUE(stadic::trim(proc.error()).empty());
-    unlink("input.txt");
+    UNLINK("input.txt");
 }
 
 TEST(ObjectsTests, ProcessMultiplesMore1)
@@ -248,7 +251,7 @@ TEST(ObjectsTests, ProcessMultiplesMore1)
     output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
     EXPECT_EQ("Input:Input:Input:Input:Input:STOP", output);
     //EXPECT_TRUE(stadic::trim(proc.error()).empty());
-    unlink("input.txt");
+    UNLINK("input.txt");
 }
 
 TEST(ObjectsTests, ProcessMultiplesMore2)
@@ -305,6 +308,6 @@ TEST(ObjectsTests, ProcessMultiplesMore2)
     EXPECT_TRUE(proc1.output().empty());
     EXPECT_TRUE(proc2.output().empty());
     EXPECT_TRUE(proc3.output().empty());
-    unlink("input.txt");
-    unlink("error.txt");
+    UNLINK("input.txt");
+    UNLINK("error.txt");
 }
