@@ -37,3 +37,16 @@ TEST(FunctionTests, Trim)
     std::string testString = " word   ";
     EXPECT_EQ("word",stadic::trim(testString));
 }
+
+TEST(FunctionTests, ToDouble)
+{
+    std::string string = "20.5";
+    bool ok;
+    double value = stadic::toDouble(string, &ok);
+    EXPECT_EQ(20.5,value);
+    EXPECT_TRUE(ok);
+    string = "not a number";
+    value = stadic::toDouble(string, &ok);
+    EXPECT_EQ(0.0, value);
+    EXPECT_FALSE(ok);
+}

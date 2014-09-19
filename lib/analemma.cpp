@@ -1,10 +1,9 @@
 #include "analemma.h"
 #include "logging.h"
+#include "functions.h"
 #include <math.h>
 #include <fstream>
 #include <iostream>
-
-
 
 const double PI=3.1415926535897932;
 
@@ -23,14 +22,17 @@ Analemma::Analemma(std::string file)
 }
 
 //Setters
-void Analemma::setRotation(double val){
+void Analemma::setRotation(double val)
+{
     m_Rotation=val;
 }
-void Analemma::setMatFile(std::string file){
+void Analemma::setMatFile(std::string file)
+{
     m_MatFile=file;
 }
 
-void Analemma::setGeoFile(std::string file){
+void Analemma::setGeoFile(std::string file)
+{
     m_GeoFile=file;
 }
 
@@ -39,7 +41,8 @@ void Analemma::setGeoFile(std::string file){
 
 
 //Functions
-bool Analemma::genSun(){
+bool Analemma::genSun()
+{
     std::clog<<"Before weather parse"<<std::endl;
     if(!parseWeather()){
         return false;
@@ -61,14 +64,16 @@ bool Analemma::genSun(){
 
 
 //Private Functions
-bool Analemma::parseWeather(){
+bool Analemma::parseWeather()
+{
     if (!m_WeaData.parseWeather(m_WeatherFile)){
         return false;
     }
     return true;
 }
 
-bool Analemma::getSunPos(){
+bool Analemma::getSunPos()
+{
     std::ofstream matFile;
     matFile.open(m_MatFile);
     if (!matFile.is_open()){
@@ -158,40 +163,52 @@ bool Analemma::getSunPos(){
     return true;
 }
 
-std::vector<double> Analemma::pos(double altitude, double azimuth){
+std::vector<double> Analemma::pos(double altitude, double azimuth)
+{
     std::vector<double> tempVec;
-    tempVec.clear();
     tempVec.push_back(cos(altitude)*sin(azimuth));
     tempVec.push_back(cos(altitude)*cos(azimuth));
     tempVec.push_back(sin(altitude));
     return tempVec;
 }
 
-double Analemma::degToRad(double val){
+double Analemma::degToRad(double val)
+{
     return val*PI/180.0;
 }
 
-double Analemma::solarDec(int julianDate){
+double Analemma::degToRad(std::string val)
+{
+    return stadic::toDouble(val)*PI/180.0;
+}
+
+double Analemma::solarDec(int julianDate)
+{
     return 0.4093*sin((2*PI/368)*(julianDate-81));
 }
 
-double Analemma::solarTimeAdj(int julianDate){
-    return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(atof(m_WeaData.timeZone().c_str()))-degToRad(atof(m_WeaData.longitude().c_str())))/PI;
+double Analemma::solarTimeAdj(int julianDate)
+{
+    return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(m_WeaData.timeZone())-degToRad(m_WeaData.longitude()))/PI;
 }
 
-double Analemma::solarAlt(double solarDeclination, double time){
-    return asin(sin(degToRad(atof(m_WeaData.latitude().c_str())))*sin(solarDeclination)-cos(degToRad(atof(m_WeaData.latitude().c_str())))*cos(solarDeclination)*cos(PI*time/12));
+double Analemma::solarAlt(double solarDeclination, double time)
+{
+    return asin(sin(degToRad(m_WeaData.latitude()))*sin(solarDeclination)-cos(degToRad(m_WeaData.latitude()))*cos(solarDeclination)*cos(PI*time/12));
 }
 
-double Analemma::solarAz(double solarDeclination, double time){
-    return -atan2(cos(solarDeclination)*sin(time*(PI/12)),-cos(degToRad(atof(m_WeaData.latitude().c_str())))*sin(solarDeclination)-sin(degToRad(atof(m_WeaData.latitude().c_str())))*cos(solarDeclination)*cos(time*(PI/12)));
+double Analemma::solarAz(double solarDeclination, double time)
+{
+    return -atan2(cos(solarDeclination)*sin(time*(PI/12)),-cos(degToRad(m_WeaData.latitude()))*sin(solarDeclination)-sin(degToRad(m_WeaData.latitude()))*cos(solarDeclination)*cos(time*(PI/12)));
 }
 
-double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2){
+double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2)
+{
     return vec1[0]*vec2[0]+vec1[1]*vec2[1]+vec1[2]*vec2[2];
 }
 
-bool Analemma::closestSun(){
+bool Analemma::closestSun()
+{
     int hr_count=0;
     int hr=0;
     double sda;         //Solar Declination Angle
@@ -234,7 +251,8 @@ bool Analemma::closestSun(){
     return true;
 }
 
-bool Analemma::genSunMtx(){
+bool Analemma::genSunMtx()
+{
     m_SunVal.reserve(8760);
     for (int i=0;i<8760;i++){
         m_SunVal.at(i).reserve(m_numSuns);
@@ -248,14 +266,12 @@ bool Analemma::genSunMtx(){
     for (int i=0;i<m_WeaData.hour().size();i++){
         if (m_ClosestSun[i]>-1){
             std::vector<double> tempVec;
-            tempVec.clear();
-            tempVec.push_back(atof(m_WeaData.directNormal()[i].c_str())/6.797e-05);
-            tempVec.push_back(atof(m_WeaData.directNormal()[i].c_str())/6.797e-05);
-            tempVec.push_back(atof(m_WeaData.directNormal()[i].c_str())/6.797e-05);
+            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
+            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
+            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
             m_SunVal[i][m_ClosestSun[i]]=tempVec;
         }
     }
-
     return true;
 }
 

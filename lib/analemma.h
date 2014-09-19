@@ -43,6 +43,7 @@ private:
     bool getSunPos();
     std::vector<double> pos(double altitude, double azimuth);
     double degToRad(double val);
+    double degToRad(std::string val);
     double solarDec(int julianDate);
     double solarTimeAdj(int julianDate);
     double solarAlt(double solarDeclination, double time);
