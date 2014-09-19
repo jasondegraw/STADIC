@@ -4,6 +4,7 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 const double PI=3.1415926535897932;
 
@@ -16,7 +17,6 @@ Analemma::Analemma(std::string file)
     m_Rotation=0;
     m_numSuns=0;
     m_ClosestSun.clear();
-    m_ClosestSun.reserve(8760);
 
 
 }
@@ -36,6 +36,10 @@ void Analemma::setGeoFile(std::string file)
     m_GeoFile=file;
 }
 
+void Analemma::setSMXFile(std::string file){
+    m_SMXFile=file;
+}
+
 
 //Getters
 
@@ -43,19 +47,15 @@ void Analemma::setGeoFile(std::string file)
 //Functions
 bool Analemma::genSun()
 {
-    std::clog<<"Before weather parse"<<std::endl;
     if(!parseWeather()){
         return false;
     }
-    std::clog<<"Before getsunpos"<<std::endl;
     if (!getSunPos()){
         return false;
     }
-    std::clog<<"Before closestSun"<<std::endl;
     if (!closestSun()){
         return false;
     }
-    std::clog<<"Before gensunmtx"<<std::endl;
     if (!genSunMtx()){
         return false;
     }
@@ -131,27 +131,29 @@ bool Analemma::getSunPos()
                         pvec=pos(alt_prev,azi_prev);
                     }else{
                         std::vector<double> tempvec;
-                        //THIS NEXT SECTION IS CREATING MASSIVE AMOUNTS OF SUNS   > 16000
-                        int loopNum=m_SunLoc.size()-1;
-                        for (int j=n_first;j<=loopNum;j++){
+                        bool exclude=false;
+                        for (int j=n_first;j<=(m_SunLoc.size()-1);j++){
                             tempvec.clear();
                             tempvec.push_back(m_SunLoc[j][0]);
                             tempvec.push_back(m_SunLoc[j][1]);
                             tempvec.push_back(m_SunLoc[j][2]);
                             dprod=dotProd(tempvec,svec);
-                            if (dprod<0.999954){
-                                tempvec.clear();
-                                tempvec.push_back(svec[0]);
-                                tempvec.push_back(svec[1]);
-                                tempvec.push_back(svec[2]);
-                                m_SunLoc.push_back(tempvec);
-                                m_numSuns++;
-                                matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
-                                geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< "\t" << svec[1] << "\t" << svec[2]  <<" 0.533" << std::endl;
-                                azi_prev=azimuth;
-                                alt_prev=altitude;
-                                pvec=pos(alt_prev,azi_prev);
+                            if (dprod>0.999954){
+                                exclude=true;
                             }
+                        }
+                        if (!exclude){
+                            tempvec.clear();
+                            tempvec.push_back(svec[0]);
+                            tempvec.push_back(svec[1]);
+                            tempvec.push_back(svec[2]);
+                            m_SunLoc.push_back(tempvec);
+                            m_numSuns++;
+                            matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
+                            geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< "\t" << svec[1] << "\t" << svec[2]  <<" 0.533" << std::endl;
+                            azi_prev=azimuth;
+                            alt_prev=altitude;
+                            pvec=pos(alt_prev,azi_prev);
                         }
                     }
                 }
@@ -238,13 +240,20 @@ bool Analemma::closestSun()
                 tempvec.push_back(m_SunLoc[j][2]);
                 dprod = dotProd(tempvec,svec);
                 if(dprod>dp_closest){
-                  m_ClosestSun[hr_count-1]=j;
-                  dp_closest=dprod;
+                    if (m_ClosestSun.size()<hr_count){
+                        m_ClosestSun.push_back(j);
+                    }else{
+                        m_ClosestSun[hr_count-1]=j;
+                    }
+                    dp_closest=dprod;
                 }
               }
-            }
-            else {
-              m_ClosestSun[hr_count-1]=-1;
+            }else {
+                if (m_ClosestSun.size()<hr_count){
+                    m_ClosestSun.push_back(-1);
+                }else{
+                    m_ClosestSun[hr_count-1]=-1;
+                }
             }
         }
     }
@@ -253,11 +262,11 @@ bool Analemma::closestSun()
 
 bool Analemma::genSunMtx()
 {
-    m_SunVal.reserve(8760);
+    m_SunVal.resize(8760);
     for (int i=0;i<8760;i++){
-        m_SunVal.at(i).reserve(m_numSuns);
+        m_SunVal[i].resize(m_numSuns);
         for (int j=0;j<m_numSuns;j++){
-            m_SunVal[i][j].reserve(3);
+            m_SunVal[i][j].resize(3);
             for (int k=0;k<3;k++){
                 m_SunVal[i][j][k]=0;
             }
@@ -272,6 +281,27 @@ bool Analemma::genSunMtx()
             m_SunVal[i][m_ClosestSun[i]]=tempVec;
         }
     }
+    //Write out SMX matrix
+    std::ofstream smx;
+    smx.open(m_SMXFile);
+    if (!smx.is_open()){
+        STADIC_ERROR("There was a problem opening the smx file \""+m_SMXFile+"\".");
+        return false;
+    }
+    smx.setf(std::ios::scientific);
+    smx.setf(std::ios::fixed);
+    smx.precision(3);
+    for (int i=0;i<m_SunLoc.size();i++){
+        for (int j=0;j<8760;j++){
+            if (m_SunVal[j][i][0]==0){
+                smx<<"0\t0\t0"<<std::endl;
+            }else{
+                //Write exponential format
+                smx<<m_SunVal[j][i][0]<<"\t"<<m_SunVal[j][i][1]<<"\t"<<m_SunVal[j][i][2]<<std::endl;
+            }
+        }
+    }
+    smx.close();
     return true;
 }
 

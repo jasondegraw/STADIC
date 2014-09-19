@@ -20,6 +20,7 @@ public:
     void setRotation(double val);
     void setMatFile(std::string file);
     void setGeoFile(std::string file);
+    void setSMXFile(std::string file);
 
     //Getters
 
@@ -36,6 +37,7 @@ private:
     int m_numSuns;
     std::string m_MatFile;
     std::string m_GeoFile;
+    std::string m_SMXFile;
     std::vector<int> m_ClosestSun;
 
     //Functions

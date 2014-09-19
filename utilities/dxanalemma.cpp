@@ -14,8 +14,13 @@ int main (int argc, char *argv[])
         usage();
     }
     std::string weaFile;
+    weaFile.clear();
     std::string matFile;
+    matFile.clear();
     std::string geoFile;
+    geoFile.clear();
+    std::string smxFile;
+    smxFile.clear();
     double rotation=0;
 
     for (int i=1;i<argc;i++){
@@ -28,6 +33,9 @@ int main (int argc, char *argv[])
         }else if (std::string("-g")==argv[i]){
             i++;
             geoFile=argv[i];
+        }else if (std::string("-s")==argv[i]){
+            i++;
+            smxFile=argv[i];
         }else if (std::string("-r")==argv[i]){
             i++;
             rotation=atof(argv[i]);
@@ -36,12 +44,29 @@ int main (int argc, char *argv[])
             STADIC_WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
+    if (geoFile.empty()){
+        STADIC_ERROR("The gometry file must be specified.");
+        usage();
+        return EXIT_FAILURE;
+    }
+    if (matFile.empty()){
+        STADIC_ERROR("The material file must be specified.");
+        usage();
+        return EXIT_FAILURE;
+    }
+    if (smxFile.empty()){
+        STADIC_ERROR("The smx file must be specified.");
+        usage();
+        return EXIT_FAILURE;
+    }
+
     stadic::Analemma suns(weaFile);
     suns.setGeoFile(geoFile);
     suns.setMatFile(matFile);
     suns.setRotation(rotation);
+    suns.setSMXFile(smxFile);
     if (!suns.genSun()){
-        return false;
+        return EXIT_FAILURE;
     }
 
 
