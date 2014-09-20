@@ -46,7 +46,7 @@ void Control::setDataFolder(std::string folder){
 //******************
 bool Control::setGroundReflect(double value){
     if (value>1 || value<0){
-        STADIC_WARNING(std::string("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."));
+        STADIC_WARNING("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied.");
         //std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
         m_GroundReflect=0.2;
     }else{
@@ -59,7 +59,7 @@ void Control::setWeaDataFile(std::string file){
 }
 bool Control::setFirstDay(int value){
     if (value>7 || value<1){
-        std::cerr<<"WARNING: The first day must be an integer between 1 and 7.\n\tA default value of 1 will be applied."<<std::endl;
+        STADIC_WARNING("The first day must be an integer between 1 and 7.\n\tA default value of 1 will be applied.");
         m_FirstDay=1;
     }else{
         m_FirstDay=value;
@@ -78,7 +78,7 @@ void Control::setGeoFile(std::string file){
 }
 bool Control::setBuildingRotation(double value){
     if (value>360 || value<-360){
-        std::cerr<<"ERROR: The building rotation must be between -360 and 360."<<std::endl;
+        STADIC_ERROR("The building rotation must be between -360 and 360.");
         return false;
     }else{
         m_BuildingRotation=value;
@@ -92,7 +92,7 @@ bool Control::setImportUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_ImportUnits=units;
     }else{
-        std::cerr<<"ERROR: The import units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\""<<std::endl;
+        STADIC_ERROR("The import units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\"");
         return false;
     }
     return true;
@@ -101,7 +101,7 @@ bool Control::setIllumUnits(std::string units){
     if (units=="lux" || units=="fc"){
         m_IllumUnits=units;
     }else{
-        std::cerr<<"ERROR: The illuminance units must be either \"lux\" or \"fc\"."<<std::endl;
+        STADIC_ERROR("The illuminance units must be either \"lux\" or \"fc\".");
         return false;
     }
     return true;
@@ -110,7 +110,7 @@ bool Control::setDisplayUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_DisplayUnits=units;
     }else{
-        std::cerr<<"ERROR: The display units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\""<<std::endl;
+        STADIC_ERROR("The display units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\"");
         return false;
     }
     return true;
@@ -120,7 +120,7 @@ void Control::setOccSchedule(std::string file){
 }
 bool Control::setTargetIlluminance(double value){
     if (value<0){
-        std::cerr<<"ERROR: The target illuminance must be greater than 0."<<std::endl;
+        STADIC_ERROR("The target illuminance must be greater than 0.");
         return false;
     }else{
         m_TargetIlluminance=value;
@@ -133,26 +133,32 @@ bool Control::setTargetIlluminance(double value){
 //******************
 bool Control::setSunDivisions(int value){
     if (value<1 || value>6){
-        std::cerr<<"WARNING: The sun divisions must be between 1 and 6.\n\tA default value of 3 will be applied."<<std::endl;
+        STADIC_WARNING("The sun divisions must be between 1 and 6.\n\tA default value of 3 will be applied.");
         m_SunDivisions=3;
     }else{
         m_SunDivisions=value;
     }
     return true;
 }
-bool Control::setSkyDivisions(int value){
+
+bool Control::setSkyDivisions(int value)
+{
     if (value<1 || value>6){
-        std::cerr<<"WARNING: The sky divisions must be between 1 and 6.\n\tA default value of 3 will be applied."<<std::endl;
+        STADIC_WARNING("The sky divisions must be between 1 and 6.\n\tA default value of 3 will be applied.");
         m_SkyDivisions=3;
     }else{
         m_SkyDivisions=value;
     }
     return true;
 }
-void Control::setDaylightSavingsTime(bool value){
+
+void Control::setDaylightSavingsTime(bool value)
+{
     m_DaylightSavingsTime=value;
 }
-bool Control::setDefaultRadianceParameters(){
+
+bool Control::setDefaultRadianceParameters()
+{
     std::cerr<<"\t\tab=4"<<std::endl;
     if (!setAB(4)){
         return false;
@@ -270,7 +276,7 @@ bool Control::setDA(bool run, double illum){
     if (illum>0){
         m_DAIllum=illum;
     }else{
-        std::cerr<<"ERROR: The DA illuminance must be greater than 0."<<std::endl;
+        STADIC_ERROR("The DA illuminance must be greater than 0.");
         return false;
     }
     return true;
@@ -280,7 +286,7 @@ bool Control::setcDA(bool run, double illum){
     if (illum>0){
         m_cDAIllum=illum;
     }else{
-        std::cerr<<"ERROR: The cDA illuminance must be greater than 0."<<std::endl;
+        STADIC_ERROR("The cDA illuminance must be greater than 0.");
         return false;
     }
     return true;
@@ -290,25 +296,25 @@ bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, do
     if (illum>0){
         m_sDAIllum=illum;
     }else{
-        std::cerr<<"ERROR: The sDA illuminance must be greater than 0."<<std::endl;
+        STADIC_ERROR("The sDA illuminance must be greater than 0.");
         return false;
     }
     if (DAFrac>0 && DAFrac<1){
         m_sDAFrac=DAFrac;
     }else{
-        std::cerr<<"ERROR: The sDA fraction must be between 0 and 1."<<std::endl;
+        STADIC_ERROR("The sDA fraction must be between 0 and 1.");
         return false;
     }
     if (startTime>0 && startTime<endTime){
         m_sDAStart=startTime;
     }else{
-        std::cerr<<"ERROR: The sDA start time has to be greater than 0 and less than the end time."<<std::endl;
+        STADIC_ERROR("The sDA start time has to be greater than 0 and less than the end time.");
         return false;
     }
     if (endTime<24 && endTime>startTime){
         m_sDAEnd=endTime;
     }else{
-        std::cerr<<"ERROR: The sDA end time has to be greater than the start time and less than 24."<<std::endl;
+        STADIC_ERROR("The sDA end time has to be greater than the start time and less than 24.");
         return false;
     }
     return true;
@@ -318,13 +324,13 @@ bool Control::setOccsDA(bool run, double illum, double DAFrac){
     if (illum>0){
         m_OccsDAIllum=illum;
     }else{
-        std::cerr<<"ERROR: The occupancy schedule based sDA illuminance must be greater than 0."<<std::endl;
+        STADIC_ERROR("The occupancy schedule based sDA illuminance must be greater than 0.");
         return false;
     }
     if (DAFrac>0 && DAFrac<1){
         m_OccsDAFrac=DAFrac;
     }else{
-        std::cerr<<"ERROR: The occupancy schedule based sDA fraction must be between 0 and 1."<<std::endl;
+        STADIC_ERROR("The occupancy schedule based sDA fraction must be between 0 and 1.");
         return false;
     }
     return true;
@@ -337,7 +343,7 @@ bool Control::setUDI(bool run, double minIllum, double maxIllum){
     if (minIllum>=0 && minIllum<maxIllum){
         m_UDIMin=minIllum;
     }else{
-        std::cerr<<"ERROR: The UDI minimum illuminance must be between 0 and the maximum illuminance."<<std::endl;
+        STADIC_ERROR("The UDI minimum illuminance must be between 0 and the maximum illuminance.");
         return false;
     }
     m_UDIMax=maxIllum;
@@ -553,91 +559,91 @@ bool Control::parseJson(std::string file){
     //******************
     QJsonValue val= jsonObj.value("project_name");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"project_name\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"project_name\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setProjectName(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"project_name\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"project_name\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("project_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"project_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"project_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setProjectFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"project_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"project_folder\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("tmp_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"tmp_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"tmp_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setTmpFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"tmp_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"tmp_folder\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("geometry_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"geometry_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"geometry_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setGeoFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"geometry_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"geometry_folder\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("ies_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"ies_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"ies_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setIESFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"ies_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"ies_folder\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("results_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"results_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"results_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setResultsFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"results_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"results_folder\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("data_folder");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"data_folder\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"data_folder\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setDataFolder(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"data_folder\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"data_folder\" is not a string.");
             return false;
         }
     }
@@ -647,7 +653,7 @@ bool Control::parseJson(std::string file){
     //******************
     val=jsonObj.value("ground_reflectance");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"ground_reflectance\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"ground_reflectance\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isDouble()){
@@ -655,27 +661,27 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"ground_reflectance\" is not a double."<<std::endl;
+            STADIC_ERROR("The \"ground_reflectance\" is not a double.");
             return false;
         }
     }
 
     val=jsonObj.value("wea_data_file");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"wea_data_file\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"wea_data_file\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setWeaDataFile(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"wea_data_file\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"wea_data_file\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("first_day");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"first_day\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"first_day\" does not appear in the STADIC Control File.");
         return false;
     }else{
         int num;
@@ -685,7 +691,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"first_day\" is not an integer."<<std::endl;
+            STADIC_ERROR("The \"first_day\" is not an integer.");
             return false;
         }
     }
@@ -695,33 +701,33 @@ bool Control::parseJson(std::string file){
     //******************
     val=jsonObj.value("material_file");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"material_file\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"material_file\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setMatFile(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"material_file\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"material_file\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("geometry_file");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"geometry_file\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"geometry_file\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setGeoFile(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"geometry_file\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"geometry_file\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value("building_rotation");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"building_rotation\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"building_rotation\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isDouble()){
@@ -729,20 +735,20 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"building_rotation\" is not a double."<<std::endl;
+            STADIC_ERROR("The \"building_rotation\" is not a double.");
             return false;
         }
     }
 
     val=jsonObj.value("analysis_points");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"analysis_points\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"analysis_points\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setPTSFile(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"analysis_points\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"analysis_points\" is not a string.");
             return false;
         }
     }
@@ -750,7 +756,7 @@ bool Control::parseJson(std::string file){
     val=jsonObj.value("window_groups");
     QJsonArray array=val.toArray();
     if (val.isUndefined()){
-        std::cerr<<"ERROR:  The key \"window_groups\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR(" The key \"window_groups\" does not appear in the STADIC Control File.");
         return false;
     }else{
         for (int i=0;i<array.size();i++){
@@ -762,7 +768,7 @@ bool Control::parseJson(std::string file){
                     return false;
                 }
             }else{
-                std::cerr<<"ERROR: The \"window_groups\" is not an object."<<std::endl;
+                STADIC_ERROR("The \"window_groups\" is not an object.");
                 return false;
             }
         }
@@ -771,7 +777,7 @@ bool Control::parseJson(std::string file){
 
     val=jsonObj.value("import_units");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"import_units\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"import_units\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
@@ -779,14 +785,14 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"import_units\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"import_units\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("illum_units"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"illum_units\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"illum_units\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
@@ -794,14 +800,14 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"illum_units\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"illum_units\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("display_units"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"display_units\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"display_units\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
@@ -809,27 +815,27 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"display_units\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"display_units\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("occupancy_schedule"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"occupancy_schedule\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"occupancy_schedule\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isString()){
             setOccSchedule(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The \"occupancy_schedule\" is not a string."<<std::endl;
+            STADIC_ERROR("The \"occupancy_schedule\" is not a string.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("target_illuminance"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"target_illuminance\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"target_illuminance\" does not appear in the STADIC Control File.");
         return false;
     }else{
         if (val.isDouble()){
@@ -837,7 +843,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"target_illuminance\" is not a double."<<std::endl;
+            STADIC_ERROR("The \"target_illuminance\" is not a double.");
             return false;
         }
     }
@@ -847,7 +853,7 @@ bool Control::parseJson(std::string file){
     //******************
     val=jsonObj.value(QString("sun_divisions"));
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The key \"sun_divisions\" does not appear in the STADIC Control File.\n\tSun Divisions will be set to 3."<<std::endl;
+        STADIC_WARNING("The key \"sun_divisions\" does not appear in the STADIC Control File.\n\tSun Divisions will be set to 3.");
         setSunDivisions(3);
     }else{
         int num;
@@ -857,14 +863,14 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"sun_divisions\" is not an integer."<<std::endl;
+            STADIC_ERROR("The \"sun_divisions\" is not an integer.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("sky_divisions"));
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The key \"sky_divisions\" does not appear in the STADIC Control File.\n\tSky Divisions will be set to 3."<<std::endl;
+        STADIC_WARNING("The key \"sky_divisions\" does not appear in the STADIC Control File.\n\tSky Divisions will be set to 3.");
         setSkyDivisions(3);
     }else{
         int num;
@@ -874,27 +880,27 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"sky_divisions\" is not an integer."<<std::endl;
+            STADIC_ERROR("The \"sky_divisions\" is not an integer.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("daylight_savings_time"));
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The key \"daylight_savings_time\" does not appear in the STADIC Control File.\n\tDaylight Savings Time will be enabled."<<std::endl;
+        STADIC_WARNING("The key \"daylight_savings_time\" does not appear in the STADIC Control File.\n\tDaylight Savings Time will be enabled.");
         setDaylightSavingsTime(true);
     }else{
         if (val.isBool()){
                setDaylightSavingsTime(val.toBool());
         }else{
-            std::cerr<<"ERROR: The \"daylight_savings_time\" is not a boolean."<<std::endl;
+            STADIC_ERROR("The \"daylight_savings_time\" is not a boolean.");
             return false;
         }
     }
 
     val=jsonObj.value(QString("radiance_parameters"));
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The key \"radiance_parameters\" does not appear in the STADIC Control File.\n\tThe default values of the parameters will be as follows."<<std::endl;
+        STADIC_WARNING("The key \"radiance_parameters\" does not appear in the STADIC Control File.\n\tThe default values of the parameters will be as follows.");
         if (!setDefaultRadianceParameters()){
             return false;
         }
@@ -903,7 +909,7 @@ bool Control::parseJson(std::string file){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("ab");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"ab\" was not found. A default value of 4 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"ab\" was not found. A default value of 4 will be applied.");
                 if (!setAB(4)){
                     return false;
                 }
@@ -913,7 +919,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"ab\" is not a number. A default value of 4 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"ab\" is not a number. A default value of 4 will be applied.");
                     if (!setAB(4)){
                         return false;
                     }
@@ -922,7 +928,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("ad");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"ad\" was not found. A default value of 300 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"ad\" was not found. A default value of 300 will be applied.");
                 if (!setAD(300)){
                     return false;
                 }
@@ -932,7 +938,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"ad\" is not a number. A default value of 300 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"ad\" is not a number. A default value of 300 will be applied.");
                     if (!setAD(300)){
                         return false;
                     }
@@ -941,7 +947,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("as");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"as\" was not found. A default value of 20 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"as\" was not found. A default value of 20 will be applied.");
                 if (!setAS(20)){
                     return false;
                 }
@@ -951,7 +957,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"as\" is not a number. A default value of 20 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"as\" is not a number. A default value of 20 will be applied.");
                     if (!setAS(20)){
                         return false;
                     }
@@ -960,7 +966,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("ar");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"ar\" was not found. A default value of 150 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"ar\" was not found. A default value of 150 will be applied.");
                 if (!setAR(150)){
                     return false;
                 }
@@ -970,7 +976,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"ar\" is not a number. A default value of 150 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"ar\" is not a number. A default value of 150 will be applied.");
                     if (!setAR(150)){
                         return false;
                     }
@@ -979,7 +985,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("aa");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"aa\" was not found. A default value of 0.1 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"aa\" was not found. A default value of 0.1 will be applied.");
                 if (!setAA(0.1)){
                     return false;
                 }
@@ -989,7 +995,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"aa\" is not a number. A default value of 0.1 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"aa\" is not a number. A default value of 0.1 will be applied.");
                     if (!setAA(0.1)){
                         return false;
                     }
@@ -998,7 +1004,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("lr");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"lr\" was not found. A default value of 6 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"lr\" was not found. A default value of 6 will be applied.");
                 if (!setLR(6)){
                     return false;
                 }
@@ -1008,7 +1014,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"lr\" is not a number. A default value of 6 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"lr\" is not a number. A default value of 6 will be applied.");
                     if (!setLR(6)){
                         return false;
                     }
@@ -1017,7 +1023,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("st");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"st\" was not found. A default value of 0.15 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"st\" was not found. A default value of 0.15 will be applied.");
                 if (!setST(0.15)){
                     return false;
                 }
@@ -1027,7 +1033,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"st\" is not a number. A default value of 0.15 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"st\" is not a number. A default value of 0.15 will be applied.");
                     if (!setST(0.15)){
                         return false;
                     }
@@ -1036,7 +1042,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("sj");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"sj\" was not found. A default value of 1.0 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"sj\" was not found. A default value of 1.0 will be applied.");
                 if (!setSJ(1.0)){
                     return false;
                 }
@@ -1046,7 +1052,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"sj\" is not a number. A default value of 1.0 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"sj\" is not a number. A default value of 1.0 will be applied.");
                     if (!setSJ(1.0)){
                         return false;
                     }
@@ -1055,7 +1061,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("lw");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"lw\" was not found. A default value of 0.004 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"lw\" was not found. A default value of 0.004 will be applied.");
                 if (!setLW(0.004)){
                     return false;
                 }
@@ -1065,7 +1071,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"lw\" is not a number. A default value of 0.004 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"lw\" is not a number. A default value of 0.004 will be applied.");
                     if (!setLW(0.004)){
                         return false;
                     }
@@ -1074,7 +1080,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("dj");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"dj\" was not found. A default value of 0.0 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"dj\" was not found. A default value of 0.0 will be applied.");
                 if (!setDJ(0.0000)){
                     return false;
                 }
@@ -1084,7 +1090,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"dj\" is not a number. A default value of 0.0 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"dj\" is not a number. A default value of 0.0 will be applied.");
                     if (!setDJ(0.0000)){
                         return false;
                     }
@@ -1093,7 +1099,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("ds");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"ds\" was not found. A default value of 0.200 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"ds\" was not found. A default value of 0.200 will be applied.");
                 if (!setDS(0.200)){
                     return false;
                 }
@@ -1103,7 +1109,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"ds\" is not a number. A default value of 0.200 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"ds\" is not a number. A default value of 0.200 will be applied.");
                     if (!setDS(0.200)){
                         return false;
                     }
@@ -1112,7 +1118,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("dr");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"dr\" was not found. A default value of 2 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"dr\" was not found. A default value of 2 will be applied.");
                 if (!setDR(2)){
                     return false;
                 }
@@ -1122,7 +1128,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"dr\" is not a number. A default value of 2 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"dr\" is not a number. A default value of 2 will be applied.");
                     if (!setDR(2)){
                         return false;
                     }
@@ -1131,7 +1137,7 @@ bool Control::parseJson(std::string file){
 
             val=tempObject.value("dp");
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The parameter \"dp\" was not found. A default value of 512 will be applied."<<std::endl;
+                STADIC_WARNING("The parameter \"dp\" was not found. A default value of 512 will be applied.");
                 if (!setDP(512)){
                     return false;
                 }
@@ -1141,7 +1147,7 @@ bool Control::parseJson(std::string file){
                         return false;
                     }
                 }else{
-                    std::cerr<<"WARNING: The parameter \"dp\" is not a number. A default value of 512 will be applied."<<std::endl;
+                    STADIC_WARNING("The parameter \"dp\" is not a number. A default value of 512 will be applied.");
                     if (!setDP(512)){
                         return false;
                     }
@@ -1151,7 +1157,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"The key \"radiance_parameters\" is not an object.\n\tThe default values of the parameters will be as follows."<<std::endl;
+            STADIC_WARNING("The key \"radiance_parameters\" is not an object.\n\tThe default values of the parameters will be as follows.");
             if (!setDefaultRadianceParameters()){
                 return false;
             }
@@ -1164,7 +1170,7 @@ bool Control::parseJson(std::string file){
     val=jsonObj.value(QString("control_zones"));
     array=val.toArray();
     if (val.isUndefined()){
-        std::cerr<<"WARNING:  The key \"control_zones\" does not appear in the STADIC Control File."<<std::endl;
+        STADIC_WARNING(" The key \"control_zones\" does not appear in the STADIC Control File.");
     }else{
         for (int i=0;i<array.size();i++){
             ControlZone *zone=new ControlZone;
@@ -1175,7 +1181,7 @@ bool Control::parseJson(std::string file){
                     return false;
                 }
             }else{
-                std::cerr<<"ERROR: The \"control_zones\" is not an object."<<std::endl;
+                STADIC_ERROR("The \"control_zones\" is not an object.");
                 return false;
             }
         }
@@ -1192,57 +1198,49 @@ bool Control::parseJson(std::string file){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value(QString("illuminance"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"illuminance\" is missing under sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                STADIC_WARNING("The key \"illuminance\" is missing under sDA.\n\tAn assumed value of 300 will be used.");
                 illum=300;
             }else{
                 if (val.isDouble()){
                     illum=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"illuminance\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"illuminance\" does not contain a number.\n\tAn assumed value of 300 will be used.");
                     illum=300;
                 }
             }
             val=tempObject.value(QString("DA_fraction"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"DA_fraction\" is missing under sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                STADIC_WARNING("The key \"DA_fraction\" is missing under sDA.\n\tAn assumed value of 0.5 will be used.");
                 frac=0.5;
             }else{
                 if (val.isDouble()){
                     frac=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"DA_fraction\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"DA_fraction\" does not contain a number.\n\tAn assumed value of 0.5 will be used.");
                     frac=0.5;
                 }
             }
             val=tempObject.value(QString("start_time"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"start_time\" is missing under sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 8 will be used."<<std::endl;
+                STADIC_WARNING("The key \"start_time\" is missing under sDA.\n\tAn assumed value of 8 will be used.");
                 start=8;
             }else{
                 if (val.isDouble()){
                     start=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"start_time\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 8 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"start_time\" does not contain a number.\n\tAn assumed value of 8 will be used.");
                     start=8;
                 }
             }
             val=tempObject.value(QString("end_time"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"end_time\" is missing under sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 17 will be used."<<std::endl;
+                STADIC_WARNING("The key \"end_time\" is missing under sDA.\n\tAn assumed value of 17 will be used.");
                 endTime=17;
             }else{
                 if (val.isDouble()){
                     endTime=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"end_time\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 17 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"end_time\" does not contain a number.\n\tAn assumed value of 17 will be used.");
                     endTime=17;
                 }
             }
@@ -1250,7 +1248,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"sDA\" is not an object."<<std::endl;
+            STADIC_ERROR("The \"sDA\" is not an object.");
             return false;
         }
     }
@@ -1261,29 +1259,25 @@ bool Control::parseJson(std::string file){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value(QString("illuminance"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"illuminance\" is missing under occupied_sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                STADIC_WARNING("The key \"illuminance\" is missing under occupied_sDA.\n\tAn assumed value of 300 will be used.");
                 illum=300;
             }else{
                 if (val.isDouble()){
                     illum=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"illuminance\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 300 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"illuminance\" does not contain a number.\n\tAn assumed value of 300 will be used.");
                     illum=300;
                 }
             }
             val=tempObject.value(QString("DA_fraction"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"DA_fraction\" is missing under occupied_sDA."<<std::endl;
-                std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                STADIC_WARNING("The key \"DA_fraction\" is missing under occupied_sDA.\n\tAn assumed value of 0.5 will be used.");
                 frac=0.5;
             }else{
                 if (val.isDouble()){
                     frac=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"DA_fraction\" does not contain a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 0.5 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"DA_fraction\" does not contain a number.\n\tAn assumed value of 0.5 will be used.");
                     frac=0.5;
                 }
             }
@@ -1291,7 +1285,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The key \"occupied_sDA\" is not an object."<<std::endl;
+            STADIC_ERROR("The key \"occupied_sDA\" is not an object.");
             return false;
         }
     }
@@ -1302,7 +1296,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"DA\" is not a double."<<std::endl;
+            STADIC_ERROR("The \"DA\" is not a double.");
             return false;
         }
     }
@@ -1314,7 +1308,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The \"cDA\" is not a double."<<std::endl;
+            STADIC_ERROR("The \"cDA\" is not a double.");
             return false;
         }
     }
@@ -1324,7 +1318,7 @@ bool Control::parseJson(std::string file){
         if (val.isBool()){
                setDF(val.toBool());
         }else{
-            std::cerr<<"ERROR: The \"DF\" is not a boolean."<<std::endl;
+            STADIC_ERROR("The \"DF\" is not a boolean.");
             return false;
         }
     }
@@ -1335,29 +1329,25 @@ bool Control::parseJson(std::string file){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value(QString("minimum"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"minimum\" is missing under UDI."<<std::endl;
-                std::cerr<<"\tAn assumed value of 100 will be used."<<std::endl;
+                STADIC_WARNING("The key \"minimum\" is missing under UDI.\n\tAn assumed value of 100 will be used.");
                 minimum=100;
             }else{
                 if (val.isDouble()){
                     minimum=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"minimum\" is not a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 100 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"minimum\" is not a number.\n\tAn assumed value of 100 will be used.");
                     minimum=100;
                 }
             }
             val=tempObject.value(QString("maximum"));
             if (val.isUndefined()){
-                std::cerr<<"WARNING: The key \"maximum\" is missing under UDI."<<std::endl;
-                std::cerr<<"\tAn assumed value of 250 will be used."<<std::endl;
+                STADIC_WARNING("The key \"maximum\" is missing under UDI.\n\tAn assumed value of 250 will be used.");
                 maximum=250;
             }else{
                 if (val.isDouble()){
                     maximum=val.toDouble();
                 }else{
-                    std::cerr<<"WARNING: The key \"maximum\" is not a number."<<std::endl;
-                    std::cerr<<"\tAn assumed value of 250 will be used."<<std::endl;
+                    STADIC_WARNING("The key \"maximum\" is not a number.\n\tAn assumed value of 250 will be used.");
                     maximum=250;
                 }
             }
@@ -1365,7 +1355,7 @@ bool Control::parseJson(std::string file){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The key \"UDI\" is not an object."<<std::endl;
+            STADIC_ERROR("The key \"UDI\" is not an object.");
             return false;
         }
     }
