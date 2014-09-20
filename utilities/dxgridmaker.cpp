@@ -16,6 +16,7 @@ void usage(){
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
+    std::cerr<<"-v location\tSet the location that the files should be placed for creating the .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-p name\tSet the ouput for the joined polygon to name. This file contains the joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\"."<<std::endl;
     std::cerr<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
 }
@@ -33,6 +34,8 @@ int main (int argc, char *argv[])
     csvFile.clear();
     std::string polyFile;
     polyFile.clear();
+    std::string viewLocation;
+    viewLocation.clear();
     std::vector<std::string> layerNames;
     bool useZOffset=false;
     bool useOffset=false;
@@ -77,6 +80,9 @@ int main (int argc, char *argv[])
         }else if(std::strcmp(argv[i],"-l")==0){
             i++;
             layerNames.push_back(argv[i]);
+        }else if(std::strcmp(argv[i],"-v")==0){
+            i++;
+            viewLocation=argv[i];
         }else if(std::strcmp(argv[i],"-p")==0){
             i++;
             polyFile=argv[i];
@@ -139,6 +145,10 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-
+    if (!viewLocation.empty()){
+        if (!grid.viewPTS(viewLocation)){
+            return EXIT_FAILURE;
+        }
+    }
     return EXIT_SUCCESS;
 }

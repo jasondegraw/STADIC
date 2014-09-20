@@ -50,7 +50,8 @@ public:
     bool writePTS();
     bool writePTS(std::string file);
     bool writePTScsv(std::string file);
-    //bool writeRadPoly(std::string file);
+    bool viewPTS(std::string location);
+
 
 private:
     //Points
@@ -72,6 +73,10 @@ private:
     bool m_useZOffset;
     double m_Offset;
     bool m_UseOffset;
+    std::string m_RadPolyFile;
+    std::string m_RadPtsFile;
+    std::string m_oconvFile;
+    std::string m_picFile;
 
     //Dimensional
     double m_MinX;
@@ -92,6 +97,10 @@ private:
     bool testPoints();
     void addTestPoints(double x, double y);
     void zHeights();
+    bool writeRadPoly(std::string file);
+    bool writeRadPoints(std::string file);
+    bool runoconv(std::string file);
+    bool runrpict();
 
 signals:
 

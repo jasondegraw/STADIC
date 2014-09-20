@@ -4,6 +4,7 @@
 #include "functions.h"
 #include <iostream>
 #include <fstream>
+#include "process.h"
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -169,23 +170,32 @@ bool GridMaker::writePTScsv(std::string file){
     oFile.close();
     return true;
 }
-/*
-bool GridMaker::writeRadPoly(std::string file){
-    std::ofstream oFile;
-    oFile.open(file);
-    if (!oFile.is_open()){
-        STADIC_ERROR("The opening of the file "+file+" has failed.");
+bool GridMaker::viewPTS(std::string location){
+    //The file names need to be adjusted
+    m_RadPolyFile=location+"poly.rad";
+    if (!writeRadPoly(m_RadPolyFile)){
         return false;
     }
-    oFile<<"floor\tpolygon\tfloor1"<<std::endl;
-    oFile<<"0\t0\t"<<m_UnitedPolygon.size()*3;
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        oFile<<endl<<m_UnitedPolygon[i].x()<<"\t"<<m_UnitedPolygon[i].y()<<"\t0";
+
+    m_RadPtsFile=location+"points.rad";
+    if (!writeRadPoints(m_RadPtsFile)){
+        return false;
     }
-    oFile.close();
+
+    m_oconvFile=location+"points.oct";
+    if (!runoconv(m_oconvFile)){
+        return false;
+    }
+
+    m_picFile=location;
+    if (!runrpict()){
+        return false;
+    }
     return true;
 }
-*/
+
+
+
 //Private
 //Functions
 bool GridMaker::parseRad(){
@@ -259,16 +269,6 @@ bool GridMaker::insetPolygons(){
         STADIC_ERROR("Creating the offset failed to create a valid polygon.");
         return false;
     }
-    /*//This section will write out the points that are in all of the inset polygons
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        std::clog<<"Polygon"<<i<<" "<<std::endl;
-        for (int j=0;j<m_UnitedPolygon[i].outer().size();j++){
-            std::clog<<"\tPt"<<j<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<std::endl;
-        }
-    }
-    */
-
-
     return true;
 }
 
@@ -348,5 +348,121 @@ void GridMaker::zHeights(){
 
 
 }
+
+bool GridMaker::writeRadPoly(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    oFile<<"void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0"<<std::endl<<std::endl;
+
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+        oFile<<"0\t0\t"<<(m_UnitedPolygon[i].outer().size()-1)*3<<std::endl;
+        for (int j=0;j<m_UnitedPolygon[i].outer().size();j++){
+            oFile<<"\t"<<j<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<"\t0"<<std::endl;
+        }
+        oFile<<std::endl;
+    }
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::writeRadPoints(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    oFile<<"void plastic pts\n0\n0\n5\t.75\t.25\t.25\t0\t0"<<std::endl<<std::endl;
+    for (int i=0;i<m_FinalPoints.size();i++){
+        oFile<<"pts ring pts"<<i<<"\n0\n0\n8\t"<<m_FinalPoints[i][0]<<"\t"<<m_FinalPoints[i][1]<<"\t"<<m_FinalPoints[i][2]<<std::endl;
+        oFile<<"\t0\t0\t1"<<std::endl;
+        oFile<<"\t0\t"<<m_SpaceX/4<<std::endl<<std::endl;
+    }
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::runoconv(std::string file){
+    std::string oconvProgram="oconv";
+    std::vector<std::string> args;
+    args.clear();
+    args.push_back(m_RadPolyFile);
+    args.push_back(m_RadPtsFile);
+    Process oconv(oconvProgram,args);
+    oconv.setStandardOutputFile(file);
+    oconv.start();
+    if (!oconv.wait()){
+        return false;
+    }
+    return true;
+}
+
+bool GridMaker::runrpict(){
+    std::string picFile=m_picFile+"grid.pic";
+    std::string bmpFile=m_picFile+"grid.bmp";
+    std::vector<std::string> args;
+    args.push_back("-vtl");
+    args.push_back("-w");
+    args.push_back("-vp");
+    args.push_back(std::to_string((m_MaxX-m_MinX)/2+m_MinX));
+    args.push_back(std::to_string((m_MaxY-m_MinY)/2+m_MinY));
+    double tempZmax=0;
+    for (int i=0;i<m_FinalPoints.size();i++){
+        if (m_FinalPoints[i][2]>tempZmax){
+            tempZmax=m_FinalPoints[i][2];
+        }
+    }
+    args.push_back(std::to_string(2+tempZmax));
+    args.push_back("-vh");
+    args.push_back(std::to_string(1.1*(m_MaxX-m_MinX)));
+    args.push_back("-vv");
+    args.push_back(std::to_string(1.1*(m_MaxY-m_MinY)));
+    args.push_back("-vo");
+    args.push_back("0");
+    args.push_back("-va");
+    args.push_back("0");
+    args.push_back("-vs");
+    args.push_back("0");
+    args.push_back("-vl");
+    args.push_back("0");
+    args.push_back("-w");
+    args.push_back("-x");
+    args.push_back("500");
+    args.push_back("-y");
+    args.push_back("500");
+    args.push_back("-pj");
+    args.push_back("0");
+    args.push_back("-av");
+    args.push_back("0.9");
+    args.push_back("0.9");
+    args.push_back("0.9");
+    args.push_back("-ad");
+    args.push_back("15000");
+    args.push_back(m_oconvFile);
+    std::string rpictProgram="rpict";
+    Process rpict(rpictProgram,args);
+    rpict.setStandardOutputFile(picFile);
+    rpict.start();
+    if (!rpict.wait()){
+        return false;
+    }
+
+    std::string bmpProgram="ra_bmp";
+    args.clear();
+    args.push_back(picFile);
+    Process raBMP(bmpProgram,args);
+    raBMP.setStandardOutputFile(bmpFile);
+    raBMP.start();
+    if(!raBMP.wait()){
+        return false;
+    }
+    return true;
+}
+
 
 }
