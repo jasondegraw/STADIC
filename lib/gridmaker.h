@@ -57,7 +57,6 @@ private:
     std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> m_PointSet;
     std::vector<std::vector<double>> m_FinalPoints;
     //Polygons
-    std::vector<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> m_Polygons;
     boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> m_UnitedPolygon;
 
 
@@ -72,6 +71,7 @@ private:
     double m_OffsetZ;
     bool m_useZOffset;
     double m_Offset;
+    bool m_UseOffset;
 
     //Dimensional
     double m_MinX;
@@ -87,7 +87,6 @@ private:
     void setMinY(double y);
     void setMaxY(double y);
 
-    bool unitePolygons();
     bool insetPolygons();
     void boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet);
     bool testPoints();

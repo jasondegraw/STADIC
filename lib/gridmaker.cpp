@@ -1,10 +1,9 @@
 #include "logging.h"
 #include "gridmaker.h"
 #include "radprimitive.h"
-#include "logging.h"
+#include "functions.h"
 #include <iostream>
 #include <fstream>
-#include <QString>
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -29,6 +28,7 @@ GridMaker::GridMaker(std::vector<std::string> fileList)
 
     m_PointSet.clear();
     m_useZOffset=false;
+    m_UseOffset=false;
     m_FinalPoints.clear();
 }
 
@@ -49,7 +49,8 @@ void GridMaker::setSpaceY(double y){
     m_SpaceY=y;
 }
 void GridMaker::setOffset(double val){
-    m_Offset=val;
+    m_Offset=-val;
+    m_UseOffset=true;
 }
 
 void GridMaker::setOffsetX(double x){
@@ -98,13 +99,8 @@ bool GridMaker::makeGrid(){
         return false;
     }
 
-    std::clog<<"About to unite the polygons."<<std::endl;
-    if (!unitePolygons()){
-        return false;
-        }
-
     //If doing an offset all the way around
-    if (m_Offset>0){
+    if (m_UseOffset){
         std::clog<<"Insetting the polygons."<<std::endl;
         if (!insetPolygons()){
             return false;
@@ -193,6 +189,7 @@ bool GridMaker::writeRadPoly(std::string file){
 //Functions
 bool GridMaker::parseRad(){
     //set polygons
+    bool firstPolygon=false;
     if (m_RadFile.geometry().empty()){
         std::cerr<<"There are no polygons."<<std::endl;
         return false;
@@ -200,16 +197,36 @@ bool GridMaker::parseRad(){
     for (int i=0;i<m_RadFile.geometry().size();i++){
         boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> tempPolygon;
         for (int j=0;j<m_RadFile.geometry().at(i)->arg3().size()/3;j++){
-            boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(atof(m_RadFile.geometry().at(i)->arg3()[j*3].c_str()), atof(m_RadFile.geometry().at(i)->arg3()[j*3+1].c_str())));
+            boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(m_RadFile.geometry().at(i)->arg3()[j*3]), toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1])));
         }
         boost::geometry::correct(tempPolygon);
-        if (!boost::geometry::is_valid(tempPolygon)){
-            STADIC_ERROR("The creation of the boost polygon has failed.");
-            return false;
+        if (boost::geometry::is_valid(tempPolygon)){
+            //unite polygons that are the right layer name
+            bool properName=false;
+            for (int j=0;j<m_LayerNames.size();j++){
+                if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                    properName=true;
+                }
+            }
+            if (firstPolygon==true && properName==true){
+                std::clog<<"The first polygon has been found."<<std::endl;
+                firstPolygon=false;
+                //the next line of code is failing
+                m_UnitedPolygon.push_back(tempPolygon);
+                std::clog<<"The first polygon has been added to the multi-polygon."<<std::endl;
+            }else if (properName==true){
+                boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempMultiPolygon;
+                boost::geometry::union_(m_UnitedPolygon,tempPolygon,tempMultiPolygon);
+                m_UnitedPolygon=tempMultiPolygon;
+            }
         }
-        m_Polygons.push_back(tempPolygon);
     }
-    return true;
+    if (boost::geometry::is_valid(m_UnitedPolygon)){
+        return true;
+    }else{
+        STADIC_ERROR("There was a problem uniting the polygons.");
+        return false;
+    }
 }
 //Dimensional
 void GridMaker::setMinX(double x){
@@ -224,40 +241,8 @@ void GridMaker::setMinY(double y){
 void GridMaker::setMaxY(double y){
     m_MaxY=y;
 }
-bool GridMaker::unitePolygons(){
-    //unite polygons that are the right layer name
-    bool firstPolygon=true;
-    for (int i=0;i<m_RadFile.geometry().size();i++){
-        bool properName=false;
-        for (int j=0;j<m_LayerNames.size();j++){
-            if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
-                properName=true;
-            }
-        }
-
-        if (firstPolygon==true && properName==true){
-            std::clog<<"The first polygon has been found."<<std::endl;
-            firstPolygon=false;
-            //the next line of code is failing
-            m_UnitedPolygon.push_back(m_Polygons[i]);
-            std::clog<<"The first polygon has been added to the multi-polygon."<<std::endl;
-            //boost::geometry::append(m_UnitedPolygon,m_Polygons[i]);
-        }else if (properName==true){
-            boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
-            boost::geometry::union_(m_UnitedPolygon,m_Polygons[i],tempPolygon);
-            m_UnitedPolygon=tempPolygon;
-        }
-    }
-    if (boost::geometry::is_valid(m_UnitedPolygon)){
-        return true;
-    }else{
-        STADIC_ERROR("There was a problem uniting the polygons.");
-        return false;
-    }
-}
-
 bool GridMaker::insetPolygons(){
-    boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(m_OffsetX);
+    boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(m_Offset);
     boost::geometry::strategy::buffer::join_round join_strategy(36);
     boost::geometry::strategy::buffer::end_round end_strategy(36);
     boost::geometry::strategy::buffer::point_circle circle_strategy(36);
