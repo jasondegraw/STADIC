@@ -1,29 +1,27 @@
 #ifndef CONTROLZONE_H
 #define CONTROLZONE_H
 
-#include <QObject>
-#include <QString>
 #include <vector>
+#include <string>
 #include <QJsonObject>
 
 #include "stadicapi.h"
 
 namespace stadic {
 
-class STADIC_API ControlZone : public QObject
+class STADIC_API ControlZone
 {
-    Q_OBJECT
 public:
-    explicit ControlZone(QObject *parent = 0);
+    ControlZone();
     bool parseJson(const QJsonObject &object);
     
-
     //Setters
-    bool setOptimumMethod(QString method);
-    bool setCPMethod(QString method);
+    void setName(const std::string &name);
+    bool setOptimumMethod(const std::string &method);
+    bool setCPMethod(const std::string &method);
     void setNumCPs(int value);
     void setTargetPercentage(double value);
-    void setExcludedPoints(QString file);
+    void setExcludedPoints(const std::string &file);
     bool setCriticalPoints(int point);
     void setMaximumBFSignal(double value);
     void setMinimumBFSignal(double value);
@@ -32,15 +30,15 @@ public:
     void setSetpointSignal(double value);
     void setSignal(double value);
     void setDimmingLevel(double value);
-    void setSignalToBFFile(QString file);
-    bool setSensorType(QString type);
-    void setSensorFile(QString file);
+    void setSignalToBFFile(const std::string &file);
+    bool setSensorType(const std::string &type);
+    void setSensorFile(const std::string &file);
     bool setSensorLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setAlgorithm(QString algorithm);
-    void setIESFile(QString file);
+    bool setAlgorithm(const std::string &algorithm);
+    void setIESFile(const std::string &file);
     bool setLLF(double value);
     bool setLampLumens(int value);
-    bool setBallastType(QString type);
+    bool setBallastType(const std::string &type);
     bool setBFMin(double value);
     bool setBFMax(double value);
     bool setWattsMax(double value);
@@ -51,11 +49,12 @@ public:
 
 
     //Getters
-    QString optimumMethod();
-    QString cpMethod();
+    std::string name();
+    std::string optimumMethod();
+    std::string cpMethod();
     int numCPs();
     double targetPercentage();
-    QString excludedPoints();
+    std::string excludedPoints();
     std::vector<int> criticalPoints();
     double maximumBFSignal();
     double minimumBFSignal();
@@ -64,15 +63,15 @@ public:
     double onSignal();
     double signal();
     double dimmingLevel();
-    QString signalToBFFile();
-    QString sensorType();
-    QString sensorFile();
+    std::string signalToBFFile();
+    std::string sensorType();
+    std::string sensorFile();
     std::vector<double> sensorLocation();
-    QString algorithm();
-    QString iesFile();
+    std::string algorithm();
+    std::string iesFile();
     double llf();
     int lampLumens();
-    QString ballastType();
+    std::string ballastType();
     double bfMin();
     double bfMax();
     double wattsMax();
@@ -81,14 +80,14 @@ public:
     double watts();
     std::vector<std::vector<double> > luminaireLayout();
 
-
 private:
-    QString m_OptimumMethod;                                    //  Variable holding the optimum control method
-    QString m_ControlMethod;                                    //  Variable holding the actual control method
-    QString m_CPMethod;                                         //  Variable holding the critical point method
+    std::string m_Name;                                         //  Control zone name
+    std::string m_OptimumMethod;                                    //  Variable holding the optimum control method
+    std::string m_ControlMethod;                                    //  Variable holding the actual control method
+    std::string m_CPMethod;                                         //  Variable holding the critical point method
     int m_NumCPs;                                               //  Variable holding the number of critical points to consider for the "auto" feature
     double m_TargetPercentage;                                  //  Variable holding the target percentage of illuminance from the controlled zone as a means of excluding analysis points
-    QString m_ExcludedPoints;                                   //  Variable holding the excluded points file name
+    std::string m_ExcludedPoints;                                   //  Variable holding the excluded points file name
     std::vector<int> m_CriticalPoints;                          //  Variable holding the critical points for the "user" feature
     double m_MaximumBFSignal;                                   //  Variable holding the signal at the maximum ballast factor
     double m_MinimumBFSignal;                                   //  Variable holding the signal at the minimum ballast factor
@@ -97,15 +96,15 @@ private:
     double m_OnSignal;                                          //  Variable holding the signal at which to turn the lights on
     double m_Signal;                                            //  Variable holding the signal for the "user 1" algorithm
     double m_DimmingLevel;                                      //  Variable holding the dimming level for the "user 1" algorithm
-    QString m_SignalToBFFile;                                   //  Variable holding the signal to ballast factor file for the "user 1" algorithm
-    QString m_SensorType;                                       //  Variable holding the sensor type
-    QString m_SensorFile;                                       //  Variable holding the sensor file
+    std::string m_SignalToBFFile;                                   //  Variable holding the signal to ballast factor file for the "user 1" algorithm
+    std::string m_SensorType;                                       //  Variable holding the sensor type
+    std::string m_SensorFile;                                       //  Variable holding the sensor file
     std::vector<double> m_SensorLocation;                       //  Variable holding the sensor location
-    QString m_Algorithm;                                        //  Variable holding the control algorithm
-    QString m_IESFile;                                          //  Variable holding the IES file
+    std::string m_Algorithm;                                        //  Variable holding the control algorithm
+    std::string m_IESFile;                                          //  Variable holding the IES file
     double m_LLF;                                               //  Variable holding the Light Loss Factor
     int m_LampLumens;                                           //  Variable holding the Lamp Lumens
-    QString m_BallastType;                                      //  Variable holding the Ballast Type
+    std::string m_BallastType;                                      //  Variable holding the Ballast Type
     double m_BFMin;                                             //  Variable holding the Minimum Ballast Factor
     double m_BFMax;                                             //  Variable holding the Maximum Ballast Factor
     double m_WattsMax;                                          //  Variable holding the Maximum Watts
@@ -113,10 +112,6 @@ private:
     double m_BallastFactor;                                     //  Variable holding the Ballast Factor
     double m_Watts;                                             //  Variable holding the Watts
     std::vector<std::vector<double> > m_LuminaireLayout;        //  Variable holding the luminaire positions
-
-signals:
-    
-public slots:
     
 };
 

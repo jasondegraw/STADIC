@@ -68,7 +68,7 @@ TEST(ControlTests, ReadJson)
     EXPECT_EQ(2, controlFile.controlZones().size());
 
     //Control Zone 1
-    EXPECT_EQ("zone1", controlFile.controlZones()[0]->objectName());
+    EXPECT_EQ("zone1", controlFile.controlZones()[0]->name());
     EXPECT_EQ("dim_to_min", controlFile.controlZones()[0]->optimumMethod());
     EXPECT_EQ("sensitivity_file", controlFile.controlZones()[0]->sensorType());
     EXPECT_EQ("cos.sen", controlFile.controlZones()[0]->sensorFile());
@@ -133,7 +133,7 @@ TEST(ControlTests, ReadJson)
     EXPECT_EQ(0, controlFile.controlZones()[0]->luminaireLayout()[4][5]);
 
     //Control Zone 2
-    EXPECT_EQ("zone2", controlFile.controlZones()[1]->objectName());
+    EXPECT_EQ("zone2", controlFile.controlZones()[1]->name());
     EXPECT_EQ("on", controlFile.controlZones()[1]->optimumMethod());
     EXPECT_EQ("downlight.ies", controlFile.controlZones()[1]->iesFile());
     EXPECT_EQ(0.85, controlFile.controlZones()[1]->llf());

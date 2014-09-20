@@ -6,13 +6,17 @@
 
 namespace stadic {
 
-ControlZone::ControlZone(QObject *parent) :
-    QObject(parent)
+ControlZone::ControlZone()
 {
 }
 
 //Setters
-bool ControlZone::setOptimumMethod(QString method){
+void ControlZone::setName(const std::string &name)
+{
+    m_Name = name;
+}
+
+bool ControlZone::setOptimumMethod(const std::string &method){
     if (method=="on" || method=="off" || method=="dim_to_min" || method=="dim_to_off" || method=="switched"){
         m_OptimumMethod=method;
     }else{
@@ -23,7 +27,7 @@ bool ControlZone::setOptimumMethod(QString method){
     return true;
 }
 
-bool ControlZone::setCPMethod(QString method){
+bool ControlZone::setCPMethod(const std::string &method){
     if (method=="auto" || method=="user"){
         m_CPMethod=method;
     }else{
@@ -33,9 +37,11 @@ bool ControlZone::setCPMethod(QString method){
     }
     return true;
 }
+
 void ControlZone::setNumCPs(int value){
     m_NumCPs=value;
 }
+
 void ControlZone::setTargetPercentage(double value){
     if (value>=0 && value<1){
         m_TargetPercentage=value;
@@ -44,9 +50,11 @@ void ControlZone::setTargetPercentage(double value){
         m_TargetPercentage=0.1;
     }
 }
-void ControlZone::setExcludedPoints(QString file){
+
+void ControlZone::setExcludedPoints(const std::string &file){
     m_ExcludedPoints=file;
 }
+
 bool ControlZone::setCriticalPoints(int point){
     if (point>0){
         m_CriticalPoints.push_back(point);
@@ -56,31 +64,40 @@ bool ControlZone::setCriticalPoints(int point){
     }
     return true;
 }
+
 void ControlZone::setMaximumBFSignal(double value){
     m_MaximumBFSignal=value;
 }
+
 void ControlZone::setMinimumBFSignal(double value){
     m_MinimumBFSignal=value;
 }
+
 void ControlZone::setOffSignal(double value){
     m_OffSignal=value;
 }
+
 void ControlZone::setOnSignal(double value){
     m_OnSignal=value;
 }
+
 void ControlZone::setSetpointSignal(double value){
     m_SetpointSignal=value;
 }
+
 void ControlZone::setSignal(double value){
     m_Signal=value;
 }
+
 void ControlZone::setDimmingLevel(double value){
     m_DimmingLevel=value;
 }
-void ControlZone::setSignalToBFFile(QString file){
+
+void ControlZone::setSignalToBFFile(const std::string &file){
     m_SignalToBFFile=file;
 }
-bool ControlZone::setSensorType(QString type){
+
+bool ControlZone::setSensorType(const std::string &type){
     if (type=="sensitivity_file"){
         m_SensorType=type;
     }else{
@@ -90,9 +107,11 @@ bool ControlZone::setSensorType(QString type){
     }
     return true;
 }
-void ControlZone::setSensorFile(QString file){
+
+void ControlZone::setSensorFile(const std::string &file){
     m_SensorFile=file;
 }
+
 bool ControlZone::setSensorLocation(double x, double y, double z, double xd, double yd, double zd, double spin){
     if (spin>-360 && spin<360){
         m_SensorLocation.clear();
@@ -109,7 +128,8 @@ bool ControlZone::setSensorLocation(double x, double y, double z, double xd, dou
     }
     return true;
 }
-bool ControlZone::setAlgorithm(QString algorithm){
+
+bool ControlZone::setAlgorithm(const std::string &algorithm){
     if (algorithm=="open_dimming" || algorithm=="closed_proportional" || algorithm=="constant_setpoint" || algorithm=="open_switching" || algorithm=="closed_switching" || algorithm=="user_defined_1"){
         m_Algorithm=algorithm;
     }else{
@@ -119,9 +139,11 @@ bool ControlZone::setAlgorithm(QString algorithm){
     }
     return true;
 }
-void ControlZone::setIESFile(QString file){
+
+void ControlZone::setIESFile(const std::string &file){
     m_IESFile=file;
 }
+
 bool ControlZone::setLLF(double value){
     if (value>0){
         m_LLF=value;
@@ -131,6 +153,7 @@ bool ControlZone::setLLF(double value){
     }
     return true;
 }
+
 bool ControlZone::setLampLumens(int value){
     if (value>0){
         m_LampLumens=value;
@@ -140,7 +163,8 @@ bool ControlZone::setLampLumens(int value){
     }
     return true;
 }
-bool ControlZone::setBallastType(QString type){
+
+bool ControlZone::setBallastType(const std::string &type){
     if (type=="linear_dimming" || type=="non_dimming"){
         m_BallastType=type;
     }else{
@@ -150,6 +174,7 @@ bool ControlZone::setBallastType(QString type){
     }
     return true;
 }
+
 bool ControlZone::setBFMin(double value){
     if (value>=0 && value<3){
         m_BFMin=value;
@@ -159,6 +184,7 @@ bool ControlZone::setBFMin(double value){
     }
     return true;
 }
+
 bool ControlZone::setBFMax(double value){
     if (value>=0 && value<3){
         m_BFMax=value;
@@ -168,6 +194,7 @@ bool ControlZone::setBFMax(double value){
     }
     return true;
 }
+
 bool ControlZone::setWattsMax(double value){
     if (value>=0){
         m_WattsMax=value;
@@ -177,6 +204,7 @@ bool ControlZone::setWattsMax(double value){
     }
     return true;
 }
+
 bool ControlZone::setWattsMin(double value){
     if (value>=0){
         m_WattsMin=value;
@@ -186,6 +214,7 @@ bool ControlZone::setWattsMin(double value){
     }
     return true;
 }
+
 bool ControlZone::setBallastFactor(double value){
     if (value>=0 && value<3){
         m_BallastFactor=value;
@@ -195,6 +224,7 @@ bool ControlZone::setBallastFactor(double value){
     }
     return true;
 }
+
 bool ControlZone::setWatts(double value){
     if (value>0){
         m_Watts=value;
@@ -204,7 +234,9 @@ bool ControlZone::setWatts(double value){
     }
     return true;
 }
-bool ControlZone::setLuminaireLayout(double x, double y, double z, double rotation, double tilt, double spin){
+
+bool ControlZone::setLuminaireLayout(double x, double y, double z, double rotation, double tilt, double spin)
+{
     std::vector<double> tempVector;
     tempVector.push_back(x);
     tempVector.push_back(y);
@@ -231,36 +263,56 @@ bool ControlZone::setLuminaireLayout(double x, double y, double z, double rotati
     return true;
 }
 
-
-
 //Getters
-QString ControlZone::optimumMethod(){
+std::string ControlZone::name()
+{
+    return m_Name;
+}
+
+std::string ControlZone::optimumMethod()
+{
     return m_OptimumMethod;
 }
-QString ControlZone::cpMethod(){
+
+std::string ControlZone::cpMethod()
+{
     return m_CPMethod;
 }
-int ControlZone::numCPs(){
+
+int ControlZone::numCPs()
+{
     return m_NumCPs;
 }
-double ControlZone::targetPercentage(){
+
+double ControlZone::targetPercentage()
+{
     return m_TargetPercentage;
 }
-QString ControlZone::excludedPoints(){
+
+std::string ControlZone::excludedPoints()
+{
     return m_ExcludedPoints;
 }
-std::vector<int> ControlZone::criticalPoints(){
+
+std::vector<int> ControlZone::criticalPoints()
+{
     return m_CriticalPoints;
 }
-double ControlZone::maximumBFSignal(){
+
+double ControlZone::maximumBFSignal()
+{
     return m_MaximumBFSignal;
 }
-double ControlZone::minimumBFSignal(){
+
+double ControlZone::minimumBFSignal()
+{
     return m_MinimumBFSignal;
 }
+
 double ControlZone::offSignal(){
     return m_OffSignal;
 }
+
 double ControlZone::setpointSignal(){
     return m_SetpointSignal;
 }
@@ -273,69 +325,99 @@ double ControlZone::signal(){
 double ControlZone::dimmingLevel(){
     return m_DimmingLevel;
 }
-QString ControlZone::signalToBFFile(){
+
+std::string ControlZone::signalToBFFile()
+{
     return m_SignalToBFFile;
 }
-QString ControlZone::sensorType(){
+
+std::string ControlZone::sensorType()
+{
     return m_SensorType;
 }
-QString ControlZone::sensorFile(){
+
+std::string ControlZone::sensorFile()
+{
     return m_SensorFile;
 }
-std::vector<double> ControlZone::sensorLocation(){
+
+std::vector<double> ControlZone::sensorLocation()
+{
     return m_SensorLocation;
 }
-QString ControlZone::algorithm(){
-    if (m_Algorithm.isEmpty()){
+
+std::string ControlZone::algorithm()
+{
+    if (m_Algorithm.empty()){
         m_Algorithm="null";
     }
     return m_Algorithm;
 }
-QString ControlZone::iesFile(){
+
+std::string ControlZone::iesFile()
+{
     return m_IESFile;
 }
-double ControlZone::llf(){
+
+double ControlZone::llf()
+{
     return m_LLF;
 }
-int ControlZone::lampLumens(){
+
+int ControlZone::lampLumens()
+{
     return m_LampLumens;
 }
-QString ControlZone::ballastType(){
+
+std::string ControlZone::ballastType()
+{
     return m_BallastType;
 }
-double ControlZone::bfMin(){
+
+double ControlZone::bfMin()
+{
     return m_BFMin;
 }
-double ControlZone::bfMax(){
+
+double ControlZone::bfMax()
+{
     return m_BFMax;
 }
-double ControlZone::wattsMax(){
+
+double ControlZone::wattsMax()
+{
     return m_WattsMax;
 }
-double ControlZone::wattsMin(){
+
+double ControlZone::wattsMin()
+{
     return m_WattsMin;
 }
-double ControlZone::ballastFactor(){
+
+double ControlZone::ballastFactor()
+{
     return m_BallastFactor;
 }
-double ControlZone::watts(){
+
+double ControlZone::watts()
+{
     return m_Watts;
 }
-std::vector<std::vector<double> > ControlZone::luminaireLayout(){
+
+std::vector<std::vector<double> > ControlZone::luminaireLayout()
+{
     return m_LuminaireLayout;
 }
 
-
-
-
-bool ControlZone::parseJson(const QJsonObject &object){
+bool ControlZone::parseJson(const QJsonObject &object)
+{
     QJsonValue val=object.value("name");
     if (val.isUndefined()){
         std::cerr<<"ERROR: The key \"name\" is not found within \"control_zones\"."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            setObjectName(val.toString());
+            setName(val.toString().toStdString());
         }else{
             std::cerr<<"ERROR: The key\"name\" does not contain a string."<<std::endl;
             return false;
@@ -344,11 +426,11 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("optimum_control");
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key\"optimum_control\" is not found within the control zone "<<objectName().toStdString()<<"."<<std::endl;
+        std::cerr<<"ERROR: The key\"optimum_control\" is not found within the control zone "<<name()<<"."<<std::endl;
         return false;
     }else{
         if (val.isString()){
-            if (!setOptimumMethod(val.toString())){
+            if (!setOptimumMethod(val.toString().toStdString())){
                 return false;
             }
         }else{
@@ -359,38 +441,38 @@ bool ControlZone::parseJson(const QJsonObject &object){
 
     val=object.value("sensor");
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The zone named \""<<objectName().toStdString()<<"\" does not have a photosensor."<<std::endl;
+        std::cerr<<"WARNING: The zone named \""<<name()<<"\" does not have a photosensor."<<std::endl;
     }else{
         if (val.isObject()){
             QJsonObject tempObject=val.toObject();
             val=tempObject.value("sensor_type");
             if (val.isUndefined()){
-                std::cerr<<"ERROR: The key \"sensor_type\" is not found within \"sensor\" in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                std::cerr<<"ERROR: The key \"sensor_type\" is not found within \"sensor\" in the zone named \""<<name()<<"\"."<<std::endl;
                 return false;
             }else{
                 if (val.isString()){
-                    setSensorType(val.toString());
+                    setSensorType(val.toString().toStdString());
                 }else{
-                    std::cerr<<"The key \"sensor_type\" does not contain a string in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                    std::cerr<<"The key \"sensor_type\" does not contain a string in the zone named \""<<name()<<"\"."<<std::endl;
                     return false;
                 }
             }
 
             val=tempObject.value("sensor_file");
             if (val.isUndefined()){
-                std::cerr<<"ERROR: The key \"sensor_file\" is not found within \"sensor\" in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                std::cerr<<"ERROR: The key \"sensor_file\" is not found within \"sensor\" in the zone named \""<<name()<<"\"."<<std::endl;
                 return false;
             }else{
                 if (val.isString()){
-                    setSensorFile(val.toString());
+                    setSensorFile(val.toString().toStdString());
                 }else{
-                    std::cerr<<"The key \"sensor_file\" does not contain a string in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                    std::cerr<<"The key \"sensor_file\" does not contain a string in the zone named \""<<name()<<"\"."<<std::endl;
                     return false;
                 }
             }
             val=tempObject.value("location");
             if (val.isUndefined()){
-                std::cerr<<"ERROR: The key \"location\" is not found for the sensor in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                std::cerr<<"ERROR: The key \"location\" is not found for the sensor in the zone named \""<<name()<<"\"."<<std::endl;
                 return false;
             }else{
                 if (val.isObject()){
@@ -398,91 +480,91 @@ bool ControlZone::parseJson(const QJsonObject &object){
                     double x, y, z, xd, yd, zd, spin;
                     val=tempObject2.value("x");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"x\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"x\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             x=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"x\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"x\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("y");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"y\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"y\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             y=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"y\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"y\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("z");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"z\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"z\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             z=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"z\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"z\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("xd");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"xd\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"xd\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             xd=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"xd\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"xd\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("yd");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"yd\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"yd\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             yd=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"yd\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"yd\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("zd");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"zd\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"zd\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             zd=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"zd\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"zd\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
 
                     val=tempObject2.value("spin_ccw");
                     if (val.isUndefined()){
-                        std::cerr<<"ERROR: The key \"spin_ccw\" was not found for the sensor location in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"ERROR: The key \"spin_ccw\" was not found for the sensor location in the zone named \""<<name()<<"\"."<<std::endl;
                         return false;
                     }else{
                         if (val.isDouble()){
                             spin=val.toDouble();
                         }else{
-                            std::cerr<<"ERROR: The key \"spin_ccw\" for the sensor location in the zone named \""<<objectName().toStdString()<<"\" does not contain a number."<<std::endl;
+                            std::cerr<<"ERROR: The key \"spin_ccw\" for the sensor location in the zone named \""<<name()<<"\" does not contain a number."<<std::endl;
                             return false;
                         }
                     }
@@ -490,24 +572,24 @@ bool ControlZone::parseJson(const QJsonObject &object){
                         return false;
                     }
                 }else{
-                    std::cerr<<"ERROR: The key \"location\" for the sensor in the zone named \""<<objectName().toStdString()<<"\" is not an object."<<std::endl;
+                    std::cerr<<"ERROR: The key \"location\" for the sensor in the zone named \""<<name()<<"\" is not an object."<<std::endl;
                     return false;
                 }
             }
 
 
         }else{
-            std::cerr<<"ERROR: The key \"sensor\" in the zone named \""<<objectName().toStdString()<<"\" does not contain an object."<<std::endl;
+            std::cerr<<"ERROR: The key \"sensor\" in the zone named \""<<name()<<"\" does not contain an object."<<std::endl;
             return false;
         }
     }
 
     val=object.value("cp_method");
     if (val.isUndefined()){
-        std::cerr<<"WARNING: The key \"cp_method\" does not appear in the zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+        std::cerr<<"WARNING: The key \"cp_method\" does not appear in the zone named \""<<name()<<"\"."<<std::endl;
     }else{
         if (val.isString()){
-            if (!setCPMethod(val.toString())){
+            if (!setCPMethod(val.toString().toStdString())){
                 return false;
             }else{
                 if (cpMethod()=="auto"){
@@ -537,10 +619,10 @@ bool ControlZone::parseJson(const QJsonObject &object){
                     }
                     val=object.value("excluded_points");
                     if (val.isUndefined()){
-                        std::cerr<<"WARNING: No excluded points file is being used for the critical point analysis for control zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+                        std::cerr<<"WARNING: No excluded points file is being used for the critical point analysis for control zone named \""<<name()<<"\"."<<std::endl;
                     }else{
                         if (val.isString()){
-                            setExcludedPoints(val.toString());
+                            setExcludedPoints(val.toString().toStdString());
                         }else{
                             std::cerr<<"ERROR: The key \"excluded_points\" does not contain a string."<<std::endl;
                             return false;
@@ -572,7 +654,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
                 }
             }
         }else{
-            std::cerr<<"ERROR: The key \"cp_method\" in the zone named \""<<objectName().toStdString()<<"\" does not contain a string."<<std::endl;
+            std::cerr<<"ERROR: The key \"cp_method\" in the zone named \""<<name()<<"\" does not contain a string."<<std::endl;
             return false;
         }
     }
@@ -828,7 +910,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
                 return false;
             }else{
                 if (val.isString()){
-                    setSignalToBFFile(val.toString());
+                    setSignalToBFFile(val.toString().toStdString());
                 }else{
                     std::cerr<<"ERROR: The key \"signal_to_bf_file\" does not contain a string."<<std::endl;
                     return false;
@@ -841,7 +923,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
     }
     //After parsing for the algorithm test to see if the algorithm has been set.  Alert user if it hasn't been set
     if (algorithm()=="null"){
-        std::cerr<<"WARNING: There is no algorithm specified for the control zone named \""<<objectName().toStdString()<<"\"."<<std::endl;
+        std::cerr<<"WARNING: There is no algorithm specified for the control zone named \""<<name()<<"\"."<<std::endl;
     }
 
     val=object.value("luminaire_information");
@@ -857,7 +939,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
                 return false;
             }else{
                 if (val.isString()){
-                    setIESFile(val.toString());
+                    setIESFile(val.toString().toStdString());
                 }else{
                     std::cerr<<"ERROR: The key \"ies_file\" is not a string."<<std::endl;
                     return false;
@@ -911,7 +993,7 @@ bool ControlZone::parseJson(const QJsonObject &object){
                 return false;
             }else{
                 if (val.isString()){
-                    if (!setBallastType(val.toString())){
+                    if (!setBallastType(val.toString().toStdString())){
                         return false;
                     }else{
                         if (ballastType()=="linear_dimming"){
