@@ -481,7 +481,7 @@ double Control::dp(){
 //******************
 //Lighting Control
 //******************
-std::vector<ControlZone*> Control::controlZones(){
+std::vector<ControlZone> Control::controlZones(){
     return m_ControlZones;
 }
 
@@ -1173,9 +1173,9 @@ bool Control::parseJson(std::string file){
         STADIC_WARNING(" The key \"control_zones\" does not appear in the STADIC Control File.");
     }else{
         for (int i=0;i<array.size();i++){
-            ControlZone *zone=new ControlZone;
+            ControlZone zone;
             if (array[i].isObject()){
-                if(zone->parseJson(array[i].toObject())){
+                if(zone.parseJson(array[i].toObject())){
                     m_ControlZones.push_back(zone);
                 }else{
                     return false;

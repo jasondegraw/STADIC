@@ -117,7 +117,7 @@ public:
     //******************
     //Lighting Control
     //******************
-    std::vector<ControlZone*> controlZones();
+    std::vector<ControlZone> controlZones();
 
     //******************
     //Simulation Settings
@@ -215,7 +215,7 @@ private:
     //******************
     //Lighting Control
     //******************
-    std::vector<ControlZone*> m_ControlZones;
+    std::vector<ControlZone> m_ControlZones;
 
     //******************
     //Metrics
