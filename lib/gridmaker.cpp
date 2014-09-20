@@ -9,10 +9,15 @@
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/buffer.hpp>
-#include <boost/geometry/strategies/agnostic/buffer_distance_symmetric.hpp>
-#include <boost/geometry/strategies/cartesian/buffer_join_round.hpp>
-#include <boost/geometry/strategies/cartesian/buffer_end_round.hpp>
-#include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
+#include <boost/geometry/strategies/agnostic/buffer_distance_asymmetric.hpp>
+//#include <boost/geometry/strategies/agnostic/buffer_distance_symmetric.hpp>
+//#include <boost/geometry/strategies/cartesian/buffer_join_round.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_join_miter.hpp>
+//#include <boost/geometry/strategies/cartesian/buffer_end_round.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_end_flat.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
+//#include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_side_straight.hpp>
 #include <boost/geometry/algorithms/covered_by.hpp>
 #include <boost/geometry/algorithms/is_valid.hpp>
@@ -101,11 +106,9 @@ bool GridMaker::makeGrid(){
 
     //If doing an offset all the way around
     if (m_UseOffset){
-        std::clog<<"Insetting the polygons."<<std::endl;
         if (!insetPolygons()){
             return false;
-    }
-        std::clog<<"Creating the bounding box."<<std::endl;
+        }
         boundingBox(m_UnitedPolygon);
     }else if (m_OffsetX>0 || m_OffsetY>0){
         //Offset x and y from bounding rectangle given m_OffsetX and m_OffsetY
@@ -116,14 +119,12 @@ bool GridMaker::makeGrid(){
         //If the result is an integer then the offset should be equal to the spacing
         //if the result is not an integer multiply the remainder by the spacing and divide by two for the offset
         //reset min and max x and y
-            }
-    std::clog<<"Getting the points in the polygons."<<std::endl;
+    }
     if (!testPoints()){
         return false;
-        }
+    }
 
     if (m_useZOffset){
-        std::clog<<"Getting the z heights from the polygons."<<std::endl;
         zHeights();
     }
     //Finish this code for when the program is ran with absolute z
@@ -242,36 +243,61 @@ void GridMaker::setMaxY(double y){
     m_MaxY=y;
 }
 bool GridMaker::insetPolygons(){
-    boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(m_Offset);
-    boost::geometry::strategy::buffer::join_round join_strategy(36);
-    boost::geometry::strategy::buffer::end_round end_strategy(36);
-    boost::geometry::strategy::buffer::point_circle circle_strategy(36);
+    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy((m_Offset -m_Offset*0.10), (m_Offset-m_Offset*0.10));
+    //boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(m_Offset);
+    //boost::geometry::strategy::buffer::join_round join_strategy(36);
+    boost::geometry::strategy::buffer::join_miter join_strategy;
+    //boost::geometry::strategy::buffer::end_round end_strategy(36);
+    boost::geometry::strategy::buffer::end_flat end_strategy;
+    //boost::geometry::strategy::buffer::point_circle point_strategy(36);
+    boost::geometry::strategy::buffer::point_square point_strategy;
     boost::geometry::strategy::buffer::side_straight side_strategy;
     boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
-    boost::geometry::buffer(m_UnitedPolygon,tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,circle_strategy);
+    boost::geometry::buffer(m_UnitedPolygon,tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
     m_UnitedPolygon=tempPolygon;
     if (!boost::geometry::is_valid(m_UnitedPolygon)){
         STADIC_ERROR("Creating the offset failed to create a valid polygon.");
         return false;
     }
+    /*//This section will write out the points that are in all of the inset polygons
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        std::clog<<"Polygon"<<i<<" "<<std::endl;
+        for (int j=0;j<m_UnitedPolygon[i].outer().size();j++){
+            std::clog<<"\tPt"<<j<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<std::endl;
+        }
+    }
+    */
+
+
     return true;
 }
+
 
 void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet){
     boost::geometry::model::box<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> box;
     boost::geometry::envelope(polygonSet,box);
-    setMinX(box.min_corner().get<0>());
-    setMinY(box.min_corner().get<1>());
-    setMaxX(box.max_corner().get<0>());
-    setMaxY(box.max_corner().get<1>());
+    //std::clog<<"minX="<<box.min_corner().get<0>()<<std::endl;
+    //std::clog<<"minY="<<box.min_corner().get<1>()<<std::endl;
+    //std::clog<<"maxX="<<box.max_corner().get<0>()<<std::endl;
+    //std::clog<<"maxY="<<box.max_corner().get<1>()<<std::endl;
+    //std::clog<<"offset="<<m_Offset<<std::endl;
+    setMinX(box.min_corner().get<0>()-m_Offset*.1);
+    setMinY(box.min_corner().get<1>()-m_Offset*.1);
+    setMaxX(box.max_corner().get<0>()+m_Offset*.1);
+    setMaxY(box.max_corner().get<1>()+m_Offset*.1);
+    //std::clog<<"minX="<<m_MinX<<std::endl;
+    //std::clog<<"minY="<<m_MinY<<std::endl;
+    //std::clog<<"maxX="<<m_MaxX<<std::endl;
+    //std::clog<<"maxY="<<m_MaxY<<std::endl;
+
 }
 
 bool GridMaker::testPoints(){
     //Create vector of test points
     double x=m_MinX;
-    while (x<m_MaxX){
+    while (x<=m_MaxX){
         double y=m_MinY;
-        while (y<m_MaxY){
+        while (y<=m_MaxY){
             if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon)){
                 addTestPoints(x,y);
             }
