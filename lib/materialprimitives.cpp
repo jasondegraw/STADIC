@@ -1,5 +1,6 @@
 #include "materialprimitives.h"
 #include "logging.h"
+#include "functions.h"
 namespace stadic{
 //PLASTIC
 PlasticMaterial::PlasticMaterial() : RadPrimitive()
@@ -12,127 +13,117 @@ PlasticMaterial::PlasticMaterial() : RadPrimitive()
 PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough) : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
-    setArg(3,std::to_string(red),0);
-    setArg(3,std::to_string(green),1);
-    setArg(3,std::to_string(blue),2);
-    setArg(3,std::to_string(spec),3);
-    setArg(3,std::to_string(rough),4);
+    setArg(3, stadic::toString(red), 0);
+    setArg(3, stadic::toString(green), 1);
+    setArg(3, stadic::toString(blue), 2);
+    setArg(3, stadic::toString(spec), 3);
+    setArg(3, stadic::toString(rough), 4);
 }
 
 // Setters
 bool PlasticMaterial::setRed(double value)
 {
-    return setArg(3,std::to_string(value),0);
+    return setArg(3, stadic::toString(value), 0);
 }
 
 bool PlasticMaterial::setGreen(double value)
 {
-    return setArg(3,std::to_string(value),1);
+    return setArg(3, stadic::toString(value), 1);
 }
 
 bool PlasticMaterial::setBlue(double value)
 {
-    return setArg(3,std::to_string(value),2);
+    return setArg(3, stadic::toString(value), 2);
 }
 
 bool PlasticMaterial::setSpecularity(double value)
 {
-    return setArg(3,std::to_string(value),3);
+    return setArg(3, stadic::toString(value), 3);
 }
 
 bool PlasticMaterial::setRoughness(double value)
 {
-    return setArg(3,std::to_string(value),4);
+    return setArg(3, stadic::toString(value), 4);
 }
 
 // Getters
 double PlasticMaterial::red() const
 {
-    //bool ok;
-    double value = atof(getArg3(0).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(0), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double PlasticMaterial::green() const
 {
-    //bool ok;
-    double value = atof(getArg3(1).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(1), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double PlasticMaterial::blue() const
 {
-    //bool ok;
-    double value = atof(getArg3(2).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(2), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double PlasticMaterial::specularity() const
 {
-    //bool ok;
-    double value = atof(getArg3(3).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(3), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double PlasticMaterial::roughness() const
 {
-    //bool ok;
-    double value = atof(getArg3(4).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(4), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 bool PlasticMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        //bool ok;
-        double dval = atof(value.c_str());
+        bool ok;
+        double dval = stadic::toDouble(value, &ok);
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The R G B values for a plastic must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (/*ok && */dval >=0 && dval <=0.07){
+                if (ok && dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07&&dval<1){
                     STADIC_WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
@@ -144,7 +135,7 @@ bool PlasticMaterial::validateArg(int number, std::string value, int position) c
                 }
                 break;
             case 4:
-                if (/*ok && */dval >=0 && dval <=0.02){
+                if (ok && dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     STADIC_ERROR("The roughness for a plastic cannot be less than 0.");
@@ -167,9 +158,9 @@ bool PlasticMaterial::validateArg(int number, std::vector<std::string> arg) cons
             return false;
         }
         for(std::string value : arg) {
-            //bool ok;
-            double dval = atof(value.c_str());
-            if(/*ok && */dval >= 0 && dval <= 1.0) {
+            bool ok;
+            double dval = stadic::toDouble(value, &ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -226,91 +217,81 @@ bool MetalMaterial::setRoughness(double value)
 // Getters
 double MetalMaterial::red() const
 {
-    //bool ok;
-    double value = atof(getArg3(0).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(0), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double MetalMaterial::green() const
 {
-    //bool ok;
-    double value = atof(getArg3(1).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(1), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double MetalMaterial::blue() const
 {
-    //bool ok;
-    double value = atof(getArg3(2).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(2), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double MetalMaterial::specularity() const
 {
-    //bool ok;
-    double value = atof(getArg3(3).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(3), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double MetalMaterial::roughness() const
 {
-    //bool ok;
-    double value = atof(getArg3(4).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(4), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 bool MetalMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        //bool ok;
-        double dval = atof(value.c_str());
+        bool ok;
+        double dval = stadic::toDouble(value, &ok);
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The R G B values for a metal must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (/*ok && */dval >=.5 && dval <=1){
+                if (ok && dval >=.5 && dval <=1){
                     return true;
                 }else if (dval<.5&&dval>=0){
                     STADIC_WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
@@ -322,7 +303,7 @@ bool MetalMaterial::validateArg(int number, std::string value, int position) con
                 }
                 break;
             case 4:
-                if (/*ok && */dval >=0 && dval <=0.5){
+                if (ok && dval >=0 && dval <=0.5){
                     return true;
                 }else if (dval<0){
                     STADIC_ERROR("The roughness for a metal cannot be less than 0.");
@@ -345,9 +326,9 @@ bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
             return false;
         }
         for(std::string value : arg) {
-            //bool ok;
-            double dval = atof(value.c_str());
-            if(/*ok && */dval >= 0 && dval <= 1.0) {
+            bool ok;
+            double dval = stadic::toDouble(value, &ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -421,119 +402,105 @@ bool TransMaterial::setTransSpecular(double value)
 // Getters
 double TransMaterial::red() const
 {
-    //bool ok;
-    double value = atof(getArg3(0).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(0), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::green() const
 {
-    //bool ok;
-    double value = atof(getArg3(1).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(1), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::blue() const
 {
-    //bool ok;
-    double value = atof(getArg3(2).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(2), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::specularity() const
 {
-    //bool ok;
-    double value = atof(getArg3(3).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(3), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::roughness() const
 {
-    //bool ok;
-    double value = atof(getArg3(4).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(4), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::transmissivity() const
 {
-    //bool ok;
-    double value = atof(getArg3(5).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(5), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double TransMaterial::transSpecular() const
 {
-    //bool ok;
-    double value = atof(getArg3(6).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(6), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 bool TransMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        //bool ok;
-        double dval = atof(value.c_str());
+        bool ok;
+        double dval = stadic::toDouble(value, &ok);
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The R G B values for a trans must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (/*ok && */dval >=0 && dval <=0.07){
+                if (ok && dval >=0 && dval <=0.07){
                     return true;
                 }else if (dval>.07 && dval<1){
                     STADIC_WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
@@ -545,7 +512,7 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
                 }
                 break;
             case 4:
-                if (/*ok && */dval >=0 && dval <=0.02){
+                if (ok && dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
                     STADIC_ERROR("The roughness for a trans cannot be less than 0.");
@@ -557,14 +524,14 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
                 }
                 break;
             case 5:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The transmissivity value for a trans must be between 0 and 1.");
                 }
                 break;
             case 6:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
@@ -582,9 +549,9 @@ bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
             return false;
         }
         for(std::string value : arg) {
-            //bool ok;
-            double dval = atof(value.c_str());
-            if(/*ok &&*/ dval >= 0 && dval <= 1.0) {
+            bool ok;
+            double dval = stadic::toDouble(value, &ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -642,77 +609,69 @@ bool GlassMaterial::setRefraction(double value)
 // Getters
 double GlassMaterial::redTrans() const
 {
-    //bool ok;
-    double value = atof(getArg3(0).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(0), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double GlassMaterial::greenTrans() const
 {
-    //bool ok;
-    double value = atof(getArg3(1).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(1), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double GlassMaterial::blueTrans() const
 {
-    //bool ok;
-    double value = atof(getArg3(2).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(2), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double GlassMaterial::refraction() const
 {
-    //bool ok;
-    double value = atof(getArg3(3).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg3(3), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 bool GlassMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        //bool ok;
-        double dval = atof(value.c_str());
+        bool ok;
+        double dval = stadic::toDouble(value, &ok);
         switch (position){
             case 0:
             case 1:
             case 2:
-                if(/*ok && */dval >= 0 && dval <= 1.0) {
+                if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
                     STADIC_ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
                 }
                 break;
             case 3:
-                if (/*ok && */dval >=0 && dval <=5){
+                if (ok && dval >=0 && dval <=5){
                     return true;
                 }else {
                     STADIC_ERROR("The index of refraction value for glass must be between 0 and 5.");
@@ -730,9 +689,9 @@ bool GlassMaterial::validateArg(int number, std::vector<std::string> arg) const
             return false;
         }
         for(std::string value : arg) {
-            //bool ok;
-            double dval = atof(value.c_str());
-            if(/*ok && */dval >= 0 && dval <= 1.0) {
+            bool ok;
+            double dval = stadic::toDouble(value, &ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }
@@ -788,15 +747,13 @@ bool BSDFMaterial::setUZ(double value)
 // Getters
 double BSDFMaterial::thickness() const
 {
-    //bool ok;
-    double value = atof(getArg1(0).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg1(0), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
@@ -807,55 +764,51 @@ std::string BSDFMaterial::bsdfFile() const
 
 double BSDFMaterial::ux() const
 {
-    //bool ok;
-    double value = atof(getArg1(2).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg1(2), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double BSDFMaterial::uy() const
 {
-    //bool ok;
-    double value = atof(getArg1(3).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg1(3), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 double BSDFMaterial::uz() const
 {
-    //bool ok;
-    double value = atof(getArg1(4).c_str());
-    /*
+    bool ok;
+    double value = stadic::toDouble(getArg1(4), &ok);
     if(!ok) {
         // This is bad and should *never* happen
         // Probably need to issue a panicky error message
         return 0;
     }
-    */
     return value;
 }
 
 bool BSDFMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==1) {
-        //bool ok;
+        bool ok;
         double dval = 0;
-        if (position!=1){dval=atof(value.c_str());}
+        if (position!=1){
+            dval=stadic::toDouble(value, &ok);
+        }
         switch (position){
             case 0:
-                if (/*ok&&*/dval>=0){
+                if (ok && dval>=0){
                     return true;
                 }
                 break;
@@ -864,34 +817,25 @@ bool BSDFMaterial::validateArg(int number, std::string value, int position) cons
                 return true;
                 break;
             case 2:
-                return true;
-                /*
                 if(ok) {
                     return true;
                 }else{
                     STADIC_ERROR("There was an error in the x vector for the BSDF material.");
                 }
-                */
                 break;
             case 3:
-                return true;
-                /*
                 if (ok){
                     return true;
                 }else{
                     STADIC_ERROR("There was an error in the y vector for the BSDF material.");
                 }
-                */
                 break;
             case 4:
-                return true;
-                /*
                 if (ok){
                     return true;
                 }else{
                     STADIC_ERROR("There was an error in the z vector for the BSDF material.");
                 }
-                */
                 break;
             case 5:
                 if (value=="."){
@@ -912,9 +856,9 @@ bool BSDFMaterial::validateArg(int number, std::vector<std::string> arg) const
             return false;
         }
         for(std::string value : arg) {
-            //bool ok;
-            double dval = atof(value.c_str());
-            if(/*ok && */dval >= 0 && dval <= 1.0) {
+            bool ok;
+            double dval = stadic::toDouble(value, &ok);
+            if(ok && dval >= 0 && dval <= 1.0) {
                 return true;
             }
         }

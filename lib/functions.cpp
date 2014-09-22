@@ -78,4 +78,11 @@ double toDouble(const std::string &string, bool *ok)
     return value;
 }
 
+std::string toString(double value)
+{
+    std::stringstream stream;
+    stream << value;
+    return stream.str();
+}
+
 }
