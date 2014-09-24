@@ -140,7 +140,7 @@ bool PlasticMaterial::validateArg(int number, std::string value, int position) c
                 }else if (dval<0){
                     STADIC_ERROR("The roughness for a plastic cannot be less than 0.");
                 }else if (dval>0.02 && dval<1){
-                    STADIC_WARNING("The roughness value for a plastic is suggested to be 0 and 0.02.");
+                    STADIC_WARNING("The roughness value for a plastic is suggested to be between 0 and 0.02.");
                     return true;
                 }else if (dval>1){
                     STADIC_ERROR("The roughness for a plastic cannot be greater than 1.");
@@ -181,37 +181,37 @@ MetalMaterial::MetalMaterial(double red, double green, double blue, double spec,
     : RadPrimitive()
 {
     RadPrimitive::setType("metal");
-    setArg(3,std::to_string(red),0);
-    setArg(3,std::to_string(green),1);
-    setArg(3,std::to_string(blue),2);
-    setArg(3,std::to_string(spec),3);
-    setArg(3,std::to_string(rough),4);
+    setArg(3, stadic::toString(red), 0);
+    setArg(3, stadic::toString(green), 1);
+    setArg(3, stadic::toString(blue), 2);
+    setArg(3, stadic::toString(spec), 3);
+    setArg(3, stadic::toString(rough), 4);
 }
 
 // Setters
 bool MetalMaterial::setRed(double value)
 {
-    return setArg(3,std::to_string(value),0);
+    return setArg(3, stadic::toString(value), 0);
 }
 
 bool MetalMaterial::setGreen(double value)
 {
-    return setArg(3,std::to_string(value),1);
+    return setArg(3, stadic::toString(value), 1);
 }
 
 bool MetalMaterial::setBlue(double value)
 {
-    return setArg(3,std::to_string(value),2);
+    return setArg(3, stadic::toString(value), 2);
 }
 
 bool MetalMaterial::setSpecularity(double value)
 {
-    return setArg(3,std::to_string(value),3);
+    return setArg(3, stadic::toString(value), 3);
 }
 
 bool MetalMaterial::setRoughness(double value)
 {
-    return setArg(3,std::to_string(value),4);
+    return setArg(3, stadic::toString(value), 4);
 }
 
 // Getters
@@ -308,7 +308,7 @@ bool MetalMaterial::validateArg(int number, std::string value, int position) con
                 }else if (dval<0){
                     STADIC_ERROR("The roughness for a metal cannot be less than 0.");
                 }else if (dval>0.5 && dval<1){
-                    STADIC_WARNING("The roughness value for a metal is suggested to be 0 and 0.5.");
+                    STADIC_WARNING("The roughness value for a metal is suggested to be between 0 and 0.5.");
                     return true;
                 }else if (dval>1){
                     STADIC_ERROR("The roughness for a metal cannot be greater than 1.");
