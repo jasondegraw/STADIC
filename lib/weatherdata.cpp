@@ -8,11 +8,15 @@
 #include <vector>
 #include "logging.h"
 #include "functions.h"
+#include "math.h"
+
+const double PI=3.1415926535897932;
 
 namespace stadic {
 
 WeatherData::WeatherData()
 {
+    m_JulianDate.clear();
 }
 
 //Setters
@@ -58,14 +62,22 @@ std::vector<std::string> WeatherData::directNormal() const {
     return m_DirectNormal;
 }
 
-std::vector<std::string> WeatherData::directHorizontal() const{
-    return m_DirectHorizontal;
+std::vector<std::string> WeatherData::diffuseHorizontal() const{
+    return m_DiffuseHorizontal;
 }
-/*
+
+std::vector<double> WeatherData::directIlluminance() const{
+    return m_DirectIlluminance;
+}
+std::vector<double> WeatherData::dewPointC() const{
+    return m_DewPointC;
+}
+
+
 std::vector<int> WeatherData::julianDate() const{
     return m_JulianDate;
 }
-*/
+
 
 std::string WeatherData::place() const
 {
@@ -110,6 +122,16 @@ bool WeatherData::parseWeather(std::string file)
     }else{
         parseTMY(file);
     }
+    if (m_DirectNormal.size()==8760){
+        for (int i=0;i<365;i++){
+            for (int j=0;j<24;j++){
+                m_JulianDate.push_back(i+1);
+            }
+        }
+    }
+    if (!calcDirectIll()){
+        return false;
+    }
     return true;
 }
 
@@ -128,7 +150,7 @@ bool WeatherData::writeWea(std::string file)
     oFile<<"site_elevation "<<elevation()<<std::endl;
     oFile<<"weather_data_file_units 1"<<std::endl;
     for (int i=0;i<month().size();i++){
-        oFile<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<directNormal()[i]<<" "<<directHorizontal()[i]<<std::endl;
+        oFile<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<directNormal()[i]<<" "<<diffuseHorizontal()[i]<<std::endl;
     }
     oFile.close();
     return true;
@@ -196,8 +218,9 @@ bool WeatherData::parseEPW(std::string file)
         m_Month.push_back(month);
         m_Day.push_back(day);
         m_Hour.push_back(hour);
-        m_DirectHorizontal.push_back(vals[15]);
+        m_DiffuseHorizontal.push_back(vals[15]);
         m_DirectNormal.push_back(vals[14]);
+        m_DewPointC.push_back(toDouble(vals[6]));
     }
     return true;
 }
@@ -236,7 +259,8 @@ bool WeatherData::parseTMY(std::string file){
     double correction=tempHour-0.5;
     m_Hour.push_back(tempHour-correction);
     m_DirectNormal.push_back(vals[7]);
-    m_DirectHorizontal.push_back(vals[10]);
+    m_DiffuseHorizontal.push_back(vals[10]);
+    m_DewPointC.push_back(toDouble(vals[34]));
     while(getline(iFile,line)){
         vals.clear();
         vals=split(line,',');
@@ -253,7 +277,8 @@ bool WeatherData::parseTMY(std::string file){
         double tempHour=atof(parseDate[0].c_str())+atof(parseDate[1].c_str())/60;
         m_Hour.push_back(tempHour-correction);
         m_DirectNormal.push_back(vals[7]);
-        m_DirectHorizontal.push_back(vals[10]);
+        m_DiffuseHorizontal.push_back(vals[10]);
+        m_DewPointC.push_back(toDouble(vals[34]));
     }
     iFile.close();
     /*
@@ -310,6 +335,161 @@ bool WeatherData::parseTMY(std::string file){
     iFile.close();
     */
     return true;
+}
+bool WeatherData::calcDirectIll(){
+    if (m_JulianDate.empty()){
+        STADIC_WARNING("There are not 8760 intervals in the weather file.");
+        return false;
+    }
+    setSolarPositions();
+    calcEpsilon();
+    calcDelta();
+    calcAPWC();
+    m_DirectIlluminance.clear();
+    for (int i=0;i<m_JulianDate.size();i++){
+        double tempVal;
+        std::vector<double> tempVec;
+        tempVec=directLumEff(m_Epsilon[i]);
+        if (tempVec[0]==0){
+            STADIC_ERROR("There was a problem with the direct luminous efficiency values.");
+            return false;
+        }
+        tempVal=toDouble(m_DirectNormal[i])*(tempVec[0]+tempVec[1]*m_APWC[i]+tempVec[2]*exp(5.73*m_SolarZenAng[i]-5)+tempVec[3]*m_Delta[i]);
+        if (tempVal<0){
+            tempVal=0;
+        }
+        m_DirectIlluminance.push_back(tempVal);
+    }
+    return true;
+}
+void WeatherData::setSolarPositions(){
+    for (int i=0;i<m_JulianDate.size();i++){
+        m_SolarDec.push_back(solarDec(m_JulianDate[i]));
+        m_SolarTimeAdj.push_back(m_JulianDate[i]);
+        m_SolarAlt.push_back(solarAlt(m_SolarDec[i],m_Hour[i]+m_SolarTimeAdj[i]));
+        m_SolarAz.push_back(solarAz(m_SolarDec[i],m_Hour[i]+m_SolarTimeAdj[i])+PI);
+        m_SolarZenAng.push_back(solarZen(m_SolarAlt[i]));
+    }
+}
+
+double WeatherData::solarDec(int julianDate){
+    return 0.4093*sin((2*PI/368)*(julianDate-81));
+}
+
+double WeatherData::solarTimeadj(int julianDate){
+    return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(toDouble(timeZone()))-degToRad(toDouble(longitude())))/PI;
+}
+
+double WeatherData::solarAlt(double solarDeclination, double time){
+    return asin(sin(degToRad(toDouble(latitude())))*sin(solarDeclination)-cos(degToRad(toDouble(latitude())))*cos(solarDeclination)*cos(PI*time/12));
+}
+
+double WeatherData::solarAz(double solarDeclination, double time){
+    return -atan2(cos(solarDeclination)*sin(time*(PI/12)),-cos(degToRad(toDouble(latitude())))*sin(solarDeclination)-sin(degToRad(toDouble(latitude())))*cos(solarDeclination)*cos(time*(PI/12)));
+}
+
+double WeatherData::solarZen(double solarAltAng){
+    return PI/2-solarAltAng;
+}
+
+double WeatherData::degToRad(double val){
+    return val*PI/180.0;
+}
+
+void WeatherData::calcEpsilon(){
+    m_Epsilon.clear();
+    for (int i=0;i<m_JulianDate.size();i++){
+        m_Epsilon.push_back(((toDouble(m_DiffuseHorizontal[i])+toDouble(m_DirectNormal[i]))/toDouble(m_DiffuseHorizontal[i])+1.041*pow(m_SolarZenAng[i],3))/1+1.041*pow(m_SolarZenAng[i],3));
+    }
+}
+
+void WeatherData::calcDelta(){
+    m_Delta.clear();
+    for (int i=0;i<m_JulianDate.size();i++){
+        m_Delta.push_back(toDouble(m_DiffuseHorizontal[i])*(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253))));
+    }
+}
+
+void WeatherData::calcAPWC(){
+    m_APWC.clear();
+    for (int i=0;i<m_JulianDate.size();i++){
+        m_APWC.push_back(exp(0.07*m_DewPointC[i]-0.075));
+    }
+}
+
+int WeatherData::skyBin(double epsilon){
+    if (epsilon<1){
+        STADIC_ERROR("The value of epsilon was less than zero and therefore cannot be computed");
+        return 0;
+    }else if (epsilon<1.065){
+        return 1;
+    }else if (epsilon<1.230){
+        return 2;
+    }else if (epsilon<1.5){
+        return 3;
+    }else if (epsilon<1.95){
+        return 4;
+    }else if (epsilon<2.8){
+        return 5;
+    }else if (epsilon<4.5){
+        return 6;
+    }else if (epsilon<6.2){
+        return 7;
+    }else{
+        return 8;
+    }
+}
+std::vector<double> WeatherData::directLumEff(double epsilon){
+    std::vector<double> tempVec;
+    tempVec.clear();
+    int bin=skyBin(epsilon);
+    if (bin==0){
+        tempVec.push_back(0);
+        tempVec.push_back(0);
+        tempVec.push_back(0);
+        tempVec.push_back(0);
+    }else if (bin==1){
+        tempVec.push_back(57.20);
+        tempVec.push_back(-4.55);
+        tempVec.push_back(-2.98);
+        tempVec.push_back(117.12);
+    }else if (bin==2){
+        tempVec.push_back(98.99);
+        tempVec.push_back(-3.46);
+        tempVec.push_back(-1.21);
+        tempVec.push_back(12.38);
+    }else if (bin==3){
+        tempVec.push_back(109.83);
+        tempVec.push_back(-4.90);
+        tempVec.push_back(-1.71);
+        tempVec.push_back(-8.81);
+    }else if (bin==4){
+        tempVec.push_back(110.34);
+        tempVec.push_back(-5.84);
+        tempVec.push_back(-1.99);
+        tempVec.push_back(-4.56);
+    }else if (bin==5){
+        tempVec.push_back(106.36);
+        tempVec.push_back(-3.97);
+        tempVec.push_back(-1.75);
+        tempVec.push_back(-6.16);
+    }else if (bin ==6){
+        tempVec.push_back(107.19);
+        tempVec.push_back(-1.25);
+        tempVec.push_back(-1.51);
+        tempVec.push_back(-26.73);
+    }else if (bin==7){
+        tempVec.push_back(105.75);
+        tempVec.push_back(0.77);
+        tempVec.push_back(-1.26);
+        tempVec.push_back(-34.44);
+    }else if (bin==8){
+        tempVec.push_back(101.18);
+        tempVec.push_back(1.58);
+        tempVec.push_back(-1.10);
+        tempVec.push_back(-8.29);
+    }
+    return tempVec;
 }
 
 }

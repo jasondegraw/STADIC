@@ -50,15 +50,15 @@ public:
     bool writePTS();
     bool writePTS(std::string file);
     bool writePTScsv(std::string file);
-    bool viewPTS(std::string location);
+    bool viewPTS(std::string location, std::string vType);
 
 
 private:
     //Points
-    std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> m_PointSet;
-    std::vector<std::vector<double>> m_FinalPoints;
+    std::vector<std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>>> m_PointSet;       //The x,y points in boost format that are within the polygons
+    std::vector<std::vector<std::vector<double>>> m_FinalPoints;                                                         //The x,y,z points as doubles that are the final output set
     //Polygons
-    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> m_UnitedPolygon;
+    std::vector<boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>>> m_UnitedPolygon;
 
 
     //InputData
@@ -79,32 +79,34 @@ private:
     std::string m_picFile;
 
     //Dimensional
-    double m_MinX;
-    double m_MinY;
-    double m_MaxX;
-    double m_MaxY;
+    std::vector<double> m_MinX;
+    std::vector<double> m_MinY;
+    std::vector<double> m_MaxX;
+    std::vector<double> m_MaxY;
     double m_MaxXRad;
     double m_MinXRad;
     double m_MaxYRad;
     double m_MinYRad;
+    double m_MaxZRad;
+    double m_MinZRad;
+    std::vector<double> m_PolySetHeight;
 
     //Functions
     bool parseRad();
     //Dimensional
-    void setMinX(double x);
-    void setMaxX(double x);
-    void setMinY(double y);
-    void setMaxY(double y);
+    void setMinX(double x, int set);
+    void setMaxX(double x, int set);
+    void setMinY(double y, int set);
+    void setMaxY(double y, int set);
 
     bool insetPolygons();
-    void boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet);
+    void boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet, int set);
     bool testPoints();
-    void addTestPoints(double x, double y);
-    void zHeights();
+    void addTestPoints(double x, double y, int set);
     bool writeRadPoly(std::string file);
     bool writeRadPoints(std::string file);
     bool runoconv(std::string file);
-    bool runrpict();
+    bool runrpict(std::string vType);
 
 signals:
 

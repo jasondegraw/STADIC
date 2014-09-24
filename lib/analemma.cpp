@@ -275,9 +275,9 @@ bool Analemma::genSunMtx()
     for (int i=0;i<m_WeaData.hour().size();i++){
         if (m_ClosestSun[i]>-1){
             std::vector<double> tempVec;
-            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
-            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
-            tempVec.push_back(stadic::toDouble(m_WeaData.directNormal()[i])/6.797e-05);
+            tempVec.push_back(m_WeaData.directIlluminance()[i]/6.797e-05);
+            tempVec.push_back(m_WeaData.directIlluminance()[i]/6.797e-05);
+            tempVec.push_back(m_WeaData.directIlluminance()[i]/6.797e-05);
             m_SunVal[i][m_ClosestSun[i]]=tempVec;
         }
     }

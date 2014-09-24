@@ -42,24 +42,49 @@ public:
     std::vector<int> day() const;
     std::vector<double> hour() const;
     std::vector<std::string> directNormal() const;
-    std::vector<std::string> directHorizontal() const;
+    std::vector<std::string> diffuseHorizontal() const;
+    std::vector<double> directIlluminance() const;
+    std::vector<double> dewPointC() const;
     std::string place() const;
     std::string latitude() const;
     std::string longitude() const;
     std::string timeZone() const;
     std::string elevation() const;
-    //std::vector<int> julianDate() const;
+    std::vector<int> julianDate() const;
 
 private:
     bool parseEPW(std::string file);
     bool parseTMY(std::string file);
+    bool calcDirectIll();
+    void setSolarPositions();
+    double solarDec(int julianDate);
+    double solarTimeadj(int julianDate);
+    double solarAlt(double solarDeclination, double time);
+    double solarAz(double solarDeclination, double time);
+    double solarZen(double solarAltAng);
+    double degToRad(double val);
+    void calcEpsilon();
+    void calcDelta();
+    void calcAPWC();
+    int skyBin(double epsilon);
+    std::vector<double> directLumEff(double epsilon);
 
     std::vector<int> m_Month;
     std::vector<int> m_Day;
     std::vector<double> m_Hour;
-    //std::vector<int> m_JulianDate;
+    std::vector<int> m_JulianDate;
     std::vector<std::string> m_DirectNormal;
-    std::vector<std::string> m_DirectHorizontal;
+    std::vector<double> m_DirectIlluminance;
+    std::vector<std::string> m_DiffuseHorizontal;
+    std::vector<double> m_DewPointC;
+    std::vector<double> m_SolarDec;
+    std::vector<double> m_SolarTimeAdj;
+    std::vector<double> m_SolarAlt;
+    std::vector<double> m_SolarAz;
+    std::vector<double> m_SolarZenAng;
+    std::vector<double> m_Epsilon;          //Sky's cleaness
+    std::vector<double> m_Delta;            //Sky's brightness
+    std::vector<double> m_APWC;             //Atmospheric preciptiable water content
     std::string m_Place;
     std::string m_Latitude;
     std::string m_Longitude;

@@ -17,7 +17,7 @@ TEST(WeatherTests, ReadEpw)
   EXPECT_EQ(30,data.day()[710]);
   EXPECT_EQ(14.5,data.hour()[710]);
   EXPECT_EQ("0",data.directNormal()[710]);
-  EXPECT_EQ("67",data.directHorizontal()[710]);
+  EXPECT_EQ("67",data.diffuseHorizontal()[710]);
 }
 
 TEST(WeatherTests, WriteWea)

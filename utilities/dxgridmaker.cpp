@@ -16,7 +16,11 @@ void usage(){
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
-    std::cerr<<"-v location\tSet the location that the files should be placed for creating the .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vne location\tSet the location that the files should be placed for creating the North East isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vnw location\tSet the location that the files should be placed for creating the North West isometric .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-p name\tSet the ouput for the joined polygon to name. This file contains the joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\"."<<std::endl;
     std::cerr<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
 }
@@ -36,6 +40,8 @@ int main (int argc, char *argv[])
     polyFile.clear();
     std::string viewLocation;
     viewLocation.clear();
+    std::string vType;
+    vType.clear();
     std::vector<std::string> layerNames;
     bool useZOffset=false;
     bool useOffset=false;
@@ -80,9 +86,26 @@ int main (int argc, char *argv[])
         }else if(std::strcmp(argv[i],"-l")==0){
             i++;
             layerNames.push_back(argv[i]);
-        }else if(std::strcmp(argv[i],"-v")==0){
+        }else if(std::strcmp(argv[i],"-vp")==0){
             i++;
             viewLocation=argv[i];
+            vType="p";
+        }else if(std::strcmp(argv[i],"-vse")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="se";
+        }else if(std::strcmp(argv[i],"-vne")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="ne";
+        }else if(std::strcmp(argv[i],"-vsw")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="sw";
+        }else if(std::strcmp(argv[i],"-vnw")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="nw";
         }else if(std::strcmp(argv[i],"-p")==0){
             i++;
             polyFile=argv[i];
@@ -146,7 +169,7 @@ int main (int argc, char *argv[])
         }
     }
     if (!viewLocation.empty()){
-        if (!grid.viewPTS(viewLocation)){
+        if (!grid.viewPTS(viewLocation, vType)){
             return EXIT_FAILURE;
         }
     }
