@@ -83,6 +83,10 @@ private:
     double m_MinY;
     double m_MaxX;
     double m_MaxY;
+    double m_MaxXRad;
+    double m_MinXRad;
+    double m_MaxYRad;
+    double m_MinYRad;
 
     //Functions
     bool parseRad();

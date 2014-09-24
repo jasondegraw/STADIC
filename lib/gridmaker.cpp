@@ -11,13 +11,9 @@
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/buffer.hpp>
 #include <boost/geometry/strategies/agnostic/buffer_distance_asymmetric.hpp>
-//#include <boost/geometry/strategies/agnostic/buffer_distance_symmetric.hpp>
-//#include <boost/geometry/strategies/cartesian/buffer_join_round.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_join_miter.hpp>
-//#include <boost/geometry/strategies/cartesian/buffer_end_round.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_end_flat.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
-//#include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_side_straight.hpp>
 #include <boost/geometry/algorithms/covered_by.hpp>
@@ -105,32 +101,21 @@ bool GridMaker::makeGrid(){
         return false;
     }
 
-    //If doing an offset all the way around
-    if (m_UseOffset){
-        if (!insetPolygons()){
-            return false;
-        }
-        boundingBox(m_UnitedPolygon);
-    }else if (m_OffsetX>0 || m_OffsetY>0){
-        //Offset x and y from bounding rectangle given m_OffsetX and m_OffsetY
-        //reset min and max x and y
-
-    }else{
-        //Get min and max of bounding rectangle and divide by spacing for both x and y
-        //If the result is an integer then the offset should be equal to the spacing
-        //if the result is not an integer multiply the remainder by the spacing and divide by two for the offset
-        //reset min and max x and y
-    }
     if (!testPoints()){
         return false;
     }
 
     if (m_useZOffset){
         zHeights();
+    }else{
+        for (int p=0;p<m_PointSet.size();p++){
+            std::vector<double> tempPoint;
+            tempPoint.push_back(m_PointSet[p].get<0>());
+            tempPoint.push_back(m_PointSet[p].get<1>());
+            tempPoint.push_back(m_ZHeight);
+            m_FinalPoints.push_back(tempPoint);
+        }
     }
-    //Finish this code for when the program is ran with absolute z
-
-
     return true;
 }
 
@@ -254,12 +239,8 @@ void GridMaker::setMaxY(double y){
 }
 bool GridMaker::insetPolygons(){
     boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy((m_Offset -m_Offset*0.10), (m_Offset-m_Offset*0.10));
-    //boost::geometry::strategy::buffer::distance_symmetric<double> distance_strategy(m_Offset);
-    //boost::geometry::strategy::buffer::join_round join_strategy(36);
     boost::geometry::strategy::buffer::join_miter join_strategy;
-    //boost::geometry::strategy::buffer::end_round end_strategy(36);
     boost::geometry::strategy::buffer::end_flat end_strategy;
-    //boost::geometry::strategy::buffer::point_circle point_strategy(36);
     boost::geometry::strategy::buffer::point_square point_strategy;
     boost::geometry::strategy::buffer::side_straight side_strategy;
     boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
@@ -293,13 +274,58 @@ void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometr
 }
 
 bool GridMaker::testPoints(){
-    //Create vector of test points
+    if (m_UseOffset){
+        if (!insetPolygons()){
+            return false;
+        }
+        boundingBox(m_UnitedPolygon);
+    }else if (m_OffsetX>0 || m_OffsetY>0){
+        //Offset x and y from bounding rectangle given m_OffsetX and m_OffsetY
+        //reset min and max x and y
+        boundingBox(m_UnitedPolygon);
+        setMinX(m_MinX+m_OffsetX);
+        setMaxX(m_MaxX-m_OffsetX);
+        setMinY(m_MinY+m_OffsetY);
+        setMaxY(m_MaxY-m_OffsetY);
+    }else if (m_SpaceX>0 && m_SpaceY>0){
+        //Get min and max of bounding rectangle and divide by spacing for both x and y
+        //If the result is an integer then the offset should be equal to the spacing
+        //if the result is not an integer multiply the remainder by the spacing and divide by two for the offset
+        //reset min and max x and y
+        boundingBox(m_UnitedPolygon);
+        if (remainder((m_MaxX-m_MinX),m_SpaceX)){
+            setMinX(m_MinX+m_SpaceX);
+            setMaxX(m_MaxX-m_SpaceX);
+        }else{
+            double tempNum=remainder((m_MaxX-m_MinX),m_SpaceX)*m_SpaceX;
+            setMinX(m_MinX+tempNum);
+            setMaxX(m_MaxX-tempNum);
+        }
+        if (remainder((m_MaxY-m_MinY),m_SpaceY)){
+            setMinX(m_MinY+m_SpaceY);
+            setMaxX(m_MaxY-m_SpaceY);
+        }else{
+            double tempNum=remainder((m_MaxY-m_MinY),m_SpaceY)*m_SpaceY;
+            setMinX(m_MinY+tempNum);
+            setMaxX(m_MaxY-tempNum);
+        }
+    }else{
+        STADIC_ERROR("The offsets cannot be determined, because the spacing and offset values are all 0.");
+        return false;
+    }
+        //Create vector of test points
     double x=m_MinX;
     while (x<=m_MaxX){
         double y=m_MinY;
         while (y<=m_MaxY){
-            if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon)){
-                addTestPoints(x,y);
+            if (m_UseOffset){
+                if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon)){
+                    addTestPoints(x,y);
+                }
+            }else{
+                if (boost::geometry::within(boost::geometry::model::point<double,2,boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon)){
+                    addTestPoints(x,y);
+                }
             }
             y=y+spaceY();
         }
@@ -357,15 +383,53 @@ bool GridMaker::writeRadPoly(std::string file){
         return false;
     }
     oFile<<"void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0"<<std::endl<<std::endl;
+    m_MaxXRad=-1000;
+    m_MinXRad=1000;
+    m_MaxYRad=-1000;
+    m_MinYRad=1000;
+    for (int i=0;i<m_RadFile.geometry().size();i++){
+        for (int j=0;j<m_LayerNames.size();j++){
+            if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+                oFile<<"0\t0\t"<<m_RadFile.geometry().at(i)->arg3().size()<<std::endl;
+                int coordinate=0;
+                for (int k=0;k<m_RadFile.geometry().at(i)->arg3().size();k++){
+                    oFile<<"\t"<<m_RadFile.geometry().at(i)->arg3()[k];
+                    if (coordinate==0){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxXRad){
+                            m_MaxXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinXRad){
+                            m_MinXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else if (coordinate==1){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxYRad){
+                            m_MaxYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinYRad){
+                            m_MinYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else{
+                        coordinate=0;
+                    }
+                }
+                oFile<<std::endl;
+            }
+        }
+    }
 
+    /*
     for (int i=0;i<m_UnitedPolygon.size();i++){
         oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
         oFile<<"0\t0\t"<<(m_UnitedPolygon[i].outer().size()-1)*3<<std::endl;
-        for (int j=0;j<m_UnitedPolygon[i].outer().size();j++){
-            oFile<<"\t"<<j<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<"\t0"<<std::endl;
+        for (int j=0;j<m_UnitedPolygon[i].outer().size()-1;j++){
+            oFile<<"\t"<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<"\t0"<<std::endl;
         }
         oFile<<std::endl;
     }
+    */
     oFile.close();
     return true;
 }
@@ -381,7 +445,7 @@ bool GridMaker::writeRadPoints(std::string file){
     for (int i=0;i<m_FinalPoints.size();i++){
         oFile<<"pts ring pts"<<i<<"\n0\n0\n8\t"<<m_FinalPoints[i][0]<<"\t"<<m_FinalPoints[i][1]<<"\t"<<m_FinalPoints[i][2]<<std::endl;
         oFile<<"\t0\t0\t1"<<std::endl;
-        oFile<<"\t0\t"<<m_SpaceX/4<<std::endl<<std::endl;
+        oFile<<"\t0\t"<<m_SpaceX/8<<std::endl<<std::endl;
     }
     oFile.close();
     return true;
@@ -409,8 +473,8 @@ bool GridMaker::runrpict(){
     args.push_back("-vtl");
     args.push_back("-w");
     args.push_back("-vp");
-    args.push_back(std::to_string((m_MaxX-m_MinX)/2+m_MinX));
-    args.push_back(std::to_string((m_MaxY-m_MinY)/2+m_MinY));
+    args.push_back(std::to_string((m_MaxXRad-m_MinXRad)/2+m_MinXRad));
+    args.push_back(std::to_string((m_MaxYRad-m_MinYRad)/2+m_MinYRad));
     double tempZmax=0;
     for (int i=0;i<m_FinalPoints.size();i++){
         if (m_FinalPoints[i][2]>tempZmax){
@@ -418,10 +482,14 @@ bool GridMaker::runrpict(){
         }
     }
     args.push_back(std::to_string(2+tempZmax));
+    args.push_back("-vd");
+    args.push_back("0");
+    args.push_back("0.000000001");
+    args.push_back("-1");
     args.push_back("-vh");
-    args.push_back(std::to_string(1.1*(m_MaxX-m_MinX)));
+    args.push_back(std::to_string(1.1*(m_MaxXRad-m_MinXRad)));
     args.push_back("-vv");
-    args.push_back(std::to_string(1.1*(m_MaxY-m_MinY)));
+    args.push_back(std::to_string(1.1*(m_MaxYRad-m_MinYRad)));
     args.push_back("-vo");
     args.push_back("0");
     args.push_back("-va");
@@ -444,6 +512,7 @@ bool GridMaker::runrpict(){
     args.push_back("-ad");
     args.push_back("15000");
     args.push_back(m_oconvFile);
+
     std::string rpictProgram="rpict";
     Process rpict(rpictProgram,args);
     rpict.setStandardOutputFile(picFile);
