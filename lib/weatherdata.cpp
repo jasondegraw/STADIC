@@ -361,7 +361,7 @@ bool WeatherData::calcDirectIll(){
         if (tempVal<0){
             tempVal=0;
         }
-        if (m_SolarZenAng[i]>(PI/2.0)){
+        if (m_SolarZenAng[i]>=(PI/2.0)){
             tempVal=0;
         }
         oFile<<tempVal<<std::endl;
@@ -397,6 +397,11 @@ double WeatherData::solarAz(double solarDeclination, double time){
 }
 
 double WeatherData::solarZen(double solarAltAng){
+    if (solarAltAng<=0){
+        return degToRad(90);
+    }else if (solarAltAng>= degToRad(87)){
+        return degToRad(3);
+    }
     return PI/2-solarAltAng;
 }
 
@@ -405,20 +410,32 @@ double WeatherData::degToRad(double val){
 }
 
 void WeatherData::calcEpsilon(){
+    //This is the sky clearness
     m_Epsilon.clear();
     for (int i=0;i<m_JulianDate.size();i++){
-        m_Epsilon.push_back(((toDouble(m_DiffuseHorizontal[i])+toDouble(m_DirectNormal[i]))/toDouble(m_DiffuseHorizontal[i])+1.041*pow(m_SolarZenAng[i],3))/1+1.041*pow(m_SolarZenAng[i],3));
+        double epsilon=((toDouble(m_DiffuseHorizontal[i])+toDouble(m_DirectNormal[i]))/toDouble(m_DiffuseHorizontal[i])+1.041*pow(m_SolarZenAng[i],3))/1+1.041*pow(m_SolarZenAng[i],3);
+        if (epsilon>11.9){
+            m_Epsilon.push_back(11.9);
+        }else{
+            m_Epsilon.push_back(epsilon);
+        }
     }
 }
 
 void WeatherData::calcDelta(){
+    //This is the sky brightness
     m_Delta.clear();
     double dayAngle;
     double eccentricity;
     for (int i=0;i<m_JulianDate.size();i++){
         dayAngle=(m_JulianDate[i]-1.0)*(2.0*PI/365);
         eccentricity=1.00011+0.034221*cos(dayAngle)+0.00128*sin(dayAngle)+0.000719*cos(2.0*dayAngle)+0.000077*sin(2.0*dayAngle);
-        m_Delta.push_back(toDouble(m_DiffuseHorizontal[i])*(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253)))/(1367*eccentricity));
+        double delta=toDouble(m_DiffuseHorizontal[i])*(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253)))/(1367*eccentricity);
+        if (delta<0.01){
+            m_Delta.push_back(0.01);
+        }else{
+            m_Delta.push_back(delta);
+        }
     }
 }
 
