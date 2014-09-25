@@ -58,7 +58,7 @@ private:
     bool calcDirectIll();
     void setSolarPositions();
     double solarDec(int julianDate);
-    double solarTimeadj(int julianDate);
+    double solarTimeAdj(int julianDate);
     double solarAlt(double solarDeclination, double time);
     double solarAz(double solarDeclination, double time);
     double solarZen(double solarAltAng);
