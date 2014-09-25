@@ -1,7 +1,3 @@
-/*The direct illuminance calculations in this code were adapted from gendaymtx.
- * Greg Ward and Ian Ashdown
- */
-
 #include "analemma.h"
 #include "logging.h"
 #include "functions.h"

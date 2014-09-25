@@ -1,3 +1,7 @@
+/*The direct illuminance calculations in this code were adapted from gendaymtx.
+ * Greg Ward and Ian Ashdown
+ */
+
 #include "weatherdata.h"
 //#include <QTextStream>
 //#include <QFile>
