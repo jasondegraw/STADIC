@@ -350,8 +350,8 @@ bool WeatherData::calcDirectIll(){
     calcDelta();
     calcAPWC();
     m_DirectIlluminance.clear();
-    std::ofstream oFile;
-    oFile.open("c:/001/bracketvalues.txt");
+    //std::ofstream oFile;
+    //oFile.open("c:/001/bracketvalues.txt");
     for (int i=0;i<m_JulianDate.size();i++){
         double tempVal;
         std::vector<double> tempVec;
@@ -361,31 +361,31 @@ bool WeatherData::calcDirectIll(){
             return false;
         }
         tempVal=toDouble(m_DirectNormal[i])*(tempVec[0]+tempVec[1]*m_APWC[i]+tempVec[2]*exp(5.73*m_SolarZenAng[i]-5)+tempVec[3]*m_Delta[i])/179.0;
-        oFile<<"a="<<tempVec[0]<<" b="<<tempVec[1]<<" apwc="<<m_APWC[i]<<" c="<<tempVec[2]<<" solarZen="<<m_SolarZenAng[i]<<" d="<<tempVec[3]<<" delta="<<m_Delta[i]<<" resultant=";
+        //oFile<<"a="<<tempVec[0]<<" b="<<tempVec[1]<<" apwc="<<m_APWC[i]<<" c="<<tempVec[2]<<" solarZen="<<m_SolarZenAng[i]<<" d="<<tempVec[3]<<" delta="<<m_Delta[i]<<" resultant=";
         if (tempVal<0){
             tempVal=0;
         }
         if (m_SolarZenAng[i]>=(PI/2.0)){
             tempVal=0;
         }
-        oFile<<tempVal<<std::endl;
+        //oFile<<tempVal<<std::endl;
         m_DirectIlluminance.push_back(tempVal);
     }
-    oFile.close();
+    //oFile.close();
     return true;
 }
 void WeatherData::setSolarPositions(){
     std::ofstream oFile;
-    oFile.open("c:/001/hours.txt");
+    //oFile.open("c:/001/hours.txt");
     for (int i=0;i<m_JulianDate.size();i++){
         m_SolarDec.push_back(solarDec(m_JulianDate[i]));
         m_SolarTimeAdj.push_back(solarTimeAdj(m_JulianDate[i]));
         m_SolarAlt.push_back(solarAlt(m_SolarDec[i],m_Hour[i]+m_SolarTimeAdj[i]));
-        oFile<<"julianDate="<<m_JulianDate[i]<<" time="<<m_Hour[i]+m_SolarTimeAdj[i]<<std::endl;
+        //oFile<<"julianDate="<<m_JulianDate[i]<<" time="<<m_Hour[i]+m_SolarTimeAdj[i]<<std::endl;
         m_SolarAz.push_back(solarAz(m_SolarDec[i],m_Hour[i]+m_SolarTimeAdj[i])+PI);
         m_SolarZenAng.push_back(solarZen(m_SolarAlt[i]));
     }
-    oFile.close();
+    //oFile.close();
 }
 
 double WeatherData::solarDec(int julianDate){
@@ -394,7 +394,7 @@ double WeatherData::solarDec(int julianDate){
 
 double WeatherData::solarTimeAdj(int julianDate){
     double sta=0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(toDouble(timeZone()))-degToRad(toDouble(longitude())))/PI;
-    std::clog<<sta<<std::endl;
+    //std::clog<<sta<<std::endl;
     return sta;
 }
 
@@ -434,8 +434,8 @@ void WeatherData::calcEpsilon(){
 
 void WeatherData::calcDelta(){
     //This is the sky brightness
-    std::ofstream oFile;
-    oFile.open("c:/001/AirMass.txt");
+    //std::ofstream oFile;
+    //oFile.open("c:/001/AirMass.txt");
     m_Delta.clear();
     double dayAngle;
     double eccentricity;
@@ -443,7 +443,7 @@ void WeatherData::calcDelta(){
         dayAngle=(m_JulianDate[i]-1.0)*(2.0*PI/365);
         eccentricity=1.00011+0.034221*cos(dayAngle)+0.00128*sin(dayAngle)+0.000719*cos(2.0*dayAngle)+0.000077*sin(2.0*dayAngle);
         double delta=(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253)));
-        oFile<<"Hour="<<m_Hour[i]<<" AirMass="<<delta<<std::endl;
+        //oFile<<"Hour="<<m_Hour[i]<<" AirMass="<<delta<<std::endl;
         delta=toDouble(m_DiffuseHorizontal[i])*delta/(1367*eccentricity);
         if (delta<0.01){
             m_Delta.push_back(0.01);
@@ -451,7 +451,7 @@ void WeatherData::calcDelta(){
             m_Delta.push_back(delta);
         }
     }
-    oFile.close();
+    //oFile.close();
 }
 
 void WeatherData::calcAPWC(){

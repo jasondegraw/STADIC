@@ -12,10 +12,10 @@ public:
 
     // Setters
     bool setType(std::string){return false;}
-    bool setPoints(std::vector<double> points);
+    bool setPoints(std::vector<double> points);                                     //Function to set the points of a radiance polygon
 
     // Getters
-    std::vector<double> points() const;
+    std::vector<double> points() const;                                             //Function that returns the points of a radiance polygon as a vector
 
 
 private:

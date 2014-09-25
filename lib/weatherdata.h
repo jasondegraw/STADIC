@@ -20,8 +20,8 @@ class STADIC_API WeatherData
 {
 public:
     WeatherData();
-    bool parseWeather(std::string file);
-    bool writeWea(std::string file);
+    bool parseWeather(std::string file);                    //Function to parse the weather file
+    bool writeWea(std::string file);                        //Function to write the wea file to a given filename
 
     //Setters
     /*
@@ -31,65 +31,65 @@ public:
     void setDN(double dn);
     void setDH(double dh);
     */
-    void setPlace(std::string place);
-    void setLatitude(std::string lat);
-    void setLongitude(std::string lon);
-    void setTimeZone(std::string timeZone);
-    void setElevation(std::string elev);
+    void setPlace(std::string place);                       //Function to set the place
+    void setLatitude(std::string lat);                      //Function to set the latitude
+    void setLongitude(std::string lon);                     //Function to set the longitude
+    void setTimeZone(std::string timeZone);                 //Function to set the timezone
+    void setElevation(std::string elev);                    //Function to set the elevation
 
     //Getters
-    std::vector<int> month() const;
-    std::vector<int> day() const;
-    std::vector<double> hour() const;
-    std::vector<std::string> directNormal() const;
-    std::vector<std::string> diffuseHorizontal() const;
-    std::vector<double> directIlluminance() const;
-    std::vector<double> dewPointC() const;
-    std::string place() const;
-    std::string latitude() const;
-    std::string longitude() const;
-    std::string timeZone() const;
-    std::string elevation() const;
-    std::vector<int> julianDate() const;
+    std::vector<int> month() const;                         //Function that returns the month per interval as a vector
+    std::vector<int> day() const;                           //Function that returns the day per interval as a vector
+    std::vector<double> hour() const;                       //Function that returns the hour per interval as a vector
+    std::vector<std::string> directNormal() const;          //Function that returns the directNormal per interval as a vector
+    std::vector<std::string> diffuseHorizontal() const;     //Function that returns the diffuseHorizontal per interval as a vector
+    std::vector<double> directIlluminance() const;          //Function that returns the directIlluminance per interval as a vector
+    std::vector<double> dewPointC() const;                  //Function that returns the dew point per interval as a vector
+    std::string place() const;                              //Function that returns the place as a string
+    std::string latitude() const;                           //Function that returns the latitude as a string
+    std::string longitude() const;                          //Function that returns the longitude as a string
+    std::string timeZone() const;                           //Function that returns the timezone as a string
+    std::string elevation() const;                          //Function that returns the elevation as a string
+    std::vector<int> julianDate() const;                    //Function that returns the julian date as a vector
 
 private:
-    bool parseEPW(std::string file);
-    bool parseTMY(std::string file);
-    bool calcDirectIll();
-    void setSolarPositions();
-    double solarDec(int julianDate);
-    double solarTimeAdj(int julianDate);
-    double solarAlt(double solarDeclination, double time);
-    double solarAz(double solarDeclination, double time);
-    double solarZen(double solarAltAng);
-    double degToRad(double val);
-    void calcEpsilon();
-    void calcDelta();
-    void calcAPWC();
-    int skyBin(double epsilon);
-    std::vector<double> directLumEff(double epsilon);
+    bool parseEPW(std::string file);                        //Function to parse an EPW file
+    bool parseTMY(std::string file);                        //Function to pase a TMY file
+    bool calcDirectIll();                                   //Function to calculate the direct illuminance
+    void setSolarPositions();                               //Function to set the solar positions
+    double solarDec(int julianDate);                        //Function to calculate the solar declination angle
+    double solarTimeAdj(int julianDate);                    //Function to calculate the solar time adjustment
+    double solarAlt(double solarDeclination, double time);  //Function to calculate the solar altitude angle
+    double solarAz(double solarDeclination, double time);   //Function to calculate the solar azimuth angle
+    double solarZen(double solarAltAng);                    //Function to calculate the soalr zenith angle with bounds
+    double degToRad(double val);                            //Function to conver degrees to radians
+    void calcEpsilon();                                     //Function to calculate the sky clearness
+    void calcDelta();                                       //Function to calculate the sky brightness
+    void calcAPWC();                                        //Function to calculate the atmospheric precipitable water content
+    int skyBin(double epsilon);                             //Function to determine which bin epsilon fits into
+    std::vector<double> directLumEff(double epsilon);       //Function that returns a vector of direct luminous efficiency multipliers
 
-    std::vector<int> m_Month;
-    std::vector<int> m_Day;
-    std::vector<double> m_Hour;
-    std::vector<int> m_JulianDate;
-    std::vector<std::string> m_DirectNormal;
-    std::vector<double> m_DirectIlluminance;
-    std::vector<std::string> m_DiffuseHorizontal;
-    std::vector<double> m_DewPointC;
-    std::vector<double> m_SolarDec;
-    std::vector<double> m_SolarTimeAdj;
-    std::vector<double> m_SolarAlt;
-    std::vector<double> m_SolarAz;
-    std::vector<double> m_SolarZenAng;
-    std::vector<double> m_Epsilon;          //Sky's cleaness
-    std::vector<double> m_Delta;            //Sky's brightness
-    std::vector<double> m_APWC;             //Atmospheric preciptiable water content
-    std::string m_Place;
-    std::string m_Latitude;
-    std::string m_Longitude;
-    std::string m_TimeZone;
-    std::string m_Elevation;
+    std::vector<int> m_Month;                               //Vector holding the month per interval
+    std::vector<int> m_Day;                                 //Vector holding the day per interval
+    std::vector<double> m_Hour;                             //Vector holding the hour per interval
+    std::vector<int> m_JulianDate;                          //Vector holding the julian date per interval
+    std::vector<std::string> m_DirectNormal;                //Vector holding the direct normal as a string per interval
+    std::vector<double> m_DirectIlluminance;                //Vector holding the direct illuminance as a double per interval
+    std::vector<std::string> m_DiffuseHorizontal;           //Vector holding the diffuse horizontal as a string per interval
+    std::vector<double> m_DewPointC;                        //Vector holding the dewpoint as a double per interval
+    std::vector<double> m_SolarDec;                         //Vector holding the solar declination angle as a double per interval
+    std::vector<double> m_SolarTimeAdj;                     //Vector holding the solar time adjustment as a double per interval
+    std::vector<double> m_SolarAlt;                         //Vector holding the solar altitude angle as a double per interval
+    std::vector<double> m_SolarAz;                          //Vector holding the solar azimuth angle as a double per interval
+    std::vector<double> m_SolarZenAng;                      //Vector holding the solar zenith angle as a double per interval
+    std::vector<double> m_Epsilon;                          //Vector holding the Sky's cleaness as a double per interval
+    std::vector<double> m_Delta;                            //Vector holding the Sky's brightness as a double per interval
+    std::vector<double> m_APWC;                             //Vector holding the Atmospheric preciptiable water content as a double per interval
+    std::string m_Place;                                    //Variable holding the place as a string
+    std::string m_Latitude;                                 //Variable holding the latitude as a string
+    std::string m_Longitude;                                //Variable holding the longitude as a string
+    std::string m_TimeZone;                                 //Variable holding the timezone as a string
+    std::string m_Elevation;                                //Variable holding the elevation as a string
 
 };
 

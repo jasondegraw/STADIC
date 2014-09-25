@@ -6,7 +6,7 @@
 #include <vector>
 
 /*
- * Adapted from Greg Ward's gendaymtx
+ * Adapted from Greg Ward's and Ian Ashdown's gendaymtx
  */
 
 namespace stadic{
@@ -14,45 +14,45 @@ namespace stadic{
 class STADIC_API Analemma
 {
 public:
-    Analemma(std::string file);
+    Analemma(std::string file);                                             //Constructor that takes the weather file
 
     //Setters
-    void setRotation(double val);
-    void setMatFile(std::string file);
-    void setGeoFile(std::string file);
-    void setSMXFile(std::string file);
+    void setRotation(double val);                                           //Function to set the rotation of the building(ex. 0=South, 90=East, -90=West)
+    void setMatFile(std::string file);                                      //Function to set the output sun material filename
+    void setGeoFile(std::string file);                                      //Function to set the output sun geometry filename
+    void setSMXFile(std::string file);                                      //Function to set the output smx filename
 
     //Getters
 
     //Functions
-    bool genSun();
+    bool genSun();                                                          //Main function that generates the sun files
 
 private:
     //Variables
-    std::string m_WeatherFile;
-    WeatherData m_WeaData;
-    std::vector<std::vector<double>> m_SunLoc;
-    std::vector<std::vector<std::vector<double>>> m_SunVal;
-    double m_Rotation;
-    int m_numSuns;
-    std::string m_MatFile;
-    std::string m_GeoFile;
-    std::string m_SMXFile;
-    std::vector<int> m_ClosestSun;
+    std::string m_WeatherFile;                                              //Variable holding the input weather file
+    WeatherData m_WeaData;                                                  //WeatherData object
+    std::vector<std::vector<double>> m_SunLoc;                              //Vector holding the sun locations
+    std::vector<std::vector<std::vector<double>>> m_SunVal;                 //Vector holding the sun luminance values
+    double m_Rotation;                                                      //Variable holding the building rotation
+    int m_numSuns;                                                          //Variable holding the number of suns (Maybe not needed)
+    std::string m_MatFile;                                                  //Variable holding the sun mateterial filename
+    std::string m_GeoFile;                                                  //Variable holding the sun geometry filename
+    std::string m_SMXFile;                                                  //Variable holding the sun smx filename
+    std::vector<int> m_ClosestSun;                                          //Vector holding which sun is closest at any given hour
 
     //Functions
-    bool parseWeather();
-    bool getSunPos();
-    std::vector<double> pos(double altitude, double azimuth);
-    double degToRad(double val);
-    double degToRad(std::string val);
-    double solarDec(int julianDate);
-    double solarTimeAdj(int julianDate);
-    double solarAlt(double solarDeclination, double time);
-    double solarAz(double solarDeclination, double time);
-    double dotProd(std::vector<double> vec1,std::vector<double> vec2);
-    bool closestSun();
-    bool genSunMtx();
+    bool parseWeather();                                                    //Function to parse the weather file.  Handled by WeatherData object
+    bool getSunPos();                                                       //Function to generate the sun positions at every hour
+    std::vector<double> pos(double altitude, double azimuth);               //Function to calculate the position give altitude and azimuth
+    double degToRad(double val);                                            //Function that takes degrees as a double and outputs radians as double
+    double degToRad(std::string val);                                       //Function that takes degrees as a string and outputs radians as double
+    double solarDec(int julianDate);                                        //Function to calculate the solar declination angle
+    double solarTimeAdj(int julianDate);                                    //Function to calculate the solar time adjustment based on julian date and location
+    double solarAlt(double solarDeclination, double time);                  //Function to calculate the solar altitude angle
+    double solarAz(double solarDeclination, double time);                   //Function to calculate the solar azimuth angle
+    double dotProd(std::vector<double> vec1,std::vector<double> vec2);      //Function to calculate the dot product of two 3 dimensional vectors
+    bool closestSun();                                                      //Function to find the closest sun
+    bool genSunMtx();                                                       //Function to generate the sun matrix
 };
 
 }

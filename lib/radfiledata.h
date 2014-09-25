@@ -17,18 +17,18 @@ public:
     explicit RadFileData();
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
-    bool addRad(std::string file);
+    bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
     bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
-    bool blackOutLayer(std::string layer);
-    bool writeRadFile(std::string file);
-    std::vector<double> surfaceNormal(std::string layer);
+    bool blackOutLayer(std::string layer);                              //Function to black out a layer
+    bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
+    std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
 
-    bool addPrimitive(RadPrimitive *primitive);
+    bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
 
     //Getters
-    shared_vector<RadPrimitive> geometry() const;
-    shared_vector<RadPrimitive> materials() const;
-    shared_vector<RadPrimitive> primitives() const;
+    shared_vector<RadPrimitive> geometry() const;                       //Function to get just the geometry primitives as a vector
+    shared_vector<RadPrimitive> materials() const;                      //Function to get just the material primitives as a vector
+    shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
 
 
     template<class T> shared_vector<T> getPrimitives();

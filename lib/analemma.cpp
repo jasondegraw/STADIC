@@ -212,7 +212,7 @@ double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2)
 bool Analemma::closestSun()
 {
     int hr_count=0;
-    int hr=0;
+    double hr=0;
     double sda;         //Solar Declination Angle
     double sta;         //Solar Time Adjustment
     double altitude;
@@ -230,8 +230,8 @@ bool Analemma::closestSun()
             azimuth = solarAz(sda, hr+sta) + PI - degToRad(m_Rotation);
             svec=pos(altitude,azimuth);
             double dp_closest=0;
-            //std::clog<<"time= "<<hr+sta<<" sta="<<sta<<" PI="<<PI<<std::endl;
-            //std::clog<<"sda "<<sda<<" sta "<<sta<< " altitude "<<altitude<<" azimuth "<<azimuth<<" svec= "<<svec[0]<< ","<<svec[1]<< ","<<svec[2]<<std::endl;
+            //oFile<<"time= "<<hr+sta<<" sta="<<sta<<" PI="<<PI;
+            //oFile<<" sda "<<sda<<" sta "<<sta<< " altitude "<<altitude<<" azimuth "<<azimuth<<" svec= "<<svec[0]<< ","<<svec[1]<< ","<<svec[2];
             if(altitude > 0){
               for (unsigned int j=0; j<m_SunLoc.size(); j++) {
                 std::vector<double> tempvec;
@@ -255,8 +255,12 @@ bool Analemma::closestSun()
                     m_ClosestSun[hr_count-1]=-1;
                 }
             }
+            //oFile<<" ClosestSun="<<m_ClosestSun[hr_count-1]<<std::endl;
         }
     }
+
+
+
     return true;
 }
 

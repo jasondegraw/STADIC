@@ -14,20 +14,20 @@ public:
     TemporalIlluminance();
     TemporalIlluminance(int month, int day, double hour, const std::vector<double> &illuminance);
 
-    bool add(std::vector<double> newIll);
+    bool add(std::vector<double> newIll);                                       //Function to add a vector of illuminance values to the current object
 
 
     //Getters
-    std::vector<double> illuminance();
-    int month();
-    int day();
-    double hour();
+    std::vector<double> illuminance();                                          //Function that returns the temporal illuminance as a vector
+    int month();                                                                //Function that returns the month as an int
+    int day();                                                                  //Function that returns the day as an int
+    double hour();                                                              //Function that returns the hour as a double
 
 private:
-    std::vector<double> m_Illuminance;
-    int m_Month;
-    int m_Day;
-    double m_Hour;
+    std::vector<double> m_Illuminance;                                          //Vector holding the illuminance values for a given interval
+    int m_Month;                                                                //Variable holding the month as an int
+    int m_Day;                                                                  //Variable holding the day as an int
+    double m_Hour;                                                              //Variable holding the hour as an int
 };
 
 
@@ -36,21 +36,21 @@ class STADIC_API DaylightIlluminanceData : public QObject
     Q_OBJECT
 public:
     explicit DaylightIlluminanceData(QObject *parent = 0);
-    bool parse(std::string fileName,std::string weaFile);
-    bool parseTimeBased(std::string fileName);
-    bool addIllFile(std::string fileName);
-    bool addTimeBasedIll(std::string fileName);
-    bool writeIllFile(std::string fileName);
+    bool parse(std::string fileName,std::string weaFile);                       //Function to parse an illuminance file that doesn't contain time values
+    bool parseTimeBased(std::string fileName);                                  //Function to parse an illuminance file that contains time values
+    bool addIllFile(std::string fileName);                                      //Function to add the illuminance of a file that doesn't contain time values to the object
+    bool addTimeBasedIll(std::string fileName);                                 //Function to add the illuminance of a file that contains time values to the object
+    bool writeIllFile(std::string fileName);                                    //Function to write the illuminance file
     //Setters
     //void setIlluminance(double value);
 
     //Getters
-    std::vector<TemporalIlluminance> illuminance();
+    std::vector<TemporalIlluminance> illuminance();                             //Function that returns the illuminance values in a vector
 
     //int hoursGreaterThan(double value, int point);
 
 private:
-    std::vector<TemporalIlluminance> m_data;
+    std::vector<TemporalIlluminance> m_data;                                    //Vector holding the illuminance values
 
 signals:
 
