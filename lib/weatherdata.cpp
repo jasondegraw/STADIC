@@ -346,6 +346,8 @@ bool WeatherData::calcDirectIll(){
     calcDelta();
     calcAPWC();
     m_DirectIlluminance.clear();
+    std::ofstream oFile;
+    oFile.open("c:/001/bracketvalues.txt");
     for (int i=0;i<m_JulianDate.size();i++){
         double tempVal;
         std::vector<double> tempVec;
@@ -354,12 +356,18 @@ bool WeatherData::calcDirectIll(){
             STADIC_ERROR("There was a problem with the direct luminous efficiency values.");
             return false;
         }
-        tempVal=toDouble(m_DirectNormal[i])*(tempVec[0]+tempVec[1]*m_APWC[i]+tempVec[2]*exp(5.73*m_SolarZenAng[i]-5)+tempVec[3]*m_Delta[i]);
+        tempVal=toDouble(m_DirectNormal[i])*(tempVec[0]+tempVec[1]*m_APWC[i]+tempVec[2]*exp(5.73*m_SolarZenAng[i]-5)+tempVec[3]*m_Delta[i])/179.0;
+        oFile<<"a="<<tempVec[0]<<" b="<<tempVec[1]<<" apwc="<<m_APWC[i]<<" c="<<tempVec[2]<<" solarZen="<<m_SolarZenAng[i]<<" d="<<tempVec[3]<<" delta="<<m_Delta[i]<<" resultant=";
         if (tempVal<0){
             tempVal=0;
         }
+        if (m_SolarZenAng[i]>(PI/2.0)){
+            tempVal=0;
+        }
+        oFile<<tempVal<<std::endl;
         m_DirectIlluminance.push_back(tempVal);
     }
+    oFile.close();
     return true;
 }
 void WeatherData::setSolarPositions(){
@@ -405,15 +413,20 @@ void WeatherData::calcEpsilon(){
 
 void WeatherData::calcDelta(){
     m_Delta.clear();
+    double dayAngle;
+    double eccentricity;
     for (int i=0;i<m_JulianDate.size();i++){
-        m_Delta.push_back(toDouble(m_DiffuseHorizontal[i])*(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253))));
+        dayAngle=(m_JulianDate[i]-1.0)*(2.0*PI/365);
+        eccentricity=1.00011+0.034221*cos(dayAngle)+0.00128*sin(dayAngle)+0.000719*cos(2.0*dayAngle)+0.000077*sin(2.0*dayAngle);
+        m_Delta.push_back(toDouble(m_DiffuseHorizontal[i])*(1.0/(cos(m_SolarZenAng[i])+0.15*pow(93.885-(180.0/PI)*m_SolarZenAng[i],-1.253)))/(1367*eccentricity));
     }
 }
 
 void WeatherData::calcAPWC(){
     m_APWC.clear();
     for (int i=0;i<m_JulianDate.size();i++){
-        m_APWC.push_back(exp(0.07*m_DewPointC[i]-0.075));
+        m_APWC.push_back(exp(0.07*11-0.075));
+        //m_APWC.push_back(exp(0.07*m_DewPointC[i]-0.075));
     }
 }
 
