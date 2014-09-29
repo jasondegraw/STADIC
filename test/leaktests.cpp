@@ -1,9 +1,7 @@
 #include "leakcheck.h"
 #include "gtest/gtest.h"
-#include <QStringList>
-#include <QDir>
-#include <QFile>
 #include <iostream>
+#include <vector>
 
 TEST(LeakTests, EnclosedModel)
 {
