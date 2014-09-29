@@ -38,9 +38,13 @@ SpatialIlluminance::SpatialIlluminance(std::string x, std::string y, std::string
 }
 
 //Getters
-double SpatialIlluminance::illuminance(){
+double SpatialIlluminance::lux(){
     return m_Illuminance;
 }
+double SpatialIlluminance::fc(){
+    return m_Illuminance/10.764;
+}
+
 std::string SpatialIlluminance::x(){
     return m_x;
 }
@@ -55,22 +59,6 @@ std::string SpatialIlluminance::z(){
 ElectricIlluminanceData::ElectricIlluminanceData()
 {
 }
-
-//Setters
-/*
-void ElectricIlluminance::setIlluminance(double value){
-    m_Illuminace.push_back(value);
-}
-void ElectricIlluminance::setX(QString x){
-    m_X.push_back(x);
-}
-void ElectricIlluminance::setY(QString y){
-    m_Y.push_back(y);
-}
-void ElectricIlluminance::setZ(QString z){
-    m_Z.push_back(z);
-}
-*/
 
 //Getters
 std::vector<SpatialIlluminance> ElectricIlluminanceData::illuminance(){

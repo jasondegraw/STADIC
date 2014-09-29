@@ -19,13 +19,14 @@ public:
     SpatialIlluminance(std::string x, std::string y, std::string z, double illuminance);
 
     //Getters
-    double illuminance();                               //Function to get the illuminance at the point described by x, y, z
+    double lux();                                       //Function to get the illuminance at the point described by x, y, z in lux
+    double fc();                                        //Function to get the illuminance at the point described by x, y, z in fc
     std::string x();                                    //Function to get the x location of the illuminance point
     std::string y();                                    //Function to get the y location of the illuminance point
     std::string z();                                    //Function to get the z location of the illuminance point
 
 private:
-    double m_Illuminance;                               //Variable holding the illuminance value
+    double m_Illuminance;                               //Variable holding the illuminance values (in lux)
     std::string m_x;                                    //Variable holding the x location of the illuminance point
     std::string m_y;                                    //Variable holding the y location of the illuminance point
     std::string m_z;                                    //Variable holding the z location of the illuminance point
@@ -41,14 +42,8 @@ public:
     ElectricIlluminanceData();
     bool parseIlluminance(std::string fileName);        //Function to parse an electric lighting illuminance file given the filename
 
-    //Setters
-    //void setIlluminance(double value);
-    //void setX(std::string x);
-    //void setY(std::string y);
-    //void setZ(std::string z);
-
     //Getters
-    std::vector<SpatialIlluminance> illuminance();      //Function that returns the illuminance of an electric light zone as a vector of illuminance points
+    std::vector<SpatialIlluminance> illuminance();      //Function that returns the illuminance of an electric light zone as a vector of illuminance points in lux
 
 private:
     std::vector<SpatialIlluminance> m_Illuminance;      //Vector holding the illuminance points as SpatialIlluminance objects

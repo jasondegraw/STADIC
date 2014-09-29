@@ -18,7 +18,8 @@ public:
 
 
     //Getters
-    std::vector<double> illuminance();                                          //Function that returns the temporal illuminance as a vector
+    std::vector<double> lux();                                                  //Function that returns the temporal illuminance as a vector in lux
+    std::vector<double> fc();                                                   //Function that returns the temporal illuminance as a vector in fc
     int month();                                                                //Function that returns the month as an int
     int day();                                                                  //Function that returns the day as an int
     double hour();                                                              //Function that returns the hour as a double
@@ -40,10 +41,8 @@ public:
     bool parseTimeBased(std::string fileName);                                  //Function to parse an illuminance file that contains time values
     bool addIllFile(std::string fileName);                                      //Function to add the illuminance of a file that doesn't contain time values to the object
     bool addTimeBasedIll(std::string fileName);                                 //Function to add the illuminance of a file that contains time values to the object
-    bool writeIllFile(std::string fileName);                                    //Function to write the illuminance file
-    //Setters
-    //void setIlluminance(double value);
-
+    bool writeIllFileLux(std::string fileName);                                    //Function to write the illuminance file in lux
+    bool writeIllFileFC(std::string fileName);                                  //Function to write the illuminance file in fc
     //Getters
     std::vector<TemporalIlluminance> illuminance();                             //Function that returns the illuminance values in a vector
 

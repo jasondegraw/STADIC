@@ -1845,7 +1845,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll->writeIllFile(FinalIllFileName);
+            baseIll->writeIllFileLux(FinalIllFileName);
         }else{
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
             FilePath checkFile2(tempFileName);
@@ -1865,7 +1865,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll->writeIllFile(FinalIllFileName);
+            baseIll->writeIllFileLux(FinalIllFileName);
         }
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
             DaylightIlluminanceData *settingIll=new DaylightIlluminanceData(this);
@@ -1882,7 +1882,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         settingIll->addIllFile(tempFileName);
                     }
                 }
-                settingIll->writeIllFile(FinalIllFileName);
+                settingIll->writeIllFileLux(FinalIllFileName);
             }else{
                 tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
                 FilePath checkFile3(tempFileName);
@@ -1896,7 +1896,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                             settingIll->addIllFile(tempFileName);
                         }
                     }
-                    settingIll->writeIllFile(FinalIllFileName);
+                    settingIll->writeIllFileLux(FinalIllFileName);
                 }else{
                     STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                     return false;

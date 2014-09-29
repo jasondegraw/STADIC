@@ -34,9 +34,17 @@ bool TemporalIlluminance::add(std::vector<double> addIll){
 }
 
 //Getters
-std::vector<double> TemporalIlluminance::illuminance(){
+std::vector<double> TemporalIlluminance::lux(){
     return m_Illuminance;
 }
+std::vector<double> TemporalIlluminance::fc(){
+    std::vector<double> tempVec;
+    for (int i=0;i<m_Illuminance.size();i++){
+        tempVec.push_back(m_Illuminance[i]/10.764);
+    }
+    return tempVec;
+}
+
 int TemporalIlluminance::month(){
     return m_Month;
 }
@@ -53,44 +61,7 @@ DaylightIlluminanceData::DaylightIlluminanceData(QObject *parent) :
 }
 
 
-//Setters
-/*
-void DayIll::setIlluminance(double value){
-    if (value>0){
-        m_Illuminance.push_back(value);
-    }else{
-        WARNING("The illuminance data contains value less than 0 which will be set to 0.");
-        m_Illuminance.push_back(0);
-    }
-}
-bool DayIll::setMonth(QString month){
-    if (month.toInt()>0 && month.toInt()<13){
-        m_Month.push_back(month);
-    }else{
-        ERROR("The illuminance data contains month values that are not between 1 and 12.");
-        return false;
-    }
-    return true;
-}
-bool DayIll::setDay(QString day){
-    if (day.toInt()>0 && day.toInt()<32){
-        m_Month.push_back(day);
-    }else{
-        ERROR("The illuminance data contains day values that are not between 1 and 31.");
-        return false;
-    }
-    return true;
-}
-bool DayIll::setHour(QString hour){
-    if (hour.toDouble()>0 &&hour.toDouble()<24){
-        m_Hour.push_back(hour);
-    }else{
-        ERROR("The illuminance data contains hour values that are not between 0 and 24,\n\texcluding 0 and 24.");
-        return false;
-    }
-    return true;
-}
-*/
+
 
 bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
     std::ifstream iFile;
@@ -221,11 +192,32 @@ bool DaylightIlluminanceData::addIllFile(std::string fileName){
 }
 
 bool DaylightIlluminanceData::addTimeBasedIll(std::string fileName){
+    std::ifstream iFile;
+    iFile.open(fileName);
+    if (!iFile.is_open()){
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" failed.");
+        return false;
+    }
+    std::string line;
+    int i;
+    while (std::getline(iFile,line)){
+        i=0;
+        std::vector<std::string> vals;
 
+        vals=split(line,' ');
+        std::vector<double> ill;
+
+        for (int j=3;j<vals.size();j++){
+            ill.push_back(atof(vals[j].c_str()));
+        }
+        m_data[i].add(ill);
+        i++;
+    }
+    iFile.close();
     return true;
 }
 
-bool DaylightIlluminanceData::writeIllFile(std::string fileName){
+bool DaylightIlluminanceData::writeIllFileLux(std::string fileName){
     std::ofstream oFile;
     oFile.open(fileName);
     if (!oFile.is_open()){
@@ -233,8 +225,24 @@ bool DaylightIlluminanceData::writeIllFile(std::string fileName){
     }
     for (int i=0;i<m_data.size();i++){
         oFile<<m_data[i].month()<<" "<<m_data[i].day()<<" "<<m_data[i].hour();
-        for (int j=0;j<m_data[i].illuminance().size();j++){
-            oFile<<" "<<m_data[i].illuminance()[j];
+        for (int j=0;j<m_data[i].lux().size();j++){
+            oFile<<" "<<m_data[i].lux()[j];
+        }
+        oFile<<std::endl;
+    }
+    oFile.close();
+    return true;
+}
+bool DaylightIlluminanceData::writeIllFileFC(std::string fileName){
+    std::ofstream oFile;
+    oFile.open(fileName);
+    if (!oFile.is_open()){
+        return false;
+    }
+    for (int i=0;i<m_data.size();i++){
+        oFile<<m_data[i].month()<<" "<<m_data[i].day()<<" "<<m_data[i].hour();
+        for (int j=0;j<m_data[i].fc().size();j++){
+            oFile<<" "<<m_data[i].fc()[j];
         }
         oFile<<std::endl;
     }
