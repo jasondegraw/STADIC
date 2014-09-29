@@ -1,10 +1,9 @@
 #ifndef DAYILL_H
 #define DAYILL_H
 
-#include <QObject>
-#include <QVector>
-
 #include "stadicapi.h"
+#include <vector>
+#include <string>
 
 namespace stadic {
 
@@ -32,11 +31,10 @@ private:
 };
 
 
-class STADIC_API DaylightIlluminanceData : public QObject
+class STADIC_API DaylightIlluminanceData
 {
-    Q_OBJECT
 public:
-    explicit DaylightIlluminanceData(QObject *parent = 0);
+    explicit DaylightIlluminanceData();
     bool parse(std::string fileName,std::string weaFile);                       //Function to parse an illuminance file that doesn't contain time values
     bool parseTimeBased(std::string fileName);                                  //Function to parse an illuminance file that contains time values
     bool addIllFile(std::string fileName);                                      //Function to add the illuminance of a file that doesn't contain time values to the object
@@ -50,10 +48,6 @@ public:
 
 private:
     std::vector<TemporalIlluminance> m_data;                                    //Vector holding the illuminance values
-
-signals:
-
-public slots:
 
 };
 

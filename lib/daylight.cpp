@@ -1828,10 +1828,10 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         //Base Illuminance files
         FinalIllFileName=model->projectFolder()+model->resultsFolder()+model->projectName()+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
-        DaylightIlluminanceData *baseIll=new DaylightIlluminanceData(this);
+        DaylightIlluminanceData baseIll;
         FilePath checkFile(tempFileName);
         if (checkFile.isFile()){
-            if (!baseIll->parse(tempFileName,model->weaDataFile())){
+            if (!baseIll.parse(tempFileName,model->weaDataFile())){
                 return false;
             }
             if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
@@ -1839,18 +1839,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     tempFileName==model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+".ill";
                     FilePath checkFile2(tempFileName);
                     if (checkFile2.isFile()){
-                        if (!baseIll->addIllFile(tempFileName)){
+                        if (!baseIll.addIllFile(tempFileName)){
                             return false;
                         }
                     }
                 }
             }
-            baseIll->writeIllFileLux(FinalIllFileName);
+            baseIll.writeIllFileLux(FinalIllFileName);
         }else{
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
             FilePath checkFile2(tempFileName);
             if (checkFile2.isFile()){
-                if (!baseIll->parse(tempFileName, model->weaDataFile())){
+                if (!baseIll.parse(tempFileName, model->weaDataFile())){
                     return false;
                 }
             }else{
@@ -1860,43 +1860,43 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
                 for (int j=1;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
                     tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+".ill";
-                    if (!baseIll->addIllFile(tempFileName)){
+                    if (!baseIll.addIllFile(tempFileName)){
                         return false;
                     }
                 }
             }
-            baseIll->writeIllFileLux(FinalIllFileName);
+            baseIll.writeIllFileLux(FinalIllFileName);
         }
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData *settingIll=new DaylightIlluminanceData(this);
+            DaylightIlluminanceData settingIll;
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
             FinalIllFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
             FilePath checkFile2(tempFileName);
             if (checkFile2.isFile()){
-                if (!settingIll->parse(tempFileName,model->weaDataFile())){
+                if (!settingIll.parse(tempFileName,model->weaDataFile())){
                     return false;
                 }
                 if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=0){
                     for (int k=0;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
                         tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+".ill";
-                        settingIll->addIllFile(tempFileName);
+                        settingIll.addIllFile(tempFileName);
                     }
                 }
-                settingIll->writeIllFileLux(FinalIllFileName);
+                settingIll.writeIllFileLux(FinalIllFileName);
             }else{
                 tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
                 FilePath checkFile3(tempFileName);
                 if (checkFile3.isFile()){
-                    if (!settingIll->parse(tempFileName,model->weaDataFile())){
+                    if (!settingIll.parse(tempFileName,model->weaDataFile())){
                         return false;
                     }
                     if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=1){
                         for (int k=1;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
                             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+".ill";
-                            settingIll->addIllFile(tempFileName);
+                            settingIll.addIllFile(tempFileName);
                         }
                     }
-                    settingIll->writeIllFileLux(FinalIllFileName);
+                    settingIll.writeIllFileLux(FinalIllFileName);
                 }else{
                     STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                     return false;

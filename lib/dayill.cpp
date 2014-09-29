@@ -2,9 +2,9 @@
 #include "logging.h"
 #include <fstream>
 #include "functions.h"
-#include <QFile>
-#include <QStringList>
-#include <QTextStream>
+//#include <QFile>
+//#include <QStringList>
+//#include <QTextStream>
 
 namespace stadic {
 
@@ -55,8 +55,7 @@ double TemporalIlluminance::hour(){
     return m_Hour;
 }
 
-DaylightIlluminanceData::DaylightIlluminanceData(QObject *parent) :
-    QObject(parent)
+DaylightIlluminanceData::DaylightIlluminanceData()
 {
 }
 
