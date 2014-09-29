@@ -216,18 +216,12 @@ bool GridMaker::parseRad(){
     }
     for (int i=0;i<m_RadFile.geometry().size();i++){
         boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> tempPolygon;
-        int coordinate=0;
         double tempZ=0;
         for (int j=0;j<m_RadFile.geometry().at(i)->arg3().size()/3;j++){
             boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(m_RadFile.geometry().at(i)->arg3()[j*3]), toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1])));
-            if (coordinate==2){
-                coordinate=0;
-                tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1]);
-            }else{
-                coordinate++;
-            }
+            tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+2]);
         }
-        tempZ=tempZ/m_RadFile.geometry().at(i)->arg3().size()/3;
+        tempZ=tempZ/m_RadFile.geometry().at(i)->arg3().size()/3.0;
         boost::geometry::correct(tempPolygon);
         if (boost::geometry::is_valid(tempPolygon)){
             //unite polygons that are the right layer name
