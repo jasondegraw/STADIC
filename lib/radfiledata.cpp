@@ -22,7 +22,7 @@ bool RadFileData::addRad(std::string file){
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        STADIC_ERROR(QString("The opening of the rad file '%1' failed.").arg(QString().fromStdString(file)));
+        STADIC_ERROR("The opening of the rad file '"+file+"' failed.");
         return false;
     }
     std::stringstream data;
