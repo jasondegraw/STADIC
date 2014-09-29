@@ -50,3 +50,10 @@ TEST(FunctionTests, ToDouble)
     EXPECT_EQ(0.0, value);
     EXPECT_FALSE(ok);
 }
+
+TEST(FunctionTests, ToString)
+{
+  std::string string = "20.5";
+  double value = 20.5;
+  EXPECT_EQ(string, stadic::toString(value));
+}
