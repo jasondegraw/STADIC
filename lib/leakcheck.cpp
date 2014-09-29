@@ -8,8 +8,7 @@
 
 namespace stadic{
 
-LeakCheck::LeakCheck(QObject *parent) :
-    QObject(parent)
+LeakCheck::LeakCheck()
 {
 }
 bool LeakCheck::isEnclosed(){

@@ -1,24 +1,18 @@
 #ifndef LEAKCHECK_H
 #define LEAKCHECK_H
 
-#include <QObject>
-//#include <QPolygonF>
-//#include <QPointF>
 #include <vector>
 #include <string>
 #include "stadicapi.h"
-//#include "radfiledata.h"
-//#include "radprimitive.h"
 
 
 
 namespace stadic{
 
-class STADIC_API LeakCheck : public QObject
+class STADIC_API LeakCheck
 {
-    Q_OBJECT
 public:
-    explicit LeakCheck(QObject *parent = 0);
+    explicit LeakCheck();
     bool isEnclosed();                                                  //Main function call to determine if the model is enclosed
 
 
@@ -40,15 +34,6 @@ private:
     bool xformModifiers();                                              //Function to xform the layers to black if necessary
     bool createOct();                                                   //Function to create the octree
     bool runCalc();                                                     //Function to run the calculation
-
-
-signals:
-
-public slots:
-
-private slots:
-
-
 };
 
 }
