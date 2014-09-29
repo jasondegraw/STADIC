@@ -1,21 +1,18 @@
 #ifndef DAYLIGHT_H
 #define DAYLIGHT_H
 
-#include <QObject>
 #include "stadiccontrol.h"
 #include <vector>
 #include <string>
-#include <QStringList>
 #include "radfiledata.h"
 
 #include "stadicapi.h"
 
 namespace stadic {
-class STADIC_API Daylight : public QObject
+class STADIC_API Daylight
 {
-    Q_OBJECT
 public:
-    explicit Daylight(Control *model, QObject *parent = 0);                         //Constructor that takes a Control object as an argument
+    explicit Daylight(Control *model);                         //Constructor that takes a Control object as an argument
     bool simDaylight();                                                             //Function to simulate the daylight
 
 private:
@@ -38,10 +35,6 @@ private:
     std::vector<int> m_SimCase;                                                     //Vector holding the simulation case for each window group
     Control *m_Model;                                                               //Control object
     std::vector<RadFileData* > m_RadFiles;                                          //Vector of RadFileData objects
-
-signals:
-
-public slots:
 
 };
 

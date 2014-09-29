@@ -1,16 +1,13 @@
 #include "daylight.h"
 #include "logging.h"
 #include "dayill.h"
-#include <QFile>
-#include <QTextStream>
 #include "objects.h"
 #include <fstream>
-//#include <QProcess>
 #include "materialprimitives.h"
 
 namespace stadic {
-Daylight::Daylight(Control *model, QObject *parent) :
-    m_Model(model), QObject(parent)
+Daylight::Daylight(Control *model) :
+    m_Model(model)
 {
 }
 
