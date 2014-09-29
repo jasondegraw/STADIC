@@ -1,9 +1,8 @@
 #ifndef RADPRIMITIVE_H
 #define RADPRIMITIVE_H
 
-#include <QFile>
-#include <QTextStream>
-#include<array>
+
+#include <array>
 #include <vector>
 #include <string>
 #include <sstream>
