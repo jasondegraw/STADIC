@@ -1,8 +1,7 @@
 #include "elecill.h"
-#include <QFile>
-#include <QStringList>
 #include "logging.h"
 #include "functions.h"
+#include <fstream>
 
 namespace stadic {
 
@@ -66,23 +65,22 @@ std::vector<SpatialIlluminance> ElectricIlluminanceData::illuminance(){
 }
 
 bool ElectricIlluminanceData::parseIlluminance(std::string fileName){
-    QFile iFile;
-    iFile.setFileName(QString::fromStdString(fileName));
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.isOpen()){
-        STADIC_ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
+    std::ifstream iFile;
+    iFile.open(fileName);
+    if (!iFile.is_open()){
+        STADIC_ERROR("The opening of the illuminance file "+fileName+ " failed.");
         return false;
     }
-    QString line;
-    while (!iFile.atEnd()){
-        line=iFile.readLine();
-        QStringList vals;
-        vals=line.split(" ");
-        if(vals.size() != 3) {
-            continue;
+    std::string line;
+
+    while (std::getline(iFile, line)){
+        std::vector<std::string> vals;
+        vals=split(line, ' ');
+        if(vals.size() != 4) {
+            STADIC_ERROR("The illuminance file "+fileName +" does not contain 4 items per line.");
+            return false;
         }
-        m_Illuminance.push_back(SpatialIlluminance(vals.at(0).toStdString(), vals.at(1).toStdString(), vals.at(2).toStdString(),
-            vals.at(3).toDouble()));
+        m_Illuminance.push_back(SpatialIlluminance(vals[0], vals[1], vals[2], toDouble(vals[3])));
     }
     iFile.close();
     return true;
