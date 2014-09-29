@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include "objects.h"
+#include "gridmaker.h"
+#include "functions.h"
 
 namespace stadic{
 
@@ -11,14 +13,9 @@ LeakCheck::LeakCheck(QObject *parent) :
 {
 }
 bool LeakCheck::isEnclosed(){
-    if (!checkPoint()){
+    if (!makeGrid()){
         return false;
     }
-
-    if (!writePTS()){
-        return false;
-    }
-
     if (!writeExtraRad()){
         return false;
     }
@@ -41,21 +38,28 @@ bool LeakCheck::isEnclosed(){
         return false;
     }
     std::string val;
-    if (!getline(iFile,val)){
-        STADIC_ERROR("The results file is empty.");
-        return false;
+    bool containsLeak=false;
+    bool likelyEnclosed=false;
+    for (int i=0;i<m_Points.size();i++){
+        for (int j=0;j<m_Points[i].size();j++){
+            iFile>>val;
+            if (toDouble(val)>0 &&toDouble(val)<0.5){
+                likelyEnclosed=true;
+            }else if (toDouble(val)>=0.5){
+                containsLeak=true;
+            }
+        }
     }
     iFile.close();
 
-    if (atof(val.c_str())>0&&atof(val.c_str())<0.5){
-        STADIC_WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
-    }else if (atof(val.c_str())>=0.5){
+    if (containsLeak){
         STADIC_ERROR("The provided model either contains a leak or the provided point is outside the space.");
         return false;
+    }else if (likelyEnclosed){
+        STADIC_WARNING("The illuminance value is greater than 0 at the analysis point, but less than 0.5.\n\tIt will be assumed that there is no light leak.");
     }else{
         std::cout<<"The model is fully enclosed."<<std::endl;
     }
-
     return true;
 }
 //Setters
@@ -67,145 +71,19 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
             return false;
         }
         m_RadFiles.push_back(files[i]);
-        if (!m_RadGeo.addRad(files[i])){
-            return false;
-        }
-    }
-    if (m_RadGeo.geometry().empty()){
-        STADIC_ERROR("There are no polygons in the rad files.");
-        return false;
-    }
-    for (int i=0;i<m_RadGeo.geometry().size();i++){
-        QPolygonF tempPolygon;
-        for (int j=0;j<m_RadGeo.geometry()[i]->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(atof(m_RadGeo.geometry()[i]->arg3()[j*3].c_str()), atof(m_RadGeo.geometry()[i]->arg3()[j*3+1].c_str())));
-        }
-        m_Polygons.push_back(tempPolygon);
     }
     return true;
 }
 
-bool LeakCheck::setFloorLayers(std::vector<std::string> layers){
-    if (m_RadGeo.primitives().empty()){
-        STADIC_ERROR("No radiance geometry or materials have been specified.");
-        return false;
-    }
-    for (int i=0;i<layers.size();i++){
-        bool layerExists=false;
-        for (int j=0;j<m_RadGeo.primitives().size();j++){
-            if (layers[i]==m_RadGeo.primitives()[j]->modifier()){
-                layerExists=true;
-            }
-        }
-        if (!layerExists){
-            STADIC_ERROR("The layer "+layers[i]+" does not exist in the model.");
-            return false;
-        }
-        m_FloorLayers.push_back(layers[i]);
-    }
-    if (!unitePolygons()){
-        return false;
-    }
-    return true;
+void LeakCheck::setFloorLayers(std::vector<std::string> layers){
+    m_FloorLayers=layers;
 }
-
-bool LeakCheck::setX(double x){
-    if (m_UnitedPolygon.isEmpty()){
-        if (!unitePolygons()){
-            return false;
-        }
+bool LeakCheck::setUnits(int unit){
+    if (unit>=0 &&unit<=3){
+        m_Units=unit;
+        return true;
     }
-    if (m_UnitedPolygon.isEmpty()){
-        STADIC_ERROR("The uniting of the polygons has failed.");
-        return false;
-    }
-
-    double minX=m_UnitedPolygon.boundingRect().left();
-    double maxX=m_UnitedPolygon.boundingRect().right();
-    if (minX>maxX){
-        maxX=m_UnitedPolygon.boundingRect().left();
-        minX=m_UnitedPolygon.boundingRect().right();
-    }
-
-    if (x<minX || x>maxX){
-        STADIC_ERROR("The x coordinate is not within the "+std::to_string(minX) +" to "+std::to_string(maxX)+".");
-        return false;
-    }
-    if (m_TestPoint.size()<3){
-        m_TestPoint.reserve(3);
-    }
-    m_TestPoint[0]=x;
-    return true;
-}
-
-bool LeakCheck::setY(double y){
-    if (m_UnitedPolygon.isEmpty()){
-        if (!unitePolygons()){
-            return false;
-        }
-    }
-    if (m_UnitedPolygon.isEmpty()){
-        STADIC_ERROR("The uniting of the polygons has failed.");
-        return false;
-    }
-    double minY=m_UnitedPolygon.boundingRect().bottom();
-    double maxY=m_UnitedPolygon.boundingRect().top();
-    if (minY>maxY){
-        minY=m_UnitedPolygon.boundingRect().top();
-        maxY=m_UnitedPolygon.boundingRect().bottom();
-    }
-    if (y<minY|| y>maxY){
-        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
-        return false;
-    }
-    if (m_TestPoint.size()<3){
-        m_TestPoint.reserve(3);
-    }
-    m_TestPoint[1]=y;
-    return true;
-}
-
-bool LeakCheck::setZ(double z){
-    if (m_TestPoint.size()<3){
-        m_TestPoint.reserve(3);
-    }
-    m_TestPoint[2]=z;
-    return true;
-}
-
-bool LeakCheck::setPoint(std::vector<double> point){
-    if (point.size()!=3){
-        STADIC_ERROR("The vector of points does not contain 3 values.");
-        return false;
-    }
-    if (m_UnitedPolygon.isEmpty()){
-        if (!unitePolygons()){
-            return false;
-        }
-    }
-
-    if (point[0]<m_UnitedPolygon.boundingRect().left() || point[0]>m_UnitedPolygon.boundingRect().right()){
-        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
-        return false;
-    }
-    if (m_TestPoint.size()<3){
-        m_TestPoint.reserve(3);
-    }
-    m_TestPoint[0]=point[0];
-
-    double minY=m_UnitedPolygon.boundingRect().bottom();
-    double maxY=m_UnitedPolygon.boundingRect().top();
-    if (minY>maxY){
-        minY=m_UnitedPolygon.boundingRect().top();
-        maxY=m_UnitedPolygon.boundingRect().bottom();
-    }
-    if (point[1]<minY|| point[1]>maxY){
-        STADIC_ERROR("The x coordinate is not within the min and max x coordinates.");
-        return false;
-    }
-    m_TestPoint[1]=point[1];
-    m_TestPoint[2]=point[2];
-    return true;
+    return false;
 }
 
 bool LeakCheck::setReflectance(int ref){
@@ -218,61 +96,50 @@ bool LeakCheck::setReflectance(int ref){
 }
 
 //Private
-bool LeakCheck::unitePolygons(){
-    //unite polygons that are the right layer name
-    bool firstPolygon=true;
-    for (int i=0;i<m_RadGeo.geometry().size();i++){
-        bool properName=false;
-        for (int j=0;j<m_FloorLayers.size();j++){
-            if (m_RadGeo.geometry()[i]->modifier()==m_FloorLayers[j]){
-                properName=true;
-            }
-        }
-        if (firstPolygon==true && properName==true){
-            firstPolygon=false;
-            m_UnitedPolygon=m_Polygons[i];
-        }else if (properName==true){
-            m_UnitedPolygon=m_UnitedPolygon.united(m_Polygons[i]);
-        }
+bool LeakCheck::makeGrid(){
+    GridMaker grid(m_RadFiles);
+    grid.setLayerNames(m_FloorLayers);
+    switch (m_Units){
+        case 0:
+            //Inches
+            grid.setOffset(24);
+            grid.setSpaceX(24);
+            grid.setSpaceY(24);
+            grid.setOffsetZ(30);
+            break;
+        case 1:
+            //Feet
+            grid.setOffset(2);
+            grid.setSpaceX(2);
+            grid.setSpaceY(2);
+            grid.setOffsetZ(2.5);
+            break;
+        case 2:
+            //Millimeters
+            grid.setOffset(609.6);
+            grid.setSpaceX(609.6);
+            grid.setSpaceY(609.6);
+            grid.setOffsetZ(762);
+            break;
+        case 3:
+            //Millimeters
+            grid.setOffset(.6096);
+            grid.setSpaceX(.6096);
+            grid.setSpaceY(.6096);
+            grid.setOffsetZ(.762);
+            break;
     }
-    return true;
-}
-
-bool LeakCheck::checkPoint(){
-    QPointF tempPoint;
-    tempPoint.setX(m_TestPoint[0]);
-    tempPoint.setY(m_TestPoint[1]);
-    if (m_UnitedPolygon.containsPoint(tempPoint,Qt::OddEvenFill)){
-        bool surroundIn=true;
-        for (int i=-1;i<2;i++){
-            double tempX=m_TestPoint[0]+.01*i;
-            for (int j=-1;j<2;j++){
-                double tempY=m_TestPoint[1]+.01*j;
-                if (!m_UnitedPolygon.containsPoint(QPointF(tempX, tempY), Qt::OddEvenFill)){
-                    surroundIn=false;
-                }
-            }
-        }
-        if (surroundIn==true){
-            return true;
-        }else{
-            STADIC_WARNING("The point is on the boundary and may result in an incorrect analysis.");
-            return true;
-        }
-    }
-    STADIC_ERROR("The point is not contained within the polygon.");
-    return false;
-}
-
-bool LeakCheck::writePTS(){
-    std::ofstream oFile;
-    oFile.open("Test.pts");
-    if (!oFile.is_open()){
+    if (!grid.makeGrid()){
         return false;
     }
-    oFile<<m_TestPoint[0]<<" "<<m_TestPoint[1]<<" "<<m_TestPoint[2]<<" 0 0 1";
-    oFile.close();
-
+    if (!grid.writePTS("Test.pts")){
+        return false;
+    }
+    m_Points=grid.points();
+    if (m_Points.empty()){
+        STADIC_ERROR("The points vector is empty.");
+        return false;
+    }
     return true;
 }
 

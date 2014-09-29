@@ -94,7 +94,9 @@ double GridMaker::offsetY(){
 double GridMaker::zHeight(){
     return m_ZHeight;
 }
-
+std::vector<std::vector<std::vector<double>>> GridMaker::points(){
+    return m_FinalPoints;
+}
 
 
 //Utilities

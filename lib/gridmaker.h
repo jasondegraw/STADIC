@@ -42,6 +42,8 @@ public:
     double offsetY();                                                                   //Function that returns the y offset as a double
     double zHeight();                                                                   //Function that returns the absolute z height as a double
 
+    std::vector<std::vector<std::vector<double>>> points();                             //Function that returns the points that are used for analysis
+
     //Utilities
     bool makeGrid();                                                                    //Main function that makes the grid
     bool writePTS(std::ostream& out);                                                   //Function to write the points file to the given stream

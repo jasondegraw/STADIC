@@ -5,9 +5,7 @@
 void usage(){
     std::cout<<"dxleakcheck tests a radiance model for whether the space is or is not fully enclosed.  The program allows any number of polygons and any number of layer names to be used for the placement of the analysis point.  dxleakcheck will then test to ensure that point is within the bouding area of the polygons for the specified layers.  The program will then simulate the model with a uniform sky to determine if any light enters the model."<<std::endl;
     std::cout<<std::endl<<"-f name\tSet the rad file name. This file contains the radiance polygons that will be used for creating the analysis points.  Multiple files may be added with each preceded by a \"-f\".  This is a mandatory option."<<std::endl;
-    std::cout<<"-x val\tSet the x position for the analysis point.  This is a mandatory option. "<<std::endl;
-    std::cout<<"-y val\tSet the y position for the analysis point.  This is a mandatory option."<<std::endl;
-    std::cout<<"-z val\tSet the z position for the analysis point.  This is a mandatory option."<<std::endl;
+    std::cout<<"-u unit\tSet the unit type (in, ft, mm, or m) to unit for determining the point spacing."<<std::endl;
     std::cout<<"-l name\tSet the layer name that will be used to find the polygons for use in testint the analysis point location.  Multiple layer names can be added with each preceded by a  \"-l\".  This is a mandatory option."<<std::endl;
     std::cout<<"-r val\tSet the reflectance value to use for the analysis.  This can either be 0 or 1."<<std::endl;
 
@@ -22,9 +20,7 @@ int main (int argc, char *argv[])
     radFiles.clear();
     std::vector<std::string> floorLayers;                //  Variable holding the floor layer names for testing whether the given point is in the polygons
     floorLayers.clear();
-    double xPt;                             //  Variable holding the x coordinate of the test point
-    double yPt;                             //  Variable holding the y coordinate of the test point
-    double zPt;                             //  Variable holding the z coordinate of the test point
+    int unit;
     double reflectance=1;                   //  Variable holding the reflectance
 
 
@@ -32,15 +28,20 @@ int main (int argc, char *argv[])
         if (argv[i]=="-f"){
             i++;
             radFiles.push_back(argv[i]);
-        }else if (argv[i]=="-x"){
+        }else if (argv[i]=="-u"){
             i++;
-            xPt=atof(argv[i]);
-        }else if (argv[i]=="-y"){
-            i++;
-            yPt=atof(argv[i]);
-        }else if (argv[i]=="-z"){
-            i++;
-            zPt=atof(argv[i]);
+            if (argv[i]=="in"){
+                unit=0;
+            }else if (argv[i]=="ft"){
+                unit=1;
+            }else if (argv[i]=="mm"){
+                unit=2;
+            }else if (argv[i]=="m"){
+                unit=3;
+            }else{
+                usage;
+                EXIT_FAILURE;
+            }
         }else if(argv[i]=="-l"){
             i++;
             floorLayers.push_back(argv[i]);
@@ -65,16 +66,8 @@ int main (int argc, char *argv[])
     if (!leakChecker.setRadFile(radFiles)){
         return EXIT_FAILURE;
     }
-    if (!leakChecker.setFloorLayers(floorLayers)){
-        return EXIT_FAILURE;
-    }
-    if(!leakChecker.setX(xPt)){
-        return EXIT_FAILURE;
-    }
-    if(!leakChecker.setY(yPt)){
-        return EXIT_FAILURE;
-    }
-    if(!leakChecker.setZ(zPt)){
+    leakChecker.setFloorLayers(floorLayers);
+    if (!leakChecker.setUnits(unit)){
         return EXIT_FAILURE;
     }
     if(!leakChecker.setReflectance(reflectance)){

@@ -211,6 +211,8 @@ double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2)
 
 bool Analemma::closestSun()
 {
+    std::ofstream oFile;
+    oFile.open("c:/001/BracketValues.txt");
     int hr_count=0;
     double hr=0;
     double sda;         //Solar Declination Angle
@@ -221,7 +223,7 @@ bool Analemma::closestSun()
     std::vector<double> svec;
     for (int julian_date=1;julian_date<366;julian_date++){
         for (int hri=0;hri<24; hri++){
-            //std::clog<<"date: "<<julian_date<<" hour: "<<hri<<std::endl;
+
             hr=hri+.5;
             hr_count=hr_count+1;
             sda = solarDec(julian_date);
@@ -230,8 +232,8 @@ bool Analemma::closestSun()
             azimuth = solarAz(sda, hr+sta) + PI - degToRad(m_Rotation);
             svec=pos(altitude,azimuth);
             double dp_closest=0;
-            //oFile<<"time= "<<hr+sta<<" sta="<<sta<<" PI="<<PI;
-            //oFile<<" sda "<<sda<<" sta "<<sta<< " altitude "<<altitude<<" azimuth "<<azimuth<<" svec= "<<svec[0]<< ","<<svec[1]<< ","<<svec[2];
+            oFile<<"julianDate="<<julian_date<<" time= "<<hr+sta<<" sta="<<sta<<" PI="<<PI;
+            oFile<<" sda "<<sda<< " altitude "<<altitude<<" azimuth "<<azimuth<<" svec= "<<svec[0]<< ","<<svec[1]<< ","<<svec[2];
             if(altitude > 0){
               for (unsigned int j=0; j<m_SunLoc.size(); j++) {
                 std::vector<double> tempvec;
@@ -255,11 +257,11 @@ bool Analemma::closestSun()
                     m_ClosestSun[hr_count-1]=-1;
                 }
             }
-            //oFile<<" ClosestSun="<<m_ClosestSun[hr_count-1]<<std::endl;
+            oFile<<" ClosestSun="<<m_ClosestSun[hr_count-1]<<std::endl;
         }
     }
 
-
+    oFile.close();
 
     return true;
 }

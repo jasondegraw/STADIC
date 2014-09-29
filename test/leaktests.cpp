@@ -12,10 +12,8 @@ TEST(LeakTests, EnclosedModel)
   std::vector<std::string> radFiles = { "Simple.rad", "material.rad" };
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
   std::vector<std::string> layerNames = { "l_floor" };
-  ASSERT_TRUE(leakChecker.setFloorLayers(layerNames));
-  ASSERT_TRUE(leakChecker.setX(120));
-  ASSERT_TRUE(leakChecker.setY(120));
-  ASSERT_TRUE(leakChecker.setZ(30));
+  leakChecker.setFloorLayers(layerNames);
+  ASSERT_TRUE(leakChecker.setUnits(0));
   ASSERT_TRUE(leakChecker.setReflectance(1));
   ASSERT_TRUE(leakChecker.isEnclosed());
 
@@ -30,10 +28,8 @@ TEST(LeakTests, LeakModel)
   std::vector<std::string> layerNames;
   layerNames.clear();
   layerNames.push_back("l_floor");
-  ASSERT_TRUE(leakChecker.setFloorLayers(layerNames));
-  ASSERT_TRUE(leakChecker.setX(120));
-  ASSERT_TRUE(leakChecker.setY(120));
-  ASSERT_TRUE(leakChecker.setZ(30));
+  leakChecker.setFloorLayers(layerNames);
+  ASSERT_TRUE(leakChecker.setUnits(0));
   ASSERT_TRUE(leakChecker.setReflectance(1));
   ASSERT_FALSE(leakChecker.isEnclosed());
 
