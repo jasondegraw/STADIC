@@ -2,9 +2,6 @@
 #include "logging.h"
 #include <fstream>
 #include "functions.h"
-//#include <QFile>
-//#include <QStringList>
-//#include <QTextStream>
 
 namespace stadic {
 

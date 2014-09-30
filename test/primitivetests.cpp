@@ -62,4 +62,8 @@ TEST(PrimitiveTests, Metal)
     EXPECT_EQ(0.1, rad.blue());
     EXPECT_EQ(0.5, rad.specularity());
     EXPECT_EQ(0.75, rad.roughness());
+    // Bad constructor args
+    stadic::MetalMaterial rad2(1.2, 0.8, 0.1, 0.5, 0.75);
+    EXPECT_EQ(0, rad2.red());
+    EXPECT_EQ(0.8, rad2.green());
 }

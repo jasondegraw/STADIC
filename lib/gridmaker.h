@@ -42,7 +42,7 @@ public:
     double offsetY();                                                                   //Function that returns the y offset as a double
     double zHeight();                                                                   //Function that returns the absolute z height as a double
 
-    std::vector<std::vector<std::vector<double>>> points();                             //Function that returns the points that are used for analysis
+    std::vector<std::vector<std::vector<double> > > points();                           //Function that returns the points that are used for analysis
 
     //Utilities
     bool makeGrid();                                                                    //Main function that makes the grid
@@ -55,10 +55,10 @@ public:
 
 private:
     //Points
-    std::vector<std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>>> m_PointSet;       //The x,y points in boost format that are within the polygons
-    std::vector<std::vector<std::vector<double>>> m_FinalPoints;                                                         //The x,y,z points as doubles that are the final output set
+    std::vector<std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> > > m_PointSet;       //The x,y points in boost format that are within the polygons
+    std::vector<std::vector<std::vector<double> > > m_FinalPoints;                                                         //The x,y,z points as doubles that are the final output set
     //Polygons
-    std::vector<boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>>> m_UnitedPolygon;  //Vector containing a multipolygon at each elevation that holds each of the joined polygons
+    std::vector<boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true> > > m_UnitedPolygon;  //Vector containing a multipolygon at each elevation that holds each of the joined polygons
 
 
     //InputData

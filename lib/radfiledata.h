@@ -1,11 +1,11 @@
 #ifndef RADFILEDATA_H
 #define RADFILEDATA_H
 
-#include <QPair>
 #include "radprimitive.h"
 #include "objects.h"
 #include <vector>
 #include <memory>
+#include <utility>
 
 #include "stadicapi.h"
 
@@ -18,7 +18,7 @@ public:
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
     bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
-    bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
+    //bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
     bool blackOutLayer(std::string layer);                              //Function to black out a layer
     bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
     std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
@@ -34,8 +34,8 @@ public:
     // Splitting is officially broken
     //QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
     //template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
-	// This one is the one that is most critical, but it needs to be redone
-	QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
+    // This one is the one that is most critical, but it needs to be redone
+    std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
 
 private:
     shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING

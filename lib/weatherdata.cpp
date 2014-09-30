@@ -3,9 +3,6 @@
  */
 
 #include "weatherdata.h"
-//#include <QTextStream>
-//#include <QFile>
-//#include <QStringList>
 #include <iostream>
 #include <fstream>
 #include <string>

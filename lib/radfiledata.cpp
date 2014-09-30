@@ -1,6 +1,4 @@
 #include "radfiledata.h"
-#include <QFile>
-#include <QTextStream>
 #include "logging.h"
 #include <fstream>
 #include <sstream>
@@ -22,7 +20,7 @@ bool RadFileData::addRad(std::string file){
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
-        STADIC_ERROR(QString("The opening of the rad file '%1' failed.").arg(QString().fromStdString(file)));
+        STADIC_ERROR("The opening of the rad file '"+file+"' failed.");
         return false;
     }
     std::stringstream data;
@@ -67,7 +65,7 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
 }
 */
 
-QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::split(const std::vector<std::string> &vector)
+std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::split(const std::vector<std::string> &vector)
 {
 	shared_vector<RadPrimitive> in, out;
     for(std::shared_ptr<RadPrimitive> primitive : m_Primitives) {
@@ -88,7 +86,7 @@ QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::s
         }
     }
     // In this new version, the caller is responsible for checking that the vectors actually contain something
-	return QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
+	return std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
 }
 
 /*
@@ -191,7 +189,7 @@ bool RadFileData::writeRadFile(std::string file){
 std::vector<double> RadFileData::surfaceNormal(std::string layer){
     std::vector<double> normalVector;
     for(int i=0;i<m_Primitives.size();i++) {
-        if(m_Primitives[i]->modifier()==layer && QString(m_Primitives[i]->type())=="Polygon") {
+        if(m_Primitives[i]->modifier()==layer && m_Primitives[i]->typeString()=="Polygon") {
             std::vector<std::vector<double>> normalPoints;
             for (int j=0;j<m_Primitives[i]->arg3().size();j++){
                 std::vector<double> temp;

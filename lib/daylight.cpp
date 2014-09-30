@@ -1,16 +1,13 @@
 #include "daylight.h"
 #include "logging.h"
 #include "dayill.h"
-#include <QFile>
-#include <QTextStream>
 #include "objects.h"
 #include <fstream>
-//#include <QProcess>
 #include "materialprimitives.h"
 
 namespace stadic {
-Daylight::Daylight(Control *model, QObject *parent) :
-    m_Model(model), QObject(parent)
+Daylight::Daylight(Control *model) :
+    m_Model(model)
 {
 }
 
@@ -1033,7 +1030,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo = settingRad->split(layers);
+                    std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo = settingRad->split(layers);
                     if (splitGeo.first.size() == 0 || splitGeo.second.size() == 0){
                         STADIC_ERROR("The program quit...");
                         return false;
@@ -1117,7 +1114,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
         for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfBaseLayers().size();j++){
             std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
             layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
-            QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            std::pair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive> > splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 STADIC_ERROR("The program quit...");
                 return false;
@@ -1173,7 +1170,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    std::pair<shared_vector<RadPrimitive>,shared_vector<RadPrimitive> > splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         STADIC_ERROR("The program quit...");
                         return false;
@@ -1237,7 +1234,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
             if (std::find(layers.begin(),layers.end(),model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])==layers.end()){
                 layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             }
-            QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 STADIC_ERROR("The program quit...");
                 return false;
@@ -1274,7 +1271,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         STADIC_ERROR("The program quit...");
                         return false;
@@ -1330,7 +1327,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
             if (std::find(layers.begin(),layers.end(),model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])==layers.end()){
                 layers.push_back(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j]);
             }
-            QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=baseRad->split(layers);
+            std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo=baseRad->split(layers);
             if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                 STADIC_ERROR("The program quit...");
                 return false;
@@ -1366,7 +1363,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     std::vector<std::string> layers=model->windowGroups()[blindGroupNum].glazingLayers();
                     layers.push_back(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j]);
-                    QPair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>> splitGeo=settingRad->split(layers);
+                    std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > splitGeo=settingRad->split(layers);
                     if (splitGeo.first.size()==0|| splitGeo.second.size()==0){
                         STADIC_ERROR("The program quit...");
                         return false;

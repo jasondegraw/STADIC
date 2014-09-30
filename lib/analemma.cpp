@@ -124,7 +124,7 @@ bool Analemma::getSunPos()
                         m_SunLoc.push_back(tempvec);
                         m_numSuns++;
                         matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
-                        geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< "\t" << svec[1] << "\t" << svec[2]  <<" 0.533" << std::endl;
+                        geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< " " << svec[1] << " " << svec[2]  <<" 0.533" << std::endl;
                         first_of_hour=false;
                         azi_prev=azimuth;
                         alt_prev=altitude;
@@ -150,7 +150,7 @@ bool Analemma::getSunPos()
                             m_SunLoc.push_back(tempvec);
                             m_numSuns++;
                             matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
-                            geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< "\t" << svec[1] << "\t" << svec[2]  <<" 0.533" << std::endl;
+                            geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< " " << svec[1] << " " << svec[2]  <<" 0.533" << std::endl;
                             azi_prev=azimuth;
                             alt_prev=altitude;
                             pvec=pos(alt_prev,azi_prev);
