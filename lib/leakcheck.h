@@ -25,7 +25,7 @@ public:
 private:
     std::vector<std::string> m_RadFiles;                                //Vector holding the rad files
     std::vector<std::string> m_FloorLayers;                             //Vector holding the floor layers
-    std::vector<std::vector<std::vector<double>>> m_Points;             //Vector holding the position of each of the analysis points
+    std::vector<std::vector<std::vector<double> > > m_Points;             //Vector holding the position of each of the analysis points
     int m_Units;                                                        //Variable holding the unit type 0=in, 1=ft, 2=mm, 3=m
     double m_Reflectance;                                               //Variable holding the reflectance
 
