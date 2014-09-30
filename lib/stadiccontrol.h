@@ -5,6 +5,8 @@
 #include <vector>
 #include "windowgroup.h"
 #include "controlzone.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/optional/optional.hpp>
 
 #include "stadicapi.h"
 
@@ -15,6 +17,7 @@ class STADIC_API Control
 public:
     Control();
     bool parseJson(std::string file);
+    bool parseJson2(std::string file);
 
     //Setters
     //******************
@@ -44,7 +47,7 @@ public:
     bool setBuildingRotation(double value);
     void setPTSFile(std::string file);
     bool setImportUnits(std::string units);
-    bool setIllumUnits(std::string units);
+    void setIllumUnits(std::string units);
     bool setDisplayUnits(std::string units);
     void setOccSchedule(std::string file);
     bool setTargetIlluminance(double value);
@@ -160,6 +163,21 @@ public:
     double UDIMax();
 
 private:
+    //******************
+    //Boost ptree functions
+    //******************
+    boost::optional<double> getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<double> getDoubleWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<int> getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<int> getIntWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<std::string> getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<std::string> getStringWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<bool> getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<bool> getBoolWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<boost::property_tree::ptree> getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<boost::property_tree::ptree> getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+
+
     //******************
     //Folder Information
     //******************

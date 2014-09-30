@@ -8,6 +8,10 @@
 #include <QString>
 #include <iostream>
 #include "logging.h"
+#include <fstream>
+#include <string>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 
 namespace stadic {
 
@@ -97,14 +101,13 @@ bool Control::setImportUnits(std::string units){
     }
     return true;
 }
-bool Control::setIllumUnits(std::string units){
+void Control::setIllumUnits(std::string units){
     if (units=="lux" || units=="fc"){
         m_IllumUnits=units;
     }else{
-        STADIC_ERROR("The illuminance units must be either \"lux\" or \"fc\".");
-        return false;
+        STADIC_WARNING("The illuminance units must be either \"lux\" or \"fc\".  The default illuminance units will be set to lux.");
+        m_IllumUnits="lux";
     }
-    return true;
 }
 bool Control::setDisplayUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
@@ -541,6 +544,131 @@ double Control::UDIMax(){
 //******************
 //PARSER
 //******************
+boost::optional<double> Control::getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<double> dVal;
+    try{
+        dVal=json.get<double>(key);
+        return dVal;
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_ERROR(errorMissing);
+        return dVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_ERROR(errorBad);
+        return dVal;
+    }
+}
+boost::optional<double> Control::getDoubleWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<double> dVal;
+    try{
+        dVal=json.get<double>(key);
+        return dVal;
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_WARNING(errorMissing);
+        return dVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_WARNING(errorBad);
+        return dVal;
+    }
+}
+boost::optional<int> Control::getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<int> iVal;
+    try{
+        iVal=json.get<int>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_ERROR(errorMissing);
+        return iVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_ERROR(errorBad);
+        return iVal;
+    }
+
+}
+boost::optional<int> Control::getIntWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<int> iVal;
+    try{
+        iVal=json.get<int>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_WARNING(errorMissing);
+        return iVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_WARNING(errorBad);
+        return iVal;
+    }
+
+}
+boost::optional<std::string> Control::getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<std::string> sVal;
+    try{
+        sVal=json.get<std::string>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_ERROR(errorMissing);
+        return sVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_ERROR(errorBad);
+        return sVal;
+    }
+}
+boost::optional<std::string> Control::getStringWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<std::string> sVal;
+    try{
+        sVal=json.get<std::string>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_WARNING(errorMissing);
+        return sVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_WARNING(errorBad);
+        return sVal;
+    }
+}
+boost::optional<bool> Control::getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<bool> bVal;
+    try{
+        bVal=json.get<bool>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_ERROR(errorMissing);
+        return bVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_ERROR(errorBad);
+        return bVal;
+    }
+}
+boost::optional<bool> Control::getBoolWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<bool> bVal;
+    try{
+        bVal=json.get<bool>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_WARNING(errorMissing);
+        return bVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_WARNING(errorBad);
+        return bVal;
+    }
+}
+boost::optional<boost::property_tree::ptree> Control::getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<boost::property_tree::ptree> treeVal;
+    try{
+        treeVal=json.get<boost::property_tree::ptree>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_ERROR(errorMissing);
+        return treeVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_ERROR(errorBad);
+        return treeVal;
+    }
+}
+boost::optional<boost::property_tree::ptree> Control::getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+    boost::optional<boost::property_tree::ptree> treeVal;
+    try{
+        treeVal=json.get<boost::property_tree::ptree>(key);
+    }catch (const boost::property_tree::ptree_bad_path &e){
+        STADIC_WARNING(errorMissing);
+        return treeVal;
+    }catch (const boost::property_tree::ptree_bad_data &e){
+        STADIC_WARNING(errorBad);
+        return treeVal;
+    }
+}
+
 bool Control::parseJson(std::string file){
     QString data;
     QFile iFile;
@@ -796,9 +924,7 @@ bool Control::parseJson(std::string file){
         return false;
     }else{
         if (val.isString()){
-            if (!setIllumUnits(val.toString().toStdString())){
-                return false;
-            }
+            setIllumUnits(val.toString().toStdString());
         }else{
             STADIC_ERROR("The \"illum_units\" is not a string.");
             return false;
@@ -1363,5 +1489,728 @@ bool Control::parseJson(std::string file){
 
     return true;
 }
+
+bool Control::parseJson2(std::string file){
+    std::string data;
+    std::fstream iFile;
+    iFile.open(file);
+    if (!iFile.is_open()){
+        return false;
+    }
+    iFile.close();
+
+    boost::property_tree::ptree json;
+    boost::property_tree::read_json(file, json);
+    if (json.empty()){
+        STADIC_ERROR("The json file is empty");
+        return false;
+    }
+    //get_value_or(/*default*/);
+    boost::optional<std::string> sVal;
+    boost::optional<double> dVal;
+    boost::optional<int> iVal;
+    boost::optional<boost::property_tree::ptree> treeVal;
+
+    //******************
+    //Folder Information
+    //******************
+    sVal=getString(json, "project_name", "The key \"project_name\" does not appear in the STADIC Control File.", "The key \"project_name\" does not contain a string.");
+    if (sVal){
+        return false;
+    }else{
+        setProjectName(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "project_folder", "The key \"project_folder\" does not appear in the STADIC Control File.", "The key \"project_folder\" does not contain a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setProjectFolder(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "tmp_folder", "The key \"tmp_folder\" does not appear in the STADIC Control File.", "The \"tmp_folder\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setTmpFolder(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "geometry_folder", "The key \"geometry_folder\" does not appear in the STADIC Control File.", "The \"geometry_folder\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setGeoFolder(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getStringWarn(json, "ies_folder", "The key \"ies_folder\" does not appear in the STADIC Control File.", "The \"ies_folder\" is not a string.");
+    if (sVal){
+        setIESFolder(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "results_folder", "The key \"results_folder\" does not appear in the STADIC Control File.", "The \"results_folder\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setResultsFolder(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "data_folder", "The key \"data_folder\" does not appear in the STADIC Control File.", "The \"data_folder\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setDataFolder(sVal.get());
+        sVal.reset();
+    }
+
+    //******************
+    //Site Information
+    //******************
+    dVal=getDoubleWarn(json, "ground_reflectance", "The key \"ground_reflectance\" does not appear in the STADIC Control File.", "The \"ground_reflectance\" is not a double.");
+    if (!dVal){
+        STADIC_WARNING("A default value of 0.2 will be applied for the ground reflectance.");
+        setGroundReflect(0.2);
+    }else{
+        setGroundReflect(dVal.get());
+        dVal.reset();
+    }
+
+    sVal=getString(json, "wea_data_file", "The key \"wea_data_file\" does not appear in the STADIC Control File.", "The \"wea_data_file\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setWeaDataFile(sVal.get());
+        sVal.reset();
+    }
+
+    iVal=getIntWarn(json, "first_day", "The key \"first_day\" does not appear in the STADIC Control File.", "The \"first_day\" is not an integer.");
+    if (!iVal){
+        STADIC_WARNING("The default first day will be set to 1 (Sunday).");
+        setFirstDay(1);
+    }else{
+        setFirstDay(iVal.get());
+        iVal.reset();
+    }
+
+
+    //******************
+    //Geometry Information
+    //******************
+    sVal=getString(json, "material_file", "The key \"material_file\" does not appear in the STADIC Control File.", "The \"material_file\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setMatFile(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "geometry_file", "The key \"geometry_file\" does not appear in the STADIC Control File.", "The \"geometry_file\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setGeoFile(sVal.get());
+    }
+
+    dVal=getDoubleWarn(json, "building_rotation", "The key \"building_rotation\" does not appear in the STADIC Control File.", "The \"building_rotation\" is not a double.");
+    if (!dVal){
+        STADIC_WARNING("The default building rotation will be set to 0");
+        setBuildingRotation(0);
+    }else{
+        setBuildingRotation(dVal.get());
+        dVal.reset();
+    }
+
+    sVal=getString(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", "The \"analysis_points\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setPTSFile(sVal.get());
+        sVal.reset();
+    }
+
+    treeVal=getTree(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", "The \"window_groups\" is not of the correct type.");
+    if (!treeVal){
+        return false;
+    }else{
+        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, treeVal){
+            WindowGroup WG;
+            if (WG.parseJson(v.second.data())){
+                m_WindowGroups.push_back(WG);
+            }else{
+                return false;
+            }
+        }
+        treeVal.reset();
+    }
+
+    sVal=getString(json, "import_units", "The key \"import_units\" does not appear in the STADIC Control File.", "The \"import_units\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        if (!setImportUnits(sVal.get())){
+            return false;
+        }
+        sVal.reset();
+    }
+
+    sVal=getStringWarn(json, "illum_units", "The key \"illum_units\" does not appear in the STADIC Control File.", "The \"illum_units\" is not a string.");
+    if (!sVal){
+        STADIC_WARNING("The default illuminance units will be set to lux.");
+        setIllumUnits("lux");
+    }else{
+        setIllumUnits(sVal.get());
+        sVal.reset();
+    }
+
+    sVal=getString(json, "display_units", "The key \"display_units\" does not appear in the STADIC Control File.", "The \"display_units\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        if (!setDisplayUnits(sVal.get())){
+            return false;
+        }
+        sVal.reset();
+    }
+
+    sVal=getString(json, "occupancy_schedule", "The key \"occupancy_schedule\" does not appear in the STADIC Control File.", "The \"occupancy_schedule\" is not a string.");
+    if (!sVal){
+        return false;
+    }else{
+        setOccSchedule(sVal.get());
+        sVal.reset();
+    }
+
+    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear in the STADIC Control File.", "The \"target_illuminance\" is not a double.");
+    if (!dVal){
+        return false;
+    }else{
+        if (!setTargetIlluminance(dVal.get())){
+            return false;
+        }
+        dVal.reset();
+    }
+
+    /*
+    //******************
+    //Simulation Settings
+    //******************
+    val=jsonObj.value(QString("sun_divisions"));
+    if (val.isUndefined()){
+        STADIC_WARNING("The key \"sun_divisions\" does not appear in the STADIC Control File.\n\tSun Divisions will be set to 3.");
+        setSunDivisions(3);
+    }else{
+        int num;
+        num=val.toDouble();
+        if ((val.toDouble()-num)<0.01 && (val.toDouble()-num>-0.01)){
+            if (!setSunDivisions(val.toDouble())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The \"sun_divisions\" is not an integer.");
+            return false;
+        }
+    }
+
+    val=jsonObj.value(QString("sky_divisions"));
+    if (val.isUndefined()){
+        STADIC_WARNING("The key \"sky_divisions\" does not appear in the STADIC Control File.\n\tSky Divisions will be set to 3.");
+        setSkyDivisions(3);
+    }else{
+        int num;
+        num=val.toDouble();
+        if ((val.toDouble()-num)<0.01 && (val.toDouble()-num>-0.01)){
+            if (!setSkyDivisions(val.toDouble())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The \"sky_divisions\" is not an integer.");
+            return false;
+        }
+    }
+
+    val=jsonObj.value(QString("daylight_savings_time"));
+    if (val.isUndefined()){
+        STADIC_WARNING("The key \"daylight_savings_time\" does not appear in the STADIC Control File.\n\tDaylight Savings Time will be enabled.");
+        setDaylightSavingsTime(true);
+    }else{
+        if (val.isBool()){
+               setDaylightSavingsTime(val.toBool());
+        }else{
+            STADIC_ERROR("The \"daylight_savings_time\" is not a boolean.");
+            return false;
+        }
+    }
+
+    val=jsonObj.value(QString("radiance_parameters"));
+    if (val.isUndefined()){
+        STADIC_WARNING("The key \"radiance_parameters\" does not appear in the STADIC Control File.\n\tThe default values of the parameters will be as follows.");
+        if (!setDefaultRadianceParameters()){
+            return false;
+        }
+    }else{
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("ab");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"ab\" was not found. A default value of 4 will be applied.");
+                if (!setAB(4)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setAB(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"ab\" is not a number. A default value of 4 will be applied.");
+                    if (!setAB(4)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("ad");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"ad\" was not found. A default value of 300 will be applied.");
+                if (!setAD(300)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setAD(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"ad\" is not a number. A default value of 300 will be applied.");
+                    if (!setAD(300)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("as");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"as\" was not found. A default value of 20 will be applied.");
+                if (!setAS(20)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setAS(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"as\" is not a number. A default value of 20 will be applied.");
+                    if (!setAS(20)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("ar");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"ar\" was not found. A default value of 150 will be applied.");
+                if (!setAR(150)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setAR(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"ar\" is not a number. A default value of 150 will be applied.");
+                    if (!setAR(150)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("aa");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"aa\" was not found. A default value of 0.1 will be applied.");
+                if (!setAA(0.1)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setAA(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"aa\" is not a number. A default value of 0.1 will be applied.");
+                    if (!setAA(0.1)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("lr");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"lr\" was not found. A default value of 6 will be applied.");
+                if (!setLR(6)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setLR(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"lr\" is not a number. A default value of 6 will be applied.");
+                    if (!setLR(6)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("st");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"st\" was not found. A default value of 0.15 will be applied.");
+                if (!setST(0.15)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setST(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"st\" is not a number. A default value of 0.15 will be applied.");
+                    if (!setST(0.15)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("sj");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"sj\" was not found. A default value of 1.0 will be applied.");
+                if (!setSJ(1.0)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setSJ(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"sj\" is not a number. A default value of 1.0 will be applied.");
+                    if (!setSJ(1.0)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("lw");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"lw\" was not found. A default value of 0.004 will be applied.");
+                if (!setLW(0.004)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setLW(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"lw\" is not a number. A default value of 0.004 will be applied.");
+                    if (!setLW(0.004)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("dj");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"dj\" was not found. A default value of 0.0 will be applied.");
+                if (!setDJ(0.0000)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setDJ(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"dj\" is not a number. A default value of 0.0 will be applied.");
+                    if (!setDJ(0.0000)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("ds");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"ds\" was not found. A default value of 0.200 will be applied.");
+                if (!setDS(0.200)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setDS(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"ds\" is not a number. A default value of 0.200 will be applied.");
+                    if (!setDS(0.200)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("dr");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"dr\" was not found. A default value of 2 will be applied.");
+                if (!setDR(2)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setDR(int(val.toDouble()))){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"dr\" is not a number. A default value of 2 will be applied.");
+                    if (!setDR(2)){
+                        return false;
+                    }
+                }
+            }
+
+            val=tempObject.value("dp");
+            if (val.isUndefined()){
+                STADIC_WARNING("The parameter \"dp\" was not found. A default value of 512 will be applied.");
+                if (!setDP(512)){
+                    return false;
+                }
+            }else{
+                if (val.isDouble()){
+                    if (!setDP(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_WARNING("The parameter \"dp\" is not a number. A default value of 512 will be applied.");
+                    if (!setDP(512)){
+                        return false;
+                    }
+                }
+            }
+            if (!setDP(512)){
+                return false;
+            }
+        }else{
+            STADIC_WARNING("The key \"radiance_parameters\" is not an object.\n\tThe default values of the parameters will be as follows.");
+            if (!setDefaultRadianceParameters()){
+                return false;
+            }
+        }
+    }
+
+    //******************
+    //Lighting Control
+    //******************
+    val=jsonObj.value(QString("control_zones"));
+    array=val.toArray();
+    if (val.isUndefined()){
+        STADIC_WARNING(" The key \"control_zones\" does not appear in the STADIC Control File.");
+    }else{
+        for (int i=0;i<array.size();i++){
+            ControlZone zone;
+            if (array[i].isObject()){
+                if(zone.parseJson(array[i].toObject())){
+                    m_ControlZones.push_back(zone);
+                }else{
+                    return false;
+                }
+            }else{
+                STADIC_ERROR("The \"control_zones\" is not an object.");
+                return false;
+            }
+        }
+    }
+
+
+    //******************
+    //Metrics
+    //******************
+    val=jsonObj.value(QString("sDA"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double illum, frac, start, endTime;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("illuminance"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"illuminance\" is missing under sDA.\n\tAn assumed value of 300 will be used.");
+                illum=300;
+            }else{
+                if (val.isDouble()){
+                    illum=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"illuminance\" does not contain a number.\n\tAn assumed value of 300 will be used.");
+                    illum=300;
+                }
+            }
+            val=tempObject.value(QString("DA_fraction"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"DA_fraction\" is missing under sDA.\n\tAn assumed value of 0.5 will be used.");
+                frac=0.5;
+            }else{
+                if (val.isDouble()){
+                    frac=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"DA_fraction\" does not contain a number.\n\tAn assumed value of 0.5 will be used.");
+                    frac=0.5;
+                }
+            }
+            val=tempObject.value(QString("start_time"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"start_time\" is missing under sDA.\n\tAn assumed value of 8 will be used.");
+                start=8;
+            }else{
+                if (val.isDouble()){
+                    start=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"start_time\" does not contain a number.\n\tAn assumed value of 8 will be used.");
+                    start=8;
+                }
+            }
+            val=tempObject.value(QString("end_time"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"end_time\" is missing under sDA.\n\tAn assumed value of 17 will be used.");
+                endTime=17;
+            }else{
+                if (val.isDouble()){
+                    endTime=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"end_time\" does not contain a number.\n\tAn assumed value of 17 will be used.");
+                    endTime=17;
+                }
+            }
+            if (!setsDA(true, illum, frac, start, endTime)){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The \"sDA\" is not an object.");
+            return false;
+        }
+    }
+    val=jsonObj.value(QString("occupied_sDA"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double illum, frac;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("illuminance"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"illuminance\" is missing under occupied_sDA.\n\tAn assumed value of 300 will be used.");
+                illum=300;
+            }else{
+                if (val.isDouble()){
+                    illum=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"illuminance\" does not contain a number.\n\tAn assumed value of 300 will be used.");
+                    illum=300;
+                }
+            }
+            val=tempObject.value(QString("DA_fraction"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"DA_fraction\" is missing under occupied_sDA.\n\tAn assumed value of 0.5 will be used.");
+                frac=0.5;
+            }else{
+                if (val.isDouble()){
+                    frac=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"DA_fraction\" does not contain a number.\n\tAn assumed value of 0.5 will be used.");
+                    frac=0.5;
+                }
+            }
+            if (!setOccsDA(true, illum, frac)){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The key \"occupied_sDA\" is not an object.");
+            return false;
+        }
+    }
+    val=jsonObj.value(QString("DA"));
+    if (!val.isUndefined()){
+        if (val.isDouble()){
+            if (!setDA(true, val.toDouble())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The \"DA\" is not a double.");
+            return false;
+        }
+    }
+
+    val=jsonObj.value(QString("cDA"));
+    if (!val.isUndefined()){
+        if (val.isDouble()){
+            if (!setcDA(true, val.toDouble())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The \"cDA\" is not a double.");
+            return false;
+        }
+    }
+
+    val=jsonObj.value(QString("DF"));
+    if (!val.isUndefined()){
+        if (val.isBool()){
+               setDF(val.toBool());
+        }else{
+            STADIC_ERROR("The \"DF\" is not a boolean.");
+            return false;
+        }
+    }
+    val=jsonObj.value(QString("UDI"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            double minimum, maximum;
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value(QString("minimum"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"minimum\" is missing under UDI.\n\tAn assumed value of 100 will be used.");
+                minimum=100;
+            }else{
+                if (val.isDouble()){
+                    minimum=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"minimum\" is not a number.\n\tAn assumed value of 100 will be used.");
+                    minimum=100;
+                }
+            }
+            val=tempObject.value(QString("maximum"));
+            if (val.isUndefined()){
+                STADIC_WARNING("The key \"maximum\" is missing under UDI.\n\tAn assumed value of 250 will be used.");
+                maximum=250;
+            }else{
+                if (val.isDouble()){
+                    maximum=val.toDouble();
+                }else{
+                    STADIC_WARNING("The key \"maximum\" is not a number.\n\tAn assumed value of 250 will be used.");
+                    maximum=250;
+                }
+            }
+            if (!setUDI(true, minimum, maximum)){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The key \"UDI\" is not an object.");
+            return false;
+        }
+    }
+    */
+
+    return true;
+}
+
 
 }
