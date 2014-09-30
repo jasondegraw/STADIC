@@ -8,20 +8,22 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS "4.6.0")
     message(FATAL_ERROR "g++ versions earlier than 4.6.0 are not supported")
   endif()
-  set(CMAKE_CXX_FLAGS "-std=c++11")
-endif()
-
-if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(MSVC)
   # Visual Studio compiler check, totally borrowed from OpenStudio
   # http://en.wikipedia.org/wiki/Visual_C%2B%2B#32-bit_and_64-bit_versions
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "18.0.21005.1")
     message(FATAL_ERROR "Visual Studio earlier than VS2013 is not supported")
   endif()
   if(WIN32)
-  set(Boost_USE_STATIC_LIBS ON)
-  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-endif()
-
+    set(Boost_USE_STATIC_LIBS ON)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+  endif()
+elseif(Apple)
+  # The checks to determine if the compiler is clang are all rather sketchy,
+  # and maybe this should go before the g++ test above to get things right.
+  # But for now skip the checks and assume everything will be Ok.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -29,7 +31,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 #Boost
 
-find_package(Boost 1.55 COMPONENTS system filesystem REQUIRED)
+find_package(Boost 1.56 COMPONENTS system filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 # Find includes in the build directories

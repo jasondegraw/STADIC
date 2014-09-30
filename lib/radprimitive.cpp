@@ -1,5 +1,4 @@
 #include "radprimitive.h"
-#include <QTextStream>
 #include "geometryprimitives.h"
 #include "materialprimitives.h"
 #include <iostream>

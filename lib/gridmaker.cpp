@@ -4,7 +4,6 @@
 #include "functions.h"
 #include <iostream>
 #include <fstream>
-#include "process.h"
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -94,7 +93,7 @@ double GridMaker::offsetY(){
 double GridMaker::zHeight(){
     return m_ZHeight;
 }
-std::vector<std::vector<std::vector<double>>> GridMaker::points(){
+std::vector<std::vector<std::vector<double> > > GridMaker::points(){
     return m_FinalPoints;
 }
 
@@ -111,7 +110,7 @@ bool GridMaker::makeGrid(){
 
     if (m_useZOffset){
         for (int p=0;p<m_PointSet.size();p++){
-            std::vector<std::vector<double>> tempVect;
+            std::vector<std::vector<double> > tempVect;
             for (int i=0;i<m_PointSet[p].size();i++){
                 std::vector<double> tempPoint;
                 tempPoint.push_back(m_PointSet[p][i].get<0>());
@@ -123,7 +122,7 @@ bool GridMaker::makeGrid(){
         }
     }else{
         for (int p=0;p<m_PointSet.size();p++){
-            std::vector<std::vector<double>> tempVect;
+            std::vector<std::vector<double> > tempVect;
             for (int i=0;i<m_PointSet[p].size();i++){
                 std::vector<double> tempPoint;
                 tempPoint.push_back(m_PointSet[p][i].get<0>());
@@ -253,11 +252,11 @@ bool GridMaker::parseRad(){
                 }
                 if (firstPolygon[setPos]){
                     firstPolygon[setPos]=false;
-                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempMultiPolygon;
+                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempMultiPolygon;
                     tempMultiPolygon.push_back(tempPolygon);
                     m_UnitedPolygon.push_back(tempMultiPolygon);
                 }else{
-                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempMultiPolygon;
+                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempMultiPolygon;
                     boost::geometry::union_(m_UnitedPolygon[setPos],tempPolygon,tempMultiPolygon);
                     m_UnitedPolygon[setPos]=tempMultiPolygon;
                 }
@@ -292,7 +291,7 @@ bool GridMaker::insetPolygons(){
     boost::geometry::strategy::buffer::point_square point_strategy;
     boost::geometry::strategy::buffer::side_straight side_strategy;
     for (int i=0;i<m_PolySetHeight.size();i++){
-        boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
+        boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon;
         boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
         m_UnitedPolygon[i]=tempPolygon;
         if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
@@ -304,12 +303,12 @@ bool GridMaker::insetPolygons(){
 }
 
 
-void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet, int set){
+void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true> > polygonSet, int set){
     m_MinX.resize(m_PolySetHeight.size());
     m_MinY.resize(m_PolySetHeight.size());
     m_MaxX.resize(m_PolySetHeight.size());
     m_MaxY.resize(m_PolySetHeight.size());
-    boost::geometry::model::box<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> box;
+    boost::geometry::model::box<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> > box;
     boost::geometry::envelope(polygonSet,box);
     //std::clog<<"minX="<<box.min_corner().get<0>()<<std::endl;
     //std::clog<<"minY="<<box.min_corner().get<1>()<<std::endl;
@@ -409,7 +408,7 @@ void GridMaker::addTestPoints(double x, double y, int set){
     if (m_PointSet.size()<(set+1)){
         m_PointSet.resize(set+1);
     }
-    std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> tempVec;
+    std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> > tempVec;
     tempVec=m_PointSet[set];
     tempVec.push_back(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y));
     m_PointSet[set]=tempVec;
