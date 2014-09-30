@@ -79,3 +79,8 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/gtest-1.7.0/)
 else()
   message(WARNING "Failed to find gtest 1.7.0, tests will not be built")
 endif()
+
+# Use CPack
+if(BUILD_PACKAGE)
+  include(STADICCPack.cmake)
+endif()
