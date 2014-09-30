@@ -2,13 +2,40 @@
 #include <iostream>
 #include <QString>
 
-void ERROR(QString mesg){
+void STADIC_ERROR(QString mesg)
+{
     QString string;
     string ="ERROR: "+mesg;
     std::cerr << string.toStdString() << std::endl;
 }
-void WARNING(QString mesg){
+
+void STADIC_WARNING(QString mesg)
+{
     QString string;
     string="WARNING: "+mesg;
     std::cerr << string.toStdString() << std::endl;
+}
+
+void STADIC_ERROR(std::string mesg)
+{
+    std::string string ="ERROR: "+mesg;
+    std::cerr << string << std::endl;
+}
+
+void STADIC_WARNING(std::string mesg)
+{
+    std::string string="WARNING: "+mesg;
+    std::cerr << string << std::endl;
+}
+
+void STADIC_ERROR(const char mesg[])
+{
+  std::string string = "ERROR: " + std::string(mesg);
+  std::cerr << string << std::endl;
+}
+
+void STADIC_WARNING(const char mesg[])
+{
+  std::string string = "WARNING: " + std::string(mesg);
+  std::cerr << string << std::endl;
 }

@@ -12,4 +12,19 @@ target_link_libraries(dxmakewea stadic_core)
 add_executable(dxgridmaker dxgridmaker.cpp)
 target_link_libraries(dxgridmaker stadic_core)
 
-install(TARGETS dxmakewea dxgridmaker DESTINATION bin)
+add_executable(dxleakcheck dxleakcheck.cpp)
+target_link_libraries(dxleakcheck stadic_core)
+
+add_executable(dxdaylight dxdaylight.cpp)
+target_link_libraries(dxdaylight stadic_core)
+
+add_executable(dxanalemma dxanalemma.cpp)
+target_link_libraries(dxanalemma stadic_core)
+
+set(PROGRAMS dxmakewea
+             dxgridmaker
+             dxleakcheck
+             dxdaylight
+             dxanalemma)
+
+install(TARGETS ${PROGRAMS} DESTINATION bin)

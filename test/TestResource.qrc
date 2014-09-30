@@ -4,5 +4,12 @@
         <file>resources/USA_PA_Lancaster.AP.725116_TMY3.epw</file>
         <file>resources/material.rad</file>
         <file>resources/Simple.rad</file>
+        <file>resources/SimpleHole.rad</file>
+        <file>resources/standard/SimpleStd.json</file>
+        <file>resources/standard/data/Lancaster.wea</file>
+        <file>resources/standard/rad/material.rad</file>
+        <file>resources/standard/rad/Simple.rad</file>
+        <file>resources/standard/rad/SimpleShadesFull.rad</file>
+        <file>resources/standard/rad/SimpleShadesHalf.rad</file>
     </qresource>
 </RCC>

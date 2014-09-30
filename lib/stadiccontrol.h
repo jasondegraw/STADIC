@@ -1,8 +1,7 @@
 #ifndef STADICCONTROL_H
 #define STADICCONTROL_H
 
-#include <QObject>
-#include <QString>
+#include <string>
 #include <vector>
 #include "windowgroup.h"
 #include "controlzone.h"
@@ -11,44 +10,43 @@
 
 namespace stadic {
 
-class STADIC_API Control : public QObject
+class STADIC_API Control
 {
-    Q_OBJECT
 public:
-    explicit Control(QObject *parent = 0);
-    bool parseJson(QString file);
+    Control();
+    bool parseJson(std::string file);
 
     //Setters
     //******************
     //Folder Information
     //******************
-    void setProjectName(QString name);
-    void setProjectFolder(QString folder);
-    void setTmpFolder(QString folder);
-    void setGeoFolder(QString folder);
-    void setIESFolder(QString folder);
-    void setResultsFolder(QString folder);
-    void setDataFolder(QString folder);
+    void setProjectName(std::string name);
+    void setProjectFolder(std::string folder);
+    void setTmpFolder(std::string folder);
+    void setGeoFolder(std::string folder);
+    void setIESFolder(std::string folder);
+    void setResultsFolder(std::string folder);
+    void setDataFolder(std::string folder);
 
     //******************
     //Site Information
     //******************
     bool setGroundReflect(double value);
-    void setWeaDataFile(QString file);
+    void setWeaDataFile(std::string file);
     bool setFirstDay(int value);
 
 
     //******************
     //Geometry Information
     //******************
-    void setMatFile(QString file);
-    void setGeoFile(QString file);
+    void setMatFile(std::string file);
+    void setGeoFile(std::string file);
     bool setBuildingRotation(double value);
-    void setPTSFile(QString file);
-    bool setImportUnits(QString units);
-    bool setIllumUnits(QString units);
-    bool setDisplayUnits(QString units);
-    void setOccSchedule(QString file);
+    void setPTSFile(std::string file);
+    bool setImportUnits(std::string units);
+    bool setIllumUnits(std::string units);
+    bool setDisplayUnits(std::string units);
+    void setOccSchedule(std::string file);
     bool setTargetIlluminance(double value);
 
     //******************
@@ -87,39 +85,39 @@ public:
     //******************
     //Folder Information
     //******************
-    QString projectName();
-    QString projectFolder();
-    QString tmpFolder();
-    QString geoFolder();
-    QString iesFolder();
-    QString resultsFolder();
-    QString dataFolder();
+    std::string projectName();
+    std::string projectFolder();
+    std::string tmpFolder();
+    std::string geoFolder();
+    std::string iesFolder();
+    std::string resultsFolder();
+    std::string dataFolder();
 
     //******************
     //Site Information
     //******************
     double groundReflect();
-    QString weaDataFile();
+    std::string weaDataFile();
     int firstDay();
 
     //******************
     //Geometry Information
     //******************
-    QString matFile();
-    QString geoFile();
+    std::string matFile();
+    std::string geoFile();
     double buildingRotation();
-    QString ptsFile();
-    std::vector<WindowGroup*> windowGroups();
-    QString importUnits();
-    QString illumUnits();
-    QString displayUnits();
-    QString occSchedule();
+    std::string ptsFile();
+    std::vector<WindowGroup> windowGroups();
+    std::string importUnits();
+    std::string illumUnits();
+    std::string displayUnits();
+    std::string occSchedule();
     double targetIlluminance();
 
     //******************
     //Lighting Control
     //******************
-    std::vector<ControlZone*> controlZones();
+    std::vector<ControlZone> controlZones();
 
     //******************
     //Simulation Settings
@@ -165,34 +163,34 @@ private:
     //******************
     //Folder Information
     //******************
-    QString m_ProjectName;                              //  Variable holding the project name
-    QString m_ProjectFolder;                            //  Variable holding the project folder
-    QString m_TmpFolder;                                //  Variable holding the tmp folder
-    QString m_GeoFolder;                                //  Variable holding the geometry folder
-    QString m_IESFolder;                                //  Variable holding the luminaire folder
-    QString m_ResultsFolder;                            //  Variable holding the results folder
-    QString m_DataFolder;                               //  Variable holding the data folder
+    std::string m_ProjectName;                          //  Variable holding the project name
+    std::string m_ProjectFolder;                        //  Variable holding the project folder
+    std::string m_TmpFolder;                            //  Variable holding the tmp folder
+    std::string m_GeoFolder;                            //  Variable holding the geometry folder
+    std::string m_IESFolder;                            //  Variable holding the luminaire folder
+    std::string m_ResultsFolder;                        //  Variable holding the results folder
+    std::string m_DataFolder;                           //  Variable holding the data folder
 
     //******************
     //Site Information
     //******************
     double m_GroundReflect;                             //  Variable holding the ground reflectance
-    QString m_WeaDataFile;                              //  Variable holding the weather data file
+    std::string m_WeaDataFile;                          //  Variable holding the weather data file
     int m_FirstDay;                                     //  Variable holding the start day of the year
 
     //******************
     //Geometry Information
     //******************
-    QString m_MatFile;                                  //  Variable holding the main material file
-    QString m_GeoFile;                                  //  Variable holding the main geometry file
+    std::string m_MatFile;                              //  Variable holding the main material file
+    std::string m_GeoFile;                              //  Variable holding the main geometry file
     double m_BuildingRotation;                          //  Variable holding the building rotation which is assumed to be positive=counter-clockwise
-    QString m_PTSFile;                                  //  Variable holding the analysis grid file
-    QString m_ImportUnits;                              //  Variable holding the geometry file import units
-    QString m_IllumUnits;                               //  Variable holding the illuminance units
-    QString m_DisplayUnits;                             //  Variable holding the distance units for display
-    QString m_OccSchedule;                              //  Variable holding the occupancy schedule file
+    std::string m_PTSFile;                              //  Variable holding the analysis grid file
+    std::string m_ImportUnits;                          //  Variable holding the geometry file import units
+    std::string m_IllumUnits;                           //  Variable holding the illuminance units
+    std::string m_DisplayUnits;                         //  Variable holding the distance units for display
+    std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
-    std::vector<WindowGroup*> m_WindowGroups;
+    std::vector<WindowGroup> m_WindowGroups;
 
     //******************
     //Simulation Settings
@@ -217,7 +215,7 @@ private:
     //******************
     //Lighting Control
     //******************
-    std::vector<ControlZone*> m_ControlZones;
+    std::vector<ControlZone> m_ControlZones;
 
     //******************
     //Metrics
@@ -238,11 +236,6 @@ private:
     bool m_UDI;                                         //  Variable holding whether the UDI analysis shoud be completed
     double m_UDIMin;                                    //  Variable holding the minimum illuminance for UDI
     double m_UDIMax;                                    //  Variable holding the maximum illuminance for UDI
-
-
-signals:
-    
-public slots:
     
 };
 

@@ -1,31 +1,49 @@
+#include "logging.h"
 #include "gridmaker.h"
 #include "radprimitive.h"
-//#include "logging.h"
-#include <QFile>
-#include <QTextStream>
+#include "functions.h"
 #include <iostream>
-#include <QString>
-#include <QLineF>
-#include <radfiledata.h>
+#include <fstream>
+#include "process.h"
+#include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/append.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/algorithms/correct.hpp>
+#include <boost/geometry/algorithms/buffer.hpp>
+#include <boost/geometry/strategies/agnostic/buffer_distance_asymmetric.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_join_miter.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_end_flat.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_side_straight.hpp>
+#include <boost/geometry/algorithms/covered_by.hpp>
+#include <boost/geometry/algorithms/within.hpp>
+#include <boost/geometry/algorithms/is_valid.hpp>
+#include <boost/geometry/algorithms/union.hpp>
 
 namespace stadic {
 
-GridMaker::GridMaker(QObject *parent) :
-    QObject(parent)
+GridMaker::GridMaker(std::vector<std::string> fileList)
 {
-    m_TestPoints.clear();
+    for (unsigned int i=0;i<fileList.size();i++){
+        m_RadFile.addRad(fileList[i]);
+}
+
+    m_PointSet.clear();
+    m_useZOffset=false;
+    m_UseOffset=false;
+    m_FinalPoints.clear();
+    m_PolySetHeight.clear();
 }
 
 //Setters
 //Points
-void GridMaker::setTestPoints(double x, double y){
-    QPointF tempPoint;
-    tempPoint.setX(x);
-    tempPoint.setY(y);
-    m_TestPoints.push_back(tempPoint);
-}
+
 //InputData
-void GridMaker::setLayerNames(QString string){
+void GridMaker::setLayerNames(std::vector<std::string> layerList){
+    m_LayerNames=layerList;
+}
+void GridMaker::addLayerName(std::string string){
     m_LayerNames.push_back(string);
 }
 void GridMaker::setSpaceX(double x){
@@ -34,37 +52,30 @@ void GridMaker::setSpaceX(double x){
 void GridMaker::setSpaceY(double y){
     m_SpaceY=y;
 }
+void GridMaker::setOffset(double val){
+    m_Offset=-val;
+    m_UseOffset=true;
+}
+
 void GridMaker::setOffsetX(double x){
     m_OffsetX=x;
 }
 void GridMaker::setOffsetY(double y){
     m_OffsetY=y;
 }
+void GridMaker::setOffsetZ(double z){
+    m_OffsetZ=z;
+    m_useZOffset=true;
+}
 void GridMaker::setZHeight(double z){
     m_ZHeight=z;
 }
-//Dimensional
-void GridMaker::setMinX(double x){
-    m_MinX=x;
-}
-void GridMaker::setMaxX(double x){
-    m_MaxX=x;
-}
-void GridMaker::setMinY(double y){
-    m_MinY=y;
-}
-void GridMaker::setMaxY(double y){
-    m_MaxY=y;
-}
+
 
 
 //Getters
-//Points
-std::vector<QPointF> GridMaker::testPoints(){
-    return m_TestPoints;
-}
 //InputData
-std::vector<QString> GridMaker::layerNames(){
+std::vector<std::string> GridMaker::layerNames(){
     return m_LayerNames;
 }
 double GridMaker::spaceX(){
@@ -79,311 +90,555 @@ double GridMaker::offsetX(){
 double GridMaker::offsetY(){
     return m_OffsetY;
 }
+
 double GridMaker::zHeight(){
     return m_ZHeight;
 }
-//Dimensional
-double GridMaker::minX(){
-    return m_MinX;
-}
-double GridMaker::minY(){
-    return m_MinY;
-}
-double GridMaker::maxX(){
-    return m_MaxX;
-}
-double GridMaker::maxY(){
-    return m_MaxY;
+std::vector<std::vector<std::vector<double>>> GridMaker::points(){
+    return m_FinalPoints;
 }
 
 
 //Utilities
-bool GridMaker::parseRad(QString file){
-    stadic::RadFileData radGeo;
-    radGeo.addRad(file);
-    //set polygons
-    if (radGeo.geometry().empty()){
-        std::cerr<<"There are no polygons."<<std::endl;
-        return false;
-    }
-    for (int i=0;i<radGeo.geometry().size();i++){
-        QPolygonF tempPolygon;
-        for (int j=0;j<radGeo.geometry().at(i)->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(radGeo.geometry().at(i)->arg3()[j*3].toDouble(), radGeo.geometry().at(i)->arg3()[j*3+1].toDouble()));
-        }
-        m_Polygons.push_back(tempPolygon);
-    }
-    /*
-    QFile iFile;
-    iFile.setFileName(file);
-    iFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    if (!iFile.exists()){
-        std::cerr<<"The opening of the rad file failed."<<std::endl;
+bool GridMaker::makeGrid(){
+    if (!parseRad()){
         return false;
     }
 
-    QTextStream data(&iFile);
-    //data<<iFile.readAll();
-    while (!data.atEnd()){
-        QString string;
-        QString string2;
-        data>>string;
-        if (string.contains('#')){
-            QString tempString;
-            tempString=data.readLine();
-        }else{
-            if (string.contains("void")){
-                data>>string;   //reads type
-                data>>string;   //reads name
-                data>>string;   //Reads number of arguments from first line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
+    if (!testPoints()){
+        return false;
+    }
+
+    if (m_useZOffset){
+        for (int p=0;p<m_PointSet.size();p++){
+            std::vector<std::vector<double>> tempVect;
+            for (int i=0;i<m_PointSet[p].size();i++){
+                std::vector<double> tempPoint;
+                tempPoint.push_back(m_PointSet[p][i].get<0>());
+                tempPoint.push_back(m_PointSet[p][i].get<1>());
+                tempPoint.push_back(m_PolySetHeight[p]+m_OffsetZ);
+                tempVect.push_back(tempPoint);
+            }
+            m_FinalPoints.push_back(tempVect);
+        }
+    }else{
+        for (int p=0;p<m_PointSet.size();p++){
+            std::vector<std::vector<double>> tempVect;
+            for (int i=0;i<m_PointSet[p].size();i++){
+                std::vector<double> tempPoint;
+                tempPoint.push_back(m_PointSet[p][i].get<0>());
+                tempPoint.push_back(m_PointSet[p][i].get<1>());
+                tempPoint.push_back(m_ZHeight);
+                tempVect.push_back(tempPoint);
+            }
+            m_FinalPoints.push_back(tempVect);
+        }
+    }
+    return true;
+}
+
+bool GridMaker::writePTS(std::ostream& out){
+    for (int i=0;i<m_FinalPoints.size();i++){
+        for (int p=0;p<m_FinalPoints[i].size();p++){
+            out<<m_FinalPoints[i][p][0]<<" "<<m_FinalPoints[i][p][1]<<" "<<m_FinalPoints[i][p][2]<<" 0 0 1"<<std::endl;
+        }
+    }
+    return true;
+}
+
+bool GridMaker::writePTS(){
+    return writePTS(std::cout);
+}
+
+bool GridMaker::writePTS(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    return writePTS(oFile);
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::writePTScsv(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    for (int i=0;i<m_FinalPoints.size();i++){
+        for (int p=0;p<m_FinalPoints[i].size();p++){
+            oFile<<m_FinalPoints[i][p][0]<<","<<m_FinalPoints[i][p][1]<<","<<m_FinalPoints[i][p][2]<<",0,0,1"<<std::endl;
+        }
+    }
+    oFile.close();
+    return true;
+}
+bool GridMaker::viewPTS(std::string location, std::string vType){
+    //The file names need to be adjusted
+    m_RadPolyFile=location+"poly.rad";
+    if (!writeRadPoly(m_RadPolyFile)){
+        return false;
+    }
+
+    m_RadPtsFile=location+"points.rad";
+    if (!writeRadPoints(m_RadPtsFile)){
+        return false;
+    }
+
+    m_oconvFile=location+"points.oct";
+    if (!runoconv(m_oconvFile)){
+        return false;
+    }
+
+    m_picFile=location;
+    if (!runrpict(vType)){
+        return false;
+    }
+
+    return true;
+}
+
+
+
+//Private
+//Functions
+bool GridMaker::parseRad(){
+    //set polygons
+    std::vector<bool> firstPolygon;
+
+    if (m_RadFile.geometry().empty()){
+        std::cerr<<"There are no polygons."<<std::endl;
+        return false;
+    }
+    for (int i=0;i<m_RadFile.geometry().size();i++){
+        boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> tempPolygon;
+        double tempZ=0;
+        for (int j=0;j<m_RadFile.geometry().at(i)->arg3().size()/3;j++){
+            boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(m_RadFile.geometry().at(i)->arg3()[j*3]), toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1])));
+            tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+2]);
+        }
+        tempZ=tempZ/m_RadFile.geometry().at(i)->arg3().size()/3.0;
+        boost::geometry::correct(tempPolygon);
+        if (boost::geometry::is_valid(tempPolygon)){
+            //unite polygons that are the right layer name
+            bool properName=false;
+            for (int j=0;j<m_LayerNames.size();j++){
+                if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                    properName=true;
+                }
+            }
+            int setPos;
+            if (properName==true){
+                if (m_PolySetHeight.empty()){
+                    m_PolySetHeight.push_back(tempZ);
+                    firstPolygon.push_back(true);
+                    setPos=0;
+                }else{
+                    bool heightFound=false;
+                    for (int j=0;j<m_PolySetHeight.size();j++){
+                        if (tempZ>(m_PolySetHeight[j]*.99)&&tempZ<(m_PolySetHeight[j]*1.01)){
+                            heightFound=true;
+                            setPos=j;
+                        }
+                        if (!heightFound){
+                            m_PolySetHeight.push_back(tempZ);
+                            firstPolygon.push_back(true);
+                            setPos=0;
+                        }
                     }
                 }
-                data>>string;   //Reads number of arguments from second line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                    }
-                }
-                data>>string;   //Reads number of arguments from third line
-                if (string.toInt()>0){
-                    for (int i=0;i<string.toInt();i++){
-                        data>>string2;
-                    }
-                }
-            }else{
-                data>>string2;
-                if (string2=="polygon"){
-                    RadGeometry *rad=new RadGeometry(this);
-                    rad->setModifier(string);
-                    rad->setType(string2);
-                    data>>string;
-                    rad->setName(string);
-                    data>>string;               //Read number of arguments from first line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg1(args);
-                    }
-                    data>>string;               //Read number of arguments from second line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg2(args);
-                    }
-                    data>>string;               //Read number of arguments from third line
-                    if (string.toInt()>0){
-                        std::vector<QString> args;
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                            args.push_back(string2);
-                        }
-                        rad->setArg3(args);
-                    }
-                    m_RadGeo.push_back(rad);
-                }else{                          //If it isn't a polygon, the info still needs to be read in
-                    data>>string;   //reads name
-                    data>>string;   //Reads number of arguments from first line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from second line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
-                    data>>string;   //Reads number of arguments from third line
-                    if (string.toInt()>0){
-                        for (int i=0;i<string.toInt();i++){
-                            data>>string2;
-                        }
-                    }
+                if (firstPolygon[setPos]){
+                    firstPolygon[setPos]=false;
+                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempMultiPolygon;
+                    tempMultiPolygon.push_back(tempPolygon);
+                    m_UnitedPolygon.push_back(tempMultiPolygon);
+                }else{
+                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempMultiPolygon;
+                    boost::geometry::union_(m_UnitedPolygon[setPos],tempPolygon,tempMultiPolygon);
+                    m_UnitedPolygon[setPos]=tempMultiPolygon;
                 }
             }
         }
     }
-    iFile.close();
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
+            STADIC_ERROR("There was a problem uniting the polygons.");
+            return false;
+        }
+    }
+    return true;
+}
+//Dimensional
+void GridMaker::setMinX(double x, int set){
+    m_MinX[set]=x;
+}
+void GridMaker::setMaxX(double x, int set){
+    m_MaxX[set]=x;
+}
+void GridMaker::setMinY(double y, int set){
+    m_MinY[set]=y;
+}
+void GridMaker::setMaxY(double y, int set){
+    m_MaxY[set]=y;
+}
+bool GridMaker::insetPolygons(){
+    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy((m_Offset -m_Offset*0.10), (m_Offset-m_Offset*0.10));
+    boost::geometry::strategy::buffer::join_miter join_strategy;
+    boost::geometry::strategy::buffer::end_flat end_strategy;
+    boost::geometry::strategy::buffer::point_square point_strategy;
+    boost::geometry::strategy::buffer::side_straight side_strategy;
+    for (int i=0;i<m_PolySetHeight.size();i++){
+        boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true>> tempPolygon;
+        boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
+        m_UnitedPolygon[i]=tempPolygon;
+        if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
+            STADIC_ERROR("Creating the offset failed to create a valid polygon.");
+            return false;
+        }
+    }
+    return true;
+}
 
-    //set polygons
-    if (m_RadGeo.empty()){
-        std::cerr<<"There are no polygons."<<std::endl;
+
+void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true>> polygonSet, int set){
+    m_MinX.resize(m_PolySetHeight.size());
+    m_MinY.resize(m_PolySetHeight.size());
+    m_MaxX.resize(m_PolySetHeight.size());
+    m_MaxY.resize(m_PolySetHeight.size());
+    boost::geometry::model::box<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> box;
+    boost::geometry::envelope(polygonSet,box);
+    //std::clog<<"minX="<<box.min_corner().get<0>()<<std::endl;
+    //std::clog<<"minY="<<box.min_corner().get<1>()<<std::endl;
+    //std::clog<<"maxX="<<box.max_corner().get<0>()<<std::endl;
+    //std::clog<<"maxY="<<box.max_corner().get<1>()<<std::endl;
+    //std::clog<<"offset="<<m_Offset<<std::endl;
+    setMinX(box.min_corner().get<0>()-m_Offset*.1, set);
+    setMinY(box.min_corner().get<1>()-m_Offset*.1, set);
+    setMaxX(box.max_corner().get<0>()+m_Offset*.1, set);
+    setMaxY(box.max_corner().get<1>()+m_Offset*.1, set);
+    //std::clog<<"minX="<<m_MinX<<std::endl;
+    //std::clog<<"minY="<<m_MinY<<std::endl;
+    //std::clog<<"maxX="<<m_MaxX<<std::endl;
+    //std::clog<<"maxY="<<m_MaxY<<std::endl;
+
+}
+
+bool GridMaker::testPoints(){
+    if (m_UseOffset){
+        if (!insetPolygons()){
+            return false;
+        }
+        for (int i=0;i<m_PolySetHeight.size();i++){
+            boundingBox(m_UnitedPolygon[i],i);
+        }
+
+    }else if (m_OffsetX>0 || m_OffsetY>0){
+        //Offset x and y from bounding rectangle given m_OffsetX and m_OffsetY
+        //reset min and max x and y
+
+        for (int i=0;i<m_PolySetHeight.size();i++){
+            boundingBox(m_UnitedPolygon[i],i);
+            setMinX(m_MinX[i]+m_OffsetX, i);
+            setMaxX(m_MaxX[i]-m_OffsetX, i);
+            setMinY(m_MinY[i]+m_OffsetY, i);
+            setMaxY(m_MaxY[i]-m_OffsetY, i);
+        }
+    }else if (m_SpaceX>0 && m_SpaceY>0){
+        //Get min and max of bounding rectangle and divide by spacing for both x and y
+        //If the result is an integer then the offset should be equal to the spacing
+        //if the result is not an integer multiply the remainder by the spacing and divide by two for the offset
+        //reset min and max x and y
+        for (int i=0;i<m_PolySetHeight.size();i++){
+            boundingBox(m_UnitedPolygon[i],i);
+            if (remainder((m_MaxX[i]-m_MinX[i]),m_SpaceX)){
+                setMinX((m_MinX[i]+m_SpaceX),i);
+                setMaxX((m_MaxX[i]-m_SpaceX),i);
+            }else{
+                double tempNum=remainder((m_MaxX[i]-m_MinX[i]),m_SpaceX)*m_SpaceX;
+                setMinX((m_MinX[i]+tempNum),i);
+                setMaxX((m_MaxX[i]-tempNum),i);
+            }
+            if (remainder((m_MaxY[i]-m_MinY[i]),m_SpaceY)){
+                setMinX((m_MinY[i]+m_SpaceY),i);
+                setMaxX((m_MaxY[i]-m_SpaceY),i);
+            }else{
+                double tempNum=remainder((m_MaxY[i]-m_MinY[i]),m_SpaceY)*m_SpaceY;
+                setMinX((m_MinY[i]+tempNum),i);
+                setMaxX((m_MaxY[i]-tempNum),i);
+            }
+        }
+    }else{
+        STADIC_ERROR("The offsets cannot be determined, because the spacing and offset values are all 0.");
         return false;
     }
-    for (int i=0;i<m_RadGeo.size();i++){
-        QPolygonF tempPolygon;
-        for (int j=0;j<m_RadGeo.at(i)->arg3().size()/3;j++){
-            tempPolygon.append(QPointF(m_RadGeo.at(i)->arg3()[j*3].toDouble(), m_RadGeo.at(i)->arg3()[j*3+1].toDouble()));
+    for (int i=0;i<m_PolySetHeight.size();i++){
+        //Create vector of test points
+        double x=m_MinX[i];
+        while (x<=m_MaxX[i]){
+            double y=m_MinY[i];
+            while (y<=m_MaxY[i]){
+                if (m_UseOffset){
+                    if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
+                        addTestPoints(x,y,i);
+                    }
+                }else{
+                    if (boost::geometry::within(boost::geometry::model::point<double,2,boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
+                        addTestPoints(x,y,i);
+                    }
+                }
+                y=y+spaceY();
+            }
+            x=x+spaceX();
         }
-        m_Polygons.push_back(tempPolygon);
+        if (m_PointSet[i].empty()){
+            std::cerr<<"The points array is empty."<<std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+void GridMaker::addTestPoints(double x, double y, int set){
+    if (m_PointSet.empty()){
+        m_PointSet.resize(1);
+    }
+    if (m_PointSet.size()<(set+1)){
+        m_PointSet.resize(set+1);
+    }
+    std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>> tempVec;
+    tempVec=m_PointSet[set];
+    tempVec.push_back(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y));
+    m_PointSet[set]=tempVec;
+}
+
+bool GridMaker::writeRadPoly(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    oFile<<"void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0"<<std::endl<<std::endl;
+    m_MaxXRad=-1000;
+    m_MinXRad=1000;
+    m_MaxYRad=-1000;
+    m_MinYRad=1000;
+    m_MaxZRad=-1000;
+    m_MinZRad=1000;
+    for (int i=0;i<m_RadFile.geometry().size();i++){
+        for (int j=0;j<m_LayerNames.size();j++){
+            if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+                oFile<<"0\t0\t"<<m_RadFile.geometry().at(i)->arg3().size()<<std::endl;
+                int coordinate=0;
+                for (int k=0;k<m_RadFile.geometry().at(i)->arg3().size();k++){
+                    oFile<<"\t"<<m_RadFile.geometry().at(i)->arg3()[k];
+                    if (coordinate==0){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxXRad){
+                            m_MaxXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinXRad){
+                            m_MinXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else if (coordinate==1){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxYRad){
+                            m_MaxYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinYRad){
+                            m_MinYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else{
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxZRad){
+                            m_MaxZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinZRad){
+                            m_MinZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate=0;
+                    }
+                }
+                oFile<<std::endl;
+            }
+        }
+    }
+
+    /*
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+        oFile<<"0\t0\t"<<(m_UnitedPolygon[i].outer().size()-1)*3<<std::endl;
+        for (int j=0;j<m_UnitedPolygon[i].outer().size()-1;j++){
+            oFile<<"\t"<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<"\t0"<<std::endl;
+        }
+        oFile<<std::endl;
     }
     */
+    oFile.close();
     return true;
 }
 
-bool GridMaker::makeGrid(QString file){
-    stadic::RadFileData radGeo;
-    radGeo.addRad(file);
-    //unite polygons that are the right layer name
-    bool firstPolygon=true;
-    for (int i=0;i<radGeo.geometry().size();i++){
-        bool properName=false;
-        for (int j=0;j<m_LayerNames.size();j++){
-            if (radGeo.geometry().at(i)->modifier()==m_LayerNames.at(j)){
-                properName=true;
+bool GridMaker::writeRadPoints(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if (!oFile.is_open()){
+        STADIC_ERROR("The opening of the file "+file+" has failed.");
+        return false;
+    }
+    oFile<<"void plastic pts\n0\n0\n5\t.75\t.25\t.25\t0\t0"<<std::endl<<std::endl;
+    for (int i=0;i<m_FinalPoints.size();i++){
+        for (int p=0;p<m_FinalPoints[i].size();p++){
+            oFile<<"pts sphere pts"<<i<<"\n0\n0\n4\t"<<m_FinalPoints[i][p][0]<<"\t"<<m_FinalPoints[i][p][1]<<"\t"<<m_FinalPoints[i][p][2]<<std::endl;
+            oFile<<"\t"<<m_SpaceX/8<<std::endl<<std::endl;
+        }
+    }
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::runoconv(std::string file){
+    std::string oconvProgram="oconv";
+    std::vector<std::string> args;
+    args.clear();
+    args.push_back(m_RadPolyFile);
+    args.push_back(m_RadPtsFile);
+    Process oconv(oconvProgram,args);
+    oconv.setStandardOutputFile(file);
+    oconv.start();
+    if (!oconv.wait()){
+        return false;
+    }
+    return true;
+}
+
+bool GridMaker::runrpict(std::string vType){
+    std::string picFile=m_picFile+"grid.pic";
+    std::string bmpFile=m_picFile+"grid.bmp";
+    std::vector<std::string> args;
+    double deltaX=m_MaxXRad-m_MinXRad;
+    double deltaY=m_MaxYRad-m_MinYRad;
+    double deltaZ=m_MaxZRad-m_MinZRad;
+    double tempZmax=0;
+    for (int i=0;i<m_FinalPoints.size();i++){
+        for (int p=0;p<m_FinalPoints[i].size();p++){
+            if (m_FinalPoints[i][p][2]>tempZmax){
+                tempZmax=m_FinalPoints[i][p][2];
             }
         }
-        if (firstPolygon==true && properName==true){
-            firstPolygon=false;
-            m_UnitedPolygon=m_Polygons.at(i);
-        }else if (properName==true){
-            m_UnitedPolygon=m_UnitedPolygon.united(m_Polygons.at(i));
+    }
+    if (deltaZ==0){
+        deltaZ=m_MaxZRad+2*tempZmax;
+    }
+    args.push_back("-w");
+    if (vType=="p"){
+        args.push_back("-vtl");
+        args.push_back("-vp");
+        args.push_back(std::to_string(deltaX/2+m_MinXRad));
+        args.push_back(std::to_string(deltaY/2+m_MinYRad));
+
+        args.push_back(std::to_string(2+tempZmax));
+        args.push_back("-vd");
+        args.push_back("0");
+        args.push_back("0.000000001");
+        args.push_back("-1");
+        args.push_back("-vh");
+        args.push_back(std::to_string(1.1*(deltaX)));
+        args.push_back("-vv");
+        args.push_back(std::to_string(1.1*(deltaY)));
+    }else{
+        args.push_back("-vtv");
+        args.push_back("-vp");
+        if (vType=="ne"){
+            args.push_back(toString(m_MaxXRad+deltaX));
+            args.push_back(toString(m_MaxYRad+deltaY));
+            args.push_back(toString(m_MaxZRad+4*deltaZ));
+            args.push_back("-vd");
+            args.push_back(toString(-1.5*deltaX));
+            args.push_back(toString(-1.5*deltaY));
+            args.push_back(toString(-4.5*deltaZ));
+        }else if (vType=="nw"){
+            args.push_back(toString(m_MinXRad-deltaX));
+            args.push_back(toString(m_MaxYRad+deltaY));
+            args.push_back(toString(m_MaxZRad+4*deltaZ));
+            args.push_back("-vd");
+            args.push_back(toString(1.5*deltaX));
+            args.push_back(toString(-1.5*deltaY));
+            args.push_back(toString(-4.5*deltaZ));
+        }else if (vType=="sw"){
+            args.push_back(toString(m_MinXRad-deltaX));
+            args.push_back(toString(m_MinYRad-deltaY));
+            args.push_back(toString(m_MaxZRad+4*deltaZ));
+            args.push_back("-vd");
+            args.push_back(toString(1.5*deltaX));
+            args.push_back(toString(1.5*deltaY));
+            args.push_back(toString(-4.5*deltaZ));
+        }else if (vType=="se"){
+            args.push_back(toString(m_MaxXRad+deltaX));
+            args.push_back(toString(m_MinYRad-deltaY));
+            args.push_back(toString(m_MaxZRad+4*deltaZ));
+            args.push_back("-vd");
+            args.push_back(toString(-1.5*deltaX));
+            args.push_back(toString(1.5*deltaY));
+            args.push_back(toString(-4.5*deltaZ));
+        }else{
+            STADIC_ERROR("The view type chosen is not an appropriate type.");
+            return false;
         }
+        args.push_back("-vu");
+        args.push_back("0");
+        args.push_back("0");
+        args.push_back("1");
+        args.push_back("-vh");
+        args.push_back("45");
+        args.push_back("-vv");
+        args.push_back("45");
+    }
+    args.push_back("-vo");
+    args.push_back("0");
+    args.push_back("-va");
+    args.push_back("0");
+    args.push_back("-vs");
+    args.push_back("0");
+    args.push_back("-vl");
+    args.push_back("0");
+    args.push_back("-w");
+    args.push_back("-x");
+    args.push_back("500");
+    args.push_back("-y");
+    args.push_back("500");
+    args.push_back("-pj");
+    args.push_back("0");
+    args.push_back("-av");
+    args.push_back("0.9");
+    args.push_back("0.9");
+    args.push_back("0.9");
+    args.push_back("-ad");
+    args.push_back("15000");
+    args.push_back(m_oconvFile);
+
+    std::string rpictProgram="rpict";
+    Process rpict(rpictProgram,args);
+    rpict.setStandardOutputFile(picFile);
+    rpict.start();
+    if (!rpict.wait()){
+        return false;
     }
 
-    //get min and max coordinates
-    setMinX(m_UnitedPolygon.boundingRect().left());
-    setMaxX(m_UnitedPolygon.boundingRect().right());
-    setMinY(m_UnitedPolygon.boundingRect().bottom());
-    setMaxY(m_UnitedPolygon.boundingRect().top());
-    if (minY()>maxY()){
-        //The previous two functions for the polygon bounding rectangle I think are backwards
-        setMinY(m_UnitedPolygon.boundingRect().top());
-        setMaxY(m_UnitedPolygon.boundingRect().bottom());
-    }
-    std::cout<<"Points:"<<std::endl;
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        std::cout<<"\t"<<m_UnitedPolygon.at(i).x()<<" "<<m_UnitedPolygon.at(i).y()<<std::endl;
-    }
-    //Create vector of test points
-    double x=minX()+offsetX();
-    if (x==minX()){
-        x=x+spaceX();
-    }
-    while (x<maxX()){
-        double y=minY()+offsetY();
-        if (y==minY()){
-            y=y+spaceY();
-        }
-        while (y<maxY()){
-            QPointF tempPoint;
-            tempPoint.setX(x);
-            tempPoint.setY(y);
-            //QPointF interPoint;
-            if (m_UnitedPolygon.containsPoint(tempPoint, Qt::OddEvenFill)){
-                //This code uses 9 points surrounding the point in question.  If all of the surrounding points are inside then this point is also inside.
-                bool surroundIn=true;
-                for (int i=-1;i<2;i++){
-                    double tempX=x+.01*i;
-                    for (int j=-1;j<2;j++){
-                        double tempY=y+.01*j;
-                        if (!m_UnitedPolygon.containsPoint(QPointF(tempX, tempY), Qt::OddEvenFill)){
-                            surroundIn=false;
-                        }
-                    }
-                }
-                if (surroundIn==true){
-                    setTestPoints(x,y);
-                }
-
-                //Old code that tested to see if a point was on a line using QLineF::intersect
-                /*
-                bool onLine=false;
-                for (int i=0;i<m_UnitedPolygon.size()-1;i++){
-                    QLineF line;
-                    QLineF line1;
-                    line1.setP1(tempPoint);
-                    line1.setP2(QPointF(0,0));
-                    line.setP1(m_UnitedPolygon.at(i));
-                    line.setP2(m_UnitedPolygon.at(i+1));
-                    if (line.intersect(line1, &interPoint)==1){
-                        if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
-                            onLine=true;
-                        }
-                    }
-                }
-                QLineF line;
-                QLineF line1;
-                line1.setP1(tempPoint);
-                line1.setP2(QPointF(0,0));
-                line.setP1(m_UnitedPolygon.at(m_UnitedPolygon.size()-1));
-                line.setP2(m_UnitedPolygon.at(0));
-                if (line.intersect(line1, &interPoint)==1){
-                    if (qFuzzyCompare(interPoint.x(),tempPoint.x())&&qFuzzyCompare(interPoint.y(), tempPoint.y())){
-                    //if (interPoint==tempPoint){
-                        onLine=true;
-                    }
-                }
-                if (!onLine){
-                    setTestPoints(x,y);
-                }*/
-            }
-            y=y+spaceY();
-        }
-        x=x+spaceX();
-    }
-    if (m_TestPoints.empty()){
-        std::cerr<<"The points array is empty."<<std::endl;
+    std::string bmpProgram="ra_bmp";
+    args.clear();
+    args.push_back(picFile);
+    Process raBMP(bmpProgram,args);
+    raBMP.setStandardOutputFile(bmpFile);
+    raBMP.start();
+    if(!raBMP.wait()){
         return false;
     }
     return true;
 }
 
-bool GridMaker::writePTS(QString file){
-    QFile oFile;
-    oFile.setFileName(file);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        return false;
-    }
-    QTextStream out(&oFile);
-    for (int i=0;i<m_TestPoints.size();i++){
-        out<<m_TestPoints.at(i).rx()<<" "<<m_TestPoints.at(i).ry()<<" "<<m_ZHeight<<" 0 0 1"<<endl;
-    }
-    oFile.close();
-    return true;
-}
-
-bool GridMaker::writePTScsv(QString file){
-    QFile oFile;
-    oFile.setFileName(file);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        return false;
-    }
-    QTextStream out(&oFile);
-    for (int i=0;i<m_TestPoints.size();i++){
-        out<<m_TestPoints.at(i).rx()<<","<<m_TestPoints.at(i).ry()<<","<<m_ZHeight<<",0,0,1"<<endl;
-    }
-    oFile.close();
-    return true;
-}
-
-bool GridMaker::writeRadPoly(QString file){
- QFile oFile;
-    oFile.setFileName(file);
-    oFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile.exists()){
-        return false;
-    }
-    QTextStream out(&oFile);
-    out<<"floor\tpolygon\tfloor1"<<endl;
-    out<<"0\t0\t"<<m_UnitedPolygon.size()*3;
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        out<<endl<<m_UnitedPolygon.at(i).x()<<"\t"<<m_UnitedPolygon.at(i).y()<<"\t0";
-    }
-    oFile.close();
-    return true;
-}
 
 }

@@ -7,55 +7,70 @@
 #include <vector>
 #include <iostream>
 
+#include "logging.h"
+
 namespace stadic {
 
-WindowGroup::WindowGroup(QObject *parent) :
-    QObject(parent)
+WindowGroup::WindowGroup() 
 {
 }
 
 //  Setters
+void WindowGroup::setName(const std::string &name){
+    m_name = name;
+}
 void WindowGroup::setBSDF(bool isBSDF){
     m_BSDF=isBSDF;
 }
-void WindowGroup::setBaseGeometry(QString file){
+void WindowGroup::setBaseGeometry(const std::string &file){
     m_BaseGeometry=file;
 }
 
 //  Getters
-bool WindowGroup::isBSDF(){
+std::string WindowGroup::name() const
+{
+    return m_name;
+}
+bool WindowGroup::isBSDF() const
+{
     return m_BSDF;
 }
-QString WindowGroup::baseGeometry(){
+std::string WindowGroup::baseGeometry() const
+{
     return m_BaseGeometry;
 }
-std::vector<QString> WindowGroup::bsdfBaseLayers(){
+std::vector<std::string> WindowGroup::bsdfBaseLayers() const
+{
     return m_BSDFBaseLayers;
 }
-std::vector<QString> WindowGroup::glazingLayers(){
+std::vector<std::string> WindowGroup::glazingLayers() const
+{
     return m_GlazingLayers;
 }
-std::vector<QString> WindowGroup::shadeSettingGeometry(){
+std::vector<std::string> WindowGroup::shadeSettingGeometry() const
+{
     return m_ShadeSettingGeometry;
 }
-std::vector<std::vector<QString> > WindowGroup::bsdfSettingLayers(){
+std::vector<std::vector<std::string> > WindowGroup::bsdfSettingLayers() const
+{
     return m_BSDFSettingLayers;
 }
-ShadeControl* WindowGroup::shadeControl(){
-    return m_ShadeControl;
+ShadeControl* WindowGroup::shadeControl()
+{
+    return &m_ShadeControl;
 }
 
 
 bool WindowGroup::parseJson(const QJsonObject &object){
     QJsonValue val=object.value(QString("name"));
     if (val.isUndefined()){
-        std::cerr<<"ERROR: The key \"name\" within window_groups does not appear in the STADIC Control File."<<std::endl;
+        STADIC_ERROR("The key \"name\" within window_groups does not appear in the STADIC Control File.");
         return false;
     }else{
         if(val.isString()){
-            setObjectName(val.toString());
+            setName(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The key \"name\" within window_groups is not a string."<<std::endl;
+            STADIC_ERROR("The key \"name\" within window_groups is not a string.");
             return false;
         }
     }
@@ -67,19 +82,19 @@ bool WindowGroup::parseJson(const QJsonObject &object){
         if (val.isBool()){
             setBSDF(val.toBool());
         }else{
-            std::cerr<<"ERROR: The key \"BSDF\" within window group "<<objectName().toStdString()<<" is not a bool."<<std::endl;
+            STADIC_ERROR("The key \"BSDF\" within window group " + name() + " is not a bool.");
             return false;
         }
     }
 
     val=object.value(QString("base_geometry"));
     if (val.isUndefined()){
-        setBaseGeometry(QString("emptry.rad"));
+        setBaseGeometry("emptry.rad");
     }else{
         if (val.isString()){
-            setBaseGeometry(val.toString());
+            setBaseGeometry(val.toString().toStdString());
         }else{
-            std::cerr<<"ERROR: The key \"base_geometry\" within window group "<<objectName().toStdString()<<" is not a bool."<<std::endl;
+            STADIC_ERROR("The key \"base_geometry\" within window group " + name() + " is not a bool.");
             return false;
         }
     }
@@ -90,14 +105,14 @@ bool WindowGroup::parseJson(const QJsonObject &object){
             QJsonArray array=val.toArray();
             for (int i=0;i<array.size();i++){
                 if (array[i].isString()){
-                    m_BSDFBaseLayers.push_back(array[i].toString());
+                    m_BSDFBaseLayers.push_back(array[i].toString().toStdString());
                 }else{
-                    std::cerr<<"ERROR: The key \"bsdf_base_layers\" within window group "<<objectName().toStdString()<<" does not contain a string."<<std::endl;
+                    STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            std::cerr<<"ERROR: The key \"bsdf_base_layers\" within window group "<<objectName().toStdString()<<" is not an array."<<std::endl;
+            STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " is not an array.");
             return false;
         }
     }
@@ -108,14 +123,14 @@ bool WindowGroup::parseJson(const QJsonObject &object){
             QJsonArray array=val.toArray();
             for (int i=0;i<array.size();i++){
                 if (array[i].isString()){
-                    m_GlazingLayers.push_back(array[i].toString());
+                    m_GlazingLayers.push_back(array[i].toString().toStdString());
                 }else{
-                    std::cerr<<"ERROR: The key \"glazing_layers\" withinwindow group "<<objectName().toStdString()<<" does not contain a string."<<std::endl;
+                    STADIC_ERROR("The key \"glazing_layers\" withinwindow group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            std::cerr<<"ERROR: The key \"glazing_layers\" within window group "<<objectName().toStdString()<<" is not an array."<<std::endl;
+            STADIC_ERROR("The key \"glazing_layers\" within window group " + name() + " is not an array.");
             return false;
         }
     }
@@ -123,16 +138,15 @@ bool WindowGroup::parseJson(const QJsonObject &object){
     val=object.value(QString("shade_control"));
     if (!val.isUndefined()){
         if (val.isObject()){
-            m_ShadeControl=new ShadeControl(this);
-            if (!m_ShadeControl->parseJson(val.toObject())){
+            if (!m_ShadeControl.parseJson(val.toObject())){
                 return false;
             }
         }else{
-            std::cerr<<"ERROR: The key \"shade_control\" within window group "<<objectName().toStdString()<<" is not an object."<<std::endl;
+            STADIC_ERROR("The key \"shade_control\" within window group " + name() + " is not an object.");
             return false;
         }
     }else{
-        std::cerr<<"WARNING: There are no \"shade_controls\" listed for window group "<<objectName().toStdString()<<std::endl;
+        STADIC_WARNING("There are no \"shade_controls\" listed for window group " + name());
     }
 
     val=object.value(QString("shade_settings"));
@@ -141,18 +155,18 @@ bool WindowGroup::parseJson(const QJsonObject &object){
             QJsonArray array=val.toArray();
             for (int i=0;i<array.size();i++){
                 if (array[i].isString()){
-                    m_ShadeSettingGeometry.push_back(array[i].toString());
+                    m_ShadeSettingGeometry.push_back(array[i].toString().toStdString());
                 }else{
-                    std::cerr<<"ERROR: The key \"shade_settings\" within window group "<<objectName().toStdString()<<" does not contain a string."<<std::endl;
+                    STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " does not contain a string.");
                     return false;
                 }
             }
         }else{
-            std::cerr<<"ERROR: The key \"shade_settings\" within window group "<<objectName().toStdString()<<" is not an array."<<std::endl;
+            STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " is not an array.");
             return false;
         }
     }else{
-        std::cerr<<"WARNING: There are no \"shade_settings\" listed for window group "<<objectName().toStdString()<<std::endl;
+        STADIC_WARNING("There are no \"shade_settings\" listed for window group " + name());
     }
 
     val=object.value(QString("bsdf_setting_layers"));
@@ -162,23 +176,23 @@ bool WindowGroup::parseJson(const QJsonObject &object){
             for (unsigned int j=0;j<tempArray.size();j++){
                 if (val.isArray()){
                     QJsonArray array=tempArray.at(j).toArray();
-                    std::vector<QString> tempVector;
+                    std::vector<std::string> tempVector;
                     for (int i=0;i<array.size();i++){
                         if (array[i].isString()){
-                            tempVector.push_back(array[i].toString());
+                            tempVector.push_back(array[i].toString().toStdString());
                         }else{
-                            std::cerr<<"ERROR: The key \"bsdf_setting_layers\" within window group "<<objectName().toStdString()<<" does not contain a string."<<std::endl;
+                            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " does not contain a string.");
                             return false;
                         }
                     }
                     m_BSDFSettingLayers.push_back(tempVector);
                 }else{
-                    std::cerr<<"ERROR: The key \"bsdf_setting_layers\" within window group "<<objectName().toStdString()<<" is not an array."<<std::endl;
+                    STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
                     return false;
                 }
             }
         }else{
-            std::cerr<<"ERROR: The key \"bsdf_setting_layers\" within window group "<<objectName().toStdString()<<" is not an array."<<std::endl;
+            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
         }
     }
 

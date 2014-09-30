@@ -2,49 +2,75 @@
 #include <QFile>
 #include <QStringList>
 #include "logging.h"
+#include "functions.h"
 
 namespace stadic {
 
-ElecIll::ElecIll(QObject *parent) :
-    QObject(parent)
+
+SpatialIlluminance::SpatialIlluminance()
 {
+    m_Illuminance = 0;
+    m_x = m_y = m_z = "0.0";
 }
 
-//Setters
-void ElecIll::setIlluminance(double value){
-    m_Illuminace.push_back(value);
-}
-void ElecIll::setX(QString x){
-    m_X.push_back(x);
-}
-void ElecIll::setY(QString y){
-    m_Y.push_back(y);
-}
-void ElecIll::setZ(QString z){
-    m_Z.push_back(z);
+SpatialIlluminance::SpatialIlluminance(std::string x, std::string y, std::string z, double illuminance) : SpatialIlluminance()
+{
+    m_Illuminance = illuminance;
+    bool ok;
+    stadic::toDouble(x, &ok);
+    if(ok) {
+        m_x = x;
+    } else {
+        STADIC_ERROR("Bad spatial illuminance x value ("+x+")");
+    }
+    stadic::toDouble(y, &ok);
+    if(ok) {
+        m_y = y;
+    } else {
+        STADIC_ERROR("Bad spatial illuminance y value ("+y+")");
+    }
+    stadic::toDouble(z, &ok);
+    if(ok) {
+        m_z = z;
+    } else {
+        STADIC_ERROR("Bad spatial illuminance z value ("+z+")");
+    }
 }
 
 //Getters
-std::vector<double> ElecIll::illuminance(){
-    return m_Illuminace;
+double SpatialIlluminance::lux(){
+    return m_Illuminance;
 }
-std::vector<QString> ElecIll::x(){
-    return m_X;
+double SpatialIlluminance::fc(){
+    return m_Illuminance/10.764;
 }
-std::vector<QString> ElecIll::y(){
-    return m_Y;
+
+std::string SpatialIlluminance::x(){
+    return m_x;
 }
-std::vector<QString> ElecIll::z(){
-    return m_Z;
+std::string SpatialIlluminance::y(){
+    return m_y;
+}
+std::string SpatialIlluminance::z(){
+    return m_z;
 }
 
 
-bool ElecIll::parseIll(QString fileName){
+ElectricIlluminanceData::ElectricIlluminanceData()
+{
+}
+
+//Getters
+std::vector<SpatialIlluminance> ElectricIlluminanceData::illuminance(){
+    return m_Illuminance;
+}
+
+bool ElectricIlluminanceData::parseIlluminance(std::string fileName){
     QFile iFile;
-    iFile.setFileName(fileName);
+    iFile.setFileName(QString::fromStdString(fileName));
     iFile.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!iFile.isOpen()){
-        ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
+        STADIC_ERROR("The opening of the illuminance file "+fileName+" could not be opened.");
         return false;
     }
     QString line;
@@ -52,12 +78,14 @@ bool ElecIll::parseIll(QString fileName){
         line=iFile.readLine();
         QStringList vals;
         vals=line.split(" ");
-        setX(vals.at(0));
-        setY(vals.at(1));
-        setZ(vals.at(2));
-        setIlluminance(vals.at(3).toDouble());
+        if(vals.size() != 3) {
+            continue;
+        }
+        m_Illuminance.push_back(SpatialIlluminance(vals.at(0).toStdString(), vals.at(1).toStdString(), vals.at(2).toStdString(),
+            vals.at(3).toDouble()));
     }
     iFile.close();
+    return true;
 }
 
 }

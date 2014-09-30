@@ -42,10 +42,20 @@ if(MSVC)
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "18.0.21005.1")
     message(FATAL_ERROR "Visual Studio earlier than VS2013 is not supported")
   endif()
+  if(WIN32)
+  set(Boost_USE_STATIC_LIBS ON)
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+endif()
+
 endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+#Boost
+
+find_package(Boost 1.55 COMPONENTS system filesystem REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
 
 # Find includes in the build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

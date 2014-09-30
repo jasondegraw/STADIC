@@ -2,19 +2,27 @@
 #include "logging.h"
 #include <vector>
 #include <iostream>
+#include <string>
 
 void usage(){
-    std::cout<<"dxgridmaker generates a points file for use in RADIANCE analysis programs.  The program allows any number of polygons and any number of layer names to be used for the placement of points.  grid_maker will then join all of the polygons and create an array of points within the bounding rectangle and tests each point to determine whether it is within the joined polygon.  These points will then be written out to a given file name for use as input to other programs.  It is assumed that the units of the radiance geometry file are the same as the input units for the spacing, offset, and Z height."<<std::endl;
-    std::cout<<std::endl<<"-f name\tSet the input file to name. This file contains the radiance polygons that will be used for creating the analysis points.  This is a mandatory option."<<std::endl;
-    std::cout<<"-Sx val\tSet the spacing in the x direction between the analysis points to val.  This is a mandatory option. "<<std::endl;
-    std::cout<<"-Sy val\tSet the spacing in the y direction between the analysis points to val.  This is a mandatory option."<<std::endl;
-    std::cout<<"-Ox val\tSet the offset in the x direction from the left side of the bounding rectangle to val."<<std::endl;
-    std::cout<<"-Oy val\tSet the offset in the y direction from the lower side of the bounding rectangle to val."<<std::endl;
-    std::cout<<"-Z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
-    std::cout<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
-    std::cout<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd./n/t/tThis is a mandatory option."<<std::endl;
-    std::cout<<"-p name\tSet the ouput for the joined polygon to name. This file contains the joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\"."<<std::endl;
-    std::cout<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
+    std::cerr<<"dxgridmaker generates a points file for use in RADIANCE analysis programs.  The program allows any number of polygons and any number of layer names to be used for the placement of points.  grid_maker will then join all of the polygons and create an array of points within the bounding rectangle and tests each point to determine whether it is within the joined polygon.  These points will then be written out to a given file name for use as input to other programs.  It is assumed that the units of the radiance geometry file are the same as the input units for the spacing, offset, and Z height."<<std::endl;
+    std::cerr<<std::endl<<"-f name\tSet the input file to name. This file contains the radiance polygons that will be used for creating the analysis points.  This is a mandatory option."<<std::endl;
+    std::cerr<<"-sx val\tSet the spacing in the x direction between the analysis points to val.  This is a mandatory option. "<<std::endl;
+    std::cerr<<"-sy val\tSet the spacing in the y direction between the analysis points to val.  This is a mandatory option."<<std::endl;
+    std::cerr<<"-ox val\tSet the offset in the x direction from the left side of the bounding rectangle to val."<<std::endl;
+    std::cerr<<"-oy val\tSet the offset in the y direction from the lower side of the bounding rectangle to val."<<std::endl;
+    std::cerr<<"-oz val\tSet the offset in the z direction from the average height of the floor polygons to val."<<std::endl;
+    std::cerr<<"-o val\tSet the offset for both the x and y direction from the perimeter of the floor polygons to val."<<std::endl;
+    std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
+    std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
+    std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
+    std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vne location\tSet the location that the files should be placed for creating the North East isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-vnw location\tSet the location that the files should be placed for creating the North West isometric .bmp.  This should end in the directory separator."<<std::endl;
+    std::cerr<<"-p name\tSet the ouput for the joined polygon to name. This file contains the joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\"."<<std::endl;
+    std::cerr<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -22,101 +30,148 @@ int main (int argc, char *argv[])
     if(argc == 1) {
         usage();
     }
-    QString fileName;
+    std::vector<std::string> fileName;
     fileName.clear();
-    QString resultFile;
+    std::string resultFile;
     resultFile.clear();
-    QString csvFile;
+    std::string csvFile;
     csvFile.clear();
-    QString polyFile;
+    std::string polyFile;
     polyFile.clear();
-    std::vector<QString> layerNames;
-    double Sx, Sy, Ox, Oy, Z;
-    Sx=0;
-    Sy=0;
-    Ox=0;
-    Oy=0;
-    Z=0;
+    std::string viewLocation;
+    viewLocation.clear();
+    std::string vType;
+    vType.clear();
+    std::vector<std::string> layerNames;
+    bool useZOffset=false;
+    bool useOffset=false;
+    double sx, sy, ox, oy, oz, offset,z;
+    sx=0;
+    sy=0;
+    ox=0;
+    oy=0;
+    oz=0;
+    offset=0;
+    z=0;
     for (int i=1;i<argc;i++){
-        if (QString(argv[i])=="-f"){
+        if (std::strcmp(argv[i],"-f")==0){
             i++;
-            fileName=argv[i];
-        }else if (QString(argv[i])=="-Sx"){
+            fileName.push_back(argv[i]);
+        }else if (std::strcmp(argv[i],"-sx")==0){
             i++;
-            Sx=atof(argv[i]);
-        }else if (QString(argv[i])=="-Sy"){
+            sx=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-sy")==0){
             i++;
-            Sy=atof(argv[i]);
-        }else if (QString(argv[i])=="-Ox"){
+            sy=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-ox")==0){
             i++;
-            Ox=atof(argv[i]);
-        }else if (QString(argv[i])=="-Oy"){
+            ox=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-oy")==0){
             i++;
-            Oy=atof(argv[i]);
-        }else if (QString(argv[i])=="-Z"){
+            oy=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-oz")==0){
             i++;
-            Z=atof(argv[i]);
-        }else if (QString(argv[i])=="-r"){
+            useZOffset=true;
+            oz=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-o")==0){
+            i++;
+            useOffset=true;
+            offset=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-z")==0){
+            i++;
+            z=atof(argv[i]);
+        }else if (std::strcmp(argv[i],"-r")==0){
             i++;
             resultFile=argv[i];
-        }else if(QString(argv[i])=="-l"){
+        }else if(std::strcmp(argv[i],"-l")==0){
             i++;
-            layerNames.push_back(QString(argv[i]));
-        }else if(QString(argv[i])=="-p"){
+            layerNames.push_back(argv[i]);
+        }else if(std::strcmp(argv[i],"-vp")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="p";
+        }else if(std::strcmp(argv[i],"-vse")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="se";
+        }else if(std::strcmp(argv[i],"-vne")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="ne";
+        }else if(std::strcmp(argv[i],"-vsw")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="sw";
+        }else if(std::strcmp(argv[i],"-vnw")==0){
+            i++;
+            viewLocation=argv[i];
+            vType="nw";
+        }else if(std::strcmp(argv[i],"-p")==0){
             i++;
             polyFile=argv[i];
-        }else if(QString(argv[i])=="-csv"){
+        }else if(std::strcmp(argv[i],"-csv")==0){
             i++;
             csvFile=argv[i];
         }else{
-            QString temp=argv[i];
-            WARNING("The argument "+temp+" is an unkown argument.");
+            std::string temp=argv[i];
+            STADIC_WARNING("The argument "+temp+" is an unkown argument.");
         }
     }
-    if (Sx==0 ||Sy==0){
-        ERROR("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-Sx\" and \"-Sy\".");
+    if (sx==0 ||sy==0){
+        STADIC_ERROR(std::string("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-sx\" and \"-sy\"."));
         return EXIT_FAILURE;
     }
-    if (fileName.isEmpty()){
-        ERROR("The rad file name must be specified.\n\tSpecify with \"-f\".");
+    if (fileName.empty()){
+        STADIC_ERROR(std::string("The rad file name must be specified.\n\tSpecify with \"-f\"."));
         return EXIT_FAILURE;
     }
-    if (resultFile.isEmpty()){
-        ERROR("The result file name must be specified.\n\tSpecify with \"-r\".");
-        return EXIT_FAILURE;
-    }
+
     //Instantiate GridMaker Object
-    stadic::GridMaker grid;
-    for (int i=0;i<layerNames.size();i++){
-        grid.setLayerNames(layerNames.at(i));
+    stadic::GridMaker grid(fileName);
+    grid.setLayerNames(layerNames);
+    grid.setSpaceX(sx);
+    grid.setSpaceY(sy);
+    if (useOffset){
+        grid.setOffset(offset);
+    }else{
+    grid.setOffsetX(ox);
+    grid.setOffsetY(oy);
     }
-    grid.setSpaceX(Sx);
-    grid.setSpaceY(Sy);
-    grid.setOffsetX(Ox);
-    grid.setOffsetY(Oy);
-    grid.setZHeight(Z);
-    if (!grid.parseRad(fileName)){
-        ERROR("The parsing of the rad file failed.");
+    if (useZOffset){
+        grid.setOffsetZ(oz);
+    }else{
+    grid.setZHeight(z);
+    }
+    if (!grid.makeGrid()){
         return EXIT_FAILURE;
     }
-    if (!grid.makeGrid(fileName)){
-        ERROR(QString("The creation of the grid failed."));
-        EXIT_FAILURE;
+    if (resultFile.empty()){
+        if(!grid.writePTS()){
+            STADIC_ERROR(std::string("The writing of the points file to the standard output has failed."));
+            return EXIT_FAILURE;
+        }
+    }else{
+        if (!grid.writePTS(resultFile)){
+            STADIC_ERROR(std::string("The writing of the points file failed."));
+            return EXIT_FAILURE;
+        }
     }
-    if (!grid.writePTS(resultFile)){
-        ERROR("The writing of the points file failed.");
-        return EXIT_FAILURE;
-    }
-    if (!polyFile.isEmpty()){
+    /*
+    if (!polyFile.empty()){
         if (!grid.writeRadPoly(polyFile)){
             return EXIT_FAILURE;
         }
     }
-    if (!csvFile.isEmpty()){
+    */
+    if (!csvFile.empty()){
         if (!grid.writePTScsv(csvFile)){
             return EXIT_FAILURE;
         }
     }
-
+    if (!viewLocation.empty()){
+        if (!grid.viewPTS(viewLocation, vType)){
+            return EXIT_FAILURE;
+        }
+    }
     return EXIT_SUCCESS;
 }

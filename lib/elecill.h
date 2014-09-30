@@ -1,42 +1,52 @@
 #ifndef ELECILL_H
 #define ELECILL_H
 
-#include <QObject>
-#include <QVector>
+#include <string>
+#include <vector>
 
 #include "stadicapi.h"
 
+#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
+template class __declspec(dllexport) std::basic_string < char, std::char_traits<char>, std::allocator<char> >;
+#endif
+
 namespace stadic {
 
-class STADIC_API ElecIll : public QObject
+class STADIC_API SpatialIlluminance
 {
-    Q_OBJECT
 public:
-    explicit ElecIll(QObject *parent = 0);
-    bool parseIll(QString fileName);
-
-    //Setters
-    void setIlluminance(double value);
-    void setX(QString x);
-    void setY(QString y);
-    void setZ(QString z);
+    SpatialIlluminance();
+    SpatialIlluminance(std::string x, std::string y, std::string z, double illuminance);
 
     //Getters
-    std::vector<double> illuminance();
-    std::vector<QString> x();
-    std::vector<QString> y();
-    std::vector<QString> z();
+    double lux();                                       //Function to get the illuminance at the point described by x, y, z in lux
+    double fc();                                        //Function to get the illuminance at the point described by x, y, z in fc
+    std::string x();                                    //Function to get the x location of the illuminance point
+    std::string y();                                    //Function to get the y location of the illuminance point
+    std::string z();                                    //Function to get the z location of the illuminance point
 
 private:
-    std::vector<double> m_Illuminace;
-    std::vector<QString> m_X;
-    std::vector<QString> m_Y;
-    std::vector<QString> m_Z;
+    double m_Illuminance;                               //Variable holding the illuminance values (in lux)
+    std::string m_x;                                    //Variable holding the x location of the illuminance point
+    std::string m_y;                                    //Variable holding the y location of the illuminance point
+    std::string m_z;                                    //Variable holding the z location of the illuminance point
+};
 
-signals:
+#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
+template class __declspec(dllexport) std::vector<SpatialIlluminance>;
+#endif
 
-public slots:
+class STADIC_API ElectricIlluminanceData
+{
+public:
+    ElectricIlluminanceData();
+    bool parseIlluminance(std::string fileName);        //Function to parse an electric lighting illuminance file given the filename
 
+    //Getters
+    std::vector<SpatialIlluminance> illuminance();      //Function that returns the illuminance of an electric light zone as a vector of illuminance points in lux
+
+private:
+    std::vector<SpatialIlluminance> m_Illuminance;      //Vector holding the illuminance points as SpatialIlluminance objects
 };
 
 }
