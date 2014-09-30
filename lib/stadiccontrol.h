@@ -174,8 +174,8 @@ private:
     boost::optional<std::string> getStringWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
     boost::optional<bool> getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
     boost::optional<bool> getBoolWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
-    boost::optional<boost::property_tree::ptree> getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
-    boost::optional<boost::property_tree::ptree> getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad);
+    boost::optional<boost::property_tree::ptree> getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing);
+    boost::optional<boost::property_tree::ptree> getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing);
 
 
     //******************

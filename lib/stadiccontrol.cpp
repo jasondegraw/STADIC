@@ -11,7 +11,7 @@
 #include <fstream>
 #include <string>
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
+//#include <boost/foreach.hpp>
 
 namespace stadic {
 
@@ -544,130 +544,148 @@ double Control::UDIMax(){
 //******************
 //PARSER
 //******************
-boost::optional<double> Control::getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<double> Control::getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<double> dVal;
     try{
         dVal=json.get<double>(key);
         return dVal;
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_ERROR(errorMissing);
         return dVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_ERROR(errorBad);
         return dVal;
     }
 }
-boost::optional<double> Control::getDoubleWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<double> Control::getDoubleWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<double> dVal;
     try{
         dVal=json.get<double>(key);
         return dVal;
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_WARNING(errorMissing);
         return dVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_WARNING(errorBad);
         return dVal;
     }
 }
-boost::optional<int> Control::getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<int> Control::getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<int> iVal;
     try{
         iVal=json.get<int>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_ERROR(errorMissing);
         return iVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_ERROR(errorBad);
         return iVal;
     }
 
 }
-boost::optional<int> Control::getIntWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<int> Control::getIntWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<int> iVal;
     try{
         iVal=json.get<int>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_WARNING(errorMissing);
         return iVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_WARNING(errorBad);
         return iVal;
     }
 
 }
-boost::optional<std::string> Control::getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<std::string> Control::getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<std::string> sVal;
     try{
         sVal=json.get<std::string>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_ERROR(errorMissing);
         return sVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_ERROR(errorBad);
         return sVal;
     }
 }
-boost::optional<std::string> Control::getStringWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<std::string> Control::getStringWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<std::string> sVal;
     try{
         sVal=json.get<std::string>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_WARNING(errorMissing);
         return sVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_WARNING(errorBad);
         return sVal;
     }
 }
-boost::optional<bool> Control::getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<bool> Control::getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<bool> bVal;
     try{
         bVal=json.get<bool>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_ERROR(errorMissing);
         return bVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_ERROR(errorBad);
         return bVal;
     }
 }
-boost::optional<bool> Control::getBoolWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
+
+boost::optional<bool> Control::getBoolWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad)
+{
     boost::optional<bool> bVal;
     try{
         bVal=json.get<bool>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+    }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_WARNING(errorMissing);
         return bVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
+    }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_WARNING(errorBad);
         return bVal;
     }
 }
-boost::optional<boost::property_tree::ptree> Control::getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
-    boost::optional<boost::property_tree::ptree> treeVal;
-    try{
-        treeVal=json.get<boost::property_tree::ptree>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
+
+boost::optional<boost::property_tree::ptree> Control::getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing)
+{
+    boost::property_tree::ptree treeVal;
+    try {
+        treeVal = json.get_child(key);
+    } catch(const boost::property_tree::ptree_bad_path &) {
         STADIC_ERROR(errorMissing);
-        return treeVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
-        STADIC_ERROR(errorBad);
-        return treeVal;
+        return boost::none;
     }
+    return boost::optional<boost::property_tree::ptree>(treeVal);
 }
-boost::optional<boost::property_tree::ptree> Control::getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad){
-    boost::optional<boost::property_tree::ptree> treeVal;
-    try{
-        treeVal=json.get<boost::property_tree::ptree>(key);
-    }catch (const boost::property_tree::ptree_bad_path &e){
-        STADIC_WARNING(errorMissing);
-        return treeVal;
-    }catch (const boost::property_tree::ptree_bad_data &e){
-        STADIC_WARNING(errorBad);
-        return treeVal;
+
+/*
+This is my proposed change - there'd only be one function per type instead of two
+boost::optional<boost::property_tree::ptree> Control::getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMessage, Severity severity){
+    boost::property_tree::ptree treeVal;
+    try {
+        treeVal = json.get_child(key);
+    } catch(const boost::property_tree::ptree_bad_path &) {
+        STADIC_LOG(severity, errorMessage);
+        return boost::none;
     }
+    return boost::optional<boost::property_tree::ptree>(treeVal);
 }
+*/
 
 bool Control::parseJson(std::string file){
     QString data;
@@ -1633,17 +1651,19 @@ bool Control::parseJson2(std::string file){
         sVal.reset();
     }
 
-    treeVal=getTree(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", "The \"window_groups\" is not of the correct type.");
+    treeVal=getTree(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.");
     if (!treeVal){
         return false;
     }else{
-        BOOST_FOREACH(boost::property_tree::ptree::value_type &v, treeVal){
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
             WindowGroup WG;
+            /* WindowGroup still uses QJson
             if (WG.parseJson(v.second.data())){
                 m_WindowGroups.push_back(WG);
             }else{
                 return false;
             }
+            */
         }
         treeVal.reset();
     }
@@ -1694,7 +1714,7 @@ bool Control::parseJson2(std::string file){
         }
         dVal.reset();
     }
-
+ 
     /*
     //******************
     //Simulation Settings
