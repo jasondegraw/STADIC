@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "shadecontrol.h"
+#include <boost/property_tree/ptree.hpp>
 
 #include "stadicapi.h"
 
@@ -14,6 +15,7 @@ class STADIC_API WindowGroup
 public:
     WindowGroup();
     bool parseJson(const QJsonObject &object);
+    bool parseJson(const boost::property_tree::ptree json);
 
     //  Setters
     void setName(const std::string &name);

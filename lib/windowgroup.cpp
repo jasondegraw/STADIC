@@ -200,4 +200,9 @@ bool WindowGroup::parseJson(const QJsonObject &object){
     return true;
 }
 
+bool WindowGroup::parseJson(const boost::property_tree::ptree json){
+
+    return true;
+}
+
 }

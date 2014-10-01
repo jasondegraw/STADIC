@@ -1221,4 +1221,9 @@ bool ControlZone::parseJson(const QJsonObject &object)
     return true;
 }
 
+bool ControlZone::parseJson (const boost::property_tree::ptree json){
+
+    return true;
+}
+
 }
