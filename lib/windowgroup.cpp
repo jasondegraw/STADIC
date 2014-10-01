@@ -233,103 +233,80 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
         setBaseGeometry(sVal.get());
         sVal.reset();
     }
-
     /*
-    val=object.value(QString("bsdf_base_layers"));
-    if (!val.isUndefined()){
-        if (val.isArray()){
-            QJsonArray array=val.toArray();
-            for (int i=0;i<array.size();i++){
-                if (array[i].isString()){
-                    m_BSDFBaseLayers.push_back(array[i].toString().toStdString());
-                }else{
-                    STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " does not contain a string.");
-                    return false;
-                }
-            }
-        }else{
-            STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " is not an array.");
-            return false;
-        }
-    }
-
-    val=object.value(QString("glazing_layers"));
-    if (!val.isUndefined()){
-        if (val.isArray()){
-            QJsonArray array=val.toArray();
-            for (int i=0;i<array.size();i++){
-                if (array[i].isString()){
-                    m_GlazingLayers.push_back(array[i].toString().toStdString());
-                }else{
-                    STADIC_ERROR("The key \"glazing_layers\" withinwindow group " + name() + " does not contain a string.");
-                    return false;
-                }
-            }
-        }else{
-            STADIC_ERROR("The key \"glazing_layers\" within window group " + name() + " is not an array.");
-            return false;
-        }
-    }
-
-    val=object.value(QString("shade_control"));
-    if (!val.isUndefined()){
-        if (val.isObject()){
-            if (!m_ShadeControl.parseJson(val.toObject())){
-                return false;
-            }
-        }else{
-            STADIC_ERROR("The key \"shade_control\" within window group " + name() + " is not an object.");
-            return false;
-        }
+    treeVal=getTree(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
     }else{
-        STADIC_WARNING("There are no \"shade_controls\" listed for window group " + name());
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            if (v.second){
+                m_BSDFBaseLayers.push_back(v.second.get());
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_base_layers key for window group "+name()+".");
+            }
+        }
+        treeVal.reset();
     }
 
-    val=object.value(QString("shade_settings"));
-    if (!val.isUndefined()){
-        if (val.isArray()){
-            QJsonArray array=val.toArray();
-            for (int i=0;i<array.size();i++){
-                if (array[i].isString()){
-                    m_ShadeSettingGeometry.push_back(array[i].toString().toStdString());
-                }else{
-                    STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " does not contain a string.");
-                    return false;
-                }
+    treeVal=getTree(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
+    if (!treeVal){
+        return false;
+    }else{
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            if (v.second){
+                m_GlazingLayers.push_back(v.second.get());
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the glazing_layers key for window group "+name()+".");
             }
-        }else{
-            STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " is not an array.");
+        }
+        treeVal.reset();
+    }
+
+    treeVal=getTree(json, "shade_control", "The key \"shade_control\" within window group " + name() + " is missing.", Severity::Warning);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "It is assumed there is no shade control needed for windows within window group "+name()+".");
+    }else{
+        if (!m_ShadeControl.parseJson(treeVal.get())){
             return false;
         }
-    }else{
-        STADIC_WARNING("There are no \"shade_settings\" listed for window group " + name());
+        treeVal.reset();
     }
 
-    val=object.value(QString("bsdf_setting_layers"));
-    if (!val.isUndefined()){
-        if(val.isArray()){
-            QJsonArray tempArray=val.toArray();
-            for (unsigned int j=0;j<tempArray.size();j++){
-                if (val.isArray()){
-                    QJsonArray array=tempArray.at(j).toArray();
-                    std::vector<std::string> tempVector;
-                    for (int i=0;i<array.size();i++){
-                        if (array[i].isString()){
-                            tempVector.push_back(array[i].toString().toStdString());
-                        }else{
-                            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " does not contain a string.");
-                            return false;
-                        }
+    treeVal=getTree(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
+    }else{
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            if (v.second){
+                m_ShadeSettingGeometry.push_back(v.second.get());
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the shade_settings key for window group "+name()+".");
+            }
+        }
+        treeVal.reset();
+    }
+
+
+    treeVal=getTree(json, "bsdf_setting_layers", "The key \"bsdf_setting_layers\" within window group " + name() + " is missing.", Severity::Info);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
+    }else{
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            if (v.second){
+                std::vector<std::string> tempVector;
+                for (boost::property_tree::ptree::value_type &v2 : v.second){
+                    if (v2.second){
+                        tempVector.push_back(v2.second.get());
+                    }else{
+                        STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".");
                     }
-                    m_BSDFSettingLayers.push_back(tempVector);
-                }else{
-                    STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
-                    return false;
                 }
+                m_BSDFSettingLayers.push_back(tempVector);
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".");
             }
-        }else{
-            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
         }
+        treeVal.reset();
     }
     */
     return true;
