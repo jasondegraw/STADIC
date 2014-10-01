@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "functions.h"
 #include <boost/property_tree/json_parser.hpp>
 //#include <boost/foreach.hpp>
 
@@ -543,77 +544,6 @@ double Control::UDIMax(){
 //******************
 //PARSER
 //******************
-
-boost::optional<double> Control::getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<double> dVal;
-    try{
-        dVal=json.get<double>(key);
-        return dVal;
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-        return dVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-        return dVal;
-    }
-}
-
-boost::optional<int> Control::getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<int> iVal;
-    try{
-        iVal=json.get<int>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-        return iVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-        return iVal;
-    }
-
-}
-
-boost::optional<std::string> Control::getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<std::string> sVal;
-    try{
-        sVal=json.get<std::string>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-        return sVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-        return sVal;
-    }
-}
-
-boost::optional<bool> Control::getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<bool> bVal;
-    try{
-        bVal=json.get<bool>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-        return bVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-        return bVal;
-    }
-}
-
-boost::optional<boost::property_tree::ptree> Control::getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, Severity severity)
-{
-    boost::property_tree::ptree treeVal;
-    try {
-        treeVal = json.get_child(key);
-    } catch(const boost::property_tree::ptree_bad_path &) {
-        STADIC_LOG(severity, errorMissing);
-        return boost::none;
-    }
-    return boost::optional<boost::property_tree::ptree>(treeVal);
-}
-
 /*
 This is my proposed change - there'd only be one function per type instead of two
 boost::optional<boost::property_tree::ptree> Control::getTreeWarn(boost::property_tree::ptree json, std::string key, std::string errorMessage, Severity severity){
@@ -1450,7 +1380,6 @@ bool Control::parseJson(std::string file){
 }
 
 bool Control::parseJson2(std::string file){
-    std::string data;
     std::fstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
@@ -1461,7 +1390,7 @@ bool Control::parseJson2(std::string file){
     boost::property_tree::ptree json;
     boost::property_tree::read_json(file, json);
     if (json.empty()){
-        STADIC_ERROR("The json file is empty");
+        STADIC_LOG(Severity::Fatal, "The json file is empty");
         return false;
     }
     //get_value_or(/*default*/);
@@ -1475,7 +1404,7 @@ bool Control::parseJson2(std::string file){
     //Folder Information
     //******************
     sVal=getString(json, "project_name", "The key \"project_name\" does not appear in the STADIC Control File.", "The key \"project_name\" does not contain a string.", Severity::Error);
-    if (sVal){
+    if (!sVal){
         return false;
     }else{
         setProjectName(sVal.get());
@@ -1692,160 +1621,171 @@ bool Control::parseJson2(std::string file){
         bVal.reset();
     }
 
-    iVal=getInt(json, "radiance_parameters.ab", "The parameter \"ab\" was not found under radiance_parameters.", "The parameter \"ab\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 4 will be applied for \"ab\".");
-        setAB(4);
+    treeVal=getTree(json, "radiance_parameters", "The key \"radiance_parameters\" does not appear in the STADIC Control File.", Severity::Info);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "The default radiance parameters will be set.");
+        if (!setDefaultRadianceParameters()){
+            return false;
+        }
     }else{
-        if (!setAB(iVal.get())){
+        iVal=getInt(treeVal.get(), "ab", "The parameter \"ab\" was not found under radiance_parameters.", "The parameter \"ab\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 4 will be applied for \"ab\".");
             setAB(4);
+        }else{
+            if (!setAB(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 4 will be applied for \"ab\".");
+                setAB(4);
+            }
+            iVal.reset();
         }
-        iVal.reset();
-    }
 
-    iVal=getInt(json, "radiance_parameters.ad", "The parameter \"ad\" was not found under radiance_parameters.", "The parameter \"ad\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 300 will be applied for \"ad\".");
-        setAD(300);
-    }else{
-        if (!setAD(iVal.get())){
+        iVal=getInt(treeVal.get(), "ad", "The parameter \"ad\" was not found under radiance_parameters.", "The parameter \"ad\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 300 will be applied for \"ad\".");
             setAD(300);
+        }else{
+            if (!setAD(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 300 will be applied for \"ad\".");
+                setAD(300);
+            }
+            iVal.reset();
         }
-        iVal.reset();
-    }
 
-    iVal=getInt(json, "radiance_parameters.as", "The parameter \"as\" was not found under radiance_parameters.", "The parameter \"as\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 20 will be applied for \"as\".");
-        setAS(20);
-    }else{
-        if (!setAS(iVal.get())){
+        iVal=getInt(treeVal.get(), "as", "The parameter \"as\" was not found under radiance_parameters.", "The parameter \"as\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 20 will be applied for \"as\".");
             setAS(20);
+        }else{
+            if (!setAS(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 20 will be applied for \"as\".");
+                setAS(20);
+            }
+            iVal.reset();
         }
-        iVal.reset();
-    }
 
-    iVal=getInt(json, "radiance_parameters.ar", "The parameter \"ar\" was not found under radiance_parameters.",  "The parameter \"ar\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 150 will be applied for \"ar\".");
-        setAR(150);
-    }else{
-        if (!setAR(iVal.get())){
+        iVal=getInt(treeVal.get(), "ar", "The parameter \"ar\" was not found under radiance_parameters.",  "The parameter \"ar\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 150 will be applied for \"ar\".");
             setAR(150);
+        }else{
+            if (!setAR(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 150 will be applied for \"ar\".");
+                setAR(150);
+            }
+            iVal.reset();
         }
-        iVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.aa", "The parameter \"aa\" was not found under radiance_parameters.", "The parameter \"aa\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 0.1 will be applied for \"aa\".");
-        setAA(0.1);
-    }else{
-        if (!setAA(dVal.get())){
+        dVal=getDouble(treeVal.get(), "aa", "The parameter \"aa\" was not found under radiance_parameters.", "The parameter \"aa\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 0.1 will be applied for \"aa\".");
             setAA(0.1);
+        }else{
+            if (!setAA(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 0.1 will be applied for \"aa\".");
+                setAA(0.1);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
-    iVal=getInt(json, "radiance_parameters.lr", "The parameter \"lr\" was not found under radiance_parameters.", "The parameter \"lr\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 6 will be applied for \"lr\".");
-        setLR(6);
-    }else{
-        if (!setLR(iVal.get())){
+        iVal=getInt(treeVal.get(), "lr", "The parameter \"lr\" was not found under radiance_parameters.", "The parameter \"lr\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 6 will be applied for \"lr\".");
             setLR(6);
+        }else{
+            if (!setLR(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 6 will be applied for \"lr\".");
+                setLR(6);
+            }
+            iVal.reset();
         }
-        iVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.st", "The parameter \"st\" was not found under radiance_parameters.", "The parameter \"st\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 0.15 will be applied for \"st\".");
-        setST(0.15);
-    }else{
-        if (!setST(dVal.get())){
+        dVal=getDouble(treeVal.get(), "st", "The parameter \"st\" was not found under radiance_parameters.", "The parameter \"st\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 0.15 will be applied for \"st\".");
             setST(0.15);
+        }else{
+            if (!setST(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 0.15 will be applied for \"st\".");
+                setST(0.15);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.sj", "The parameter \"sj\" was not found under radiance_parameters.", "The parameter \"sj\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 1.0 will be applied for \"sj\".");
-        setSJ(1.0);
-    }else{
-        if (!setSJ(dVal.get())){
+        dVal=getDouble(treeVal.get(), "sj", "The parameter \"sj\" was not found under radiance_parameters.", "The parameter \"sj\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 1.0 will be applied for \"sj\".");
             setSJ(1.0);
+        }else{
+            if (!setSJ(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 1.0 will be applied for \"sj\".");
+                setSJ(1.0);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.lw", "The parameter \"lw\" was not found under radiance_parameters.", "The parameter \"lw\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 0.004 will be applied for \"lw\".");
-        setLW(0.004);
-    }else{
-        if (!setLW(dVal.get())){
+        dVal=getDouble(treeVal.get(), "lw", "The parameter \"lw\" was not found under radiance_parameters.", "The parameter \"lw\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 0.004 will be applied for \"lw\".");
             setLW(0.004);
+        }else{
+            if (!setLW(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 0.004 will be applied for \"lw\".");
+                setLW(0.004);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.dj", "The parameter \"dj\" was not found under radiance_parameters.", "The parameter \"dj\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 0.0 will be applied for \"dj\".");
-        setDJ(0.0);
-    }else{
-        if (!setDJ(dVal.get())){
+        dVal=getDouble(treeVal.get(), "dj", "The parameter \"dj\" was not found under radiance_parameters.", "The parameter \"dj\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 0.0 will be applied for \"dj\".");
             setDJ(0.0);
+        }else{
+            if (!setDJ(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 0.0 will be applied for \"dj\".");
+                setDJ(0.0);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.ds", "The parameter \"ds\" was not found under radiance_parameters.", "The parameter \"ds\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 0.200 will be applied for \"ds\".");
-        setDS(0.200);
-    }else{
-        if (!setDS(dVal.get())){
+        dVal=getDouble(treeVal.get(), "ds", "The parameter \"ds\" was not found under radiance_parameters.", "The parameter \"ds\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 0.200 will be applied for \"ds\".");
             setDS(0.200);
+        }else{
+            if (!setDS(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 0.200 will be applied for \"ds\".");
+                setDS(0.200);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    dVal=getDouble(json, "radiance_parameters.dr", "The parameter \"dr\" was not found under radiance_parameters.", "The parameter \"dr\" is not a number.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "A default value of 2 will be applied for \"dr\".");
-        setDR(2);
-    }else{
-        if (!setDR(dVal.get())){
+        dVal=getDouble(treeVal.get(), "dr", "The parameter \"dr\" was not found under radiance_parameters.", "The parameter \"dr\" is not a number.", Severity::Warning);
+        if (!dVal){
             STADIC_LOG(Severity::Info, "A default value of 2 will be applied for \"dr\".");
             setDR(2);
+        }else{
+            if (!setDR(dVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 2 will be applied for \"dr\".");
+                setDR(2);
+            }
+            dVal.reset();
         }
-        dVal.reset();
-    }
 
-    iVal=getInt(json, "radiance_parameters.dp", "The parameter \"dp\" was not found under radiance_parameters.", "The parameter \"dp\" is not a number.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "A default value of 512 will be applied for \"dp\".");
-        setDP(512);
-    }else{
-        if (!setDP(iVal.get())){
+        iVal=getInt(treeVal.get(), "dp", "The parameter \"dp\" was not found under radiance_parameters.", "The parameter \"dp\" is not a number.", Severity::Warning);
+        if (!iVal){
             STADIC_LOG(Severity::Info, "A default value of 512 will be applied for \"dp\".");
             setDP(512);
+        }else{
+            if (!setDP(iVal.get())){
+                STADIC_LOG(Severity::Info, "A default value of 512 will be applied for \"dp\".");
+                setDP(512);
+            }
+            iVal.reset();
         }
-        iVal.reset();
     }
+    treeVal.reset();
+
+
 
     //******************
     //Lighting Control
@@ -1955,45 +1895,30 @@ bool Control::parseJson2(std::string file){
     }
     bVal.reset();
 
-    /*
-    val=jsonObj.value(QString("UDI"));
-    if (!val.isUndefined()){
-        if (val.isObject()){
-            double minimum, maximum;
-            QJsonObject tempObject=val.toObject();
-            val=tempObject.value(QString("minimum"));
-            if (val.isUndefined()){
-                STADIC_WARNING("The key \"minimum\" is missing under UDI.\n\tAn assumed value of 100 will be used.");
-                minimum=100;
-            }else{
-                if (val.isDouble()){
-                    minimum=val.toDouble();
-                }else{
-                    STADIC_WARNING("The key \"minimum\" is not a number.\n\tAn assumed value of 100 will be used.");
-                    minimum=100;
-                }
-            }
-            val=tempObject.value(QString("maximum"));
-            if (val.isUndefined()){
-                STADIC_WARNING("The key \"maximum\" is missing under UDI.\n\tAn assumed value of 250 will be used.");
-                maximum=250;
-            }else{
-                if (val.isDouble()){
-                    maximum=val.toDouble();
-                }else{
-                    STADIC_WARNING("The key \"maximum\" is not a number.\n\tAn assumed value of 250 will be used.");
-                    maximum=250;
-                }
-            }
-            if (!setUDI(true, minimum, maximum)){
-                return false;
-            }
+    treeVal=getTree(json, "UDI", "The key \"UDI\" does not appear in the STADIC Control File.", Severity::Info);
+    if (treeVal){
+        double minimum, maximum;
+        dVal=getDouble(treeVal.get(), "minimum", "The key \"minimum\" is missing under UDI.", "The key \"minimum\" does not contain a number.", Severity::Warning);
+        if (!dVal){
+            STADIC_LOG(Severity::Info, "An assumed value of 100 will be used for UDI minimum.");
+            minimum=100;
         }else{
-            STADIC_ERROR("The key \"UDI\" is not an object.");
-            return false;
+            minimum=dVal.get();
+        }
+        dVal.reset();
+        dVal=getDouble(treeVal.get(), "maximum", "The key \"maximum\" is missing under UDI.", "The key \"maximum\" does not contain a number.", Severity::Warning);
+        if (!dVal){
+            STADIC_LOG(Severity::Info, "An assumed value of 2500 will be used for UDI maximum.");
+            maximum=2500;
+        }else{
+            maximum=dVal.get();
+        }
+        dVal.reset();
+        if (!setUDI(true, minimum, maximum)){
+                return false;
         }
     }
-    */
+    treeVal.reset();
     return true;
 }
 

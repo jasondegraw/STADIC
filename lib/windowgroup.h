@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 #include "shadecontrol.h"
-#include <boost/property_tree/ptree.hpp>
-
 #include "stadicapi.h"
+#include <boost/property_tree/ptree.hpp>
 
 namespace stadic {
 

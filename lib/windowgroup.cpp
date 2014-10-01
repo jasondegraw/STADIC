@@ -6,7 +6,8 @@
 #include <QFile>
 #include <vector>
 #include <iostream>
-
+#include <boost/optional.hpp>
+#include "functions.h"
 #include "logging.h"
 
 namespace stadic {
@@ -59,8 +60,6 @@ ShadeControl* WindowGroup::shadeControl()
 {
     return &m_ShadeControl;
 }
-
-
 bool WindowGroup::parseJson(const QJsonObject &object){
     QJsonValue val=object.value(QString("name"));
     if (val.isUndefined()){
@@ -201,7 +200,138 @@ bool WindowGroup::parseJson(const QJsonObject &object){
 }
 
 bool WindowGroup::parseJson(const boost::property_tree::ptree json){
+    if (json.empty()){
+        STADIC_LOG(Severity::Error, "The window group does not contain data.");
+        return false;
+    }
+    boost::optional<std::string> sVal;
+    boost::optional<bool> bVal;
+    boost::optional<boost::property_tree::ptree> treeVal;
 
+    sVal=getString(json, "name", "The key \"name\" within window_groups does not appear in the STADIC Control File.", "The key \"name\" within window_groups is not a string.", Severity::Error);
+    if (!sVal){
+        return false;
+    }else{
+        setName(sVal.get());
+        sVal.reset();
+    }
+
+    bVal=getBool(json, "BSDF", "The key \"BSDF\" within window group " +name()+ " is missing.", "The key \"BSDF\" within window group " + name() + " is not a bool.", Severity::Info);
+    if (!bVal){
+        STADIC_LOG(Severity::Info, "It is assumed there are no BSDFs for window group "+name()+".");
+        setBSDF(false);
+    }else{
+        setBSDF(bVal.get());
+        bVal.reset();
+    }
+
+    sVal=getString(json, "base_geometry", "The key \"base_geometry\" within window group "+name()+" is missing.", "The key \"base_geometry\" within window group " + name() + " is not a string.", Severity::Info);
+    if (!sVal){
+        STADIC_LOG(Severity::Info, "It is assumed there are is no base geometry for window group " +name()+".");
+        setBaseGeometry("empty.rad");
+    }else{
+        setBaseGeometry(sVal.get());
+        sVal.reset();
+    }
+
+    /*
+    val=object.value(QString("bsdf_base_layers"));
+    if (!val.isUndefined()){
+        if (val.isArray()){
+            QJsonArray array=val.toArray();
+            for (int i=0;i<array.size();i++){
+                if (array[i].isString()){
+                    m_BSDFBaseLayers.push_back(array[i].toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " does not contain a string.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"bsdf_base_layers\" within window group " + name() + " is not an array.");
+            return false;
+        }
+    }
+
+    val=object.value(QString("glazing_layers"));
+    if (!val.isUndefined()){
+        if (val.isArray()){
+            QJsonArray array=val.toArray();
+            for (int i=0;i<array.size();i++){
+                if (array[i].isString()){
+                    m_GlazingLayers.push_back(array[i].toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"glazing_layers\" withinwindow group " + name() + " does not contain a string.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"glazing_layers\" within window group " + name() + " is not an array.");
+            return false;
+        }
+    }
+
+    val=object.value(QString("shade_control"));
+    if (!val.isUndefined()){
+        if (val.isObject()){
+            if (!m_ShadeControl.parseJson(val.toObject())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The key \"shade_control\" within window group " + name() + " is not an object.");
+            return false;
+        }
+    }else{
+        STADIC_WARNING("There are no \"shade_controls\" listed for window group " + name());
+    }
+
+    val=object.value(QString("shade_settings"));
+    if (!val.isUndefined()){
+        if (val.isArray()){
+            QJsonArray array=val.toArray();
+            for (int i=0;i<array.size();i++){
+                if (array[i].isString()){
+                    m_ShadeSettingGeometry.push_back(array[i].toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " does not contain a string.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"shade_settings\" within window group " + name() + " is not an array.");
+            return false;
+        }
+    }else{
+        STADIC_WARNING("There are no \"shade_settings\" listed for window group " + name());
+    }
+
+    val=object.value(QString("bsdf_setting_layers"));
+    if (!val.isUndefined()){
+        if(val.isArray()){
+            QJsonArray tempArray=val.toArray();
+            for (unsigned int j=0;j<tempArray.size();j++){
+                if (val.isArray()){
+                    QJsonArray array=tempArray.at(j).toArray();
+                    std::vector<std::string> tempVector;
+                    for (int i=0;i<array.size();i++){
+                        if (array[i].isString()){
+                            tempVector.push_back(array[i].toString().toStdString());
+                        }else{
+                            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " does not contain a string.");
+                            return false;
+                        }
+                    }
+                    m_BSDFSettingLayers.push_back(tempVector);
+                }else{
+                    STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"bsdf_setting_layers\" within window group " + name() + " is not an array.");
+        }
+    }
+    */
     return true;
 }
 
