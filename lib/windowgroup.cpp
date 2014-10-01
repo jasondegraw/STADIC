@@ -233,21 +233,22 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
         setBaseGeometry(sVal.get());
         sVal.reset();
     }
-    /*
+    
     treeVal=getTree(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
     if (!treeVal){
         STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
     }else{
         for(boost::property_tree::ptree::value_type &v : treeVal.get()){
-            if (v.second){
-                m_BSDFBaseLayers.push_back(v.second.get());
+          sVal = getString(v.second, "", "", "", Severity::Fatal);
+            if (sVal){
+                m_BSDFBaseLayers.push_back(sVal.get());
             }else{
                 STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_base_layers key for window group "+name()+".");
             }
         }
         treeVal.reset();
     }
-
+    /*
     treeVal=getTree(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
     if (!treeVal){
         return false;
