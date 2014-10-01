@@ -352,29 +352,29 @@ TEST(ControlTests, PTreeReadJson)
   EXPECT_EQ("main_geo.rad", controlFile.geoFile());
   EXPECT_EQ(0, controlFile.buildingRotation());
   EXPECT_EQ("calc_grid.pts", controlFile.ptsFile());
-  /*
   EXPECT_EQ(2,controlFile.windowGroups().size());
 
     //Window Group 1
     EXPECT_EQ("WG1", controlFile.windowGroups()[0].name());
-    EXPECT_EQ(2, controlFile.windowGroups()[0].shadeSettingGeometry().size());
+    //EXPECT_EQ(2, controlFile.windowGroups()[0].shadeSettingGeometry().size());
     EXPECT_EQ("wg1base.rad", controlFile.windowGroups()[0].baseGeometry());
-    EXPECT_EQ("l_glazing", controlFile.windowGroups()[0].glazingLayers()[0]);
-    EXPECT_EQ("l_glazing2", controlFile.windowGroups()[0].glazingLayers()[1]);
-    EXPECT_EQ("automated_profile_angle", controlFile.windowGroups()[0].shadeControl()->controlMethod());
-    EXPECT_EQ(30, controlFile.windowGroups()[0].shadeControl()->elevationAzimuth());
-    EXPECT_EQ(30, controlFile.windowGroups()[0].shadeControl()->angleSettings()[0]);
-    EXPECT_EQ(60, controlFile.windowGroups()[0].shadeControl()->angleSettings()[1]);
-    EXPECT_EQ("wg1set1.rad", controlFile.windowGroups()[0].shadeSettingGeometry()[0]);
-    EXPECT_EQ("wg1set2.rad", controlFile.windowGroups()[0].shadeSettingGeometry()[1]);
+    //EXPECT_EQ("l_glazing", controlFile.windowGroups()[0].glazingLayers()[0]);
+    //EXPECT_EQ("l_glazing2", controlFile.windowGroups()[0].glazingLayers()[1]);
+    //EXPECT_EQ("automated_profile_angle", controlFile.windowGroups()[0].shadeControl()->controlMethod());
+    //EXPECT_EQ(30, controlFile.windowGroups()[0].shadeControl()->elevationAzimuth());
+    //EXPECT_EQ(30, controlFile.windowGroups()[0].shadeControl()->angleSettings()[0]);
+    //EXPECT_EQ(60, controlFile.windowGroups()[0].shadeControl()->angleSettings()[1]);
+    //EXPECT_EQ("wg1set1.rad", controlFile.windowGroups()[0].shadeSettingGeometry()[0]);
+    //EXPECT_EQ("wg1set2.rad", controlFile.windowGroups()[0].shadeSettingGeometry()[1]);
 
     //Window Group 2
     EXPECT_EQ("WG2", controlFile.windowGroups()[1].name());
-    EXPECT_EQ(2, controlFile.windowGroups()[1].shadeSettingGeometry().size());
+    //EXPECT_EQ(2, controlFile.windowGroups()[1].shadeSettingGeometry().size());
     EXPECT_EQ(true, controlFile.windowGroups()[1].isBSDF());
     EXPECT_EQ("wg2base.rad", controlFile.windowGroups()[1].baseGeometry());
-    EXPECT_EQ("l_window", controlFile.windowGroups()[1].glazingLayers()[0]);
+    //EXPECT_EQ("l_window", controlFile.windowGroups()[1].glazingLayers()[0]);
     EXPECT_EQ("l_window", controlFile.windowGroups()[1].bsdfBaseLayers()[0]);
+    /*
     EXPECT_EQ("automated_signal", controlFile.windowGroups()[1].shadeControl()->controlMethod());
     EXPECT_EQ("sensitivity_file", controlFile.windowGroups()[1].shadeControl()->sensorType());
     EXPECT_EQ("cos.sen", controlFile.windowGroups()[1].shadeControl()->sensorFile());
@@ -390,9 +390,10 @@ TEST(ControlTests, PTreeReadJson)
     EXPECT_EQ(8000, controlFile.windowGroups()[1].shadeControl()->signalSettings()[2]);
     EXPECT_EQ("wg2set1.rad", controlFile.windowGroups()[1].shadeSettingGeometry()[0]);
     EXPECT_EQ("wg2set2.rad", controlFile.windowGroups()[1].shadeSettingGeometry()[1]);
+    */
     EXPECT_EQ("l_window", controlFile.windowGroups()[1].bsdfSettingLayers()[0][0]);
     EXPECT_EQ("l_window", controlFile.windowGroups()[1].bsdfSettingLayers()[1][0]);
-    */
+
     EXPECT_EQ("in", controlFile.importUnits());
     EXPECT_EQ("lux", controlFile.illumUnits());
     EXPECT_EQ("ft", controlFile.displayUnits());

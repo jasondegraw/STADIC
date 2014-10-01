@@ -1222,6 +1222,789 @@ bool ControlZone::parseJson(const QJsonObject &object)
 }
 
 bool ControlZone::parseJson (const boost::property_tree::ptree json){
+    /*
+    QJsonValue val=object.value("name");
+    if (val.isUndefined()){
+        STADIC_ERROR("The key \"name\" is not found within \"control_zones\".");
+        return false;
+    }else{
+        if (val.isString()){
+            setName(val.toString().toStdString());
+        }else{
+            STADIC_ERROR("The key\"name\" does not contain a string.");
+            return false;
+        }
+    }
+
+    val=object.value("optimum_control");
+    if (val.isUndefined()){
+        STADIC_ERROR("The key\"optimum_control\" is not found within the control zone "+name()+".");
+        return false;
+    }else{
+        if (val.isString()){
+            if (!setOptimumMethod(val.toString().toStdString())){
+                return false;
+            }
+        }else{
+            STADIC_ERROR("The key \"optimum_control\" does not contain a string.");
+            return false;
+        }
+    }
+
+    val=object.value("sensor");
+    if (val.isUndefined()){
+        STADIC_ERROR("The zone named \""+name()+"\" does not have a photosensor.");
+    }else{
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("sensor_type");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"sensor_type\" is not found within \"sensor\" in the zone named \""+name()+"\".");
+                return false;
+            }else{
+                if (val.isString()){
+                    setSensorType(val.toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"sensor_type\" does not contain a string in the zone named \""+name()+"\".");
+                    return false;
+                }
+            }
+
+            val=tempObject.value("sensor_file");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"sensor_file\" is not found within \"sensor\" in the zone named \""+name()+"\".");
+                return false;
+            }else{
+                if (val.isString()){
+                    setSensorFile(val.toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"sensor_file\" does not contain a string in the zone named \""+name()+"\".");
+                    return false;
+                }
+            }
+            val=tempObject.value("location");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"location\" is not found for the sensor in the zone named \""+name()+"\".");
+                return false;
+            }else{
+                if (val.isObject()){
+                    QJsonObject tempObject2=val.toObject();
+                    double x, y, z, xd, yd, zd, spin;
+                    val=tempObject2.value("x");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"x\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            x=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"x\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("y");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"y\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            y=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"y\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("z");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"z\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            z=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"z\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("xd");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"xd\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            xd=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"xd\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("yd");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"yd\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            yd=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"yd\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("zd");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"zd\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            zd=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"zd\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+
+                    val=tempObject2.value("spin_ccw");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"spin_ccw\" was not found for the sensor location in the zone named \""+name()+"\".");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            spin=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"spin_ccw\" for the sensor location in the zone named \""+name()+"\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    if (!setSensorLocation(x, y, z, xd, yd, zd, spin)){
+                        return false;
+                    }
+                }else{
+                    STADIC_ERROR("The key \"location\" for the sensor in the zone named \""+name()+"\" is not an object.");
+                    return false;
+                }
+            }
+
+
+        }else{
+            STADIC_ERROR("The key \"sensor\" in the zone named \""+name()+"\" does not contain an object.");
+            return false;
+        }
+    }
+
+    val=object.value("cp_method");
+    if (val.isUndefined()){
+        STADIC_WARNING("The key \"cp_method\" does not appear in the zone named \""+name()+"\".");
+    }else{
+        if (val.isString()){
+            if (!setCPMethod(val.toString().toStdString())){
+                return false;
+            }else{
+                if (cpMethod()=="auto"){
+                    val=object.value("quantity");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"quantity\" is needed with \"cp_method\" when auto is specified.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            setNumCPs(int(val.toDouble()));
+                        }else{
+                            STADIC_ERROR("The key \"quantity\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=object.value("target_percentage");
+                    if (val.isUndefined()){
+                        STADIC_WARNING("The key \"target_percentage\" is needed with \"cp_method\" when auto is specified.  A value of 0.10 will be assumed.");
+                        setTargetPercentage(0.1);
+                    }else{
+                        if (val.isDouble()){
+                            setTargetPercentage(val.toDouble());
+                        }else{
+                            STADIC_WARNING("The key \"target_percentage\" does not contain a number.  A value of 0.10 will be assumed.");
+                            setTargetPercentage(0.1);
+                        }
+                    }
+                    val=object.value("excluded_points");
+                    if (val.isUndefined()){
+                    STADIC_WARNING("No excluded points file is being used for the critical point analysis for control zone named \"" + name() + "\".");
+                    }else{
+                        if (val.isString()){
+                            setExcludedPoints(val.toString().toStdString());
+                        }else{
+                            STADIC_ERROR("The key \"excluded_points\" does not contain a string.");
+                            return false;
+                        }
+                    }
+                }else if(cpMethod()=="user"){
+                    val=object.value("points");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"points\" is needed with \"cp_method\" when user is specified.");
+                        return false;
+                    }else{
+                        if (val.isArray()){
+                            QJsonArray array=val.toArray();
+                            for (int j=0;j<array.size();j++){
+                                if (array.at(j).isDouble()){
+                                    if (!setCriticalPoints(int(array.at(j).toDouble()))){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"points\" has an entry that is not a number.");
+                                    return false;
+                                }
+                            }
+                        }else{
+                            STADIC_ERROR("The key \"points\" is not an array.");
+                            return false;
+                        }
+                    }
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"cp_method\" in the zone named \""+name()+"\" does not contain a string.");
+            return false;
+        }
+    }
+
+    val=object.value("open_dimming");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("open_dimming")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"open_dimming\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("maximum_bf_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"maximum_bf_signal\" is needed with the \"open_dimming\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setMaximumBFSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"maximum_bf_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("minimum_bf_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"minimum_bf_signal\" is needed with the \"open_dimming\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setMinimumBFSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"minimum_bf_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("off_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"off_signal\" is needed with the \"open_dimming\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOffSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"off_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"open_dimming\" does not contain an object.");
+            return false;
+        }
+    }
+    val=object.value("closed_proportional");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("closed_proportional")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"closed_proportional\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("maximum_bf_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"maximum_bf_signal\" is needed with the \"closed_proportional\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setMaximumBFSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"maximum_bf_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("minimum_bf_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"minimum_bf_signal\" is needed with the \"closed_proportional\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setMinimumBFSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"minimum_bf_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("off_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key\"off_signal\" is needed with the \"closed_proportional\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOffSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"off_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"closed_proportional\" does not contain an object.");
+            return false;
+        }
+    }
+
+    val=object.value("constant_setpoint");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("constant_setpoint")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"constant_setpoint\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("setpoint_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"setpoint_signal\" is needed with the \"constant_setpoint\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setSetpointSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"setpoint_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("off_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"off_signal\" is needed with the \"constant_setpoint\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOffSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"off_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"constant_setpoint\" does not contain an object.");
+            return false;
+        }
+    }
+
+    val=object.value("open_switching");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("open_switching")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"open_switching\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("off_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"off_signal\" is needed with the \"open_switching\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOffSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"off_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("on_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"on_signal\" is needed with the \"open_switching\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOnSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"on_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"open_switching\" does not contain an object.");
+            return false;
+        }
+    }
+
+    val=object.value("closed_switching");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("closed_switching")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"closed_switching\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("off_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"off_signal\" is needed with the \"closed_switching\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOffSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"off_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("on_signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"on_signal\" is needed with the \"closed_switching\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setOnSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"on_signal\" does not contain a number.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"closed_switching\" does not contain an object.");
+            return false;
+        }
+    }
+
+    val=object.value("user_defined_1");
+    if (!val.isUndefined()){
+        if (!setAlgorithm("user_defined_1")){
+            STADIC_ERROR("There was a problem setting the algorithm to \"user_defined_1\".");
+            return false;
+        }
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("signal");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"signal\" is needed with the \"user_defined_1\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setSignal(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"signal\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("dimming_level");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"dimming_level\" is needed with the \"user_defined_1\" algorithm.");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    setDimmingLevel(val.toDouble());
+                }else{
+                    STADIC_ERROR("The key \"dimming_level\" does not contain a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("signal_to_bf_file");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"signal_to_bf_file\" is needed with the \"user_defined_1\" algorithm.");
+                return false;
+            }else{
+                if (val.isString()){
+                    setSignalToBFFile(val.toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"signal_to_bf_file\" does not contain a string.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"user_defined_1\" does not contain an object.");
+            return false;
+        }
+    }
+    //After parsing for the algorithm test to see if the algorithm has been set.  Alert user if it hasn't been set
+    if (algorithm()=="null"){
+        STADIC_WARNING("There is no algorithm specified for the control zone named \""+name()+"\".");
+    }
+
+    val=object.value("luminaire_information");
+    if (val.isUndefined()){
+        STADIC_ERROR("The key \"luminaire_information\" is needed for a control zone.");
+        return false;
+    }else{
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("ies_file");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"ies_file\" is needed within \"luminaire_information\".");
+                return false;
+            }else{
+                if (val.isString()){
+                    setIESFile(val.toString().toStdString());
+                }else{
+                    STADIC_ERROR("The key \"ies_file\" is not a string.");
+                    return false;
+                }
+            }
+            val=tempObject.value("LLF");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"LLF\" is needed within \"luminaire_information\".");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    if (!setLLF(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_ERROR("The key \"LLF\" is not a number.");
+                    return false;
+                }
+            }
+            val=tempObject.value("lamp_lumens");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"lamp_lumens\" is needed within \"luminaire_information\".");
+                return false;
+            }else{
+                if (val.isDouble()){
+                    if(!setLampLumens(val.toDouble())){
+                        return false;
+                    }
+                }else{
+                    STADIC_ERROR("The key \"lamp_lumens\" is not a number.");
+                    return false;
+                }
+            }
+
+        }else{
+            STADIC_ERROR("The key \"luminaire_information\" is not an object.");
+            return false;
+        }
+    }
+
+    val=object.value("ballast_driver_information");
+    if (val.isUndefined()){
+        STADIC_ERROR("The key \"ballast_driver_information\" is needed within for a control zone.");
+        return false;
+    }else{
+        if (val.isObject()){
+            QJsonObject tempObject=val.toObject();
+            val=tempObject.value("ballast_type");
+            if (val.isUndefined()){
+                STADIC_ERROR("The key \"ballast_type\" is needed within \"ballast_driver_information\".");
+                return false;
+            }else{
+                if (val.isString()){
+                    if (!setBallastType(val.toString().toStdString())){
+                        return false;
+                    }else{
+                        if (ballastType()=="linear_dimming"){
+                            val=tempObject.value("bf_min");
+                            if (val.isUndefined()){
+                                STADIC_ERROR("The key \"bf_min\" is needed for ballast type \"linear_dimming\".");
+                                return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if(!setBFMin(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"bf_min\" is not a number.");
+                                    return false;
+                                }
+                            }
+                            val=tempObject.value("bf_max");
+                            if (val.isUndefined()){
+                                STADIC_ERROR("The key \"bf_max\" is needed for ballast type \"linear_dimming\".");
+                                return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if (!setBFMax(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"bf_max\" is not a number.");
+                                    return false;
+                                }
+                            }
+                            val=tempObject.value("watts_max");
+                            if (val.isUndefined()){
+                                STADIC_ERROR("The key \"watts_max\" is needed for ballast type \"linear_dimming\".");
+                                return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if (!setWattsMax(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"watts_max\" is not a number");
+                                    return false;
+                                }
+                            }
+                            val=tempObject.value("watts_min");
+                            if (val.isUndefined()){
+                                STADIC_ERROR("The key \"watts_min\" is needed for ballast type \"linear_dimming\".");
+                                return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if (!setWattsMin(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"watts_min\" is not a number.");
+                                    return false;
+                                }
+                            }
+                        }else if (ballastType()=="non_dimming"){
+                            val=tempObject.value("ballast_factor");
+                            if (val.isUndefined()){
+                               STADIC_ERROR("The key \"ballast_factor\" is needed for ballast type \"non_dimming\".");
+                               return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if (!setBallastFactor(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"ballast_factor\" is not a number.");
+                                    return false;
+                                }
+                            }
+                            val=tempObject.value("watts");
+                            if (val.isUndefined()){
+                                STADIC_ERROR("The key \"watts\" is needed for ballast type \"non_dimming\".");
+                                return false;
+                            }else{
+                                if (val.isDouble()){
+                                    if (!setWatts(val.toDouble())){
+                                        return false;
+                                    }
+                                }else{
+                                    STADIC_ERROR("The key \"watts\" is not a number.");
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    STADIC_ERROR("The key \"ballast_type\" is not a string.");
+                    return false;
+                }
+            }
+
+        }else{
+            STADIC_ERROR("The key \"ballast_driver_information\" is not an object.");
+            return false;
+        }
+    }
+
+    val=object.value("luminaire_layout");
+    if (val.isUndefined()){
+        STADIC_ERROR("The key \"luminaire_layout\" is needed for a control zone.");
+        return false;
+    }else{
+        if (val.isArray()){
+            QJsonArray array=val.toArray();
+            for (int i=0;i<array.size();i++){
+                if (array.at(i).isObject()){
+                    QJsonObject tempObject=array.at(i).toObject();
+                    double x, y, z, rot, tilt, spin;
+                    val=tempObject.value("x");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"x\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            x=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"x\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=tempObject.value("y");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"y\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            y=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"y\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=tempObject.value("z");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"z\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            z=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"z\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=tempObject.value("rotation");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"rotation\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            rot=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"rotation\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=tempObject.value("tilt");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"tilt\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            tilt=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"tilt\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    val=tempObject.value("spin_ccw");
+                    if (val.isUndefined()){
+                        STADIC_ERROR("The key \"spin_ccw\" must be found within the \"luminaire_layout\" entries.");
+                        return false;
+                    }else{
+                        if (val.isDouble()){
+                            spin=val.toDouble();
+                        }else{
+                            STADIC_ERROR("The key \"spin_ccw\" does not contain a number.");
+                            return false;
+                        }
+                    }
+                    if(!setLuminaireLayout(x, y, z, rot, tilt, spin)){
+                        return false;
+                    }
+                }else{
+                    STADIC_ERROR("The key \"luminaire_layout\" contains a position that is not an object.");
+                    return false;
+                }
+            }
+        }else{
+            STADIC_ERROR("The key \"luminaire_layout\" is not an array.");
+            return false;
+        }
+    }
+    */
 
     return true;
 }

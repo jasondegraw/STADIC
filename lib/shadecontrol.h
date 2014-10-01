@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QJsonObject>
+#include <boost/property_tree/ptree.hpp>
 
 #include "stadicapi.h"
 
@@ -15,6 +16,7 @@ class STADIC_API ShadeControl
 public:
     explicit ShadeControl();
     bool parseJson(const QJsonObject &object);
+    bool parseJson (const boost::property_tree::ptree json);
 
     //Setters
     bool setMethod(std::string method);
