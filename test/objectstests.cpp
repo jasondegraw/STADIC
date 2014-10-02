@@ -84,18 +84,18 @@ TEST(ObjectsTests, ProcessOutErrFiles)
 {
     std::stringstream stream;
     stadic::Process proc(PROGRAM);
-    proc.setStandardErrorFile("error.txt");
-    proc.setStandardOutputFile("output.txt");
+    proc.setStandardErrorFile("error0.txt");
+    proc.setStandardOutputFile("output0.txt");
     proc.start();
     proc.wait();
-    std::ifstream err("error.txt");
+    std::ifstream err("error0.txt");
     std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
     err.close();
-    UNLINK("error.txt");
-    std::ifstream out("output.txt");
+    //UNLINK("error.txt");
+    std::ifstream out("output0.txt");
     std::string outputString((std::istreambuf_iterator<char>(out)), std::istreambuf_iterator<char>());
     out.close();
-    UNLINK("output.txt");
+    //UNLINK("output.txt");
     EXPECT_EQ("This is the standard output", stadic::trim(outputString));
     EXPECT_EQ("This is the standard error", stadic::trim(errorString));
 }
