@@ -108,10 +108,6 @@ private:
     bool runoconv(std::string file);                            //Function for running oconv
     bool runrpict(std::string vType);                           //Function for running rpict and ra_bmp
 
-signals:
-
-public slots:
-
 };
 
 }

@@ -42,7 +42,7 @@
 #include <boost/process/detail/file_handle.hpp> 
 #include <boost/process/detail/pipe.hpp> 
 #include <boost/process/detail/stream_info.hpp> 
-#include <boost/filesystem/path.hpp> 
+#include <boost/filesystem/operations.hpp> 
 #include <boost/algorithm/string/predicate.hpp> 
 #include <boost/system/system_error.hpp> 
 #include <boost/throw_exception.hpp> 
@@ -460,7 +460,10 @@ inline children launch_pipeline(const Entries &entries)
         sio.type_ = detail::stream_info::use_handle; 
         sio.handle_ = pipes[i].wend().release(); 
 
-        detail::stream_info sie(ctx.stderr_behavior, true); 
+        detail::file_handle fhstderr;
+        detail::stream_info sie(ctx.stderr_behavior, true);
+        if(sie.type_ == detail::stream_info::use_pipe)
+            fhstderr = sie.pipe_->rend();
 
         s.work_directory = ctx.work_directory; 
 
@@ -471,7 +474,7 @@ inline children launch_pipeline(const Entries &entries)
         if (!::CloseHandle(pi.hThread)) 
             boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::launch_pipeline: CloseHandle failed")); 
 
-        cs.push_back(child(pi.dwProcessId, fhstdin, fhinvalid, fhinvalid, detail::file_handle(pi.hProcess))); 
+        cs.push_back(child(pi.dwProcessId, fhstdin, fhinvalid, fhstderr, detail::file_handle(pi.hProcess)));
     } 
 
     for (typename Entries::size_type i = 1; i < entries.size() - 1; ++i) 
@@ -487,7 +490,10 @@ inline children launch_pipeline(const Entries &entries)
         sio.type_ = detail::stream_info::use_handle; 
         sio.handle_ = pipes[i].wend().release(); 
 
-        detail::stream_info sie(ctx.stderr_behavior, true); 
+        detail::file_handle fhstderr;
+        detail::stream_info sie(ctx.stderr_behavior, true);
+        if(sie.type_ == detail::stream_info::use_pipe)
+            fhstderr = sie.pipe_->rend();
 
         s.work_directory = ctx.work_directory; 
 
@@ -498,7 +504,7 @@ inline children launch_pipeline(const Entries &entries)
         if (!::CloseHandle(pi.hThread)) 
             boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::launch_pipeline: CloseHandle failed")); 
 
-        cs.push_back(child(pi.dwProcessId, fhinvalid, fhinvalid, fhinvalid, detail::file_handle(pi.hProcess))); 
+        cs.push_back(child(pi.dwProcessId, fhinvalid, fhinvalid, fhstderr, detail::file_handle(pi.hProcess)));
     } 
 
     { 
