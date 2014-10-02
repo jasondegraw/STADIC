@@ -4,6 +4,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <iostream>
+#include "functions.h"
+#include <boost/optional.hpp>
 
 namespace stadic {
 
@@ -109,385 +111,180 @@ std::string ShadeControl::sensorFile(){
     return m_SensorFile;
 }
 
-
-bool ShadeControl::parseJson(const QJsonObject &object){
-    QJsonValue val=object.value(QString("method"));
-    if (val.isUndefined()){
-        STADIC_ERROR("The key \"method\" within shade_control does not appear in the STADIC Control File.");
+bool ShadeControl::readAutoProf(const boost::property_tree::ptree json, std::string method){
+    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<double> dVal;
+    dVal=getDouble(json, "elevation_azimuth", "The key \"elevation_azimuth\" was not found with control method \""+method+"\".","The key \"elevation_azimuth\" does not contain a number.", Severity::Error);
+    if (!dVal){
         return false;
     }else{
-        if(val.isString()){
-            if (!setMethod(val.toString().toStdString())){
-                return false;
-            }else{
-                if (controlMethod()=="automated_profile_angle"){
-                    val=object.value(QString("elevation_azimuth"));
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"elevation_azimuth\" was not found with control method \"automated_profile_angle\"");
-                        return false;
-                    }else{
-                        if (val.isDouble()){
-                            if (!setElevationAzimuth(val.toDouble())){
-                                return false;
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"elevation_azimuth\" does not contain a number.");
-                            return false;
-                        }
-                    }
-
-                    val=object.value("angle_settings");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"angle_settings\" was not found with control method \"automated_profile_angle\"");
-                        return false;
-                    }else{
-                        if (val.isArray()){
-                            QJsonArray array=val.toArray();
-                            for (int i=0;i<array.size();i++){
-                                if (array[i].isDouble()){
-                                    if (!setAngleSettings(array[i].toDouble())){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key \"angle_settings\" does not contain a number.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"angle_settings\" is not an array.");
-                            return false;
-                        }
-                    }
-                }else if (controlMethod()=="automated_signal"){
-                    val=object.value("sensor");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"sensor\" was not found witin \"shade_control\"");
-                        return false;
-                    }else{
-                        if (val.isObject()){
-                            QJsonObject object1=val.toObject();
-                            val=object1.value("sensor_type");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"sensor_type\" is not found within \"sensor\" in one of the window groups.");
-                                return false;
-                            }else{
-                                if (val.isString()){
-                                    setSensorType(val.toString().toStdString());
-                                }else{
-                                    STADIC_ERROR("The key \"sensor_type\" does not contain a string in one of the window groups.");
-                                    return false;
-                                }
-                            }
-
-                            val=object1.value("sensor_file");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.");
-                                return false;
-                            }else{
-                                if (val.isString()){
-                                    setSensorFile(val.toString().toStdString());
-                                }else{
-                                    STADIC_ERROR("The key \"sensor_file\" does not contain a string in one of the window groups.");
-                                    return false;
-                                }
-                            }
-                            val=object1.value("location");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"location\" was not found with control method\"automated_signal\".");
-                                return false;
-                            }else{
-                                if (val.isObject()){
-                                    QJsonObject tempObject=val.toObject();
-                                    double x, y, z, xd, yd, zd, spin;
-                                    val=tempObject.value("x");
-                                    if (val.isDouble()){
-                                        x=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"x\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("y");
-                                    if (val.isDouble()){
-                                        y=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"y\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("z");
-                                    if (val.isDouble()){
-                                        z=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"z\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("xd");
-                                    if (val.isDouble()){
-                                        xd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"xd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("yd");
-                                    if (val.isDouble()){
-                                        yd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"yd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("zd");
-                                    if (val.isDouble()){
-                                        zd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"zd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("spin_ccw");
-                                    if (val.isDouble()){
-                                        spin=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"spin\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    if (!setLocation(x, y, z, xd, yd, zd, spin)){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key\"location\" within \"sensor\" is not an object.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"sensor\" is not an object.");
-                            return false;
-                        }
-                    }
-
-                    val=object.value("signal_settings");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"signal_settings\" does not appear within \"control_method\".");
-                        return false;
-                    }else{
-                        if (val.isArray()){
-                            QJsonArray array=val.toArray();
-                            for (unsigned int j=0;j<array.size();j++){
-                                if (array[j].isDouble()){
-                                    if (!setSignalSettings(array[j].toDouble())){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key\"signal_settings\" does not contain an array of numbers.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"signal_settings\" does not contain an array.");
-                            return false;
-                        }
-                    }
-
-                }else if (controlMethod()=="automated_profile_angle_signal"){
-
-                }
-
-
-
-            }
-        }else{
-            STADIC_ERROR("The key \"method\" within window_groups is not a string.");
+        if (!setElevationAzimuth(dVal.get())){
             return false;
         }
+        dVal.reset();
+    }
+    treeVal=getTree(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    if (!treeVal){
+        return false;
+    }else{
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            dVal=getDouble(v.second, "", "", "", Severity::Fatal);
+            if (dVal){
+                if (!setAngleSettings(dVal.get())){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the angle_settings key.");
+            }
+            dVal.reset();
+        }
+        treeVal.reset();
     }
     return true;
 }
-bool ShadeControl::parseJson (const boost::property_tree::ptree json){
-    /*
-    QJsonValue val=object.value(QString("method"));
-    if (val.isUndefined()){
-        STADIC_ERROR("The key \"method\" within shade_control does not appear in the STADIC Control File.");
+
+bool ShadeControl::readAutoSign(const boost::property_tree::ptree json, std::string method){
+    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<double> dVal;
+    boost::optional<std::string> sVal;
+    treeVal=getTree(json, "sensor", "The key \"sensor\" was not found with control method \""+method+"\".", Severity::Error);
+    if (!treeVal){
         return false;
     }else{
-        if(val.isString()){
-            if (!setMethod(val.toString().toStdString())){
+        sVal=getString(treeVal.get(), "sensor_type", "The key \"sensor_type\" is not found within \"sensor\" in one of the window groups.","The key \"sensor_type\" does not contain a string in one of the window groups.", Severity::Error);
+        if (!sVal){
+            return false;
+        }else{
+            if (!setSensorType(sVal.get())){
+                return false;
+            }
+            sVal.reset();
+        }
+
+        sVal=getString(treeVal.get(), "sensor_file", "The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.","The key \"sensor_file\" does not contain a string in one of the window groups.", Severity::Error);
+        if (!sVal){
+            return false;
+        }else{
+            setSensorFile(sVal.get());
+            sVal.reset();
+        }
+        boost::optional<boost::property_tree::ptree> treeVal2;
+        treeVal2=getTree(treeVal.get(), "location", "The key \"location\" was not found with control method \""+method+"\".", Severity::Error);
+        if (!treeVal2){
+            return false;
+        }else{
+            double x, y, z, xd, yd, zd, spin;
+            dVal=getDouble(treeVal2.get(), "x", "The key \"x\" was not found within \"location\".", "The key \"x\" is not a double.", Severity::Error);
+            if (!dVal){
                 return false;
             }else{
-                if (controlMethod()=="automated_profile_angle"){
-                    val=object.value(QString("elevation_azimuth"));
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"elevation_azimuth\" was not found with control method \"automated_profile_angle\"");
-                        return false;
-                    }else{
-                        if (val.isDouble()){
-                            if (!setElevationAzimuth(val.toDouble())){
-                                return false;
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"elevation_azimuth\" does not contain a number.");
-                            return false;
-                        }
-                    }
-
-                    val=object.value("angle_settings");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"angle_settings\" was not found with control method \"automated_profile_angle\"");
-                        return false;
-                    }else{
-                        if (val.isArray()){
-                            QJsonArray array=val.toArray();
-                            for (int i=0;i<array.size();i++){
-                                if (array[i].isDouble()){
-                                    if (!setAngleSettings(array[i].toDouble())){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key \"angle_settings\" does not contain a number.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"angle_settings\" is not an array.");
-                            return false;
-                        }
-                    }
-                }else if (controlMethod()=="automated_signal"){
-                    val=object.value("sensor");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"sensor\" was not found witin \"shade_control\"");
-                        return false;
-                    }else{
-                        if (val.isObject()){
-                            QJsonObject object1=val.toObject();
-                            val=object1.value("sensor_type");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"sensor_type\" is not found within \"sensor\" in one of the window groups.");
-                                return false;
-                            }else{
-                                if (val.isString()){
-                                    setSensorType(val.toString().toStdString());
-                                }else{
-                                    STADIC_ERROR("The key \"sensor_type\" does not contain a string in one of the window groups.");
-                                    return false;
-                                }
-                            }
-
-                            val=object1.value("sensor_file");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.");
-                                return false;
-                            }else{
-                                if (val.isString()){
-                                    setSensorFile(val.toString().toStdString());
-                                }else{
-                                    STADIC_ERROR("The key \"sensor_file\" does not contain a string in one of the window groups.");
-                                    return false;
-                                }
-                            }
-                            val=object1.value("location");
-                            if (val.isUndefined()){
-                                STADIC_ERROR("The key \"location\" was not found with control method\"automated_signal\".");
-                                return false;
-                            }else{
-                                if (val.isObject()){
-                                    QJsonObject tempObject=val.toObject();
-                                    double x, y, z, xd, yd, zd, spin;
-                                    val=tempObject.value("x");
-                                    if (val.isDouble()){
-                                        x=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"x\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("y");
-                                    if (val.isDouble()){
-                                        y=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"y\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("z");
-                                    if (val.isDouble()){
-                                        z=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"z\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("xd");
-                                    if (val.isDouble()){
-                                        xd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"xd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("yd");
-                                    if (val.isDouble()){
-                                        yd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"yd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("zd");
-                                    if (val.isDouble()){
-                                        zd=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"zd\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    val=tempObject.value("spin_ccw");
-                                    if (val.isDouble()){
-                                        spin=val.toDouble();
-                                    }else{
-                                        STADIC_ERROR("The key \"spin\" was not found with \"location\".");
-                                        return false;
-                                    }
-                                    if (!setLocation(x, y, z, xd, yd, zd, spin)){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key\"location\" within \"sensor\" is not an object.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"sensor\" is not an object.");
-                            return false;
-                        }
-                    }
-
-                    val=object.value("signal_settings");
-                    if (val.isUndefined()){
-                        STADIC_ERROR("The key \"signal_settings\" does not appear within \"control_method\".");
-                        return false;
-                    }else{
-                        if (val.isArray()){
-                            QJsonArray array=val.toArray();
-                            for (unsigned int j=0;j<array.size();j++){
-                                if (array[j].isDouble()){
-                                    if (!setSignalSettings(array[j].toDouble())){
-                                        return false;
-                                    }
-                                }else{
-                                    STADIC_ERROR("The key\"signal_settings\" does not contain an array of numbers.");
-                                    return false;
-                                }
-                            }
-                        }else{
-                            STADIC_ERROR("The key \"signal_settings\" does not contain an array.");
-                            return false;
-                        }
-                    }
-
-                }else if (controlMethod()=="automated_profile_angle_signal"){
-
-                }
-
-
-
+                x=dVal.get();
+                dVal.reset();
             }
-        }else{
-            STADIC_ERROR("The key \"method\" within window_groups is not a string.");
-            return false;
+            dVal=getDouble(treeVal2.get(), "y", "The key \"y\" was not found within \"location\".", "The key \"y\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                y=dVal.get();
+                dVal.reset();
+            }
+            dVal=getDouble(treeVal2.get(), "z", "The key \"z\" was not found within \"location\".", "The key \"z\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                z=dVal.get();
+                dVal.reset();
+            }
+            dVal=getDouble(treeVal2.get(), "xd", "The key \"xd\" was not found within \"location\".", "The key \"xd\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                xd=dVal.get();
+                dVal.reset();
+            }
+            dVal=getDouble(treeVal2.get(), "yd", "The key \"yd\" was not found within \"location\".", "The key \"yd\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                yd=dVal.get();
+                dVal.reset();
+            }
+            dVal=getDouble(treeVal2.get(), "zd", "The key \"zd\" was not found within \"location\".", "The key \"zd\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                zd=dVal.get();
+                dVal.reset();
+            }
+            dVal=getDouble(treeVal2.get(), "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
+            if (!dVal){
+                return false;
+            }else{
+                spin=dVal.get();
+                dVal.reset();
+            }
+            if (!setLocation(x, y, z, xd, yd, zd, spin)){
+                return false;
+            }
         }
     }
-    */
+    treeVal.reset();
+    treeVal=getTree(json,"signal_settings", "The key \"signal_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    if (!treeVal){
+        return false;
+    }else{
+        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            dVal=getDouble(v.second, "", "", "", Severity::Fatal);
+            if (dVal){
+                if (!setSignalSettings(dVal.get())){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Warning, "There was a problem reading the signal_settings key.");
+            }
+            dVal.reset();
+        }
+        treeVal.reset();
+    }
+    return true;
+}
+
+bool ShadeControl::parseJson (const boost::property_tree::ptree json){
+    if (json.empty()){
+        STADIC_LOG(Severity::Error, "The window group does not contain data.");
+        return false;
+    }
+    boost::optional<std::string> sVal;
+    boost::optional<boost::property_tree::ptree> treeVal;
+    sVal=getString(json, "method", "The key \"method\" does not appear in the STADIC Control File for shade control.", "The key \"method\" is not a string." ,Severity::Info);
+    if (!sVal){
+        STADIC_LOG(Severity::Error, "There was a proble with the keyword \"method\".");
+        return false;
+    }else{
+        if (!setMethod(sVal.get())){
+            return false;
+        }else{
+            sVal.reset();
+            if (controlMethod()=="automated_profile_angle"){
+                if (!readAutoProf(json, "automated_profile_angle")){
+                    return false;
+                }
+            }else if (controlMethod()=="automated_signal"){
+                if (!readAutoSign(json, "automated_signal")){
+                    return false;
+                }
+            }else if("automated_profile_angle_signal"){
+                if (!readAutoProf(json, "automated_profile_angle_signal")){
+                    return false;
+                }
+                if (!readAutoSign(json, "automated_profile_angle_signal")){
+                    return false;
+                }
+            }
+        }
+    }
+    treeVal.reset();
+
     return true;
 }
 

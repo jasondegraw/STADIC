@@ -38,6 +38,8 @@ public:
 
 
 private:
+    bool readAutoProf(const boost::property_tree::ptree json, std::string method);
+    bool readAutoSign(const boost::property_tree::ptree json, std::string method);
     std::string m_Method;
     double m_ElevationAzimuth;
     std::vector<double> m_AngleSettings;
