@@ -41,15 +41,44 @@ TEST(AnalemmaTests, TestLancaster)
     //EXPECT_NEAR(1500,counter,15);
     iFile.open("sunsMat.rad");
     ASSERT_TRUE(iFile.is_open());
+    counter=0;
     while (std::getline(iFile, line)){
         counter++;
         if (counter==10){
             std::vector<std::string> vals;
             vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(9,vals.size());
+            EXPECT_EQ("void",vals[0]);
+            EXPECT_EQ("light",vals[1]);
+            EXPECT_EQ("solar10",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("3",vals[5]);
+            EXPECT_EQ("1.0",vals[6]);
+            EXPECT_EQ("1.0",vals[7]);
+            EXPECT_EQ("1.0",vals[8]);
 
         }
     }
     iFile.close();
+    EXPECT_EQ(1511, counter);
+    iFile.open("suns.smx");
+    ASSERT_TRUE(iFile.is_open());
+    counter=0;
+    while (std::getline(iFile, line)){
+        counter++;
+        if (counter==5838){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,'\t');
+            ASSERT_EQ(3,vals.size());
+            EXPECT_EQ("1.54e+004",vals[0]);
+            EXPECT_EQ("1.54e+004",vals[1]);
+            EXPECT_EQ("1.54e+004",vals[2]);
+
+        }
+    }
+    iFile.close();
+    EXPECT_EQ(13236360, counter);
 
 
 

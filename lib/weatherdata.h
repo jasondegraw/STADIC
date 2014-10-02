@@ -49,6 +49,7 @@ public:
     std::string latitude() const;                           //Function that returns the latitude as a string
     std::string longitude() const;                          //Function that returns the longitude as a string
     std::string timeZone() const;                           //Function that returns the timezone as a string
+    double timeZoneDeg() const;                             //Function that returns the timezone as a double in degrees
     std::string elevation() const;                          //Function that returns the elevation as a string
     std::vector<int> julianDate() const;                    //Function that returns the julian date as a vector
 

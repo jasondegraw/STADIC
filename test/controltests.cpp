@@ -66,7 +66,6 @@ TEST(ControlTests, PTreeReadJson)
     EXPECT_EQ("ft", controlFile.displayUnits());
     EXPECT_EQ("sched.csv", controlFile.occSchedule());
     EXPECT_EQ(500, controlFile.targetIlluminance());
-    /*
     EXPECT_EQ(2, controlFile.controlZones().size());
 
     //Control Zone 1
@@ -88,7 +87,7 @@ TEST(ControlTests, PTreeReadJson)
     EXPECT_EQ("open_dimming", controlFile.controlZones()[0].algorithm());
     EXPECT_EQ(3000, controlFile.controlZones()[0].maximumBFSignal());
     EXPECT_EQ(100, controlFile.controlZones()[0].minimumBFSignal());
-    EXPECT_EQ(300, controlFile.controlZones()[0].offSignal());
+    EXPECT_EQ(100, controlFile.controlZones()[0].offSignal());
     EXPECT_EQ("pendant.ies", controlFile.controlZones()[0].iesFile());
     EXPECT_EQ(0.9, controlFile.controlZones()[0].llf());
     EXPECT_EQ(2700, controlFile.controlZones()[0].lampLumens());
@@ -179,7 +178,7 @@ TEST(ControlTests, PTreeReadJson)
     EXPECT_EQ(0, controlFile.controlZones()[1].luminaireLayout()[4][3]);
     EXPECT_EQ(0, controlFile.controlZones()[1].luminaireLayout()[4][4]);
     EXPECT_EQ(0, controlFile.controlZones()[1].luminaireLayout()[4][5]);
-    */
+
     EXPECT_EQ(3, controlFile.skyDivisions());
     EXPECT_EQ(4, controlFile.sunDivisions());
     EXPECT_EQ(4, controlFile.ab());

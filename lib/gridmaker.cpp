@@ -13,7 +13,6 @@
 #include <boost/geometry/strategies/cartesian/buffer_join_miter.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_end_flat.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
-#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
 #include <boost/geometry/strategies/cartesian/buffer_side_straight.hpp>
 #include <boost/geometry/algorithms/covered_by.hpp>
 #include <boost/geometry/algorithms/within.hpp>

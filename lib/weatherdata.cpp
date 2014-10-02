@@ -99,6 +99,10 @@ std::string WeatherData::timeZone() const
 {
     return m_TimeZone;
 }
+double WeatherData::timeZoneDeg() const
+{
+    return toDouble(m_TimeZone)*15;
+}
 
 std::string WeatherData::elevation() const 
 {
@@ -177,7 +181,7 @@ bool WeatherData::parseEPW(std::string file)
     setPlace(vals[1]);
     setLatitude(vals[6]);
     setLongitude(vals[7]);
-    setTimeZone(std::to_string(atof(vals[8].c_str())*15));
+    setTimeZone(vals[8]);
     setElevation(vals[9]);
     for(int i = 1; i<8; i++){
         std::getline(iFile, line);
@@ -390,7 +394,7 @@ double WeatherData::solarDec(int julianDate){
 }
 
 double WeatherData::solarTimeAdj(int julianDate){
-    double sta=0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(toDouble(timeZone()))-degToRad(toDouble(longitude())))/PI;
+    double sta=0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(timeZoneDeg())-degToRad(toDouble(longitude())))/PI;
     //std::clog<<sta<<std::endl;
     return sta;
 }

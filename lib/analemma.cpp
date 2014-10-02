@@ -191,7 +191,7 @@ double Analemma::solarDec(int julianDate)
 
 double Analemma::solarTimeAdj(int julianDate)
 {
-    return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(m_WeaData.timeZone())-degToRad(m_WeaData.longitude()))/PI;
+    return 0.170*sin((4*PI/373)*(julianDate-80))-0.129*sin((2*PI/355)*(julianDate-8))+12 *(degToRad(m_WeaData.timeZoneDeg())-degToRad(m_WeaData.longitude()))/PI;
 }
 
 double Analemma::solarAlt(double solarDeclination, double time)
