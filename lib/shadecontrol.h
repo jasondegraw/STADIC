@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <QJsonObject>
+//#include <QJsonObject>
 #include <boost/property_tree/ptree.hpp>
 
 #include "stadicapi.h"
@@ -15,8 +15,8 @@ class STADIC_API ShadeControl
 {
 public:
     explicit ShadeControl();
-    bool parseJson(const QJsonObject &object);
-    bool parseJson (const boost::property_tree::ptree json);
+    //bool parseJson(const QJsonObject &object);
+    bool parseJson (const boost::property_tree::ptree &json);
 
     //Setters
     bool setMethod(std::string method);
@@ -38,8 +38,8 @@ public:
 
 
 private:
-    bool readAutoProf(const boost::property_tree::ptree json, std::string method);
-    bool readAutoSign(const boost::property_tree::ptree json, std::string method);
+    bool readAutoProf(const boost::property_tree::ptree &json, std::string method);
+    bool readAutoSign(const boost::property_tree::ptree &json, std::string method);
     std::string m_Method;
     double m_ElevationAzimuth;
     std::vector<double> m_AngleSettings;

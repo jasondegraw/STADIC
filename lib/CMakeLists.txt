@@ -45,4 +45,4 @@ set(HDRS stadicapi.h
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 
-target_link_libraries(stadic_core Qt5::Widgets ${Boost_LIBRARIES})
+target_link_libraries(stadic_core ${Boost_LIBRARIES}) #Qt5::Widgets)

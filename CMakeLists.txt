@@ -37,13 +37,13 @@ file(COPY boost-process/boost/process.hpp DESTINATION "${CMAKE_SOURCE_DIR}/boost
 file(COPY boost-process/boost/process DESTINATION "${CMAKE_SOURCE_DIR}/boost-root/include/boost-1_56/boost")
 
 # Find includes in the build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Turn on automatic invocation of the MOC
-set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOMOC ON)
 
 # Find the QtWidgets library
-find_package(Qt5Widgets REQUIRED)
+#find_package(Qt5Widgets REQUIRED)
 
 add_subdirectory(lib)
 add_subdirectory(utilities)
