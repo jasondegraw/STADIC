@@ -40,10 +40,6 @@ void WeatherData::setTimeZone(std::string timeZone)
 {
     m_TimeZone=timeZone;
 }
-void WeatherData::setTimeZoneDeg(double timeZone){
-    m_TimeZoneDeg=timeZone;
-}
-
 
 void WeatherData::setElevation(std::string elev)
 {
@@ -105,7 +101,7 @@ std::string WeatherData::timeZone() const
 }
 double WeatherData::timeZoneDeg() const
 {
-    return m_TimeZoneDeg;
+    return toDouble(m_TimeZone)*15;
 }
 
 std::string WeatherData::elevation() const 
@@ -186,7 +182,6 @@ bool WeatherData::parseEPW(std::string file)
     setLatitude(vals[6]);
     setLongitude(vals[7]);
     setTimeZone(vals[8]);
-    setTimeZoneDeg(toDouble(vals[8])*15);
     setElevation(vals[9]);
     for(int i = 1; i<8; i++){
         std::getline(iFile, line);
@@ -250,7 +245,6 @@ bool WeatherData::parseTMY(std::string file){
     setLatitude(vals[4]);
     setLongitude(vals[5]);
     setTimeZone(vals[3]);
-    setTimeZoneDeg(toDouble(vals[3])*15);
     setElevation(vals[6]);
     std::string tempString;
     std::vector<std::string> parseDate;

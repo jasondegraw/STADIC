@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-#include <QJsonObject>
 #include <boost/property_tree/ptree.hpp>
 
 #include "stadicapi.h"
@@ -14,7 +13,6 @@ class STADIC_API ControlZone
 {
 public:
     ControlZone();
-    bool parseJson(const QJsonObject &object);
     bool parseJson (const boost::property_tree::ptree json);
     
     //Setters

@@ -35,7 +35,6 @@ public:
     void setLatitude(std::string lat);                      //Function to set the latitude
     void setLongitude(std::string lon);                     //Function to set the longitude
     void setTimeZone(std::string timeZone);                 //Function to set the timezone
-    void setTimeZoneDeg(double timeZone);                   //Function to set the timezone in degrees
     void setElevation(std::string elev);                    //Function to set the elevation
 
     //Getters
@@ -91,7 +90,6 @@ private:
     std::string m_Latitude;                                 //Variable holding the latitude as a string
     std::string m_Longitude;                                //Variable holding the longitude as a string
     std::string m_TimeZone;                                 //Variable holding the timezone as a string
-    double m_TimeZoneDeg;                                   //Variable holding the timezone as a double in degrees
     std::string m_Elevation;                                //Variable holding the elevation as a string
 
 };
