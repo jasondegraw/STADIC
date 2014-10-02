@@ -3,7 +3,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
-
+#include "functions.h"
+#include <boost/optional.hpp>
 #include "logging.h"
 
 namespace stadic {

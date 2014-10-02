@@ -1,11 +1,5 @@
 #include "stadiccontrol.h"
 #include "windowgroup.h"
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QJsonValue>
-#include <QJsonArray>
-#include <QFile>
-#include <QString>
 #include <iostream>
 #include <fstream>
 #include <string>

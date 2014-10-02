@@ -1,8 +1,5 @@
 #include "shadecontrol.h"
 #include "logging.h"
-#include <QJsonValue>
-#include <QJsonObject>
-#include <QJsonArray>
 #include <iostream>
 #include "functions.h"
 #include <boost/optional.hpp>

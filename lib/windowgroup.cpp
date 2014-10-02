@@ -1,9 +1,5 @@
 #include "windowgroup.h"
 #include "shadecontrol.h"
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
 #include <vector>
 #include <iostream>
 #include <boost/optional.hpp>
