@@ -58,6 +58,14 @@ target_link_libraries(analemmatests stadic_core gtest gtest_main)
 
 add_executable(testprogram testprogram.cpp)
 
+add_executable(gridtests gridtests.cpp)
+add_test(gridtests gridtests)
+target_link_libraries(gridtests stadic_core gtest gtest_main)
+add_custom_command(TARGET gridtests POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_SOURCE_DIR}/test/resources/complicated.rad $<TARGET_FILE_DIR:gridtests>)
+
+
 set(RESOURCES resources/SimpleHole.rad
 			  resources/standard/SimpleStd.json
 			  resources/standard/data/Lancaster.wea

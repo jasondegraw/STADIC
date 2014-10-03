@@ -221,7 +221,6 @@ bool Analemma::closestSun()
     std::vector<double> svec;
     for (int julian_date=1;julian_date<366;julian_date++){
         for (int hri=0;hri<24; hri++){
-
             hr=hri+.5;
             hr_count=hr_count+1;
             sda = solarDec(julian_date);

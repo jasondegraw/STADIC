@@ -219,7 +219,7 @@ bool GridMaker::parseRad(){
             boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(m_RadFile.geometry().at(i)->arg3()[j*3]), toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1])));
             tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+2]);
         }
-        tempZ=tempZ/m_RadFile.geometry().at(i)->arg3().size()/3.0;
+        tempZ=tempZ/(m_RadFile.geometry().at(i)->arg3().size()/3.0);
         boost::geometry::correct(tempPolygon);
         if (boost::geometry::is_valid(tempPolygon)){
             //unite polygons that are the right layer name
@@ -242,11 +242,11 @@ bool GridMaker::parseRad(){
                             heightFound=true;
                             setPos=j;
                         }
-                        if (!heightFound){
+                    }
+                    if (!heightFound){
                             m_PolySetHeight.push_back(tempZ);
                             firstPolygon.push_back(true);
-                            setPos=0;
-                        }
+                            setPos=m_PolySetHeight.size()-1;
                     }
                 }
                 if (firstPolygon[setPos]){
@@ -293,6 +293,7 @@ bool GridMaker::insetPolygons(){
         boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon;
         boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
         m_UnitedPolygon[i]=tempPolygon;
+        boost::geometry::correct(m_UnitedPolygon[i]);
         if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
             STADIC_ERROR("Creating the offset failed to create a valid polygon.");
             return false;
