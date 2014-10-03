@@ -13,6 +13,7 @@
 //namespace bp = ::boost::process;
 #include <boost/filesystem.hpp>
 #include <thread>
+#include <fstream>
 #endif
 
 
