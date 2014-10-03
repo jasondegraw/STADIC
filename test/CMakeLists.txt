@@ -52,6 +52,10 @@ add_executable(objectstests objectstests.cpp)
 add_test(objectstests objectstests)
 target_link_libraries(objectstests stadic_core gtest gtest_main)
 
+add_executable(processtests processtests.cpp)
+add_test(processtests processtests)
+target_link_libraries(processtests stadic_core gtest gtest_main)
+
 add_executable(analemmatests analemmatests.cpp)
 add_test(analemmatests analemmatests)
 target_link_libraries(analemmatests stadic_core gtest gtest_main)

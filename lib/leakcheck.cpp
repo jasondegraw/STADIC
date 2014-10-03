@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "objects.h"
+#include "process.h"
 #include "gridmaker.h"
 #include "functions.h"
 

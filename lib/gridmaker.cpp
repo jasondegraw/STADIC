@@ -2,6 +2,7 @@
 #include "gridmaker.h"
 #include "radprimitive.h"
 #include "functions.h"
+#include "process.h"
 #include <iostream>
 #include <fstream>
 #include <boost/geometry.hpp>

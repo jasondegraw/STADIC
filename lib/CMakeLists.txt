@@ -21,7 +21,8 @@ set(SRCS stadiccontrol.cpp
          leakcheck.cpp
          functions.cpp
          objects.cpp
-         analemma.cpp)
+         analemma.cpp
+         process.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -41,8 +42,9 @@ set(HDRS stadicapi.h
          leakcheck.h
          functions.h
          objects.h
-         analemma.h)
+         analemma.h
+         process.h)
 
-add_library(stadic_core SHARED ${HDRS} ${SRCS})
+add_library(stadic_core STATIC ${HDRS} ${SRCS})
 
-target_link_libraries(stadic_core ${Boost_LIBRARIES}) #Qt5::Widgets)
+target_link_libraries(stadic_core ${Boost_LIBRARIES})
