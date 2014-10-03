@@ -211,8 +211,6 @@ double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2)
 
 bool Analemma::closestSun()
 {
-    std::ofstream oFile;
-    oFile.open("c:/001/BracketValues.txt");
     int hr_count=0;
     double hr=0;
     double sda;         //Solar Declination Angle
@@ -232,8 +230,6 @@ bool Analemma::closestSun()
             azimuth = solarAz(sda, hr+sta) + PI - degToRad(m_Rotation);
             svec=pos(altitude,azimuth);
             double dp_closest=0;
-            oFile<<"julianDate="<<julian_date<<" time= "<<hr+sta<<" sta="<<sta<<" PI="<<PI;
-            oFile<<" sda "<<sda<< " altitude "<<altitude<<" azimuth "<<azimuth<<" svec= "<<svec[0]<< ","<<svec[1]<< ","<<svec[2];
             if(altitude > 0){
               for (unsigned int j=0; j<m_SunLoc.size(); j++) {
                 std::vector<double> tempvec;
@@ -257,17 +253,36 @@ bool Analemma::closestSun()
                     m_ClosestSun[hr_count-1]=-1;
                 }
             }
-            oFile<<" ClosestSun="<<m_ClosestSun[hr_count-1]<<std::endl;
         }
     }
-
-    oFile.close();
 
     return true;
 }
 
 bool Analemma::genSunMtx()
 {
+    std::ofstream smx;
+    smx.open(m_SMXFile);
+    if (!smx.is_open()){
+        STADIC_ERROR("There was a problem opening the smx file \""+m_SMXFile+"\".");
+        return false;
+    }
+    smx.setf(std::ios::scientific);
+    smx.setf(std::ios::fixed);
+    smx.precision(3);
+    for (int j=0;j<m_numSuns;j++){
+        for (int i=0;i<8760;i++){
+            if (m_ClosestSun[i]==j){
+                smx<<m_WeaData.directIlluminance()[i]/6.797e-05<<"\t"<<m_WeaData.directIlluminance()[i]/6.797e-05<<"\t"<<m_WeaData.directIlluminance()[i]/6.797e-05<<std::endl;
+            }else{
+                smx<<"0\t0\t0\n";
+            }
+        }
+    }
+    smx.close();
+
+    /*
+    std::clog<<"Resizing Sun Matrix."<<std::endl;
     m_SunVal.resize(8760);
     for (int i=0;i<8760;i++){
         m_SunVal[i].resize(m_numSuns);
@@ -278,6 +293,7 @@ bool Analemma::genSunMtx()
             }
         }
     }
+    std::clog<<"Finished resizing Sun Matrix."<<std::endl;
     for (int i=0;i<m_WeaData.hour().size();i++){
         if (m_ClosestSun[i]>-1){
             std::vector<double> tempVec;
@@ -287,6 +303,7 @@ bool Analemma::genSunMtx()
             m_SunVal[i][m_ClosestSun[i]]=tempVec;
         }
     }
+    std::clog<<"Writing Sun Matrix."<<std::endl;
     //Write out SMX matrix
     std::ofstream smx;
     smx.open(m_SMXFile);
@@ -303,11 +320,13 @@ bool Analemma::genSunMtx()
                 smx<<"0\t0\t0"<<std::endl;
             }else{
                 //Write exponential format
-                smx<<m_SunVal[j][i][0]<<"\t"<<m_SunVal[j][i][1]<<"\t"<<m_SunVal[j][i][2]<<std::endl;
+                smx<<m_SunVal[j][i][0]<<"\t"<<m_SunVal[j][i][1]<<"\t"<<m_SunVal[j][i][2]<<"\n";
             }
         }
     }
     smx.close();
+    std::clog<<"Finished writing Sun Matrix."<<std::endl;
+    */
     return true;
 }
 
