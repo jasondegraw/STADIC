@@ -54,13 +54,13 @@ TEST(GridTests, Complicated)
     layers.push_back("l_groundfloor");
     layers.push_back("l_firstfloor");
     layers.push_back("l_secondfloor");
-    //layers.push_back("l_stairs");
+    layers.push_back("l_stairs");
     grid.setLayerNames(layers);
-    grid.setOffset(12);
+    grid.setOffset(24);
     grid.setSpaceX(24);
     grid.setSpaceY(24);
     grid.setOffsetZ(30);
     ASSERT_TRUE(grid.makeGrid());
     ASSERT_TRUE(grid.writePTS("complicatedgrid.pts"));
-    ASSERT_TRUE(grid.viewPTS("", "sw"));
+    ASSERT_TRUE(grid.viewPTS("", "se"));
 }

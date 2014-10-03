@@ -289,6 +289,40 @@ bool GridMaker::insetPolygons(){
     boost::geometry::strategy::buffer::end_flat end_strategy;
     boost::geometry::strategy::buffer::point_square point_strategy;
     boost::geometry::strategy::buffer::side_straight side_strategy;
+    std::vector<bool> keepPolygon;
+    for (int i=0;i<m_PolySetHeight.size();i++){
+        boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon;
+        boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
+        if (!boost::geometry::is_valid(tempPolygon)){
+            keepPolygon.push_back(false);
+        }else{
+            keepPolygon.push_back(true);
+        }
+        m_UnitedPolygon[i]=tempPolygon;
+        boost::geometry::correct(m_UnitedPolygon[i]);
+
+    }
+    for (int i=m_PolySetHeight.size()-1;i>=0;i--){
+        if (keepPolygon[i]){
+            if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
+                STADIC_ERROR("Creating the offset failed to create a valid polygon.");
+                return false;
+            }
+        }else{
+            m_UnitedPolygon.erase(m_UnitedPolygon.begin()+ i);
+            m_PolySetHeight.erase(m_PolySetHeight.begin()+ i);
+        }
+    }
+    if (std::find(keepPolygon.begin(), keepPolygon.end(), false)!=keepPolygon.end()){
+        STADIC_LOG(Severity::Info, "Some surfaces were too small at certain heights to place valid points.\n\tTheses surfaces were removed from the grid making process.");
+    }
+
+    /*
+    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy((m_Offset -m_Offset*0.10), (m_Offset-m_Offset*0.10));
+    boost::geometry::strategy::buffer::join_miter join_strategy;
+    boost::geometry::strategy::buffer::end_flat end_strategy;
+    boost::geometry::strategy::buffer::point_square point_strategy;
+    boost::geometry::strategy::buffer::side_straight side_strategy;
     for (int i=0;i<m_PolySetHeight.size();i++){
         boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon;
         boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
@@ -299,6 +333,7 @@ bool GridMaker::insetPolygons(){
             return false;
         }
     }
+    */
     return true;
 }
 
@@ -516,6 +551,7 @@ bool GridMaker::runoconv(std::string file){
 
 bool GridMaker::runrpict(std::string vType){
     std::string picFile=m_picFile+"grid.pic";
+    std::string pfiltFile=m_picFile+"gridfiltered.pic";
     std::string bmpFile=m_picFile+"grid.bmp";
     std::vector<std::string> args;
     double deltaX=m_MaxXRad-m_MinXRad;
@@ -606,9 +642,9 @@ bool GridMaker::runrpict(std::string vType){
     args.push_back("0");
     args.push_back("-w");
     args.push_back("-x");
-    args.push_back("500");
+    args.push_back("3000");
     args.push_back("-y");
-    args.push_back("500");
+    args.push_back("3000");
     args.push_back("-pj");
     args.push_back("0");
     args.push_back("-av");
@@ -627,9 +663,21 @@ bool GridMaker::runrpict(std::string vType){
         return false;
     }
 
+    std::string pfiltProgram="pfilt";
+    args.clear();
+    args.push_back("-x/2");
+    args.push_back("-y/2");
+    args.push_back(picFile);
+    Process pFilt(pfiltProgram, args);
+    pFilt.setStandardOutputFile(pfiltFile);
+    pFilt.start();
+    if (!pFilt.wait()){
+        return false;
+    }
+
     std::string bmpProgram="ra_bmp";
     args.clear();
-    args.push_back(picFile);
+    args.push_back(pfiltFile);
     Process raBMP(bmpProgram,args);
     raBMP.setStandardOutputFile(bmpFile);
     raBMP.start();
