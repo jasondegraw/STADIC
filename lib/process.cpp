@@ -246,12 +246,14 @@ bool Process::wait()
         Process *current = m_upstream;
         while(current != nullptr) {
             current->m_state = m_state;
+            current->writeFiles();
             current = current->m_upstream;
         }
         // Now downstream
         current = m_downstream;
         while(current != nullptr) {
             current->m_state = m_state;
+            current->writeFiles();
             current = current->m_downstream;
         }
         return m_state == RunCompleted;

@@ -347,7 +347,15 @@ inline children launch_pipeline(const Entries &entries)
         { 
             detail::stream_info si = detail::stream_info(ctx.stderr_behavior, true); 
             infoout.insert(detail::info_map::value_type(STDERR_FILENO, si)); 
-        } 
+        }
+
+        detail::file_handle fhstderr;
+
+        if (ctx.stderr_behavior.get_type() == stream_behavior::capture)
+        {
+            fhstderr = detail::posix_info_locate_pipe(infoout, STDERR_FILENO, true);
+            BOOST_ASSERT(fhstderr.valid());
+        }
 
         detail::posix_setup s; 
         s.work_directory = ctx.work_directory; 
@@ -362,7 +370,7 @@ inline children launch_pipeline(const Entries &entries)
             BOOST_ASSERT(fhstdin.valid()); 
         } 
 
-        cs.push_back(child(pid, fhstdin, fhinvalid, fhinvalid)); 
+        cs.push_back(child(pid, fhstdin, fhinvalid, fhstderr));
     } 
 
     for (typename Entries::size_type i = 1; i < entries.size() - 1; ++i) 
@@ -386,14 +394,22 @@ inline children launch_pipeline(const Entries &entries)
         { 
             detail::stream_info si = detail::stream_info(ctx.stderr_behavior, true); 
             infoout.insert(detail::info_map::value_type(STDERR_FILENO, si)); 
-        } 
+        }
+
+        detail::file_handle fhstderr;
+
+        if (ctx.stderr_behavior.get_type() == stream_behavior::capture)
+        {
+            fhstderr = detail::posix_info_locate_pipe(infoout, STDERR_FILENO, true);
+            BOOST_ASSERT(fhstderr.valid());
+        }
 
         detail::posix_setup s; 
         s.work_directory = ctx.work_directory; 
 
         pid_t pid = detail::posix_start(entries[i].executable, entries[i].arguments, ctx.environment, infoin, infoout, s); 
 
-        cs.push_back(child(pid, fhinvalid, fhinvalid, fhinvalid)); 
+        cs.push_back(child(pid, fhinvalid, fhinvalid, fhstderr));
     } 
 
     { 
