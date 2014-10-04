@@ -284,7 +284,7 @@ TEST(ProcessTests, Process5StdErrFileStdOutFile)
     proc2.setStandardOutputProcess(&proc3);
 
     stadic::Process proc4(PROGRAM, args);
-    proc4.setStandardOutputFile("error.txt");
+    proc4.setStandardOutputFile("output.txt");
     proc3.setStandardOutputProcess(&proc4);
 
     proc0.start();
@@ -299,10 +299,6 @@ TEST(ProcessTests, Process5StdErrFileStdOutFile)
     ASSERT_FALSE(proc3.wait());
     ASSERT_FALSE(proc4.wait());
 
-    //std::string output = stadic::trim(proc4.output());
-    // Zap control chars...
-    //output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
-    EXPECT_EQ("Input:Input:Input:Input:Input:STOP", stadic::trim(proc4.output()));
     EXPECT_EQ("Error:STOP", stadic::trim(proc0.error()));
     EXPECT_EQ("Error:Input:STOP", stadic::trim(proc1.error()));
     EXPECT_EQ("Error:Input:Input:STOP", stadic::trim(proc2.error()));
@@ -311,6 +307,11 @@ TEST(ProcessTests, Process5StdErrFileStdOutFile)
     err.close();
     errorString.erase(std::remove_if(errorString.begin(), errorString.end(), ::iscntrl), errorString.end());
     EXPECT_EQ("Error:Input:Input:Input:STOP", errorString);
+    std::ifstream readout("output.txt");
+    std::string outputString((std::istreambuf_iterator<char>(readout)), std::istreambuf_iterator<char>());
+    out.close();
+    outputString.erase(std::remove_if(outputString.begin(), outputString.end(), ::iscntrl), outputString.end());
+    EXPECT_EQ("Input:Input:Input:Input:Input:STOP", outputString);
     EXPECT_EQ("Error:Input:Input:Input:Input:STOP", stadic::trim(proc4.error()));
     EXPECT_TRUE(proc0.output().empty());
     EXPECT_TRUE(proc1.output().empty());

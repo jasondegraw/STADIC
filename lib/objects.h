@@ -17,11 +17,6 @@
 
 #include "stadicapi.h"
 
-// This is a C++11 thing - if we can't use this then we're looking
-// at a define or some other horrifying construct
-template<typename T>
-using shared_vector = std::vector<std::shared_ptr<T> >;
-
 #ifdef _MSC_VER
 //struct WIN32_FILE_ATTRIBUTE_DATA;
 typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;

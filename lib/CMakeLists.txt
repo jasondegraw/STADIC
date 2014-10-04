@@ -45,6 +45,6 @@ set(HDRS stadicapi.h
          analemma.h
          process.h)
 
-add_library(stadic_core STATIC ${HDRS} ${SRCS})
+add_library(stadic_core SHARED ${HDRS} ${SRCS})
 
 target_link_libraries(stadic_core ${Boost_LIBRARIES})

@@ -9,7 +9,7 @@
 #define UNLINK unlink
 #endif
 
-TEST(ObjectsTests, FilePathDirectory)
+TEST(FilePathTests, Directory)
 {
     std::string testString;
 #ifdef _WIN32
@@ -38,7 +38,7 @@ TEST(ObjectsTests, FilePathDirectory)
     EXPECT_FALSE(dir2.exists());
 }
 
-TEST(ObjectsTests, FilePathFile)
+TEST(FilePathTests, File)
 {
     std::string testString = "testfile.txt";
     UNLINK(testString.c_str());
