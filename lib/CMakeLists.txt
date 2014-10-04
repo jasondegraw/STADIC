@@ -20,7 +20,7 @@ set(SRCS stadiccontrol.cpp
          materialprimitives.cpp
          leakcheck.cpp
          functions.cpp
-         objects.cpp
+         filepath.cpp
          analemma.cpp
          process.cpp)
 		 
@@ -41,7 +41,7 @@ set(HDRS stadicapi.h
          materialprimitives.h
          leakcheck.h
          functions.h
-         objects.h
+         filepath.h
          analemma.h
          process.h)
 
