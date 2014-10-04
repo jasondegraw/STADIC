@@ -160,6 +160,47 @@ TEST(ProcessTests, ProcessMultiples2)
     UNLINK("input.txt");
 }
 
+TEST(ProcessTests, ProcessMultiples3)
+{
+    std::ofstream out("input.txt");
+    out << "This is the first line" << std::endl;
+    out << "There's not much more" << std::endl;
+    out << "STOP" << std::endl;
+    out.close();
+
+    std::vector<std::string> args0;
+    args0.push_back("-R");
+    stadic::Process proc0(PROGRAM, args0);
+    proc0.setStandardInputFile("input.txt");
+
+    std::vector<std::string> args1;
+    args1.push_back("-R");
+    stadic::Process proc1(PROGRAM, args1);
+
+    proc0.setStandardOutputProcess(&proc1);
+
+    proc1.start();
+    proc0.start();
+
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+
+    std::string output = stadic::trim(proc1.output());
+    // Zap control chars...
+    output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
+    EXPECT_EQ("Input:Input:This is the first lineInput:Input:There's not much moreInput:Input:STOP", output);
+    //EXPECT_TRUE(stadic::trim(proc.error()).empty());
+    UNLINK("input.txt");
+
+    std::string error = stadic::trim(proc0.error());
+    error.erase(std::remove_if(error.begin(), error.end(), ::iscntrl), error.end());
+    EXPECT_EQ("Error:This is the first lineError:There's not much moreError:STOP",error);
+
+    error = stadic::trim(proc1.error());
+    error.erase(std::remove_if(error.begin(), error.end(), ::iscntrl), error.end());
+    EXPECT_EQ("Error:Input:This is the first lineError:Input:There's not much moreError:Input:STOP",error);
+}
+
 TEST(ProcessTests, Process5NoStdErr)
 {
     std::ofstream out("input.txt");

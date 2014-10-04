@@ -349,14 +349,6 @@ inline children launch_pipeline(const Entries &entries)
             infoout.insert(detail::info_map::value_type(STDERR_FILENO, si)); 
         }
 
-        detail::file_handle fhstderr;
-
-        if (ctx.stderr_behavior.get_type() == stream_behavior::capture)
-        {
-            fhstderr = detail::posix_info_locate_pipe(infoout, STDERR_FILENO, true);
-            BOOST_ASSERT(fhstderr.valid());
-        }
-
         detail::posix_setup s; 
         s.work_directory = ctx.work_directory; 
 
@@ -368,7 +360,15 @@ inline children launch_pipeline(const Entries &entries)
         { 
             fhstdin = detail::posix_info_locate_pipe(infoin, STDIN_FILENO, false); 
             BOOST_ASSERT(fhstdin.valid()); 
-        } 
+        }
+
+        detail::file_handle fhstderr;
+
+        if (ctx.stderr_behavior.get_type() == stream_behavior::capture)
+        {
+            fhstderr = detail::posix_info_locate_pipe(infoout, STDERR_FILENO, true);
+            BOOST_ASSERT(fhstderr.valid());
+        }
 
         cs.push_back(child(pid, fhstdin, fhinvalid, fhstderr));
     } 
@@ -396,6 +396,11 @@ inline children launch_pipeline(const Entries &entries)
             infoout.insert(detail::info_map::value_type(STDERR_FILENO, si)); 
         }
 
+        detail::posix_setup s; 
+        s.work_directory = ctx.work_directory; 
+
+        pid_t pid = detail::posix_start(entries[i].executable, entries[i].arguments, ctx.environment, infoin, infoout, s);
+
         detail::file_handle fhstderr;
 
         if (ctx.stderr_behavior.get_type() == stream_behavior::capture)
@@ -403,11 +408,6 @@ inline children launch_pipeline(const Entries &entries)
             fhstderr = detail::posix_info_locate_pipe(infoout, STDERR_FILENO, true);
             BOOST_ASSERT(fhstderr.valid());
         }
-
-        detail::posix_setup s; 
-        s.work_directory = ctx.work_directory; 
-
-        pid_t pid = detail::posix_start(entries[i].executable, entries[i].arguments, ctx.environment, infoin, infoout, s); 
 
         cs.push_back(child(pid, fhinvalid, fhinvalid, fhstderr));
     } 
