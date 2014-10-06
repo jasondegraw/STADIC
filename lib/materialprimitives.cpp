@@ -6,13 +6,15 @@ namespace stadic{
 PlasticMaterial::PlasticMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
-    std::vector<std::string> arg3 = {"0","0","0","0","0"};
-    initArg(3,arg3);
+    std::vector<std::string> arg3 = { "0", "0", "0", "0", "0" };
+    initArg(3, arg3);
 }
 
 PlasticMaterial::PlasticMaterial(double red, double green, double blue, double spec, double rough) : RadPrimitive()
 {
     RadPrimitive::setType("plastic");
+    std::vector<std::string> arg3 = { "0", "0", "0", "0", "0" };
+    initArg(3, arg3);
     setArg(3, stadic::toString(red), 0);
     setArg(3, stadic::toString(green), 1);
     setArg(3, stadic::toString(blue), 2);
@@ -109,43 +111,20 @@ double PlasticMaterial::roughness() const
 
 bool PlasticMaterial::validateArg(int number, std::string value, int position) const
 {
-    if(number==3) {
+    if(number == 3) {
         bool ok;
         double dval = stadic::toDouble(value, &ok);
-        switch (position){
-            case 0:
-            case 1:
-            case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The R G B values for a plastic must be between 0 and 1.");
-                }
-                break;
-            case 3:
-                if (ok && dval >=0 && dval <=0.07){
-                    return true;
-                }else if (dval>.07&&dval<1){
-                    STADIC_WARNING("The specularity value for a plastic is suggested to be between 0 and 0.07.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_ERROR("The specularity value for a plastic cannot be greater than 1.");
-                }else if (dval<0){
-                    STADIC_ERROR("The specularity value for a plastic cannot be less than 0.");
-                }
-                break;
-            case 4:
-                if (ok && dval >=0 && dval <=0.02){
-                    return true;
-                }else if (dval<0){
-                    STADIC_ERROR("The roughness for a plastic cannot be less than 0.");
-                }else if (dval>0.02 && dval<1){
-                    STADIC_WARNING("The roughness value for a plastic is suggested to be between 0 and 0.02.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_ERROR("The roughness for a plastic cannot be greater than 1.");
-                }
-                break;
+        switch(position){
+        case 0:
+            return checkValue(value, 0, 0, 1, "red", "plastic");
+        case 1:
+            return checkValue(value, 1, 0, 1, "blue", "plastic");
+        case 2:
+            return checkValue(value, 1, 0, 1, "green", "plastic");
+        case 3:
+            return checkValue(value, 1, 0, 1, 0, 0.07, "specularity", "plastic");
+        case 4:
+            return checkValue(value, 1, 0, 1, 0, 0.02, "roughness", "plastic");
         }
     }
     return false;
@@ -338,22 +317,24 @@ bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
 //TRANS
 TransMaterial::TransMaterial() : RadPrimitive()
 {
-    RadPrimitive::setType("metal");
+    RadPrimitive::setType("trans");
     std::vector<std::string> arg3 = {"0","0","0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough,double trans, double transpec)
+TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec)
     : RadPrimitive()
 {
-    RadPrimitive::setType("metal");
-    setArg(3,std::to_string(red),0);
-    setArg(3,std::to_string(green),1);
-    setArg(3,std::to_string(blue),2);
-    setArg(3,std::to_string(spec),3);
-    setArg(3,std::to_string(rough),4);
-    setArg(3,std::to_string(trans),5);
-    setArg(3,std::to_string(transpec),6);
+    RadPrimitive::setType("trans");
+    std::vector<std::string> arg3 = { "0", "0", "0", "0", "0", "0", "0" };
+    initArg(3, arg3);
+    setArg(3, stadic::toString(red), 0);
+    setArg(3, stadic::toString(green), 1);
+    setArg(3, stadic::toString(blue), 2);
+    setArg(3, stadic::toString(spec), 3);
+    setArg(3, stadic::toString(rough), 4);
+    setArg(3, stadic::toString(trans), 5);
+    setArg(3, stadic::toString(transpec), 6);
 
 }
 
@@ -492,11 +473,17 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
         switch (position){
             case 0:
             case 1:
+                if(ok && dval >= 0 && dval <= 1.0) {
+                    return true;
+                } else {
+                    STADIC_ERROR("The blue value for a trans must be between 0 and 1, current value is " + getArg3(2) + ".");
+                }
+                break;
             case 2:
                 if(ok && dval >= 0 && dval <= 1.0) {
                     return true;
                 }else{
-                    STADIC_ERROR("The R G B values for a trans must be between 0 and 1.");
+                    STADIC_ERROR("The green value for a trans must be between 0 and 1, current value is " + getArg3(2) + ".");
                 }
                 break;
             case 3:
@@ -515,12 +502,12 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
                 if (ok && dval >=0 && dval <=0.02){
                     return true;
                 }else if (dval<0){
-                    STADIC_ERROR("The roughness for a trans cannot be less than 0.");
+                    STADIC_LOG(Severity::Warning, "The roughness for a trans cannot be less than 0, current value is " + getArg3(4) + ".");
                 }else if (dval>0.02 && dval<1){
-                    STADIC_WARNING("The roughness value for a trans is suggested to be 0 and 0.02.");
+                    STADIC_LOG(Severity::Warning, "The roughness value for a trans is suggested to be 0 and 0.02.");
                     return true;
                 }else if (dval>1){
-                    STADIC_ERROR("The roughness for a trans cannot be greater than 1.");
+                    STADIC_LOG(Severity::Warning, "The roughness for a trans cannot be greater than 1, current value is " + getArg3(4) + ".");
                 }
                 break;
             case 5:

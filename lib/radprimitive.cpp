@@ -346,4 +346,43 @@ void RadPrimitive::initArg(int number, std::vector<std::string> arg)
     }
 }
 
+bool RadPrimitive::checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const
+{
+    bool ok;
+    double dval = stadic::toDouble(value, &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " must be a floating point number, value remains " + getArg3(index) + ".");
+        return false;
+    }
+    if(dval < min) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be less than " + stadic::toString(min) + ", value remains " + getArg3(index) + ".");
+    } else if(dval > max) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be greater than " + stadic::toString(max) + ", value remains " + getArg3(index) + ".");
+    } else {
+        return true;
+    }
+    return false;
+}
+
+bool RadPrimitive::checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const
+{
+    bool ok;
+    double dval = stadic::toDouble(value, &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " must be a floating point number, value remains " + getArg3(index) + ".");
+        return false;
+    }
+    if(dval < min) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be less than " + stadic::toString(min) + ", value remains " + getArg3(index) + ".");
+    } else if(dval > max) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be greater than " + stadic::toString(max) + ", value remains " + getArg3(index) + ".");
+    } else {
+        if(dval < recMin || dval > recMax) {
+            STADIC_LOG(Severity::Warning, "The suggested range for the " + variable + " value for a " + object + " is [" + stadic::toString(recMin) + "," + stadic::toString(recMax) + "].");
+        }
+        return true;
+    }
+    return false;
+}
+
 }

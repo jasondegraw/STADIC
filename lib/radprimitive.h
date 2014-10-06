@@ -56,6 +56,8 @@ public:
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
+    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const;
+    bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const;
 
 private:
     virtual bool validateArg(int number, std::string value, int position) const {return true;}
