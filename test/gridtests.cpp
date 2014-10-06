@@ -22,7 +22,7 @@ TEST(GridTests, SimpleInset){
     grid.setOffsetZ(30);
     ASSERT_TRUE(grid.makeGrid());
 }
-
+*/
 TEST(GridTests, SimpleOffset){
     std::vector<std::string> files;
     files.clear();
@@ -40,7 +40,6 @@ TEST(GridTests, SimpleOffset){
     grid.setOffsetZ(30);
     ASSERT_TRUE(grid.makeGrid());
 }
-*/
 
 TEST(GridTests, Complicated)
 {
