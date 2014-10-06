@@ -338,22 +338,22 @@ bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
 //TRANS
 TransMaterial::TransMaterial() : RadPrimitive()
 {
-    RadPrimitive::setType("metal");
+    RadPrimitive::setType("trans");
     std::vector<std::string> arg3 = {"0","0","0","0","0","0","0"};
     initArg(3,arg3);
 }
 
-TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough,double trans, double transpec)
+TransMaterial::TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec)
     : RadPrimitive()
 {
-    RadPrimitive::setType("metal");
-    setArg(3,std::to_string(red),0);
-    setArg(3,std::to_string(green),1);
-    setArg(3,std::to_string(blue),2);
-    setArg(3,std::to_string(spec),3);
-    setArg(3,std::to_string(rough),4);
-    setArg(3,std::to_string(trans),5);
-    setArg(3,std::to_string(transpec),6);
+    RadPrimitive::setType("trans");
+    setArg(3, stadic::toString(red), 0);
+    setArg(3, stadic::toString(green), 1);
+    setArg(3, stadic::toString(blue), 2);
+    setArg(3, stadic::toString(spec), 3);
+    setArg(3, stadic::toString(rough), 4);
+    setArg(3, stadic::toString(trans), 5);
+    setArg(3, stadic::toString(transpec), 6);
 
 }
 
