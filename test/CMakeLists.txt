@@ -22,6 +22,9 @@ target_link_libraries(weathertests stadic_core gtest gtest_main)
 add_custom_command(TARGET weathertests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/USA_PA_Lancaster.AP.725116_TMY3.epw $<TARGET_FILE_DIR:weathertests>)
+add_custom_command(TARGET weathertests POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_SOURCE_DIR}/test/resources/LancasterTMY.csv $<TARGET_FILE_DIR:weathertests>)
 
 add_executable(primitivetests primitivetests.cpp)
 add_test(primitivetests primitivetests)

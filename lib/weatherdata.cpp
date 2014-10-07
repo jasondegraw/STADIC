@@ -151,11 +151,11 @@ bool WeatherData::writeWea(std::string file)
     oFile<<"place "<<place()<<std::endl;
     oFile<<"latitude "<<latitude()<<std::endl;
     oFile<<"longitude "<<longitude()<<std::endl;
-    oFile<<"time_zone "<<timeZone()<<std::endl;
+    oFile<<"time_zone "<<timeZoneDeg()<<std::endl;
     oFile<<"site_elevation "<<elevation()<<std::endl;
-    oFile<<"weather_data_file_units 1"<<std::endl;
+    oFile<<"weather_data_file_units 1";
     for (int i=0;i<month().size();i++){
-        oFile<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<directNormal()[i]<<" "<<diffuseHorizontal()[i]<<std::endl;
+        oFile<<std::endl<<month()[i]<<" "<<day()[i]<<" "<<hour()[i]<<" "<<directNormal()[i]<<" "<<diffuseHorizontal()[i];
     }
     oFile.close();
     return true;
@@ -178,10 +178,10 @@ bool WeatherData::parseEPW(std::string file)
         STADIC_ERROR("Weather file " + file + " first line is missing information.");
         return false;
     }
-    setPlace(vals[1]);
+    setPlace(vals[1]+"_"+vals[3]);
     setLatitude(vals[6]);
-    setLongitude(vals[7]);
-    setTimeZone(vals[8]);
+    setLongitude(toString(-1*toDouble(vals[7])));
+    setTimeZone(toString(-1*toDouble(vals[8])));
     setElevation(vals[9]);
     for(int i = 1; i<8; i++){
         std::getline(iFile, line);
@@ -241,13 +241,16 @@ bool WeatherData::parseTMY(std::string file){
     vals.clear();
     getline(iFile,line);
     vals=stadic::split(line,',');
-    setPlace(vals[1]);
+    std::vector<std::string> vals2;
+    vals2=stadic::split(vals[1],'\"');
+    setPlace(vals2[1]);
     setLatitude(vals[4]);
-    setLongitude(vals[5]);
-    setTimeZone(vals[3]);
+    setLongitude(toString(-1*toDouble(vals[5])));
+    setTimeZone(toString(-1*toDouble(vals[3])));
     setElevation(vals[6]);
     std::string tempString;
     std::vector<std::string> parseDate;
+    getline(iFile,line);            //Read in the explanation line.
     getline(iFile,line);
     vals=split(line,',');
     //Read Date String
@@ -259,7 +262,7 @@ bool WeatherData::parseTMY(std::string file){
     tempString=vals.at(1);
     parseDate.clear();
     parseDate=split(tempString,':');
-    double tempHour=atof(parseDate[0].c_str())+atof(parseDate[1].c_str())/60;
+    double tempHour=toDouble(parseDate[0])+toDouble(parseDate[1])/60.0;
     //Determine time correction factor
     double correction=tempHour-0.5;
     m_Hour.push_back(tempHour-correction);
@@ -279,11 +282,12 @@ bool WeatherData::parseTMY(std::string file){
         tempString=vals[1];
         parseDate.clear();
         parseDate=split(tempString,':');
-        double tempHour=atof(parseDate[0].c_str())+atof(parseDate[1].c_str())/60;
+        double tempHour=toDouble(parseDate[0])+toDouble(parseDate[1])/60.0;
         m_Hour.push_back(tempHour-correction);
         m_DirectNormal.push_back(vals[7]);
         m_DiffuseHorizontal.push_back(vals[10]);
         m_DewPointC.push_back(toDouble(vals[34]));
+        line.clear();
     }
     iFile.close();
     /*
