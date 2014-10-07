@@ -112,19 +112,17 @@ double PlasticMaterial::roughness() const
 bool PlasticMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number == 3) {
-        bool ok;
-        double dval = stadic::toDouble(value, &ok);
         switch(position){
         case 0:
             return checkValue(value, 0, 0, 1, "red", "plastic");
         case 1:
             return checkValue(value, 1, 0, 1, "blue", "plastic");
         case 2:
-            return checkValue(value, 1, 0, 1, "green", "plastic");
+            return checkValue(value, 2, 0, 1, "green", "plastic");
         case 3:
-            return checkValue(value, 1, 0, 1, 0, 0.07, "specularity", "plastic");
+            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "plastic");
         case 4:
-            return checkValue(value, 1, 0, 1, 0, 0.02, "roughness", "plastic");
+            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "plastic");
         }
     }
     return false;
@@ -160,6 +158,8 @@ MetalMaterial::MetalMaterial(double red, double green, double blue, double spec,
     : RadPrimitive()
 {
     RadPrimitive::setType("metal");
+    std::vector<std::string> arg3 = { "0", "0", "0", "0", "0" };
+    initArg(3, arg3);
     setArg(3, stadic::toString(red), 0);
     setArg(3, stadic::toString(green), 1);
     setArg(3, stadic::toString(blue), 2);
@@ -257,42 +257,17 @@ double MetalMaterial::roughness() const
 bool MetalMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = stadic::toDouble(value, &ok);
-        switch (position){
-            case 0:
-            case 1:
-            case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The R G B values for a metal must be between 0 and 1.");
-                }
-                break;
-            case 3:
-                if (ok && dval >=.5 && dval <=1){
-                    return true;
-                }else if (dval<.5&&dval>=0){
-                    STADIC_WARNING("The specularity value for a metal is suggested to be between 0.5 and 1.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_ERROR("The specularity value for a metal cannot be greater than 1.");
-                }else if (dval<0){
-                    STADIC_ERROR("The specularity value for a metal cannot be less than 0.");
-                }
-                break;
-            case 4:
-                if (ok && dval >=0 && dval <=0.5){
-                    return true;
-                }else if (dval<0){
-                    STADIC_ERROR("The roughness for a metal cannot be less than 0.");
-                }else if (dval>0.5 && dval<1){
-                    STADIC_WARNING("The roughness value for a metal is suggested to be between 0 and 0.5.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_ERROR("The roughness for a metal cannot be greater than 1.");
-                }
-                break;
+        switch (position) {
+        case 0:
+            return checkValue(value, 0, 0, 1, "red", "metal");
+        case 1:
+            return checkValue(value, 1, 0, 1, "blue", "metal");
+        case 2:
+            return checkValue(value, 2, 0, 1, "green", "metal");
+        case 3:
+            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "metal");
+        case 4:
+            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "metal");
         }
     }
     return false;
@@ -341,43 +316,43 @@ TransMaterial::TransMaterial(double red, double green, double blue, double spec,
 // Setters
 bool TransMaterial::setRed(double value)
 {
-    return setArg(3,std::to_string(value),0);
+    return setArg(3,stadic::toString(value),0);
 }
 
 bool TransMaterial::setGreen(double value)
 {
-    return setArg(3,std::to_string(value),1);
+    return setArg(3,stadic::toString(value),1);
 }
 
 bool TransMaterial::setBlue(double value)
 {
-    return setArg(3,std::to_string(value),2);
+    return setArg(3,stadic::toString(value),2);
 }
 
 bool TransMaterial::setSpecularity(double value)
 {
-    return setArg(3,std::to_string(value),3);
+    return setArg(3,stadic::toString(value),3);
 }
 
 bool TransMaterial::setRoughness(double value)
 {
-    return setArg(3,std::to_string(value),4);
+    return setArg(3,stadic::toString(value),4);
 }
 
 bool TransMaterial::setTransmission(double value)
 {
     //This needs to convert transmission into transmissivity
-    return setArg(3,std::to_string(value),5);
+    return setArg(3,stadic::toString(value),5);
 }
 
 bool TransMaterial::setTransmissivity(double value)
 {
-    return setArg(3,std::to_string(value),5);
+    return setArg(3,stadic::toString(value),5);
 }
 
 bool TransMaterial::setTransSpecular(double value)
 {
-    return setArg(3,std::to_string(value),6);
+    return setArg(3,stadic::toString(value),6);
 }
 
 // Getters
@@ -468,62 +443,21 @@ double TransMaterial::transSpecular() const
 bool TransMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {
-        bool ok;
-        double dval = stadic::toDouble(value, &ok);
         switch (position){
-            case 0:
-            case 1:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                } else {
-                    STADIC_ERROR("The blue value for a trans must be between 0 and 1, current value is " + getArg3(2) + ".");
-                }
-                break;
-            case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The green value for a trans must be between 0 and 1, current value is " + getArg3(2) + ".");
-                }
-                break;
-            case 3:
-                if (ok && dval >=0 && dval <=0.07){
-                    return true;
-                }else if (dval>.07 && dval<1){
-                    STADIC_WARNING("The specularity value for a trans is suggested to be between 0 and 0.07.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_ERROR("The specularity value for a trans cannot be greater than 1.");
-                }else if (dval<0){
-                    STADIC_ERROR("The specularity value for a trans cannot be less than 0.");
-                }
-                break;
-            case 4:
-                if (ok && dval >=0 && dval <=0.02){
-                    return true;
-                }else if (dval<0){
-                    STADIC_LOG(Severity::Warning, "The roughness for a trans cannot be less than 0, current value is " + getArg3(4) + ".");
-                }else if (dval>0.02 && dval<1){
-                    STADIC_LOG(Severity::Warning, "The roughness value for a trans is suggested to be 0 and 0.02.");
-                    return true;
-                }else if (dval>1){
-                    STADIC_LOG(Severity::Warning, "The roughness for a trans cannot be greater than 1, current value is " + getArg3(4) + ".");
-                }
-                break;
-            case 5:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The transmissivity value for a trans must be between 0 and 1.");
-                }
-                break;
-            case 6:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The transmitted specularity value for a trans must be between 0 and 1.");
-                }
-                break;
+        case 0:
+            return checkValue(value, 0, 0, 1, "red", "trans");
+        case 1:
+            return checkValue(value, 1, 0, 1, "blue", "trans");
+        case 2:
+            return checkValue(value, 2, 0, 1, "green", "trans");
+        case 3:
+            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "trans");
+        case 4:
+            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "trans");
+        case 5:
+            return checkValue(value, 5, 0, 1, "transmissivity", "trans");
+        case 6:
+            return checkValue(value, 6, 0, 1, "transmitted specularity", "trans");
         }
     }
     return false;
@@ -549,48 +483,41 @@ bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
 GlassMaterial::GlassMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    std::vector<std::string> arg3 = {"0","0","0"};
+    std::vector<std::string> arg3 = { "0", "0", "0", "0" };
     initArg(3,arg3);
-}
-
-GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans)
-    : RadPrimitive()
-{
-    RadPrimitive::setType("glass");
-    setArg(3,std::to_string(redTrans),0);
-    setArg(3,std::to_string(greenTrans),1);
-    setArg(3,std::to_string(blueTrans),2);
 }
 
 GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
     : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    setArg(3,std::to_string(redTrans),0);
-    setArg(3,std::to_string(greenTrans),1);
-    setArg(3,std::to_string(blueTrans),2);
-    setArg(3, std::to_string( refrac),3);
+    std::vector<std::string> arg3 = { "0", "0", "0", "0" };
+    initArg(3, arg3);
+    setArg(3,stadic::toString(redTrans),0);
+    setArg(3,stadic::toString(greenTrans),1);
+    setArg(3,stadic::toString(blueTrans),2);
+    setArg(3,stadic::toString(refrac),3);
 }
 
 // Setters
 bool GlassMaterial::setRedTrans(double value)
 {
-    return setArg(3,std::to_string(value),0);
+    return setArg(3,stadic::toString(value),0);
 }
 
 bool GlassMaterial::setGreenTrans(double value)
 {
-    return setArg(3,std::to_string(value),1);
+    return setArg(3,stadic::toString(value),1);
 }
 
 bool GlassMaterial::setBlueTrans(double value)
 {
-    return setArg(3,std::to_string(value),2);
+    return setArg(3,stadic::toString(value),2);
 }
 
 bool GlassMaterial::setRefraction(double value)
 {
-    return setArg(3,std::to_string(value),3);
+    return setArg(3,stadic::toString(value),3);
 }
 
 // Getters
@@ -648,22 +575,14 @@ bool GlassMaterial::validateArg(int number, std::string value, int position) con
         bool ok;
         double dval = stadic::toDouble(value, &ok);
         switch (position){
-            case 0:
-            case 1:
-            case 2:
-                if(ok && dval >= 0 && dval <= 1.0) {
-                    return true;
-                }else{
-                    STADIC_ERROR("The R G B transmissivity values for glass must be between 0 and 1.");
-                }
-                break;
-            case 3:
-                if (ok && dval >=0 && dval <=5){
-                    return true;
-                }else {
-                    STADIC_ERROR("The index of refraction value for glass must be between 0 and 5.");
-                }
-                break;
+        case 0:
+            return checkValue(value, 0, 0, 1, "red transmissivity", "glass");
+        case 1:
+            return checkValue(value, 1, 0, 1, "blue transmissivity", "glass");
+        case 2:
+            return checkValue(value, 2, 0, 1, "green transmissivity", "glass");
+        case 3:
+            return checkValue(value, 3, 0, 5, "index of refraction", "glass");
         }
     }
     return false;
@@ -697,18 +616,18 @@ BSDFMaterial::BSDFMaterial(double thickness, std::string BSDFfile, double ux, do
     : RadPrimitive()
 {
     RadPrimitive::setType("BSDF");
-    setArg(1,std::to_string(thickness),0);
+    setArg(1,stadic::toString(thickness),0);
     setArg(1,BSDFfile,1);
-    setArg(1,std::to_string(ux),2);
-    setArg(1,std::to_string(uy),3);
-    setArg(1,std::to_string(uz),4);
+    setArg(1,stadic::toString(ux),2);
+    setArg(1,stadic::toString(uy),3);
+    setArg(1,stadic::toString(uz),4);
     setArg(1,".",5);
 }
 
 // Setters
 bool BSDFMaterial::setThickness(double value)
 {
-    return setArg(1,std::to_string(value),0);
+    return setArg(1,stadic::toString(value),0);
 }
 
 bool BSDFMaterial::setBSDFfile(std::string name)
@@ -718,17 +637,17 @@ bool BSDFMaterial::setBSDFfile(std::string name)
 
 bool BSDFMaterial::setUX(double value)
 {
-    return setArg(1,std::to_string(value),2);
+    return setArg(1,stadic::toString(value),2);
 }
 
 bool BSDFMaterial::setUY(double value)
 {
-    return setArg(1,std::to_string(value),3);
+    return setArg(1,stadic::toString(value),3);
 }
 
 bool BSDFMaterial::setUZ(double value)
 {
-    return setArg(1,std::to_string(value),4);
+    return setArg(1,stadic::toString(value),4);
 }
 
 // Getters
