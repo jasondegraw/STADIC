@@ -79,6 +79,26 @@ double toDouble(const std::string &string, bool *ok)
     return value;
 }
 
+// Generic convert string to integer function, mainly in case we need to drop C++11
+int toInteger(const std::string &string, bool *ok)
+{
+    int value;
+    try {
+        value = std::stoi(string);
+        if(ok != nullptr) {
+            *ok = true;
+        }
+    }
+    catch(std::exception&)
+    {
+        value = 0;
+        if(ok != nullptr) {
+            *ok = false;
+        }
+    }
+    return value;
+}
+
 std::string toString(double value)
 {
     std::stringstream stream;
