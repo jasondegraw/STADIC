@@ -273,3 +273,50 @@ TEST(PrimitiveTests, Sphere)
     EXPECT_EQ(0, rad.centerPoint()[2]);
     EXPECT_EQ(3, rad.radius());
 }
+
+TEST(PrimitiveTests, Ring)
+{
+    std::vector<double> centerPoint;
+    centerPoint.push_back(0);
+    centerPoint.push_back(0);
+    centerPoint.push_back(0);
+    std::vector<double> surfaceNormal;
+    surfaceNormal.push_back(0);
+    surfaceNormal.push_back(0);
+    surfaceNormal.push_back(1);
+    stadic::RingGeometry rad(centerPoint, surfaceNormal, 0, 6);
+    EXPECT_EQ(stadic::RadPrimitive::Ring, rad.type());
+    EXPECT_EQ("ring", rad.typeString());
+    // Arg checks
+    EXPECT_EQ(0, rad.arg1().size());
+    EXPECT_EQ(0, rad.arg2().size());
+    ASSERT_EQ(8, rad.arg3().size());
+    EXPECT_EQ("0", rad.getArg3(0));
+    EXPECT_EQ("0", rad.getArg3(1));
+    EXPECT_EQ("0", rad.getArg3(2));
+    EXPECT_EQ("0", rad.getArg3(3));
+    EXPECT_EQ("0", rad.getArg3(4));
+    EXPECT_EQ("1", rad.getArg3(5));
+    EXPECT_EQ("0", rad.getArg3(6));
+    EXPECT_EQ("6", rad.getArg3(7));
+    EXPECT_EQ("0", rad.getArg(3, 0));
+    EXPECT_EQ("0", rad.getArg(3, 1));
+    EXPECT_EQ("0", rad.getArg(3, 2));
+    EXPECT_EQ("0", rad.getArg(3, 3));
+    EXPECT_EQ("0", rad.getArg(3, 4));
+    EXPECT_EQ("1", rad.getArg(3, 5));
+    EXPECT_EQ("0", rad.getArg(3, 6));
+    EXPECT_EQ("6", rad.getArg(3, 7));
+    // Miscellaneous checks
+    EXPECT_FALSE(rad.setType("polygon"));
+    ASSERT_EQ(3, rad.centerPoint().size());
+    EXPECT_EQ(0, rad.centerPoint()[0]);
+    EXPECT_EQ(0, rad.centerPoint()[1]);
+    EXPECT_EQ(0, rad.centerPoint()[2]);
+    ASSERT_EQ(3, rad.surfaceNormal().size());
+    EXPECT_EQ(0, rad.surfaceNormal()[0]);
+    EXPECT_EQ(0, rad.surfaceNormal()[1]);
+    EXPECT_EQ(1, rad.surfaceNormal()[2]);
+    EXPECT_EQ(0, rad.innerRadius());
+    EXPECT_EQ(6, rad.outerRadius());
+}
