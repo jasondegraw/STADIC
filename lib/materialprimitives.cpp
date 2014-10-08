@@ -607,7 +607,7 @@ bool GlassMaterial::validateArg(int number, std::vector<std::string> arg) const
 //BSDF
 BSDFMaterial::BSDFMaterial() : RadPrimitive()
 {
-    RadPrimitive::setType("BSDF");
+    RadPrimitive::setType("bsdf");
     std::vector<std::string> arg1 = {"0","null","0","0","0","."};
     initArg(1,arg1);
 }
@@ -615,7 +615,7 @@ BSDFMaterial::BSDFMaterial() : RadPrimitive()
 BSDFMaterial::BSDFMaterial(double thickness, std::string BSDFfile, double ux, double uy, double uz)
     : RadPrimitive()
 {
-    RadPrimitive::setType("BSDF");
+    RadPrimitive::setType("bsdf");
     setArg(1,stadic::toString(thickness),0);
     setArg(1,BSDFfile,1);
     setArg(1,stadic::toString(ux),2);
