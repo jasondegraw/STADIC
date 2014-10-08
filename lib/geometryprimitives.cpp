@@ -247,7 +247,7 @@ std::vector<double> RingGeometry::surfaceNormal() const{
     surfaceNormal.push_back(toDouble(getArg3(5)));
     return surfaceNormal;
 }
-
+//Add getters and setters for R1 and R2, but only getters for inner and outer radius
 double RingGeometry::innerRadius() const{
 
     return toDouble(getArg3(6));

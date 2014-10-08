@@ -116,9 +116,9 @@ bool PlasticMaterial::validateArg(int number, std::string value, int position) c
         case 0:
             return checkValue(value, 0, 0, 1, "red", "plastic");
         case 1:
-            return checkValue(value, 1, 0, 1, "blue", "plastic");
+            return checkValue(value, 1, 0, 1, "green", "plastic");
         case 2:
-            return checkValue(value, 2, 0, 1, "green", "plastic");
+            return checkValue(value, 2, 0, 1, "blue", "plastic");
         case 3:
             return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "plastic");
         case 4:
