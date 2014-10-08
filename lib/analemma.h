@@ -32,13 +32,14 @@ private:
     std::string m_WeatherFile;                                              //Variable holding the input weather file
     WeatherData m_WeaData;                                                  //WeatherData object
     std::vector<std::vector<double> > m_SunLoc;                              //Vector holding the sun locations
-    std::vector<std::vector<std::vector<double> > > m_SunVal;                 //Vector holding the sun luminance values
+    //std::vector<std::vector<std::vector<double> > > m_SunVal;                 //Vector holding the sun luminance values
     double m_Rotation;                                                      //Variable holding the building rotation
     int m_numSuns;                                                          //Variable holding the number of suns (Maybe not needed)
     std::string m_MatFile;                                                  //Variable holding the sun mateterial filename
     std::string m_GeoFile;                                                  //Variable holding the sun geometry filename
     std::string m_SMXFile;                                                  //Variable holding the sun smx filename
     std::vector<int> m_ClosestSun;                                          //Vector holding which sun is closest at any given hour
+    //std::vector<std::string> temporarySun;
 
     //Functions
     bool parseWeather();                                                    //Function to parse the weather file.  Handled by WeatherData object
