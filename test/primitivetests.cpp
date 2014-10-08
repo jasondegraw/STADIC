@@ -1,6 +1,7 @@
 #include "radprimitive.h"
 #include "gtest/gtest.h"
 #include "materialprimitives.h"
+#include "geometryprimitives.h"
 
 TEST(PrimitiveTests, Plastic)
 {
@@ -119,4 +120,156 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ(0, rad2.roughness());
     EXPECT_EQ(0, rad2.transmissivity());
     EXPECT_EQ(0, rad2.transSpecular());
+}
+TEST(PrimitiveTests, glass)
+{
+
+    stadic::GlassMaterial rad(0.6, 0.7, 0.5);
+    EXPECT_EQ(stadic::RadPrimitive::Glass, rad.type());
+    EXPECT_EQ("glass", rad.typeString());
+    // Arg checks
+    EXPECT_EQ(0, rad.arg1().size());
+    EXPECT_EQ(0, rad.arg2().size());
+    ASSERT_EQ(4, rad.arg3().size());
+    EXPECT_EQ("0.6", rad.getArg3(0));
+    EXPECT_EQ("0.7", rad.getArg3(1));
+    EXPECT_EQ("0.5", rad.getArg3(2));
+    EXPECT_EQ("1.52", rad.getArg3(3));
+    EXPECT_EQ("0.6", rad.getArg(3, 0));
+    EXPECT_EQ("0.7", rad.getArg(3, 1));
+    EXPECT_EQ("0.5", rad.getArg(3, 2));
+    EXPECT_EQ("1.52", rad.getArg(3, 3));
+
+    // Miscellaneous checks
+    EXPECT_FALSE(rad.setType("polygon"));
+    EXPECT_EQ(0.6, rad.redTrans());
+    EXPECT_EQ(0.7, rad.greenTrans());
+    EXPECT_EQ(0.5, rad.blueTrans());
+    EXPECT_EQ(1.52, rad.refraction());
+}
+
+TEST(PrimitiveTests, BSDF)
+{
+
+    stadic::BSDFMaterial rad(0,"bsdf.xml", 0,-1,0);
+    EXPECT_EQ(stadic::RadPrimitive::BSDF, rad.type());
+    EXPECT_EQ("bsdf", rad.typeString());
+    // Arg checks
+    EXPECT_EQ(6, rad.arg1().size());
+    EXPECT_EQ(0, rad.arg2().size());
+    ASSERT_EQ(0, rad.arg3().size());
+    EXPECT_EQ("0", rad.getArg1(0));
+    EXPECT_EQ("bsdf.xml", rad.getArg1(1));
+    EXPECT_EQ("0", rad.getArg1(2));
+    EXPECT_EQ("-1", rad.getArg1(3));
+    EXPECT_EQ("0", rad.getArg1(4));
+    EXPECT_EQ(".", rad.getArg1(5));
+    EXPECT_EQ("0", rad.getArg(1, 0));
+    EXPECT_EQ("bsdf.xml", rad.getArg(1, 1));
+    EXPECT_EQ("0", rad.getArg(1, 2));
+    EXPECT_EQ("-1", rad.getArg(1, 3));
+    EXPECT_EQ("0", rad.getArg(1, 4));
+    EXPECT_EQ(".", rad.getArg(1, 5));
+    // Miscellaneous checks
+    EXPECT_FALSE(rad.setType("polygon"));
+    EXPECT_EQ(0, rad.thickness());
+    EXPECT_EQ("bsdf.xml", rad.bsdfFile());
+    EXPECT_EQ(0, rad.ux());
+    EXPECT_EQ(-1, rad.uy());
+    EXPECT_EQ(0, rad.uz());
+}
+
+
+TEST(PrimitiveTests, Polygon)
+{
+    std::vector<double> points;
+    //Polygon with points at (0,0,0);(120,0,0);(120,120,0);(0,120,0)
+    points.push_back(0);
+    points.push_back(0);
+    points.push_back(0);
+    points.push_back(120);
+    points.push_back(0);
+    points.push_back(0);
+    points.push_back(120);
+    points.push_back(120);
+    points.push_back(0);
+    points.push_back(0);
+    points.push_back(120);
+    points.push_back(0);
+    stadic::PolygonGeometry rad(points);
+    EXPECT_EQ(stadic::RadPrimitive::Polygon, rad.type());
+    EXPECT_EQ("polygon", rad.typeString());
+    // Arg checks
+    EXPECT_EQ(0, rad.arg1().size());
+    EXPECT_EQ(0, rad.arg2().size());
+    ASSERT_EQ(12, rad.arg3().size());
+    EXPECT_EQ("0", rad.getArg3(0));
+    EXPECT_EQ("0", rad.getArg3(1));
+    EXPECT_EQ("0", rad.getArg3(2));
+    EXPECT_EQ("120", rad.getArg3(3));
+    EXPECT_EQ("0", rad.getArg3(4));
+    EXPECT_EQ("0", rad.getArg3(5));
+    EXPECT_EQ("120", rad.getArg3(6));
+    EXPECT_EQ("120", rad.getArg3(7));
+    EXPECT_EQ("0", rad.getArg3(8));
+    EXPECT_EQ("0", rad.getArg3(9));
+    EXPECT_EQ("120", rad.getArg3(10));
+    EXPECT_EQ("0", rad.getArg3(11));
+    EXPECT_EQ("0", rad.getArg(3, 0));
+    EXPECT_EQ("0", rad.getArg(3, 1));
+    EXPECT_EQ("0", rad.getArg(3, 2));
+    EXPECT_EQ("120", rad.getArg(3, 3));
+    EXPECT_EQ("0", rad.getArg(3, 4));
+    EXPECT_EQ("0", rad.getArg(3, 5));
+    EXPECT_EQ("120", rad.getArg(3, 6));
+    EXPECT_EQ("120", rad.getArg(3, 7));
+    EXPECT_EQ("0", rad.getArg(3, 8));
+    EXPECT_EQ("0", rad.getArg(3, 9));
+    EXPECT_EQ("120", rad.getArg(3, 10));
+    EXPECT_EQ("0", rad.getArg(3, 11));
+    // Miscellaneous checks
+    EXPECT_FALSE(rad.setType("sphere"));
+    ASSERT_EQ(12, rad.points().size());
+    EXPECT_EQ(0, rad.points()[0]);
+    EXPECT_EQ(0, rad.points()[1]);
+    EXPECT_EQ(0, rad.points()[2]);
+    EXPECT_EQ(120, rad.points()[3]);
+    EXPECT_EQ(0, rad.points()[4]);
+    EXPECT_EQ(0, rad.points()[5]);
+    EXPECT_EQ(120, rad.points()[6]);
+    EXPECT_EQ(120, rad.points()[7]);
+    EXPECT_EQ(0, rad.points()[8]);
+    EXPECT_EQ(0, rad.points()[9]);
+    EXPECT_EQ(120, rad.points()[10]);
+    EXPECT_EQ(0, rad.points()[11]);
+}
+
+TEST(PrimitiveTests, Sphere)
+{
+    std::vector<double> centerPoint;
+    centerPoint.push_back(0);
+    centerPoint.push_back(0);
+    centerPoint.push_back(0);
+    stadic::SphereGeometry rad(centerPoint, 3);
+    EXPECT_EQ(stadic::RadPrimitive::Sphere, rad.type());
+    EXPECT_EQ("sphere", rad.typeString());
+    // Arg checks
+    EXPECT_EQ(0, rad.arg1().size());
+    EXPECT_EQ(0, rad.arg2().size());
+    ASSERT_EQ(4, rad.arg3().size());
+    EXPECT_EQ("0", rad.getArg3(0));
+    EXPECT_EQ("0", rad.getArg3(1));
+    EXPECT_EQ("0", rad.getArg3(2));
+    EXPECT_EQ("3", rad.getArg3(3));
+    EXPECT_EQ("0", rad.getArg(3, 0));
+    EXPECT_EQ("0", rad.getArg(3, 1));
+    EXPECT_EQ("0", rad.getArg(3, 2));
+    EXPECT_EQ("3", rad.getArg(3, 3));
+    // Miscellaneous checks
+    EXPECT_FALSE(rad.setType("polygon"));
+    ASSERT_EQ(3, rad.centerPoint().size());
+    EXPECT_EQ(0, rad.centerPoint()[0]);
+    EXPECT_EQ(0, rad.centerPoint()[1]);
+    EXPECT_EQ(0, rad.centerPoint()[2]);
+    EXPECT_EQ(3, rad.radius());
 }

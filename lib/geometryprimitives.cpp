@@ -76,11 +76,15 @@ bool PolygonGeometry::validateArg(int number, std::vector<std::string> arg) cons
 SphereGeometry::SphereGeometry() : RadPrimitive()
 {
     RadPrimitive::setType("sphere");
+    std::vector<std::string> arg3={"0","0","0","1"};
+    initArg(3,arg3);
 }
 
 SphereGeometry::SphereGeometry(std::vector<double> centerPoint, double radius) : RadPrimitive()
 {
     RadPrimitive::setType("sphere");
+    std::vector<std::string> arg3={"0","0","0","1"};
+    initArg(3,arg3);
     setCenterPoint(centerPoint);
     setRadius(radius);
 }
@@ -90,10 +94,10 @@ bool SphereGeometry::setCenterPoint(std::vector<double> centerPoint){
         STADIC_ERROR("The setting of the sphere center has failed - center must contain 3 values (ex. x y z).");
         return false;
     } else {
-        std::vector<std::string> args;
-        for(double value : centerPoint) {
-            args.push_back(stadic::toString(value));
-            initArg(3, args);
+        for(int i=0;i<3;i++) {
+            if (!setArg(3, stadic::toString(centerPoint[i]), i)){
+                return false;
+            }
         }
     }
     return true;
@@ -121,7 +125,7 @@ std::vector<double> SphereGeometry::centerPoint() const{
 }
 double SphereGeometry::radius() const{
 
-    return toDouble(getArg3(4));
+    return toDouble(getArg3(3));
 }
 //Private
 bool SphereGeometry::validateArg(int number, std::string value, int position) const
@@ -143,7 +147,7 @@ bool SphereGeometry::validateArg(int number, std::string value, int position) co
 bool SphereGeometry::validateArg(int number, std::vector<std::string> arg) const
 {
     if(number==3) {
-        if(arg.size()%3 != 0) {
+        if(arg.size() != 4) {
             return false;
         }
         for(std::string value : arg) {

@@ -89,7 +89,7 @@ class STADIC_API GlassMaterial : public RadPrimitive
 {
 public:
     GlassMaterial();
-    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac=0.0);
+    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac=1.52);
     // Setters
     bool setType(std::string){return false;}
     bool setRedTrans(double value);
