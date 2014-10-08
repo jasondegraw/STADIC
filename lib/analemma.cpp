@@ -125,6 +125,7 @@ bool Analemma::getSunPos()
                         m_numSuns++;
                         matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
                         geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< " " << svec[1] << " " << svec[2]  <<" 0.533" << std::endl;
+                        //temporarySun.push_back("julianDate: "+toString(julianDate)+" Hour: "+toString(hr));
                         first_of_hour=false;
                         azi_prev=azimuth;
                         alt_prev=altitude;
@@ -151,6 +152,7 @@ bool Analemma::getSunPos()
                             m_numSuns++;
                             matFile<<"void light solar"<<m_numSuns<<" 0 0 3 1.0 1.0 1.0" <<std::endl;
                             geoFile<<"solar" << m_numSuns << " source sun"<<m_numSuns <<" "<<"0 0 4 " <<svec[0]<< " " << svec[1] << " " << svec[2]  <<" 0.533" << std::endl;
+                            //temporarySun.push_back("julianDate: "+toString(julianDate)+" Hour: "+toString(hr));
                             azi_prev=azimuth;
                             alt_prev=altitude;
                             pvec=pos(alt_prev,azi_prev);
@@ -211,6 +213,8 @@ double Analemma::dotProd(std::vector<double> vec1,std::vector<double> vec2)
 
 bool Analemma::closestSun()
 {
+    //std::ofstream debugFile;
+    //debugFile.open("c:/001/SpeedUpData.txt");
     int hr_count=0;
     double hr=0;
     double sda;         //Solar Declination Angle
@@ -245,6 +249,7 @@ bool Analemma::closestSun()
                     dp_closest=dprod;
                 }
               }
+              //debugFile<<"Time: "<<hr<<" julianDate: "<<julian_date<<" ClosestSun: "<<temporarySun[m_ClosestSun[hr_count-1]]<<std::endl;
             }else {
                 if (m_ClosestSun.size()<hr_count){
                     m_ClosestSun.push_back(-1);
@@ -254,7 +259,7 @@ bool Analemma::closestSun()
             }
         }
     }
-
+    //debugFile.close();
     return true;
 }
 
