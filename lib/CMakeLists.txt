@@ -22,7 +22,7 @@ set(SRCS stadiccontrol.cpp
          functions.cpp
          filepath.cpp
          analemma.cpp
-         process.cpp)
+         stadicprocess.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -43,7 +43,7 @@ set(HDRS stadicapi.h
          functions.h
          filepath.h
          analemma.h
-         process.h)
+         stadicprocess.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
 

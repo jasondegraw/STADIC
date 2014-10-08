@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "filepath.h"
-#include "process.h"
+#include "stadicprocess.h"
 #include "gridmaker.h"
 #include "functions.h"
 

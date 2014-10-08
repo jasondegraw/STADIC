@@ -1,4 +1,4 @@
-#include "process.h"
+#include "stadicprocess.h"
 #include "logging.h"
 #include <sstream>
 

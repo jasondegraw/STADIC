@@ -87,12 +87,12 @@ public:
 #ifdef GetEnvironmentStrings 
 #undef GetEnvironmentStrings 
 #endif 
-        char *environ = ::GetEnvironmentStrings(); 
-        if (!environ) 
+        char *environs = ::GetEnvironmentStrings(); // environ shadows a MinGW definition
+        if (!environs)
             boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::self::get_environment: GetEnvironmentStrings failed")); 
         try 
         { 
-            char *env = environ; 
+            char *env = environs;
             while (*env) 
             { 
                 std::string s = env; 
@@ -103,10 +103,10 @@ public:
         } 
         catch (...) 
         { 
-            ::FreeEnvironmentStringsA(environ); 
+            ::FreeEnvironmentStringsA(environs);
             throw; 
         } 
-        ::FreeEnvironmentStringsA(environ); 
+        ::FreeEnvironmentStringsA(environs);
 #endif 
 
         return e; 

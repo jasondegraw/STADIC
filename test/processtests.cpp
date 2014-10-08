@@ -1,4 +1,4 @@
-#include "process.h"
+#include "stadicprocess.h"
 #include "functions.h"
 #include "gtest/gtest.h"
 #include <string>

@@ -2,7 +2,7 @@
 #include "logging.h"
 #include "dayill.h"
 #include "filepath.h"
-#include "process.h"
+#include "stadicprocess.h"
 #include <fstream>
 #include "materialprimitives.h"
 
