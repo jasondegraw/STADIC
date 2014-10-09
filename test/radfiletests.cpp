@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "materialprimitives.h"
+#include "functions.h"
 
 TEST(RadFileTests, ParseRadFile)
 {
