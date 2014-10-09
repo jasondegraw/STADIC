@@ -111,14 +111,12 @@ boost::optional<double> getDouble(boost::property_tree::ptree json, std::string 
     boost::optional<double> dVal;
     try{
         dVal=json.get<double>(key);
-        return dVal;
-    }catch (const boost::property_tree::ptree_bad_path &){
+    } catch (const boost::property_tree::ptree_bad_path &){
         STADIC_LOG(severity, errorMissing);
-        return dVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
+    } catch (const boost::property_tree::ptree_bad_data &){
         STADIC_LOG(severity, errorBad);
-        return dVal;
     }
+    return dVal;
 }
 
 boost::optional<int> getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
@@ -126,14 +124,12 @@ boost::optional<int> getInt(boost::property_tree::ptree json, std::string key, s
     boost::optional<int> iVal;
     try{
         iVal=json.get<int>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
+    } catch (const boost::property_tree::ptree_bad_path &){
         STADIC_LOG(severity, errorMissing);
-        return iVal;
-    }catch (const boost::property_tree::ptree_bad_data &){
+    } catch (const boost::property_tree::ptree_bad_data &){
         STADIC_LOG(severity, errorBad);
-        return iVal;
     }
-
+    return iVal;
 }
 
 boost::optional<std::string> getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
@@ -143,11 +139,10 @@ boost::optional<std::string> getString(boost::property_tree::ptree json, std::st
         sVal=json.get<std::string>(key);
     }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_LOG(severity, errorMissing);
-        return sVal;
     }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_LOG(severity, errorBad);
-        return sVal;
     }
+    return sVal;
 }
 
 boost::optional<bool> getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
@@ -157,11 +152,10 @@ boost::optional<bool> getBool(boost::property_tree::ptree json, std::string key,
         bVal=json.get<bool>(key);
     }catch (const boost::property_tree::ptree_bad_path &){
         STADIC_LOG(severity, errorMissing);
-        return bVal;
     }catch (const boost::property_tree::ptree_bad_data &){
         STADIC_LOG(severity, errorBad);
-        return bVal;
     }
+    return bVal;
 }
 
 boost::optional<boost::property_tree::ptree> getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, Severity severity)

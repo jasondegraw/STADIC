@@ -13,7 +13,7 @@ class STADIC_API WindowGroup
 {
 public:
     WindowGroup();
-    bool parseJson(const QJsonObject &object);
+    //bool parseJson(const QJsonObject &object);
     bool parseJson(const boost::property_tree::ptree json);
 
     //  Setters

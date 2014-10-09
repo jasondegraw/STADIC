@@ -2,7 +2,8 @@
 #include "logging.h"
 #include <iostream>
 #include <fstream>
-#include "objects.h"
+#include "filepath.h"
+#include "stadicprocess.h"
 #include "gridmaker.h"
 #include "functions.h"
 

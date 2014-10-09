@@ -1,4 +1,4 @@
-#include "objects.h"
+#include "stadicprocess.h"
 #include "functions.h"
 #include "gtest/gtest.h"
 #include <string>
@@ -9,61 +9,11 @@
 #define UNLINK unlink
 #endif
 
-TEST(ObjectsTests, FilePathDirectory)
+TEST(ProcessTests, ProcessBadProgram)
 {
-    std::string testString;
-#ifdef _WIN32
-    testString = "C:\\Windows";
-#else
-    testString = "/usr";
-#endif
-    stadic::FilePath dir(testString);
-    EXPECT_TRUE(dir.exists());
-    EXPECT_TRUE(dir.isDir());
-    EXPECT_FALSE(dir.isFile());
-    EXPECT_FALSE(dir.isUpdated());
-
-#ifdef _WIN32
-    testString = "C:\\Windows\\";
-#else
-    testString = "/usr/";
-#endif
-    stadic::FilePath dir1(testString);
-    EXPECT_TRUE(dir1.exists());
-    EXPECT_TRUE(dir1.isDir());
-    EXPECT_FALSE(dir1.isFile());
-    EXPECT_FALSE(dir1.isUpdated());
-
-    stadic::FilePath dir2("DOESNOTEXIST");
-    EXPECT_FALSE(dir2.exists());
-}
-
-TEST(ObjectsTests, FilePathFile)
-{
-    std::string testString = "testfile.txt";
-    UNLINK(testString.c_str());
-
-    stadic::FilePath file(testString);
-    EXPECT_FALSE(file.exists());
-
-    std::ofstream testOut(testString);
-    testOut << "This is a test file";
-    testOut.close();
-
-    EXPECT_TRUE(file.exists());
-    EXPECT_TRUE(file.isFile());
-    EXPECT_FALSE(file.isDir());
-    EXPECT_FALSE(file.isUpdated());
-    //There may need to be a delay inserted here so the updated time actually changes
-    std::ofstream reWrite(testString);
-    reWrite << "I'm doing this as hard as I can";
-    reWrite.close();
-
-    EXPECT_TRUE(file.exists());
-    EXPECT_TRUE(file.isFile());
-    EXPECT_FALSE(file.isDir());
-    EXPECT_TRUE(file.isUpdated());
-
+    stadic::Process proc("ThisIsHopefullyNotAProgramName");
+    proc.start();
+    EXPECT_FALSE(proc.wait());
 }
 
 //#ifdef _WIN32
@@ -71,36 +21,36 @@ TEST(ObjectsTests, FilePathFile)
 //#else
 //#define PROGRAM "./testprogram"
 //#endif
-TEST(ObjectsTests, ProcessCaptureOutErr)
+TEST(ProcessTests, ProcessCaptureOutErr)
 {
     stadic::Process proc(PROGRAM);
     proc.start();
-    proc.wait();
+    ASSERT_TRUE(proc.wait());
     EXPECT_EQ("This is the standard output", stadic::trim(proc.output()));
     EXPECT_EQ("This is the standard error", stadic::trim(proc.error()));
 }
 
-TEST(ObjectsTests, ProcessOutErrFiles)
+TEST(ProcessTests, ProcessOutErrFiles)
 {
     std::stringstream stream;
     stadic::Process proc(PROGRAM);
-    proc.setStandardErrorFile("error.txt");
-    proc.setStandardOutputFile("output.txt");
+    proc.setStandardErrorFile("error0.txt");
+    proc.setStandardOutputFile("output0.txt");
     proc.start();
-    proc.wait();
-    std::ifstream err("error.txt");
+    ASSERT_TRUE(proc.wait());
+    std::ifstream err("error0.txt");
     std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
     err.close();
-    UNLINK("error.txt");
-    std::ifstream out("output.txt");
+    UNLINK("error0.txt");
+    std::ifstream out("output0.txt");
     std::string outputString((std::istreambuf_iterator<char>(out)), std::istreambuf_iterator<char>());
     out.close();
-    UNLINK("output.txt");
+    UNLINK("output0.txt");
     EXPECT_EQ("This is the standard output", stadic::trim(outputString));
     EXPECT_EQ("This is the standard error", stadic::trim(errorString));
 }
 
-TEST(ObjectsTests, ProcessArgsOutErrFiles)
+TEST(ProcessTests, ProcessArgsOutErrFiles)
 {
     std::stringstream stream;
     std::vector<std::string> args;
@@ -109,7 +59,7 @@ TEST(ObjectsTests, ProcessArgsOutErrFiles)
     proc.setStandardErrorFile("error.txt");
     proc.setStandardOutputFile("output.txt");
     proc.start();
-    proc.wait();
+    ASSERT_TRUE(proc.wait());
     std::ifstream err("error.txt");
     std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
     err.close();
@@ -122,7 +72,7 @@ TEST(ObjectsTests, ProcessArgsOutErrFiles)
     EXPECT_EQ("Here are some standard error letters: xxxxxxxxx", stadic::trim(errorString));
 }
 
-TEST(ObjectsTests, ProcessInputFile)
+TEST(ProcessTests, ProcessInputFile)
 {
     std::ofstream out("input.txt");
     out << "This is line 1" << std::endl;
@@ -135,7 +85,7 @@ TEST(ObjectsTests, ProcessInputFile)
     stadic::Process proc(PROGRAM, args);
     proc.setStandardInputFile("input.txt");
     proc.start();
-    proc.wait();
+    ASSERT_TRUE(proc.wait());
     std::string output = stadic::trim(proc.output());
     // Zap control chars...
     output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
@@ -144,7 +94,7 @@ TEST(ObjectsTests, ProcessInputFile)
     UNLINK("input.txt");
 }
 
-TEST(ObjectsTests, ProcessMultiples1)
+TEST(ProcessTests, ProcessMultiples1)
 {
     std::ofstream out("input.txt");
     out << "This is the first line" << std::endl;
@@ -166,8 +116,8 @@ TEST(ObjectsTests, ProcessMultiples1)
     proc0.start();
     proc1.start();
 
-    proc0.wait();
-    proc1.wait();
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
 
     std::string output = stadic::trim(proc1.output());
     // Zap control chars...
@@ -177,7 +127,7 @@ TEST(ObjectsTests, ProcessMultiples1)
     UNLINK("input.txt");
 }
 
-TEST(ObjectsTests, ProcessMultiples2)
+TEST(ProcessTests, ProcessMultiples2)
 {
     std::ofstream out("input.txt");
     out << "This is the first line" << std::endl;
@@ -199,8 +149,8 @@ TEST(ObjectsTests, ProcessMultiples2)
     proc1.start();
     proc0.start();
 
-    proc0.wait();
-    proc1.wait();
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
 
     std::string output = stadic::trim(proc1.output());
     // Zap control chars...
@@ -210,7 +160,48 @@ TEST(ObjectsTests, ProcessMultiples2)
     UNLINK("input.txt");
 }
 
-TEST(ObjectsTests, ProcessMultiplesMore1)
+TEST(ProcessTests, ProcessMultiples3)
+{
+    std::ofstream out("input.txt");
+    out << "This is the first line" << std::endl;
+    out << "There's not much more" << std::endl;
+    out << "STOP" << std::endl;
+    out.close();
+
+    std::vector<std::string> args0;
+    args0.push_back("-R");
+    stadic::Process proc0(PROGRAM, args0);
+    proc0.setStandardInputFile("input.txt");
+
+    std::vector<std::string> args1;
+    args1.push_back("-R");
+    stadic::Process proc1(PROGRAM, args1);
+
+    proc0.setStandardOutputProcess(&proc1);
+
+    proc1.start();
+    proc0.start();
+
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+
+    std::string output = stadic::trim(proc1.output());
+    // Zap control chars...
+    output.erase(std::remove_if(output.begin(), output.end(), ::iscntrl), output.end());
+    EXPECT_EQ("Input:Input:This is the first lineInput:Input:There's not much moreInput:Input:STOP", output);
+    //EXPECT_TRUE(stadic::trim(proc.error()).empty());
+    UNLINK("input.txt");
+
+    std::string error = stadic::trim(proc0.error());
+    error.erase(std::remove_if(error.begin(), error.end(), ::iscntrl), error.end());
+    EXPECT_EQ("Error:This is the first lineError:There's not much moreError:STOP",error);
+
+    error = stadic::trim(proc1.error());
+    error.erase(std::remove_if(error.begin(), error.end(), ::iscntrl), error.end());
+    EXPECT_EQ("Error:Input:This is the first lineError:Input:There's not much moreError:Input:STOP",error);
+}
+
+TEST(ProcessTests, Process5NoStdErr)
 {
     std::ofstream out("input.txt");
     out << "STOP" << std::endl;
@@ -240,11 +231,11 @@ TEST(ObjectsTests, ProcessMultiplesMore1)
     proc3.start();
     proc4.start();
 
-    proc0.wait();
-    proc1.wait();
-    proc2.wait();
-    proc3.wait();
-    proc4.wait();
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+    ASSERT_FALSE(proc2.wait());
+    ASSERT_FALSE(proc3.wait());
+    ASSERT_FALSE(proc4.wait());
 
     std::string output = stadic::trim(proc4.output());
     // Zap control chars...
@@ -254,7 +245,7 @@ TEST(ObjectsTests, ProcessMultiplesMore1)
     UNLINK("input.txt");
 }
 
-TEST(ObjectsTests, ProcessMultiplesMore2)
+TEST(ProcessTests, Process5StdErrFile)
 {
     std::ofstream out("input.txt");
     out << "STOP" << std::endl;
@@ -285,11 +276,11 @@ TEST(ObjectsTests, ProcessMultiplesMore2)
     proc3.start();
     proc4.start();
 
-    proc0.wait();
-    proc1.wait();
-    proc2.wait();
-    proc3.wait();
-    proc4.wait();
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+    ASSERT_FALSE(proc2.wait());
+    ASSERT_FALSE(proc3.wait());
+    ASSERT_FALSE(proc4.wait());
 
     //std::string output = stadic::trim(proc4.output());
     // Zap control chars...
@@ -303,6 +294,65 @@ TEST(ObjectsTests, ProcessMultiplesMore2)
     err.close();
     errorString.erase(std::remove_if(errorString.begin(), errorString.end(), ::iscntrl), errorString.end());
     EXPECT_EQ("Error:Input:Input:Input:STOP", errorString);
+    EXPECT_EQ("Error:Input:Input:Input:Input:STOP", stadic::trim(proc4.error()));
+    EXPECT_TRUE(proc0.output().empty());
+    EXPECT_TRUE(proc1.output().empty());
+    EXPECT_TRUE(proc2.output().empty());
+    EXPECT_TRUE(proc3.output().empty());
+    UNLINK("input.txt");
+    UNLINK("error.txt");
+}
+
+TEST(ProcessTests, Process5StdErrFileStdOutFile)
+{
+    std::ofstream out("input.txt");
+    out << "STOP" << std::endl;
+    out.close();
+
+    std::vector<std::string> args;
+    args.push_back("-R");
+    stadic::Process proc0(PROGRAM, args);
+    proc0.setStandardInputFile("input.txt");
+
+    stadic::Process proc1(PROGRAM, args);
+    proc0.setStandardOutputProcess(&proc1);
+
+    stadic::Process proc2(PROGRAM, args);
+    proc1.setStandardOutputProcess(&proc2);
+
+    stadic::Process proc3(PROGRAM, args);
+    proc3.setStandardErrorFile("error.txt");
+    proc2.setStandardOutputProcess(&proc3);
+
+    stadic::Process proc4(PROGRAM, args);
+    proc4.setStandardOutputFile("output.txt");
+    proc3.setStandardOutputProcess(&proc4);
+
+    proc0.start();
+    proc1.start();
+    proc2.start();
+    proc3.start();
+    proc4.start();
+
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+    ASSERT_FALSE(proc2.wait());
+    ASSERT_FALSE(proc3.wait());
+    ASSERT_FALSE(proc4.wait());
+
+    EXPECT_EQ("Error:STOP", stadic::trim(proc0.error()));
+    EXPECT_EQ("Error:Input:STOP", stadic::trim(proc1.error()));
+    EXPECT_EQ("Error:Input:Input:STOP", stadic::trim(proc2.error()));
+    std::ifstream err("error.txt");
+    std::string errorString((std::istreambuf_iterator<char>(err)), std::istreambuf_iterator<char>());
+    err.close();
+    errorString.erase(std::remove_if(errorString.begin(), errorString.end(), ::iscntrl), errorString.end());
+    EXPECT_EQ("Error:Input:Input:Input:STOP", errorString);
+    std::ifstream readout("output.txt");
+    std::string outputString((std::istreambuf_iterator<char>(readout)), std::istreambuf_iterator<char>());
+    out.close();
+    outputString.erase(std::remove_if(outputString.begin(), outputString.end(), ::iscntrl), outputString.end());
+    EXPECT_EQ("Input:Input:Input:Input:Input:STOP", outputString);
     EXPECT_EQ("Error:Input:Input:Input:Input:STOP", stadic::trim(proc4.error()));
     EXPECT_TRUE(proc0.output().empty());
     EXPECT_TRUE(proc1.output().empty());

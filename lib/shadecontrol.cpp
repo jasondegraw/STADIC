@@ -108,7 +108,7 @@ std::string ShadeControl::sensorFile(){
     return m_SensorFile;
 }
 
-bool ShadeControl::readAutoProf(const boost::property_tree::ptree json, std::string method){
+bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::string method){
     boost::optional<boost::property_tree::ptree> treeVal;
     boost::optional<double> dVal;
     dVal=getDouble(json, "elevation_azimuth", "The key \"elevation_azimuth\" was not found with control method \""+method+"\".","The key \"elevation_azimuth\" does not contain a number.", Severity::Error);
@@ -140,7 +140,7 @@ bool ShadeControl::readAutoProf(const boost::property_tree::ptree json, std::str
     return true;
 }
 
-bool ShadeControl::readAutoSign(const boost::property_tree::ptree json, std::string method){
+bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::string method){
     boost::optional<boost::property_tree::ptree> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
@@ -246,7 +246,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree json, std::str
     return true;
 }
 
-bool ShadeControl::parseJson (const boost::property_tree::ptree json){
+bool ShadeControl::parseJson (const boost::property_tree::ptree &json){
     if (json.empty()){
         STADIC_LOG(Severity::Error, "The window group does not contain data.");
         return false;

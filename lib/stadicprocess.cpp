@@ -1,134 +1,19 @@
-#include "objects.h"
+#include "stadicprocess.h"
 #include "logging.h"
 #include <sstream>
 
-#ifdef _MSC_VER
-#include <Windows.h>
-#else
-#include <sys/stat.h>
-#endif
-
 #ifndef USE_QT
-//#include <boost/process.hpp>
-//namespace bp = ::boost::process;
 #include <boost/filesystem.hpp>
 #include <thread>
+#include <fstream>
 #endif
 
 
 namespace stadic{
 //*************************
-//FilePath
-//*************************
-FilePath::FilePath(std::string path)
-{
-    m_Path = path;
-#ifdef _MSC_VER
-    m_fileAttr = new WIN32_FILE_ATTRIBUTE_DATA;
-    GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr);
-#else
-    if (isFile()){
-        lastMod();
-    }
-#endif
-}
-
-FilePath::~FilePath()
-{
-#ifdef _MSC_VER
-    delete m_fileAttr;
-#endif
-}
-
-//Getters
-std::string FilePath::toString(){
-    return m_Path;
-}
-
-//Utilities
-bool FilePath::isDir(){
-#ifdef _MSC_VER
-    //WIN32_FILE_ATTRIBUTE_DATA fileAttr;
-    //if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, &fileAttr)) {
-    //    return fileAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-    //}
-    DWORD result = GetFileAttributes(m_Path.c_str());
-    if(result != INVALID_FILE_ATTRIBUTES) {
-        return result & FILE_ATTRIBUTE_DIRECTORY;
-    }
-    return false;
-#else //POSIX
-    struct stat path;
-
-    if (stat(m_Path.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
-        return true;
-    }
-    return false;
-#endif
-}
-
-bool FilePath::isFile(){
-#ifdef _MSC_VER
-    DWORD result = GetFileAttributes(m_Path.c_str());
-    if(result != INVALID_FILE_ATTRIBUTES) {
-        return !(result & FILE_ATTRIBUTE_DIRECTORY);
-    }
-    return false;
-#else //POSIX
-    struct stat path;
-
-    if (stat(m_Path.c_str(), &path)==0 && S_ISREG(path.st_mode)){
-        return true;
-    }
-    return false;
-#endif
-}
-
-bool FilePath::exists(){
-    if(isDir()){
-        return true;
-    }
-    return isFile();
-    return false;
-}
-
-bool FilePath::isUpdated(){
-#ifdef _MSC_VER
-    FILETIME lastTime = m_fileAttr->ftLastWriteTime;
-    if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr)) {
-        return CompareFileTime(&(m_fileAttr->ftLastWriteTime), &lastTime) > 0;
-    }
-    return false;
-#else //POSIX
-    if(isDir()) {
-        return false;
-    }
-    struct tm* originalMod=m_LastMod;
-    lastMod();
-    if (difftime(mktime(m_LastMod),mktime(originalMod))>0){
-        return true;
-    }
-    return false;
-#endif
-}
-
-//Private
-void FilePath::lastMod(){
-#ifdef _MSC_VER
-    // On Windows, this function is not needed.
-#else
-    struct stat path;
-    if (isFile()){
-        stat(m_Path.c_str(),&path);
-        m_LastMod=localtime(&path.st_mtime);
-    }
-#endif
-}
-
-//*************************
 //Process
 //*************************
-Process::Process(std::string program)
+Process::Process(const std::string &program)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -137,12 +22,11 @@ Process::Process(std::string program)
     m_state = Initialized;
     m_upstream = nullptr;
     m_downstream = nullptr;
-    m_program = boost::process::find_executable_in_path(program);
-    m_args.push_back(program);
+    setProgram(program);
 #endif
 }
 
-Process::Process(std::string program, std::vector<std::string> args)
+Process::Process(const std::string &program, const std::vector<std::string> &args)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -156,9 +40,10 @@ Process::Process(std::string program, std::vector<std::string> args)
     m_state = Initialized;
     m_upstream = nullptr;
     m_downstream = nullptr;
-    m_program = boost::process::find_executable_in_path(program);
-    m_args.push_back(program);
-    m_args.insert(m_args.end(), args.begin(), args.end());
+    setProgram(program);
+    if(m_state == Initialized) {
+         m_args.insert(m_args.end(), args.begin(), args.end());
+    }
 #endif
 }
 
@@ -198,6 +83,7 @@ void Process::start()
                 m_state = RunFailed;
             }
             // Launch threads here to handle stdout, stderr
+            /*
             if(!m_outputFile.empty()) {
                 std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stdout()), std::ref(m_outputFile));
                 thread.detach(); // This could be very unwise
@@ -205,7 +91,7 @@ void Process::start()
             if(!m_errorFile.empty()) {
                 std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stderr()), std::ref(m_errorFile));
                 thread.detach(); // This could be very unwise
-            }
+            }*/
             // Handle input
             if(!m_inputFile.empty()) {
                 std::ifstream input(m_inputFile);
@@ -229,7 +115,8 @@ void Process::start()
             ctxin.stderr_behavior = boost::process::capture_stream();
 
             boost::process::context ctxout;
-            ctxout.stdout_behavior = boost::process::inherit_stream();
+            //ctxout.stdout_behavior = boost::process::inherit_stream();
+            ctxout.stdout_behavior = boost::process::close_stream();
             ctxout.stderr_behavior = boost::process::capture_stream();
 
             boost::process::context ctxlast;
@@ -294,17 +181,20 @@ void Process::start()
             }
             index--; // This the index of the last child
             // Launch threads here to handle stdout, stderr
+            /*
             if(!last->m_outputFile.empty()) {
                 std::thread thread = std::thread(processStreamToFile, std::ref(m_children[index].get_stdout()), std::ref(m_outputFile));
                 thread.detach(); // This could be very unwise
             }
+            */
             // Need to loop through the whole list for this
             current = first;
             while(current != nullptr) {
+                /*
                 if(!current->m_errorFile.empty()) {
                     std::thread thread = std::thread(processStreamToFile, std::ref(m_children[current->m_index].get_stderr()), std::ref(current->m_errorFile));
                     thread.detach(); // This could be very unwise
-                }
+                }*/
                 current = current->m_downstream;
             }
             // Handle input
@@ -328,7 +218,7 @@ bool Process::wait()
 #ifdef USE_QT
     return m_process.waitForFinished(-1);
 #else
-    if(m_state==RunCompleted || m_state==RunFailed) {
+    if(m_state==RunCompleted || m_state==RunFailed || m_state==BadProgram) {
         return false;
     }
     if(m_upstream == nullptr && m_downstream == nullptr) { // This is the simple case
@@ -338,6 +228,7 @@ bool Process::wait()
         if(result.exited()) {
             if(result.exit_status() == 0) { // Hopefully this is correct
                 m_state = RunCompleted;
+                writeFiles();
                 return true;
             }
         }
@@ -355,12 +246,14 @@ bool Process::wait()
         Process *current = m_upstream;
         while(current != nullptr) {
             current->m_state = m_state;
+            current->writeFiles();
             current = current->m_upstream;
         }
         // Now downstream
         current = m_downstream;
         while(current != nullptr) {
             current->m_state = m_state;
+            current->writeFiles();
             current = current->m_downstream;
         }
         return m_state == RunCompleted;
@@ -466,6 +359,50 @@ bool Process::setStandardOutputFile(const std::string &fileName)
         }
     }
     return false;
+#endif
+}
+
+void Process::setProgram(const std::string &program)
+{
+#ifdef USE_QT
+    // This function is not used with Qt
+#else
+    try {
+        m_program = boost::process::find_executable_in_path(program);
+        m_args.push_back(program);
+    } catch (const boost::filesystem::filesystem_error&) {
+#ifndef WIN32
+        try {
+            m_program = boost::process::find_executable_in_path(program,".");
+            m_args.push_back(program);
+        } catch (const boost::filesystem::filesystem_error&) {
+            m_state = BadProgram;
+        }
+#else
+        m_state = BadProgram;
+#endif
+    }
+#endif
+}
+
+void Process::writeFiles()
+{
+#ifdef USE_QT
+    // This function is not used with Qt
+#else
+    if(m_state == RunCompleted) {
+        if(!m_outputFile.empty()) {
+            if(m_children.size() == 1 || m_index == m_children.size()-1) {
+                // Only do this for single processes or the last one in the pipeline
+                boost::process::pistream &stream = m_children[m_index].get_stdout();
+                processStreamToFile(stream, m_outputFile);
+            }
+        }
+        if(!m_errorFile.empty()) {
+            boost::process::pistream &stream = m_children[m_index].get_stderr();
+            processStreamToFile(stream, m_errorFile);
+        }
+    }
 #endif
 }
 
