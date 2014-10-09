@@ -72,6 +72,7 @@ void Process::start()
             boost::process::context ctx;
             ctx.stdout_behavior = boost::process::capture_stream();
             ctx.stderr_behavior = boost::process::capture_stream();
+            ctx.environment = boost::process::self::get_environment();
             if(!m_inputFile.empty()) {
                 ctx.stdin_behavior = boost::process::capture_stream();
             }
@@ -113,15 +114,18 @@ void Process::start()
             boost::process::context ctxin;
             ctxin.stdin_behavior = boost::process::capture_stream();
             ctxin.stderr_behavior = boost::process::capture_stream();
+            ctxin.environment = boost::process::self::get_environment();
 
             boost::process::context ctxout;
             //ctxout.stdout_behavior = boost::process::inherit_stream();
             ctxout.stdout_behavior = boost::process::close_stream();
             ctxout.stderr_behavior = boost::process::capture_stream();
+            ctxout.environment = boost::process::self::get_environment();
 
             boost::process::context ctxlast;
             ctxlast.stdout_behavior = boost::process::capture_stream();
             ctxlast.stderr_behavior = boost::process::capture_stream();
+            ctxlast.environment = boost::process::self::get_environment();
 
             // Check the downstream direction
             Process *last = this;
