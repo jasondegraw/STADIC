@@ -122,16 +122,6 @@ void Process::start()
                 STADIC_ERROR(ex.what());
                 m_state = RunFailed;
             }
-            // Launch threads here to handle stdout, stderr
-            /*
-            if(!m_outputFile.empty()) {
-                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stdout()), std::ref(m_outputFile));
-                thread.detach(); // This could be very unwise
-            }
-            if(!m_errorFile.empty()) {
-                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[0].get_stderr()), std::ref(m_errorFile));
-                thread.detach(); // This could be very unwise
-            }*/
             // Handle input
             if(!m_inputFile.empty()) {
                 std::ifstream input(m_inputFile);
@@ -145,7 +135,6 @@ void Process::start()
             }
         } else { // This is a pipeline situation, so we'll only run if all children are ready
             m_state = ReadyToRun;
-            //std::vector<boost::process::pipeline_entry> entries;
             std::deque<boost::process::pipeline_entry> downstream;
             std::deque<boost::process::pipeline_entry> upstream;
             
@@ -223,23 +212,6 @@ void Process::start()
                 index++;
             }
             index--; // This the index of the last child
-            // Launch threads here to handle stdout, stderr
-            /*
-            if(!last->m_outputFile.empty()) {
-                std::thread thread = std::thread(processStreamToFile, std::ref(m_children[index].get_stdout()), std::ref(m_outputFile));
-                thread.detach(); // This could be very unwise
-            }
-            */
-            // Need to loop through the whole list for this
-            current = first;
-            while(current != nullptr) {
-                /*
-                if(!current->m_errorFile.empty()) {
-                    std::thread thread = std::thread(processStreamToFile, std::ref(m_children[current->m_index].get_stderr()), std::ref(current->m_errorFile));
-                    thread.detach(); // This could be very unwise
-                }*/
-                current = current->m_downstream;
-            }
             // Handle input
             if(!first->m_inputFile.empty()) {
                 std::ifstream input(first->m_inputFile);

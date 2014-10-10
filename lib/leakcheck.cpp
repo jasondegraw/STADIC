@@ -196,7 +196,11 @@ bool LeakCheck::xformModifiers(){
 
     //There should be a test in here that if it doesn't finish it returns false
     if (!xform.wait()){
-        STADIC_ERROR("The xform of the modifiers has failed.");
+        if(xform.state() == Process::BadProgram) {
+            STADIC_LOG(Severity::Fatal, "The xform program could not be found.");
+        } else {
+            STADIC_LOG(Severity::Fatal, "The xform of the modifiers has failed.");
+        }
         return false;
     }
 

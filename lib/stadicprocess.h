@@ -87,6 +87,8 @@ namespace stadic{
 class STADIC_API Process
 {
 public:
+    enum ProcessState { BadProgram, Initialized, ReadyToRun, Running, RunCompleted, RunFailed };
+
     Process(const std::string &program);
     Process(const std::string &program, const std::vector<std::string> &args);
 
@@ -101,11 +103,20 @@ public:
     bool setStandardInputFile(const std::string &fileName);
     bool setStandardOutputFile(const std::string &fileName);
 
+    //static bool findProgram(const std::string &program);
+    ProcessState state() const
+    {
+#ifdef USE_QT
+        return RunFailed; // If the Qt version survives, then this will need to be written
+#else
+        return m_state;
+#endif
+    }
+
 private:
 #ifdef USE_QT
     QProcess m_process;
 #else
-    enum ProcessState {BadProgram, Initialized, ReadyToRun, Running, RunCompleted, RunFailed};
     void setProgram(const std::string &program);
     void writeFiles();
 
