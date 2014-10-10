@@ -55,6 +55,34 @@ TEST(ProcessTests, ProcessBadProgram)
     EXPECT_FALSE(proc.wait());
 }
 
+TEST(ProcessTests, ProcessProgram)
+{
+#ifdef _WIN32
+    stadic::Process proc("ipconfig");
+    proc.start();
+    EXPECT_TRUE(proc.wait());
+#else
+    EXPECT_TRUE(false);
+#endif
+}
+
+TEST(ProcessTests, ProcessProgramArgs)
+{
+#ifdef _WIN32
+    std::vector<std::string> args;
+    args.push_back("/c");
+    args.push_back("date");
+    args.push_back("/t");
+    stadic::Process proc("cmd", args);
+    proc.start();
+    EXPECT_TRUE(proc.wait());
+    std::cout << proc.output();
+#else
+    EXPECT_TRUE(false);
+#endif
+}
+
+
 //#ifdef _WIN32
 #define PROGRAM "testprogram"
 //#else
