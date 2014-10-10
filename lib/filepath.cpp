@@ -40,7 +40,7 @@
 #include "filepath.h"
 #include "logging.h"
 #include <sstream>
-
+#include <iostream>
 #ifdef _MSC_VER
 #include <Windows.h>
 #else
