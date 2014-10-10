@@ -194,14 +194,14 @@ bool LeakCheck::xformModifiers(){
     xform.setStandardOutputFile("Mod.rad");
     xform.start();
 
-    //There should be a test in here that if it doesn't finish it returns false
     if (!xform.wait()){
+        // This may be rather extreme, but can these failures be recovered from? Failure
+        // to find the program is pretty bad, and any other failure indicates misuse of the
+        // process class.
         if(xform.state() == Process::BadProgram) {
             STADIC_LOG(Severity::Fatal, "The xform program could not be found.");
-        } else {
-            STADIC_LOG(Severity::Fatal, "The xform of the modifiers has failed.");
         }
-        return false;
+        STADIC_LOG(Severity::Fatal, "The xform of the modifiers has failed.");
     }
 
     return true;
