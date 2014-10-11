@@ -248,6 +248,11 @@ bool Process::wait()
             }
         }
     } else {
+        if(m_children.size() == 0) {
+            // This is a cop out, but there should only be children
+            // if everyone is running.
+            return false;
+        }
         boost::process::status result = boost::process::wait_children(m_children);
         // Figure out what happened
         m_state = RunFailed;
