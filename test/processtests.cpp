@@ -42,6 +42,9 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 #ifdef _MSC_VER
 #define UNLINK _unlink
 #else
@@ -61,14 +64,20 @@ TEST(ProcessTests, ProcessProgram)
     stadic::Process proc("ipconfig");
     proc.start();
     EXPECT_TRUE(proc.wait());
+    EXPECT_TRUE(proc.output().size() > 0);
 #else
-    EXPECT_TRUE(false);
+    EXPECT_TRUE(false); // Need to implement something similar for non-Windows systems
 #endif
 }
 
 TEST(ProcessTests, ProcessProgramArgs)
 {
 #ifdef _WIN32
+    SYSTEMTIME time;
+    GetLocalTime(&time);
+    std::vector<std::string> days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    std::string datestring = days[time.wDayOfWeek] + " " + stadic::toString(time.wDay) + "/" 
+        + stadic::toString(time.wMonth) + "/" + stadic::toString(time.wYear);
     std::vector<std::string> args;
     args.push_back("/c");
     args.push_back("date");
@@ -76,9 +85,9 @@ TEST(ProcessTests, ProcessProgramArgs)
     stadic::Process proc("cmd", args);
     proc.start();
     EXPECT_TRUE(proc.wait());
-    std::cout << proc.output();
+    EXPECT_EQ(datestring, stadic::trim(proc.output()));
 #else
-    EXPECT_TRUE(false);
+    EXPECT_TRUE(false); // Need to implement something similar for non-Windows systems
 #endif
 }
 
