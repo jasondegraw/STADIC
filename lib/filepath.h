@@ -88,7 +88,7 @@ private:
     // This may be too much data - maybe just store a FILETIME?
     WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;  // Use a pointer to avoid including Windows.h here
 #else
-    struct tm *m_LastMod;
+    struct tm m_LastMod;
 #endif
     void lastMod();
 

@@ -143,9 +143,10 @@ bool FilePath::isUpdated(){
     if(isDir()) {
         return false;
     }
-    struct tm* originalMod=m_LastMod;
+    struct tm originalMod;
+    memcpy(&originalMod, &m_LastMod, sizeof(m_LastMod));
     lastMod();
-    if (difftime(mktime(m_LastMod),mktime(originalMod))>0){
+    if (difftime(mktime(&m_LastMod),mktime(&originalMod))>0){
         return true;
     }
     return false;
@@ -160,7 +161,7 @@ void FilePath::lastMod(){
     struct stat path;
     if (isFile()){
         stat(m_Path.c_str(),&path);
-        m_LastMod=localtime(&path.st_mtime);
+        localtime_r(&path.st_mtime, &m_LastMod);
     }
 #endif
 }
