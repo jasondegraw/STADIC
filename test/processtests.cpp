@@ -114,6 +114,33 @@ TEST(ProcessTests, ProcessCaptureOutErr)
     EXPECT_EQ("This is the standard error", stadic::trim(proc.error()));
 }
 
+/*
+TEST(ProcessTests, ProcessCaptureBigOut)
+{
+    std::vector<std::string> args;
+    args.push_back("-B");
+    stadic::Process proc(PROGRAM, args);
+    proc.start();
+    ASSERT_TRUE(proc.wait());
+    EXPECT_EQ(10000,proc.output().size());
+}*/
+
+TEST(ProcessTests, ProcessPipeBigOut)
+{
+    std::vector<std::string> args;
+    args.push_back("-B");
+    stadic::Process proc0(PROGRAM, args);
+    args.clear();
+    args.push_back("-x");
+    stadic::Process proc1(PROGRAM, args);
+    proc0.setStandardOutputProcess(&proc1);
+    proc0.start();
+    proc1.start();
+    ASSERT_TRUE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+    EXPECT_EQ(10000,proc1.output().size());
+}
+
 TEST(ProcessTests, ProcessOutErrFiles)
 {
     std::stringstream stream;

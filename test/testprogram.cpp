@@ -60,8 +60,7 @@ int main(int argc, char *argv[])
                     break;
                 }
             }
-        }
-        else if(std::string("-R") == argv[1]) {
+        } else if(std::string("-R") == argv[1]) {
             std::string string;
             while(std::getline(std::cin, string)) {
                 std::cout << "Input:" << string << std::endl;
@@ -70,6 +69,18 @@ int main(int argc, char *argv[])
                     break;
                 }
             }
+        } else if(std::string("-x") == argv[1]) {
+            std::string string;
+            while(std::getline(std::cin, string)) {
+                if(string.find("STOP") != std::string::npos) {
+                    break;
+                }
+            }
+        } else if(std::string("-B") == argv[1]) {
+            for(int i=0; i<10000; i++) {
+                std::cout << "x";
+            }
+            std::cout << "STOP";
         }
     }
 
