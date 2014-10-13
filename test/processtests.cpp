@@ -42,6 +42,11 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <time.h>
+#endif
 #ifdef _MSC_VER
 #define UNLINK _unlink
 #else
@@ -54,6 +59,46 @@ TEST(ProcessTests, ProcessBadProgram)
     proc.start();
     EXPECT_FALSE(proc.wait());
 }
+
+TEST(ProcessTests, ProcessProgram)
+{
+#ifdef _WIN32
+    stadic::Process proc("ipconfig");
+#else
+    stadic::Process proc("uname");
+#endif
+    proc.start();
+    EXPECT_TRUE(proc.wait());
+    EXPECT_TRUE(proc.output().size() > 0);
+}
+
+TEST(ProcessTests, ProcessProgramArgs)
+{
+    std::vector<std::string> days = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+#ifdef _WIN32
+    SYSTEMTIME time;
+    GetLocalTime(&time);
+    std::string datestring = days[time.wDayOfWeek] + " " + stadic::toString(time.wDay) + "/" 
+        + stadic::toString(time.wMonth) + "/" + stadic::toString(time.wYear);
+    std::vector<std::string> args;
+    args.push_back("/c");
+    args.push_back("date");
+    args.push_back("/t");
+    stadic::Process proc("cmd", args);
+#else
+    std::vector<std::string> args;
+    args.push_back("+\"%a %F\"");
+    stadic::Process proc("date", args);
+    time_t result = time(NULL);
+    struct tm *current = localtime(&result);
+    std::string datestring = "\"" + days[current->tm_wday] + " " + stadic::toString(current->tm_year+1900) + "-"
+            + stadic::toString(current->tm_mon+1) + "-" + stadic::toString(current->tm_mday) + "\"";
+#endif
+    proc.start();
+    EXPECT_TRUE(proc.wait());
+    EXPECT_EQ(datestring, stadic::trim(proc.output()));
+}
+
 
 //#ifdef _WIN32
 #define PROGRAM "testprogram"
@@ -152,7 +197,11 @@ TEST(ProcessTests, ProcessMultiples1)
 
     proc0.setStandardOutputProcess(&proc1);
 
+    ASSERT_FALSE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+
     proc0.start();
+    ASSERT_FALSE(proc0.wait());
     proc1.start();
 
     ASSERT_TRUE(proc0.wait());
@@ -185,7 +234,12 @@ TEST(ProcessTests, ProcessMultiples2)
 
     proc0.setStandardOutputProcess(&proc1);
 
+    ASSERT_FALSE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+
     proc1.start();
+    ASSERT_FALSE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
     proc0.start();
 
     ASSERT_TRUE(proc0.wait());
@@ -218,7 +272,12 @@ TEST(ProcessTests, ProcessMultiples3)
 
     proc0.setStandardOutputProcess(&proc1);
 
+    ASSERT_FALSE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
+
     proc1.start();
+    ASSERT_FALSE(proc0.wait());
+    ASSERT_FALSE(proc1.wait());
     proc0.start();
 
     ASSERT_TRUE(proc0.wait());
