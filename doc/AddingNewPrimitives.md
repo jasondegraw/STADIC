@@ -17,8 +17,22 @@ Radpimitive class - the subclass is responsible for making sure that the data ma
 type. Note that primitives that do not have a subclass are still supported - the data will just not be
 validated and the only access to the object data will be through RadPrimitives getArg/setArg functions.
 
+All material primitive objects should be initialized with acceptable default values. Geometric primitives may
+be initialized to have no contents, but must cause an error if the user attempts to write out the primitive
+without adding data to the primitive.
+
 Add Basic Tests
 ---------------
+
+A basic test of the functionality of the new object should be added to primitivetests.cpp. At a minimum, this
+test should:
+
+* Construct an object with valid arguments.
+* Attempt to change the argument values to invalid values and verify that the changes are not accepted.
+* Construct an object with invalid arguments and verify that default values have been used instead.
+
+For objects in which there are fewer rules about what is acceptable or not, this test may be very short. The most
+important things is to make sure that validation works.
 
 Connect To I/O
 --------------
