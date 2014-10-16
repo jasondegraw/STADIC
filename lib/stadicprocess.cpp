@@ -42,11 +42,10 @@
 #include <sstream>
 
 #ifndef USE_QT
-#include <boost/filesystem.hpp>
-#include <thread>
-#include <fstream>
+#include <stdlib.h>
 #endif
 
+#include <iostream>
 
 namespace stadic{
 //*************************
@@ -57,11 +56,10 @@ Process::Process(const std::string &program)
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
 #else
-    m_index = 0;
     m_state = Initialized;
-    m_upstream = nullptr;
-    m_downstream = nullptr;
-    setProgram(program);
+    m_inputProcess = nullptr;
+    m_outputProcess = nullptr;
+    m_program = program;
 #endif
 }
 
@@ -75,14 +73,11 @@ Process::Process(const std::string &program, const std::vector<std::string> &arg
     }
     m_process.setArguments(arguments);
 #else
-    m_index = 0;
     m_state = Initialized;
-    m_upstream = nullptr;
-    m_downstream = nullptr;
-    setProgram(program);
-    if(m_state == Initialized) {
-         m_args.insert(m_args.end(), args.begin(), args.end());
-    }
+    m_inputProcess = nullptr;
+    m_outputProcess = nullptr;
+    m_program = program;
+    m_args = args;
 #endif
 }
 
@@ -100,131 +95,53 @@ static void processStreamToFile(boost::process::pistream &stream, const std::str
 }
 #endif
 
-void Process::start()
+bool Process::run()
 {
 #ifdef USE_QT
     m_process.start();
 #else
     if(m_state == Initialized) {
-        if(m_upstream == nullptr && m_downstream == nullptr) { // This is the simple case
-            m_state = Running;
-            boost::process::context ctx;
-            ctx.stdout_behavior = boost::process::capture_stream();
-            ctx.stderr_behavior = boost::process::capture_stream();
-            ctx.environment = boost::process::self::get_environment();
-            if(!m_inputFile.empty()) {
-                ctx.stdin_behavior = boost::process::capture_stream();
+        std::string command;
+        Process *first = this;
+        if(m_inputProcess == nullptr && m_outputProcess == nullptr) { // This is the simple case
+            command = commandLine();
+        } else { // This is a pipeline situation, run everything
+            // Get to the first command
+            while(first->m_inputProcess) {
+                first = first->m_inputProcess;
             }
-            try {
-                m_children.push_back(boost::process::launch(m_program, m_args, ctx));
-            }
-            catch(boost::system::system_error &ex) {
-                STADIC_ERROR(ex.what());
-                m_state = RunFailed;
-            }
-            // Handle input
-            if(!m_inputFile.empty()) {
-                std::ifstream input(m_inputFile);
-                boost::process::postream &stream = m_children[0].get_stdin();
-                if(input.is_open()) { // Should this cause the whole thing to fail?
-                    std::string line;
-                    while(std::getline(input, line)) {
-                        stream << line << std::endl;
-                    }
-                }
-            }
-        } else { // This is a pipeline situation, so we'll only run if all children are ready
-            m_state = ReadyToRun;
-            std::deque<boost::process::pipeline_entry> downstream;
-            std::deque<boost::process::pipeline_entry> upstream;
-            
-            // Set up some contexts
-            boost::process::context ctxin;
-            ctxin.stdin_behavior = boost::process::capture_stream();
-            ctxin.stderr_behavior = boost::process::capture_stream();
-            ctxin.environment = boost::process::self::get_environment();
-
-            boost::process::context ctxout;
-            //ctxout.stdout_behavior = boost::process::inherit_stream();
-            ctxout.stdout_behavior = boost::process::close_stream();
-            ctxout.stderr_behavior = boost::process::capture_stream();
-            ctxout.environment = boost::process::self::get_environment();
-
-            boost::process::context ctxlast;
-            ctxlast.stdout_behavior = boost::process::capture_stream();
-            ctxlast.stderr_behavior = boost::process::capture_stream();
-            ctxlast.environment = boost::process::self::get_environment();
-
-            // Check the downstream direction
-            Process *last = this;
-            while(last->m_downstream != nullptr) {
-                if(last->m_downstream->m_state == ReadyToRun) {
-                    downstream.push_back(boost::process::pipeline_entry(last->m_program, last->m_args, ctxout));
-                    last = last->m_downstream;
-                } else {
-                    return; // Bail out if any one is not ready to go
-                }
-            }
-            // If we made it to here, all of the downstream processes are ready to go
-            // We still need to set up the last one so that output can be captured
-            downstream.push_back(boost::process::pipeline_entry(last->m_program, last->m_args, ctxlast));
-
-            // Now check the upstream direction - rather than get tricky, add the current process again
-            Process *first = this;
-            while(first->m_upstream != nullptr) {
-                if(first->m_upstream->m_state == ReadyToRun) {
-                    upstream.push_front(boost::process::pipeline_entry(first->m_program, first->m_args, ctxout));
-                    first = first->m_upstream;
-                } else {
-                    return; // Bail out if any one is not ready to go
-                }
-            }
-            // If we made it to here, all of the upstream processes are ready to go
-            // We still need to set up the first one so that input can be handled
-            upstream.push_front(boost::process::pipeline_entry(first->m_program, first->m_args, ctxin));
-            // Combine the two lists, keeping in mind that the element we started with is in both (it is double counted to save logic)
-            if(upstream.size() < 2) {
-                downstream.pop_front();
-                upstream.insert(upstream.end(), downstream.begin(), downstream.end());
-            } else {
-                upstream.pop_back();
-                upstream.insert(upstream.end(), downstream.begin(), downstream.end());
-            }
-            boost::process::children subprocesses;
-            try {
-                subprocesses = boost::process::launch_pipeline(upstream);
-            }
-            catch(boost::system::system_error &ex) { // Something has gone wrong!
-                STADIC_ERROR(ex.what());
-                Process *current = first;
-                while(current != nullptr) {
-                    current->m_state = RunFailed;
-                }
-            }
-            // Give everyone a copy of the children, assign indices, set state
-            unsigned index = 0;
-            Process *current = first;
-            while(current != nullptr) {
-                current->m_index = index;
-                current->m_children = subprocesses;
-                current->m_state = Running;
-                current = current->m_downstream;
-                index++;
-            }
-            index--; // This the index of the last child
-            // Handle input
-            if(!first->m_inputFile.empty()) {
-                std::ifstream input(first->m_inputFile);
-                boost::process::postream &stream = m_children[0].get_stdin();
-                if(input.is_open()) { // Should this cause the whole thing to fail?
-                    std::string line;
-                    while(std::getline(input, line)) {
-                        stream << line << std::endl;
-                    }
-                }
+            command = first->commandLine();
+            Process *current = first->m_outputProcess;
+            while(current) {
+                command += " | " + current->commandLine();
+                current = current->m_outputProcess;
             }
         }
+        // Run the command line
+        int returnCode = system(command.c_str());
+        // Figure out what happened
+        m_state = RunCompleted;
+        if(returnCode != 0) {
+            m_state = RunFailed;
+        }
+        if(m_inputProcess || m_outputProcess) {
+            while(first) {
+                first->m_state = m_state;
+                first = first->m_outputProcess;
+            }
+        }
+        return m_state == RunCompleted;
     }
+#endif
+    return true;
+}
+
+void Process::start()
+{
+#ifdef USE_QT
+    m_process.start();
+#else
+    run();
 #endif
 }
 
@@ -233,70 +150,16 @@ bool Process::wait()
 #ifdef USE_QT
     return m_process.waitForFinished(-1);
 #else
-    if(m_state==RunCompleted || m_state==RunFailed || m_state==BadProgram) {
-        return false;
-    }
-    if(m_upstream == nullptr && m_downstream == nullptr) { // This is the simple case
-        boost::process::status result = m_children[0].wait();
-        m_state = RunFailed;
-        // Figure out what happened
-        if(result.exited()) {
-            if(result.exit_status() == 0) { // Hopefully this is correct
-                m_state = RunCompleted;
-                writeFiles();
-                return true;
-            }
-        }
-    } else {
-        if(m_children.size() == 0) {
-            // This is a cop out, but there should only be children
-            // if everyone is running.
-            return false;
-        }
-        boost::process::status result = boost::process::wait_children(m_children);
-        // Figure out what happened
-        m_state = RunFailed;
-        if(result.exited()) {
-            if(result.exit_status() == 0) { // Hopefully this is correct
-                m_state = RunCompleted;
-            }
-        }
-        // Propagate this result to all of the other processes
-        // Upstream first
-        Process *current = m_upstream;
-        while(current != nullptr) {
-            current->m_state = m_state;
-            current->writeFiles();
-            current = current->m_upstream;
-        }
-        // Now downstream
-        current = m_downstream;
-        while(current != nullptr) {
-            current->m_state = m_state;
-            current->writeFiles();
-            current = current->m_downstream;
-        }
-        return m_state == RunCompleted;
-    }
-    return false;
+    return m_state == RunCompleted;
 #endif
 }
 
+/*
 std::string Process::error()
 {
 #ifdef USE_QT
     return QString(m_process.readAllStandardError()).toStdString();
 #else
-    if(m_state == Running || m_state == RunCompleted) {
-        wait();
-        std::stringstream stream;
-        boost::process::pistream &is = m_children[m_index].get_stderr();
-        std::string line;
-        while(std::getline(is, line)) {
-            stream << line << std::endl;
-        }
-        return stream.str();
-    }
     return std::string();
 #endif
 }
@@ -306,31 +169,21 @@ std::string Process::output()
 #ifdef USE_QT
     return QString(m_process.readAllStandardOutput()).toStdString();
 #else
-    if((m_state == Running || m_state == RunCompleted) && m_outputFile.empty()) {
-        wait();
-        unsigned index = m_children.size()-1;
-        std::stringstream stream;
-        boost::process::pistream &is = m_children[index].get_stdout();
-        std::string line;
-        while(std::getline(is, line)) {
-            stream << line << std::endl;
-        }
-        return stream.str();
-    }
     return std::string();
 #endif
 }
+*/
 
 void Process::setStandardOutputProcess(Process *destination)
 {
 #ifdef USE_QT
     m_process.setStandardOutputProcess(&(destination->m_process));
 #else
-    if(destination->m_upstream) { // The target process already has an upstream process
-        destination->m_upstream->m_downstream = nullptr; // disconnect
+    if(destination->m_inputProcess) { // The target process already has an upstream process
+        destination->m_inputProcess->m_outputProcess = nullptr; // disconnect
     }
-    destination->m_upstream = this;
-    m_downstream = destination;
+    destination->m_inputProcess = this;
+    m_outputProcess = destination;
 #endif
 }
 
@@ -341,10 +194,8 @@ bool Process::setStandardErrorFile(const std::string &fileName)
     return true;
 #else
     if(m_state == Initialized) {
-        if(boost::filesystem::native(fileName)) {
-            m_errorFile = fileName;
-            return true;
-        }
+        m_errorFile = fileName;
+        return true;
     }
     return false;
 #endif
@@ -357,10 +208,12 @@ bool Process::setStandardInputFile(const std::string &fileName)
     return true;
 #else
     if(m_state == Initialized) {
-        if(boost::filesystem::native(fileName)) {
-            m_inputFile = fileName;
-            return true;
+        m_inputFile = fileName;
+        if(m_inputProcess) {
+            m_inputProcess->m_outputProcess = nullptr;
+            m_inputProcess = nullptr;
         }
+        return true;
     }
     return false;
 #endif
@@ -373,56 +226,36 @@ bool Process::setStandardOutputFile(const std::string &fileName)
     return true;
 #else
     if(m_state == Initialized) {
-        if(boost::filesystem::native(fileName)) {
-            m_outputFile = fileName;
-            return true;
+        m_outputFile = fileName;
+        if(m_outputProcess) {
+            m_outputProcess->m_inputProcess = nullptr;
+            m_outputProcess = nullptr;
         }
+        return true;
     }
     return false;
 #endif
 }
 
-void Process::setProgram(const std::string &program)
+std::string Process::commandLine()
 {
 #ifdef USE_QT
-    // This function is not used with Qt
+    return std::string;
 #else
-    try {
-        m_program = boost::process::find_executable_in_path(program);
-        m_args.push_back(program);
-    } catch (const boost::filesystem::filesystem_error&) {
-#ifndef WIN32
-        try {
-            m_program = boost::process::find_executable_in_path(program,".");
-            m_args.push_back(program);
-        } catch (const boost::filesystem::filesystem_error&) {
-            m_state = BadProgram;
-        }
-#else
-        m_state = BadProgram;
-#endif
+    std::string command = m_program;
+    for(unsigned i = 0; i<m_args.size(); i++) {
+        command += " " + m_args[i];
     }
-#endif
-}
-
-void Process::writeFiles()
-{
-#ifdef USE_QT
-    // This function is not used with Qt
-#else
-    if(m_state == RunCompleted) {
-        if(!m_outputFile.empty()) {
-            if(m_children.size() == 1 || m_index == m_children.size()-1) {
-                // Only do this for single processes or the last one in the pipeline
-                boost::process::pistream &stream = m_children[m_index].get_stdout();
-                processStreamToFile(stream, m_outputFile);
-            }
-        }
-        if(!m_errorFile.empty()) {
-            boost::process::pistream &stream = m_children[m_index].get_stderr();
-            processStreamToFile(stream, m_errorFile);
-        }
+    if(!m_inputFile.empty()) {
+        command += " < " + m_inputFile;
     }
+    if(!m_outputFile.empty()) {
+        command += " > " + m_outputFile;
+    }
+    if(!m_errorFile.empty()) {
+        command += " 2> " + m_errorFile;
+    }
+    return command;
 #endif
 }
 

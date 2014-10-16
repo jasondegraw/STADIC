@@ -92,11 +92,14 @@ public:
     Process(const std::string &program);
     Process(const std::string &program, const std::vector<std::string> &args);
 
+    std::string commandLine();
+
+    bool run();
     void start();
     bool wait();
 
-    std::string error();
-    std::string output();
+    //std::string error();
+    //std::string output();
 
     void setStandardOutputProcess(Process *destination);
     bool setStandardErrorFile(const std::string &fileName);
@@ -117,19 +120,16 @@ private:
 #ifdef USE_QT
     QProcess m_process;
 #else
-    void setProgram(const std::string &program);
-    void writeFiles();
-
     ProcessState m_state;     // Flag that describes the current state of the object
-    Process *m_upstream;      // Upstream process whose stdout stream will be directed to this object's stdin
-    Process *m_downstream;    // Downstream process whose stdin stream will get this object's stdout
+    Process *m_inputProcess;  // Upstream process whose stdout stream will be directed to this object's stdin
+    Process *m_outputProcess; // Downstream process whose stdin stream will get this object's stdout
     std::string m_program;    // Program name
     std::vector<std::string> m_args;  // Arguments: program, argv1, argv2, ...
-    boost::process::children m_children;  // Vector of process objects
+    //boost::process::children m_children;  // Vector of process objects
     std::string m_inputFile;  // File that standard input will be read from
     std::string m_outputFile; // File that standard output will be written to
     std::string m_errorFile;  // File that standard error will be written to
-    unsigned m_index;  // Index of the corresponding process in m_children
+    //unsigned m_index;  // Index of the corresponding process in m_children
 #endif
 };
 

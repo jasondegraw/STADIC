@@ -43,7 +43,7 @@
 #include <string>
 #include <fstream>
 //This is to put a delay in the test...hopefully
-#include <unistd.h>
+//#include <unistd.h>
 
 
 #ifdef _MSC_VER
@@ -97,7 +97,7 @@ TEST(FilePathTests, File)
     EXPECT_TRUE(file.isFile());
     EXPECT_FALSE(file.isDir());
     EXPECT_FALSE(file.isUpdated());
-    sleep(1);
+    //sleep(1);
     //There may need to be a delay inserted here so the updated time actually changes
     std::ofstream reWrite(testString);
     reWrite << "I'm doing this as hard as I can";
