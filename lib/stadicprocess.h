@@ -52,7 +52,7 @@
 #ifdef USE_QT
 #include <QProcess>
 #else
-#include <boost/process.hpp>
+//#include <boost/process.hpp>
 #endif
 
 #include "stadicapi.h"

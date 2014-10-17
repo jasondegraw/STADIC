@@ -46,14 +46,6 @@
 #include <memory>
 #include <vector>
 
-//#define USE_QT
-
-#ifdef USE_QT
-#include <QProcess>
-#else
-#include <boost/process.hpp>
-#endif
-
 #include "stadicapi.h"
 
 #ifdef _MSC_VER

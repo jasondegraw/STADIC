@@ -47,15 +47,6 @@
 #include <sys/stat.h>
 #endif
 
-#ifndef USE_QT
-//#include <boost/process.hpp>
-//namespace bp = ::boost::process;
-#include <boost/filesystem.hpp>
-#include <thread>
-#include <fstream>
-#endif
-
-
 namespace stadic{
 //*************************
 //FilePath

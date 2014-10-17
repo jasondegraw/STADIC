@@ -73,7 +73,7 @@ void STADIC_LOG(stadic::Severity severity, std::string mesg)
     default: //case stadic::Severity::Fatal:  // Something is really wrong, stop now!
         string = "FATAL: "+mesg;
         std::cerr << string << std::endl;
-        abort();
+        exit(EXIT_FAILURE);
     }
 }
 
