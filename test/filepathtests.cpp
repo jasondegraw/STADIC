@@ -42,13 +42,13 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
-//This is to put a delay in the test...hopefully
-//#include <unistd.h>
 
 
 #ifdef _MSC_VER
+#include <windows.h>            //Added for Sleep(ms)
 #define UNLINK _unlink
 #else
+#include <unistd.h>             //Added for sleep(s)
 #define UNLINK unlink
 #endif
 
@@ -97,7 +97,11 @@ TEST(FilePathTests, File)
     EXPECT_TRUE(file.isFile());
     EXPECT_FALSE(file.isDir());
     EXPECT_FALSE(file.isUpdated());
-    //sleep(1);
+#ifdef _MSC_VER
+    Sleep(1000);            //This is to delay for one second (the units are in milliseconds)
+#else
+    sleep(1);               //This is to delay for one second
+#endif
     //There may need to be a delay inserted here so the updated time actually changes
     std::ofstream reWrite(testString);
     reWrite << "I'm doing this as hard as I can";

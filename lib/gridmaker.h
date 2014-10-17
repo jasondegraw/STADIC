@@ -70,6 +70,7 @@ public:
     void setOffsetY(double y);                                                          //Function that sets an offset from the min and max y values
     void setOffsetZ(double z);                                                          //Function that sets a z offset from the average height of each polygon
     void setZHeight(double z);                                                          //Function that sets an absolute z height using world coordinates
+    void setThreshold(double val);
 
     //Getters
     //Points
@@ -112,6 +113,8 @@ private:
     bool m_useZOffset;                                          //Boolean for testing whether a z offset should be applied
     double m_Offset;                                            //Variable holding the uniform inset from the boundaries of the polygons described by the layer list
     bool m_UseOffset;                                           //Boolean for testing whether a unifrom offset should be applied
+    double m_Threshold;                                         //Variable holding the threshold distance for a polygon to be included in the points generation
+    bool m_UseThreshold;                                        //Boolean for testing whether to use the threshold distance
     std::string m_RadPolyFile;                                  //Variable holding the radiance polygon filename
     std::string m_RadPtsFile;                                   //Variable holding the radiance point-spheres filename
     std::string m_oconvFile;                                    //Variable holding the octree filename

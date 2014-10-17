@@ -44,7 +44,7 @@
 #include "functions.h"
 #include <vector>
 
-
+/*
 TEST(GridTests, SimpleInset){
     std::vector<std::string> files;
     files.clear();
@@ -79,7 +79,7 @@ TEST(GridTests, SimpleOffset){
     grid.setOffsetZ(30);
     ASSERT_TRUE(grid.makeGrid());
 }
-
+*/
 TEST(GridTests, Complicated)
 {
     std::vector<std::string> files;
@@ -98,9 +98,10 @@ TEST(GridTests, Complicated)
     grid.setSpaceX(24);
     grid.setSpaceY(24);
     grid.setOffsetZ(30);
+    grid.setThreshold(73);      //This line prevents the stairs (@72" long) from being included in the points generation
     ASSERT_TRUE(grid.makeGrid());
     ASSERT_TRUE(grid.writePTS("complicatedgrid.pts"));
-    ASSERT_TRUE(grid.viewPTS("", "se"));
+    //ASSERT_TRUE(grid.viewPTS("", "se"));
     std::ifstream iFile;
     iFile.open("complicatedgrid.pts");
     ASSERT_TRUE(iFile.is_open());
