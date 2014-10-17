@@ -100,8 +100,8 @@ TEST(ProcessTests, ProcessProgramArgs)
     stadic::Process proc("date", args);
     time_t result = time(NULL);
     struct tm *current = localtime(&result);
-    std::string datestring = "\"" + days[current->tm_wday] + " " + stadic::toString(current->tm_year+1900) + "-"
-            + stadic::toString(current->tm_mon+1) + "-" + stadic::toString(current->tm_mday) + "\"";
+    std::string datestring = days[current->tm_wday] + " " + stadic::toString(current->tm_year+1900) + "-"
+            + stadic::toString(current->tm_mon+1) + "-" + stadic::toString(current->tm_mday);
 #endif
     proc.setStandardOutputFile("output.txt");
     proc.start();

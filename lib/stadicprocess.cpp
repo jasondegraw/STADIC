@@ -81,20 +81,6 @@ Process::Process(const std::string &program, const std::vector<std::string> &arg
 #endif
 }
 
-#ifndef USE_QT
-static void processStreamToFile(boost::process::pistream &stream, const std::string &fileName)
-{
-    std::ofstream output(fileName);
-    if(output.is_open()) {
-        std::string line;
-        while(std::getline(stream, line)) {
-            output << line << std::endl;
-        }
-        output.close();
-    }
-}
-#endif
-
 bool Process::run()
 {
 #ifdef USE_QT
