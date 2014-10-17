@@ -46,5 +46,3 @@ set(HDRS stadicapi.h
          stadicprocess.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
-
-target_link_libraries(stadic_core ${Boost_LIBRARIES})
