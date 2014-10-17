@@ -78,7 +78,7 @@ private:
     std::string m_GeoFile;                                                  //Variable holding the sun geometry filename
     std::string m_SMXFile;                                                  //Variable holding the sun smx filename
     std::vector<int> m_ClosestSun;                                          //Vector holding which sun is closest at any given hour
-    //std::vector<std::string> temporarySun;
+    std::vector<std::string> temporarySun;
 
     //Functions
     bool parseWeather();                                                    //Function to parse the weather file.  Handled by WeatherData object
