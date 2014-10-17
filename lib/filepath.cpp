@@ -45,6 +45,7 @@
 #include <Windows.h>
 #else
 #include <sys/stat.h>
+#include <string.h>
 #endif
 
 namespace stadic{
