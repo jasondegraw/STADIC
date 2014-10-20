@@ -184,3 +184,12 @@ TEST(RadFileTests, SplitRadFile)
   */
     ASSERT_TRUE(false);
 }
+
+TEST(RadFileTests, ParseComplicatedRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("complicated.rad"));
+    ASSERT_EQ(112, radData.primitives().size());
+    ASSERT_EQ(8, radData.materials().size());
+    ASSERT_EQ(104, radData.geometry().size());
+}

@@ -162,14 +162,13 @@ TEST(PrimitiveTests, Trans)
 }
 TEST(PrimitiveTests, glass)
 {
-
     stadic::GlassMaterial rad(0.6, 0.7, 0.5);
     EXPECT_EQ(stadic::RadPrimitive::Glass, rad.type());
     EXPECT_EQ("glass", rad.typeString());
     // Arg checks
     EXPECT_EQ(0, rad.arg1().size());
     EXPECT_EQ(0, rad.arg2().size());
-    ASSERT_EQ(4, rad.arg3().size());
+    ASSERT_EQ(3, rad.arg3().size());
     EXPECT_EQ("0.6", rad.getArg3(0));
     EXPECT_EQ("0.7", rad.getArg3(1));
     EXPECT_EQ("0.5", rad.getArg3(2));
@@ -178,6 +177,9 @@ TEST(PrimitiveTests, glass)
     EXPECT_EQ("0.7", rad.getArg(3, 1));
     EXPECT_EQ("0.5", rad.getArg(3, 2));
     EXPECT_EQ("1.52", rad.getArg(3, 3));
+
+    rad.setRefraction(1.51);
+    ASSERT_EQ(4, rad.arg3().size());
 
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));

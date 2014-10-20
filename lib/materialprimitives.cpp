@@ -328,6 +328,7 @@ bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
     }
     return false;
 }
+
 //TRANS
 TransMaterial::TransMaterial() : RadPrimitive()
 {
@@ -518,6 +519,7 @@ bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
     }
     return false;
 }
+
 //GLASS
 GlassMaterial::GlassMaterial() : RadPrimitive()
 {
@@ -526,11 +528,22 @@ GlassMaterial::GlassMaterial() : RadPrimitive()
     initArg(3,arg3);
 }
 
-GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
+GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans)
     : RadPrimitive()
 {
     RadPrimitive::setType("glass");
     std::vector<std::string> arg3 = { "0", "0", "0", "0" };
+    initArg(3, arg3);
+    setArg(3, stadic::toString(redTrans), 0);
+    setArg(3, stadic::toString(greenTrans), 1);
+    setArg(3, stadic::toString(blueTrans), 2);
+}
+
+GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
+    : RadPrimitive()
+{
+    RadPrimitive::setType("glass");
+    std::vector<std::string> arg3 = { "0", "0", "0", "1.52" };
     initArg(3, arg3);
     setArg(3,stadic::toString(redTrans),0);
     setArg(3,stadic::toString(greenTrans),1);
