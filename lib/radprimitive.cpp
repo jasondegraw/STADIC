@@ -364,6 +364,30 @@ std::string RadPrimitive::getArg3(int position) const
     return m_Arg3[position];
 }
 
+std::string RadPrimitive::getArg1(int position, const std::string &defaultValue) const
+{
+    if(position<0 || position>=m_Arg1.size()) {
+        return defaultValue;
+    }
+    return m_Arg1[position];
+}
+
+std::string RadPrimitive::getArg2(int position, const std::string &defaultValue) const
+{
+    if(position<0 || position>=m_Arg2.size()) {
+        return defaultValue;
+    }
+    return m_Arg2[position];
+}
+
+std::string RadPrimitive::getArg3(int position, const std::string &defaultValue) const
+{
+    if(position<0 || position>=m_Arg3.size()) {
+        return defaultValue;
+    }
+    return m_Arg3[position];
+}
+
 std::string RadPrimitive::getArg(int number, int position) const
 {
     switch(number) {
@@ -377,6 +401,19 @@ std::string RadPrimitive::getArg(int number, int position) const
     STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
     // This return is to silence warnings about not all control paths returning a value
     return std::string();
+}
+
+std::string RadPrimitive::getArg(int number, int position, const std::string &defaultValue) const
+{
+    switch(number) {
+    case 1:
+        return getArg1(position, defaultValue);
+    case 2:
+        return getArg2(position, defaultValue);
+    case 3:
+        return getArg3(position, defaultValue);
+    }
+    return defaultValue;
 }
 
 void RadPrimitive::initArg(int number, std::vector<std::string> arg)
@@ -440,6 +477,19 @@ double RadPrimitive::argToDouble(int number, int position, const std::string &va
 {
     bool ok;
     double value = stadic::toDouble(getArg(number, position), &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Fatal, "Corrupted " + variable + " value (\"" + getArg(number, position) + "\" in arg"
+            + toString(number) + ", position " + toString(position) + ") in " + object + " primitive.");
+        return false;
+    }
+    return value;
+}
+
+double RadPrimitive::argToDouble(int number, int position, const std::string &variable, const std::string &object,
+    double defaultValue) const
+{
+    bool ok;
+    double value = stadic::toDouble(getArg(number, position, stadic::toString(defaultValue)), &ok);
     if(!ok) {
         STADIC_LOG(Severity::Fatal, "Corrupted " + variable + " value (\"" + getArg(number, position) + "\" in arg"
             + toString(number) + ", position " + toString(position) + ") in " + object + " primitive.");

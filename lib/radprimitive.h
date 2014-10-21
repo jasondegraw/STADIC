@@ -86,19 +86,33 @@ public:
     std::vector<std::string> arg2() const;                              //Function that returns the second line of arguments as a vector
     std::vector<std::string> arg3() const;                              //Function that returns the third line of arguments as a vector
 
-    virtual std::string getArg1(int position) const;                    //Function that returns a given argument from the first line as a string
-    virtual std::string getArg2(int position) const;                    //Function that returns a given argument from the second line as a string
-    virtual std::string getArg3(int position) const;                    //Function that returns a given argument from the third line as a string
-    virtual std::string getArg(int number, int position) const;         //Function that returns a given argument from a given line
+    virtual std::string getArg1(int position) const; //!< Returns a given argument from the first line as a string, throws for out of range values
+    virtual std::string getArg2(int position) const; //!< Returns a given argument from the second line as a string, throws for out of range values
+    virtual std::string getArg3(int position) const; //!< Returns a given argument from the third line as a string, throws for out of range values
+    virtual std::string getArg1(int position, const std::string &defaultValue) const; //!< Returns a given argument from the first line as a string or a default if the position is out of range
+    virtual std::string getArg2(int position, const std::string &defaultValue) const; //!< Returns a given argument from the second line as a string or a default if the position is out of range
+    virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
+    virtual std::string getArg(int number, int position) const; //!< Returns a given argument from a given line, throws for out of range values
+    virtual std::string getArg(int number, int position, const std::string &defaultValue) const; //!< Returns a given argument from a given line or a default if the number or position is out of range
 
     static RadPrimitive *fromRad(std::stringstream &data);
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
-    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const;
-    bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const;
+    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, 
+        const std::string &object) const;
+    bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, 
+        const std::string &variable, const std::string &object) const;
     double argToDouble(int number, int position, const std::string &variable, const std::string &object) const;
-
+    double argToDouble(int number, int position, const std::string &variable, const std::string &object,
+        double defaultValue) const;
+    virtual bool validateArg1(const std::string &value, int position) const { return false; }
+    virtual bool validateArg1(std::vector<std::string> value) const { return false; }
+    virtual bool validateArg2(const std::string &value, int position) const { return false; }
+    virtual bool validateArg2(std::vector<std::string> value) const { return false; }
+    virtual bool validateArg3(const std::string &value, int position) const { return false; }
+    virtual bool validateArg3(std::vector<std::string> value) const { return false; }
+    
 private:
     virtual bool validateArg(int number, std::string value, int position) const {return true;}
     virtual bool validateArg(int number, std::vector<std::string> value) const {return true;}

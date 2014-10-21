@@ -534,9 +534,9 @@ GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTran
     RadPrimitive::setType("glass");
     std::vector<std::string> arg3 = { "0", "0", "0" };
     initArg(3, arg3);
-    setArg(3, stadic::toString(redTrans), 0);
-    setArg(3, stadic::toString(greenTrans), 1);
-    setArg(3, stadic::toString(blueTrans), 2);
+    setArg3(stadic::toString(redTrans), 0);
+    setArg3(stadic::toString(greenTrans), 1);
+    setArg3(stadic::toString(blueTrans), 2);
 }
 
 GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac)
@@ -545,31 +545,31 @@ GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTran
     RadPrimitive::setType("glass");
     std::vector<std::string> arg3 = { "0", "0", "0", "1.52" };
     initArg(3, arg3);
-    setArg(3,stadic::toString(redTrans),0);
-    setArg(3,stadic::toString(greenTrans),1);
-    setArg(3,stadic::toString(blueTrans),2);
-    setArg(3,stadic::toString(refrac),3);
+    setArg3(stadic::toString(redTrans),0);
+    setArg3(stadic::toString(greenTrans),1);
+    setArg3(stadic::toString(blueTrans), 2);
+    setArg3(stadic::toString(refrac), 3);
 }
 
 // Setters
 bool GlassMaterial::setRedTrans(double value)
 {
-    return setArg(3,stadic::toString(value),0);
+    return setArg3(stadic::toString(value),0);
 }
 
 bool GlassMaterial::setGreenTrans(double value)
 {
-    return setArg(3,stadic::toString(value),1);
+    return setArg3(stadic::toString(value),1);
 }
 
 bool GlassMaterial::setBlueTrans(double value)
 {
-    return setArg(3,stadic::toString(value),2);
+    return setArg3(stadic::toString(value),2);
 }
 
 bool GlassMaterial::setRefraction(double value)
 {
-    return setArg(3,stadic::toString(value),3);
+    return setArg3(stadic::toString(value),3);
 }
 
 // Getters
@@ -590,7 +590,7 @@ double GlassMaterial::blueTrans() const
 
 double GlassMaterial::refraction() const
 {
-    return argToDouble(3, 3, "index of refraction", "glass");
+    return argToDouble(3, 3, "index of refraction", "glass", 1.52);
 }
 
 bool GlassMaterial::validateArg(int number, std::string value, int position) const
