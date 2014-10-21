@@ -524,7 +524,7 @@ bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
 GlassMaterial::GlassMaterial() : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    std::vector<std::string> arg3 = { "0", "0", "0", "0" };
+    std::vector<std::string> arg3 = { "0", "0", "0" };
     initArg(3,arg3);
 }
 
@@ -532,7 +532,7 @@ GlassMaterial::GlassMaterial(double redTrans, double greenTrans, double blueTran
     : RadPrimitive()
 {
     RadPrimitive::setType("glass");
-    std::vector<std::string> arg3 = { "0", "0", "0", "0" };
+    std::vector<std::string> arg3 = { "0", "0", "0" };
     initArg(3, arg3);
     setArg(3, stadic::toString(redTrans), 0);
     setArg(3, stadic::toString(greenTrans), 1);
@@ -575,50 +575,22 @@ bool GlassMaterial::setRefraction(double value)
 // Getters
 double GlassMaterial::redTrans() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(0), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(3, 0, "red transmissivity", "glass");
 }
 
 double GlassMaterial::greenTrans() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(1), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(3, 1, "green transmissivity", "glass");
 }
 
 double GlassMaterial::blueTrans() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(2), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(3, 2, "green transmissivity", "glass");
 }
 
 double GlassMaterial::refraction() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(3), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(3, 3, "index of refraction", "glass");
 }
 
 bool GlassMaterial::validateArg(int number, std::string value, int position) const
@@ -656,6 +628,7 @@ bool GlassMaterial::validateArg(int number, std::vector<std::string> arg) const
     }
     return false;
 }
+
 //BSDF
 BSDFMaterial::BSDFMaterial() : RadPrimitive()
 {

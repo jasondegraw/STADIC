@@ -162,6 +162,12 @@ TEST(PrimitiveTests, Trans)
 }
 TEST(PrimitiveTests, glass)
 {
+    stadic::GlassMaterial noargs;
+    EXPECT_EQ(0, noargs.redTrans());
+    EXPECT_EQ(0, noargs.greenTrans());
+    EXPECT_EQ(0, noargs.blueTrans());
+    EXPECT_EQ(1.52, noargs.refraction());
+
     stadic::GlassMaterial rad(0.6, 0.7, 0.5);
     EXPECT_EQ(stadic::RadPrimitive::Glass, rad.type());
     EXPECT_EQ("glass", rad.typeString());

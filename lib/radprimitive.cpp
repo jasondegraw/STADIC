@@ -115,26 +115,33 @@ bool RadPrimitive::isMaterial() const
 }
 
 //Setters
-void RadPrimitive::setModifier(std::string modifier){
+void RadPrimitive::setModifier(std::string modifier)
+{
     m_Modifier=modifier;
 }
 
-bool RadPrimitive::setType(std::string type){
+bool RadPrimitive::setType(std::string type)
+{
     m_TypeString=type;
     return true;
 }
-void RadPrimitive::setName(std::string name){
+
+void RadPrimitive::setName(std::string name)
+{
     m_Name=name;
 }
 
-bool RadPrimitive::setArg1(std::vector<std::string> vals){
+bool RadPrimitive::setArg1(std::vector<std::string> vals)
+{
     if(validateArg(1,vals)) {
       m_Arg1=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg1(std::string arg, int position) {
+
+bool RadPrimitive::setArg1(std::string arg, int position)
+{
     if(position<m_Arg1.size()) {
         if(!validateArg(1,arg,position)) {
             return false;
@@ -144,14 +151,18 @@ bool RadPrimitive::setArg1(std::string arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg2(std::vector<std::string> vals){
+
+bool RadPrimitive::setArg2(std::vector<std::string> vals)
+{
     if(validateArg(2,vals)) {
       m_Arg2=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg2(std::string arg, int position) {
+
+bool RadPrimitive::setArg2(std::string arg, int position)
+{
     if(position<m_Arg2.size()) {
         if(!validateArg(2,arg,position)) {
             return false;
@@ -161,14 +172,18 @@ bool RadPrimitive::setArg2(std::string arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg3(std::vector<std::string> vals){
+
+bool RadPrimitive::setArg3(std::vector<std::string> vals)
+{
     if(validateArg(3,vals)) {
       m_Arg3=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg3(std::string arg, int position) {
+
+bool RadPrimitive::setArg3(std::string arg, int position)
+{
     if(position<m_Arg3.size()) {
         if(!validateArg(3,arg,position)) {
             return false;
@@ -328,8 +343,7 @@ RadPrimitive::Type RadPrimitive::typeFromString(std::string string)
 std::string RadPrimitive::getArg1(int position) const
 {
     if(position<0 || position>=m_Arg1.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 1, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg1[position];
 }
@@ -337,8 +351,7 @@ std::string RadPrimitive::getArg1(int position) const
 std::string RadPrimitive::getArg2(int position) const
 {
     if(position<0 || position>=m_Arg2.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 2, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg2[position];
 }
@@ -346,8 +359,7 @@ std::string RadPrimitive::getArg2(int position) const
 std::string RadPrimitive::getArg3(int position) const
 {
     if(position<0 || position>=m_Arg3.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 3, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg3[position];
 }
@@ -362,9 +374,9 @@ std::string RadPrimitive::getArg(int number, int position) const
     case 3:
         return getArg3(position);
     }
-    // Error/warning message?
-    std::string empty;
-    return empty;
+    STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
+    // This return is to silence warnings about not all control paths returning a value
+    return std::string();
 }
 
 void RadPrimitive::initArg(int number, std::vector<std::string> arg)
@@ -380,7 +392,7 @@ void RadPrimitive::initArg(int number, std::vector<std::string> arg)
         m_Arg3 = arg;
         break;
     default:
-        // Error message?
+        STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
         break;
     }
 }
@@ -422,6 +434,18 @@ bool RadPrimitive::checkValue(const std::string &value, int index, double min, d
         return true;
     }
     return false;
+}
+
+double RadPrimitive::argToDouble(int number, int position, const std::string &variable, const std::string &object) const
+{
+    bool ok;
+    double value = stadic::toDouble(getArg(number, position), &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Fatal, "Corrupted " + variable + " value (\"" + getArg(number, position) + "\" in arg"
+            + toString(number) + ", position " + toString(position) + ") in " + object + " primitive.");
+        return false;
+    }
+    return value;
 }
 
 }

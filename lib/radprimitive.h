@@ -68,12 +68,12 @@ public:
     void setModifier(std::string modifier);                             //Function to set the modifier
     virtual bool setType(std::string type);                             //Function to set the type
     void setName(std::string name);                                     //Function to set the name
-    bool setArg1(std::vector<std::string> vals);                        //Function to set the argumens on line one from a vector of strings
-    bool setArg1(std::string arg, int position);                        //Function to set an argument on line one given the position of the argument
-    bool setArg2(std::vector<std::string> vals);                        //Function to set the arguments on line two from a vector of strings
-    bool setArg2(std::string arg, int position);                        //Function to set an argument on line two given the position of the argument
-    bool setArg3(std::vector<std::string> vals);                        //Function to set the arguments on line three from a vector of strings
-    bool setArg3(std::string arg, int position);                        //Function to set an argument on line three given the position of the argument
+    virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
+    virtual bool setArg1(std::string arg, int position);                //Function to set an argument on line one given the position of the argument
+    virtual bool setArg2(std::vector<std::string> vals);                //Function to set the arguments on line two from a vector of strings
+    virtual bool setArg2(std::string arg, int position);                //Function to set an argument on line two given the position of the argument
+    virtual bool setArg3(std::vector<std::string> vals);                //Function to set the arguments on line three from a vector of strings
+    virtual bool setArg3(std::string arg, int position);                //Function to set an argument on line three given the position of the argument
 
     virtual bool setArg(int number, std::string value, int position);
 
@@ -97,6 +97,7 @@ protected:
     void initArg(int number, std::vector<std::string> arg);
     bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const;
     bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const;
+    double argToDouble(int number, int position, const std::string &variable, const std::string &object) const;
 
 private:
     virtual bool validateArg(int number, std::string value, int position) const {return true;}
