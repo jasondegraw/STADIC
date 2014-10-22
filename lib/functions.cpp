@@ -88,6 +88,9 @@ std::vector<std::string> trimmedSplit(std::string line, char delimiter)
 std::string trim(std::string string)
 {
     std::size_t found=string.find_first_not_of(" \t\f\v\n\r");
+    if(found >= string.length()) {
+        return std::string();
+    }
     if (found!=string.npos){
         string.erase(string.begin(),string.begin()+found);
     }

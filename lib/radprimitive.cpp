@@ -256,19 +256,17 @@ std::vector<std::string> RadPrimitive::arg3() const{
 
 static std::string nextNonComment(std::stringstream &data)
 {
-  std::string string;
-  while(!data.eof()) {
-    std::getline(data,string);
-    string = trim(string);
-    //std::cout << "### " << string.toStdString() << std::endl;
-    if(!string.empty()) {
-        if(string.find('#')==string.npos){
-            return string;
+    std::string string;
+    while(!data.eof()) {
+        std::getline(data, string);
+        string = trim(string);
+        if(!string.empty()) {
+            if(string.find('#')==string.npos){
+                return string;
+            }
         }
     }
-  }
-  std::string empty;
-  return empty;
+    return std::string();
 }
 
 RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
@@ -279,7 +277,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     if (string.empty()){
         return nullptr;
     }
-    std::vector<std::string> list =trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
+    std::vector<std::string> list = trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
     if(list.size() != 3) {
         return nullptr;
     }
@@ -290,6 +288,15 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         break;
     case Plastic:
         rad = new PlasticMaterial();
+        break;
+    case Metal:
+        rad = new MetalMaterial();
+        break;
+    case Trans:
+        rad = new TransMaterial();
+        break;
+    case Glass:
+        rad = new GlassMaterial();
         break;
     case BSDF:
         rad = new BSDFMaterial();

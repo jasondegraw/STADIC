@@ -75,6 +75,8 @@ TEST(FunctionTests, Trim)
 {
     std::string testString = " word   ";
     EXPECT_EQ("word",stadic::trim(testString));
+    std::string nothing = " ";
+    EXPECT_TRUE(stadic::trim(nothing).empty());
 }
 
 TEST(FunctionTests, ToDouble)
