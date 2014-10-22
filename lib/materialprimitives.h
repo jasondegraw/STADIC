@@ -67,7 +67,6 @@ public:
 
 protected:
     bool validateArg3(const std::string &value, int position) const;
-
 };
 
 //METAL
@@ -91,8 +90,7 @@ public:
     double specularity() const;
     double roughness() const;
 private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+    bool validateArg3(const std::string &value, int position) const;
 };
 
 //TRANS

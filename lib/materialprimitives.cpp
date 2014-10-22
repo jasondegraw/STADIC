@@ -155,122 +155,68 @@ MetalMaterial::MetalMaterial(double red, double green, double blue, double spec,
 // Setters
 bool MetalMaterial::setRed(double value)
 {
-    return setArg(3, stadic::toString(value), 0);
+    return setArg3(stadic::toString(value), 0);
 }
 
 bool MetalMaterial::setGreen(double value)
 {
-    return setArg(3, stadic::toString(value), 1);
+    return setArg3(stadic::toString(value), 1);
 }
 
 bool MetalMaterial::setBlue(double value)
 {
-    return setArg(3, stadic::toString(value), 2);
+    return setArg3(stadic::toString(value), 2);
 }
 
 bool MetalMaterial::setSpecularity(double value)
 {
-    return setArg(3, stadic::toString(value), 3);
+    return setArg3(stadic::toString(value), 3);
 }
 
 bool MetalMaterial::setRoughness(double value)
 {
-    return setArg(3, stadic::toString(value), 4);
+    return setArg3(stadic::toString(value), 4);
 }
 
 // Getters
 double MetalMaterial::red() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(0), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(0, "red");
 }
 
 double MetalMaterial::green() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(1), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(1, "green");
 }
 
 double MetalMaterial::blue() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(2), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(2, "blue");
 }
 
 double MetalMaterial::specularity() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(3), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(3, "specularity");
 }
 
 double MetalMaterial::roughness() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(4), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(4, "roughness");
 }
 
-bool MetalMaterial::validateArg(int number, std::string value, int position) const
+bool MetalMaterial::validateArg3(const std::string &value, int position) const
 {
-    if(number==3) {
-        switch (position) {
-        case 0:
-            return checkValue(value, 0, 0, 1, "red");
-        case 1:
-            return checkValue(value, 1, 0, 1, "blue");
-        case 2:
-            return checkValue(value, 2, 0, 1, "green");
-        case 3:
-            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
-        case 4:
-            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
-        }
-    }
-    return false;
-}
-
-bool MetalMaterial::validateArg(int number, std::vector<std::string> arg) const
-{
-    if(number==3) {
-        if(arg.size() != 5) {
-            return false;
-        }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
+    switch(position) {
+    case 0:
+        return checkValue(value, 0, 0, 1, "red");
+    case 1:
+        return checkValue(value, 1, 0, 1, "blue");
+    case 2:
+        return checkValue(value, 2, 0, 1, "green");
+    case 3:
+        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
+    case 4:
+        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
     }
     return false;
 }
