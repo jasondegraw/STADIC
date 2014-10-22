@@ -90,42 +90,42 @@ bool PlasticMaterial::setRoughness(double value)
 // Getters
 double PlasticMaterial::red() const
 {
-    return arg3ToDouble(0, "red", "plastic");
+    return arg3ToDouble(0, "red");
 }
 
 double PlasticMaterial::green() const
 {
-    return arg3ToDouble(1, "green", "plastic");
+    return arg3ToDouble(1, "green");
 }
 
 double PlasticMaterial::blue() const
 {
-    return arg3ToDouble(2, "blue", "plastic");
+    return arg3ToDouble(2, "blue");
 }
 
 double PlasticMaterial::specularity() const
 {
-    return arg3ToDouble(3, "specularity", "plastic");
+    return arg3ToDouble(3, "specularity");
 }
 
 double PlasticMaterial::roughness() const
 {
-    return arg3ToDouble(4, "roughness", "plastic");
+    return arg3ToDouble(4, "roughness");
 }
 
 bool PlasticMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position){
     case 0:
-        return checkValue(value, 0, 0, 1, "red", "plastic");
+        return checkValue(value, 0, 0, 1, "red");
     case 1:
-        return checkValue(value, 1, 0, 1, "green", "plastic");
+        return checkValue(value, 1, 0, 1, "green");
     case 2:
-        return checkValue(value, 2, 0, 1, "blue", "plastic");
+        return checkValue(value, 2, 0, 1, "blue");
     case 3:
-        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "plastic");
+        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
     case 4:
-        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "plastic");
+        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
     }
     return false;
 }
@@ -244,15 +244,15 @@ bool MetalMaterial::validateArg(int number, std::string value, int position) con
     if(number==3) {
         switch (position) {
         case 0:
-            return checkValue(value, 0, 0, 1, "red", "metal");
+            return checkValue(value, 0, 0, 1, "red");
         case 1:
-            return checkValue(value, 1, 0, 1, "blue", "metal");
+            return checkValue(value, 1, 0, 1, "blue");
         case 2:
-            return checkValue(value, 2, 0, 1, "green", "metal");
+            return checkValue(value, 2, 0, 1, "green");
         case 3:
-            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "metal");
+            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
         case 4:
-            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "metal");
+            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
         }
     }
     return false;
@@ -431,19 +431,19 @@ bool TransMaterial::validateArg(int number, std::string value, int position) con
     if(number==3) {
         switch (position){
         case 0:
-            return checkValue(value, 0, 0, 1, "red", "trans");
+            return checkValue(value, 0, 0, 1, "red");
         case 1:
-            return checkValue(value, 1, 0, 1, "blue", "trans");
+            return checkValue(value, 1, 0, 1, "blue");
         case 2:
-            return checkValue(value, 2, 0, 1, "green", "trans");
+            return checkValue(value, 2, 0, 1, "green");
         case 3:
-            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "trans");
+            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
         case 4:
-            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "trans");
+            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
         case 5:
-            return checkValue(value, 5, 0, 1, "transmissivity", "trans");
+            return checkValue(value, 5, 0, 1, "transmissivity");
         case 6:
-            return checkValue(value, 6, 0, 1, "transmitted specularity", "trans");
+            return checkValue(value, 6, 0, 1, "transmitted specularity");
         }
     }
     return false;
@@ -521,35 +521,35 @@ bool GlassMaterial::setRefraction(double value)
 // Getters
 double GlassMaterial::redTrans() const
 {
-    return arg3ToDouble(0, "red transmissivity", "glass");
+    return arg3ToDouble(0, "red transmissivity");
 }
 
 double GlassMaterial::greenTrans() const
 {
-    return arg3ToDouble(1, "green transmissivity", "glass");
+    return arg3ToDouble(1, "green transmissivity");
 }
 
 double GlassMaterial::blueTrans() const
 {
-    return arg3ToDouble(2, "green transmissivity", "glass");
+    return arg3ToDouble(2, "green transmissivity");
 }
 
 double GlassMaterial::refraction() const
 {
-    return arg3ToDouble(3, "index of refraction", "glass", 1.52);
+    return arg3ToDouble(3, "index of refraction", 1.52);
 }
 
 bool GlassMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position){
     case 0:
-        return checkValue(value, 0, 0, 1, "red transmissivity", "glass");
+        return checkValue(value, 0, 0, 1, "red transmissivity");
     case 1:
-        return checkValue(value, 1, 0, 1, "blue transmissivity", "glass");
+        return checkValue(value, 1, 0, 1, "blue transmissivity");
     case 2:
-        return checkValue(value, 2, 0, 1, "green transmissivity", "glass");
+        return checkValue(value, 2, 0, 1, "green transmissivity");
     case 3:
-        return checkValue(value, 3, 0, 5, "index of refraction", "glass");
+        return checkValue(value, 3, 0, 5, "index of refraction");
     }
     return false;
 }

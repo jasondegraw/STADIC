@@ -99,13 +99,11 @@ public:
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
-    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, 
-        const std::string &object) const;
+    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable) const;
     bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, 
-        const std::string &variable, const std::string &object) const;
-    double arg3ToDouble(int position, const std::string &variable, const std::string &object) const;
-    double arg3ToDouble(int position, const std::string &variable, const std::string &object,
-        double defaultValue) const;
+        const std::string &variable) const;
+    double arg3ToDouble(int position, const std::string &variable) const;
+    double arg3ToDouble(int position, const std::string &variable, double defaultValue) const;
     virtual bool validateArg1(const std::string &value, int position) const { return false; }
     virtual bool validateArg1(std::vector<std::string> value) const { return false; }
     virtual bool validateArg2(const std::string &value, int position) const { return false; }
