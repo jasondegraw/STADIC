@@ -593,6 +593,21 @@ double GlassMaterial::refraction() const
     return argToDouble(3, 3, "index of refraction", "glass", 1.52);
 }
 
+bool GlassMaterial::validateArg3(const std::string &value, int position) const
+{
+    switch(position){
+    case 0:
+        return checkValue(value, 0, 0, 1, "red transmissivity", "glass");
+    case 1:
+        return checkValue(value, 1, 0, 1, "blue transmissivity", "glass");
+    case 2:
+        return checkValue(value, 2, 0, 1, "green transmissivity", "glass");
+    case 3:
+        return checkValue(value, 3, 0, 5, "index of refraction", "glass");
+    }
+    return false;
+}
+
 bool GlassMaterial::validateArg(int number, std::string value, int position) const
 {
     if(number==3) {

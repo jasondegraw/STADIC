@@ -112,6 +112,7 @@ protected:
     virtual bool validateArg2(std::vector<std::string> value) const { return false; }
     virtual bool validateArg3(const std::string &value, int position) const { return false; }
     virtual bool validateArg3(std::vector<std::string> value) const { return false; }
+    virtual bool extendArg3() const { return false; }
     
 private:
     virtual bool validateArg(int number, std::string value, int position) const {return true;}

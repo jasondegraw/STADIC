@@ -185,11 +185,19 @@ bool RadPrimitive::setArg3(std::vector<std::string> vals)
 bool RadPrimitive::setArg3(std::string arg, int position)
 {
     if(position<m_Arg3.size()) {
-        if(!validateArg(3,arg,position)) {
+        if(!validateArg3(arg,position)) {
             return false;
         }
         m_Arg3[position] = arg;
         return true;
+    } else if(position == m_Arg3.size() && extendArg3()) { // Allow for possible extension of the vector by one
+        if(!validateArg3(arg, position)) {
+            return false;
+        }
+        m_Arg3.push_back(arg);
+        return true;
+    } else {
+        STADIC_LOG(Severity::Error, "Argument 3, position \'" + toString(position) + "\' is out of range.");
     }
     return false;
 }

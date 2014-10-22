@@ -160,39 +160,60 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ(0, rad2.transmissivity());
     EXPECT_EQ(0, rad2.transSpecular());
 }
-TEST(PrimitiveTests, glass)
+TEST(PrimitiveTests, Glass)
 {
+    // Test no argument constructor
     stadic::GlassMaterial noargs;
     EXPECT_EQ(0, noargs.redTrans());
     EXPECT_EQ(0, noargs.greenTrans());
     EXPECT_EQ(0, noargs.blueTrans());
     EXPECT_EQ(1.52, noargs.refraction());
 
+    // Test bad arguments to constructor
+    stadic::GlassMaterial badargs(1.6, 1.7, 1.5);
+    EXPECT_EQ(0, badargs.redTrans());
+    EXPECT_EQ(0, badargs.greenTrans());
+    EXPECT_EQ(0, badargs.blueTrans());
+    EXPECT_EQ(1.52, badargs.refraction());
+
+    // Test 3 arguments to constructor
     stadic::GlassMaterial rad(0.6, 0.7, 0.5);
     EXPECT_EQ(stadic::RadPrimitive::Glass, rad.type());
     EXPECT_EQ("glass", rad.typeString());
-    // Arg checks
     EXPECT_EQ(0, rad.arg1().size());
     EXPECT_EQ(0, rad.arg2().size());
     ASSERT_EQ(3, rad.arg3().size());
     EXPECT_EQ("0.6", rad.getArg3(0));
     EXPECT_EQ("0.7", rad.getArg3(1));
     EXPECT_EQ("0.5", rad.getArg3(2));
-    //EXPECT_EQ("1.52", rad.getArg3(3));
-    EXPECT_EQ("0.6", rad.getArg(3, 0));
-    EXPECT_EQ("0.7", rad.getArg(3, 1));
-    EXPECT_EQ("0.5", rad.getArg(3, 2));
-    //EXPECT_EQ("1.52", rad.getArg(3, 3));
 
+    // Expand the third argument list by one
+    EXPECT_EQ(1.52, rad.refraction());
     rad.setRefraction(1.51);
-    ASSERT_EQ(3, rad.arg3().size());
+    ASSERT_EQ(4, rad.arg3().size());
+    EXPECT_EQ(1.51, rad.refraction());
 
-    // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_EQ(0.6, rad.redTrans());
     EXPECT_EQ(0.7, rad.greenTrans());
     EXPECT_EQ(0.5, rad.blueTrans());
-    EXPECT_EQ(1.52, rad.refraction());
+    EXPECT_EQ(1.51, rad.refraction());
+
+    // Test 4 arguments to constructor
+    stadic::GlassMaterial rad4(0.6, 0.7, 0.5, 1.75);
+    EXPECT_EQ(stadic::RadPrimitive::Glass, rad4.type());
+    EXPECT_EQ("glass", rad4.typeString());
+    EXPECT_EQ(0, rad4.arg1().size());
+    EXPECT_EQ(0, rad4.arg2().size());
+    ASSERT_EQ(4, rad4.arg3().size());
+    EXPECT_EQ("0.6", rad4.getArg3(0));
+    EXPECT_EQ("0.7", rad4.getArg3(1));
+    EXPECT_EQ("0.5", rad4.getArg3(2));
+    EXPECT_EQ("1.75", rad4.getArg3(3));
+    EXPECT_EQ(0.6, rad4.redTrans());
+    EXPECT_EQ(0.7, rad4.greenTrans());
+    EXPECT_EQ(0.5, rad4.blueTrans());
+    EXPECT_EQ(1.75, rad4.refraction());
 }
 
 TEST(PrimitiveTests, BSDF)

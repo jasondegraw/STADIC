@@ -145,10 +145,15 @@ public:
     double blueTrans() const;
     double refraction() const;
 
+protected:
+    bool validateArg3(const std::string &value, int position) const;
+    bool extendArg3() const { return true; }
+
 private:
    virtual bool validateArg(int number, std::string value, int position) const;
    virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
+
 //BSDF
 class STADIC_API BSDFMaterial : public RadPrimitive
 {
