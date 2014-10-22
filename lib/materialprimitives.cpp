@@ -54,132 +54,78 @@ PlasticMaterial::PlasticMaterial(double red, double green, double blue, double s
     RadPrimitive::setType("plastic");
     std::vector<std::string> arg3 = { "0", "0", "0", "0", "0" };
     initArg(3, arg3);
-    setArg(3, stadic::toString(red), 0);
-    setArg(3, stadic::toString(green), 1);
-    setArg(3, stadic::toString(blue), 2);
-    setArg(3, stadic::toString(spec), 3);
-    setArg(3, stadic::toString(rough), 4);
+    setArg3(stadic::toString(red), 0);
+    setArg3(stadic::toString(green), 1);
+    setArg3(stadic::toString(blue), 2);
+    setArg3(stadic::toString(spec), 3);
+    setArg3(stadic::toString(rough), 4);
 }
 
 // Setters
 bool PlasticMaterial::setRed(double value)
 {
-    return setArg(3, stadic::toString(value), 0);
+    return setArg3(stadic::toString(value), 0);
 }
 
 bool PlasticMaterial::setGreen(double value)
 {
-    return setArg(3, stadic::toString(value), 1);
+    return setArg3(stadic::toString(value), 1);
 }
 
 bool PlasticMaterial::setBlue(double value)
 {
-    return setArg(3, stadic::toString(value), 2);
+    return setArg3(stadic::toString(value), 2);
 }
 
 bool PlasticMaterial::setSpecularity(double value)
 {
-    return setArg(3, stadic::toString(value), 3);
+    return setArg3(stadic::toString(value), 3);
 }
 
 bool PlasticMaterial::setRoughness(double value)
 {
-    return setArg(3, stadic::toString(value), 4);
+    return setArg3(stadic::toString(value), 4);
 }
 
 // Getters
 double PlasticMaterial::red() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(0), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(0, "red", "plastic");
 }
 
 double PlasticMaterial::green() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(1), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(1, "green", "plastic");
 }
 
 double PlasticMaterial::blue() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(2), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(2, "blue", "plastic");
 }
 
 double PlasticMaterial::specularity() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(3), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(3, "specularity", "plastic");
 }
 
 double PlasticMaterial::roughness() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(4), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(4, "roughness", "plastic");
 }
 
-bool PlasticMaterial::validateArg(int number, std::string value, int position) const
+bool PlasticMaterial::validateArg3(const std::string &value, int position) const
 {
-    if(number == 3) {
-        switch(position){
-        case 0:
-            return checkValue(value, 0, 0, 1, "red", "plastic");
-        case 1:
-            return checkValue(value, 1, 0, 1, "green", "plastic");
-        case 2:
-            return checkValue(value, 2, 0, 1, "blue", "plastic");
-        case 3:
-            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "plastic");
-        case 4:
-            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "plastic");
-        }
-    }
-    return false;
-}
-
-bool PlasticMaterial::validateArg(int number, std::vector<std::string> arg) const
-{
-    if(number==3) {
-        if(arg.size() != 5) {
-            return false;
-        }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
+    switch(position){
+    case 0:
+        return checkValue(value, 0, 0, 1, "red", "plastic");
+    case 1:
+        return checkValue(value, 1, 0, 1, "green", "plastic");
+    case 2:
+        return checkValue(value, 2, 0, 1, "blue", "plastic");
+    case 3:
+        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity", "plastic");
+    case 4:
+        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness", "plastic");
     }
     return false;
 }
@@ -575,22 +521,22 @@ bool GlassMaterial::setRefraction(double value)
 // Getters
 double GlassMaterial::redTrans() const
 {
-    return argToDouble(3, 0, "red transmissivity", "glass");
+    return arg3ToDouble(0, "red transmissivity", "glass");
 }
 
 double GlassMaterial::greenTrans() const
 {
-    return argToDouble(3, 1, "green transmissivity", "glass");
+    return arg3ToDouble(1, "green transmissivity", "glass");
 }
 
 double GlassMaterial::blueTrans() const
 {
-    return argToDouble(3, 2, "green transmissivity", "glass");
+    return arg3ToDouble(2, "green transmissivity", "glass");
 }
 
 double GlassMaterial::refraction() const
 {
-    return argToDouble(3, 3, "index of refraction", "glass", 1.52);
+    return arg3ToDouble(3, "index of refraction", "glass", 1.52);
 }
 
 bool GlassMaterial::validateArg3(const std::string &value, int position) const
@@ -604,42 +550,6 @@ bool GlassMaterial::validateArg3(const std::string &value, int position) const
         return checkValue(value, 2, 0, 1, "green transmissivity", "glass");
     case 3:
         return checkValue(value, 3, 0, 5, "index of refraction", "glass");
-    }
-    return false;
-}
-
-bool GlassMaterial::validateArg(int number, std::string value, int position) const
-{
-    if(number==3) {
-        bool ok;
-        double dval = stadic::toDouble(value, &ok);
-        switch (position){
-        case 0:
-            return checkValue(value, 0, 0, 1, "red transmissivity", "glass");
-        case 1:
-            return checkValue(value, 1, 0, 1, "blue transmissivity", "glass");
-        case 2:
-            return checkValue(value, 2, 0, 1, "green transmissivity", "glass");
-        case 3:
-            return checkValue(value, 3, 0, 5, "index of refraction", "glass");
-        }
-    }
-    return false;
-}
-
-bool GlassMaterial::validateArg(int number, std::vector<std::string> arg) const
-{
-    if(number==3) {
-        if(arg.size() != 4 || arg.size() !=3) {
-            return false;
-        }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
     }
     return false;
 }

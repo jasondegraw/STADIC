@@ -103,8 +103,8 @@ protected:
         const std::string &object) const;
     bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, 
         const std::string &variable, const std::string &object) const;
-    double argToDouble(int number, int position, const std::string &variable, const std::string &object) const;
-    double argToDouble(int number, int position, const std::string &variable, const std::string &object,
+    double arg3ToDouble(int position, const std::string &variable, const std::string &object) const;
+    double arg3ToDouble(int position, const std::string &variable, const std::string &object,
         double defaultValue) const;
     virtual bool validateArg1(const std::string &value, int position) const { return false; }
     virtual bool validateArg1(std::vector<std::string> value) const { return false; }

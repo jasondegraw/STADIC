@@ -64,10 +64,12 @@ public:
     double blue() const;
     double specularity() const;
     double roughness() const;
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+
+protected:
+    bool validateArg3(const std::string &value, int position) const;
+
 };
+
 //METAL
 class STADIC_API MetalMaterial : public RadPrimitive
 {
@@ -92,6 +94,7 @@ private:
    virtual bool validateArg(int number, std::string value, int position) const;
    virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
+
 //TRANS
 class STADIC_API TransMaterial : public RadPrimitive
 {
@@ -123,6 +126,7 @@ private:
    virtual bool validateArg(int number, std::string value, int position) const;
    virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
+
 //GLASS
 class STADIC_API GlassMaterial : public RadPrimitive
 {
@@ -137,8 +141,6 @@ public:
     bool setBlueTrans(double value);
     bool setRefraction(double value);
 
-    void useDefaultRefraction();
-
     // Getters
     double redTrans() const;
     double greenTrans() const;
@@ -149,9 +151,6 @@ protected:
     bool validateArg3(const std::string &value, int position) const;
     bool extendArg3() const { return true; }
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
 
 //BSDF

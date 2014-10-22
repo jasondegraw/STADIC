@@ -44,6 +44,23 @@
 
 TEST(PrimitiveTests, Plastic)
 {
+    // Test no argument constructor
+    stadic::PlasticMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+
+    // Test bad arguments to constructor
+    stadic::PlasticMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+
+    // Test regular construction
     stadic::PlasticMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75);
     EXPECT_EQ(stadic::RadPrimitive::Plastic, rad.type());
     EXPECT_EQ("plastic", rad.typeString());
@@ -71,14 +88,7 @@ TEST(PrimitiveTests, Plastic)
     EXPECT_EQ(0.1, rad.blue());
     EXPECT_EQ(0.5, rad.specularity());
     EXPECT_EQ(0.75, rad.roughness());
-    // Bad constructor args
-    stadic::PlasticMaterial rad2(1.2, 1.8, 1.1, 1.5, 1.75);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.green());
-    EXPECT_EQ(0, rad2.blue());
-    EXPECT_EQ(0, rad2.specularity());
-    EXPECT_EQ(0, rad2.roughness());
+ 
 }
 
 TEST(PrimitiveTests, Metal)
@@ -193,11 +203,18 @@ TEST(PrimitiveTests, Glass)
     ASSERT_EQ(4, rad.arg3().size());
     EXPECT_EQ(1.51, rad.refraction());
 
+    // Test getters and setters
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_EQ(0.6, rad.redTrans());
     EXPECT_EQ(0.7, rad.greenTrans());
     EXPECT_EQ(0.5, rad.blueTrans());
     EXPECT_EQ(1.51, rad.refraction());
+    EXPECT_FALSE(rad.setRedTrans(1.7));
+    EXPECT_FALSE(rad.setGreenTrans(-300));
+    EXPECT_FALSE(rad.setBlueTrans(4000));
+    EXPECT_EQ(0.6, rad.redTrans());
+    EXPECT_EQ(0.7, rad.greenTrans());
+    EXPECT_EQ(0.5, rad.blueTrans());
 
     // Test 4 arguments to constructor
     stadic::GlassMaterial rad4(0.6, 0.7, 0.5, 1.75);

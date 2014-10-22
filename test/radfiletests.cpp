@@ -189,7 +189,7 @@ TEST(RadFileTests, ParseComplicatedRadFile)
 {
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("complicated.rad"));
-    ASSERT_EQ(112, radData.primitives().size());
-    ASSERT_EQ(8, radData.materials().size());
-    ASSERT_EQ(104, radData.geometry().size());
+    EXPECT_EQ(112, radData.primitives().size());
+    EXPECT_EQ(8, radData.materials().size());
+    EXPECT_EQ(104, radData.geometry().size());
 }
