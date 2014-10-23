@@ -145,11 +145,11 @@ MetalMaterial::MetalMaterial(double red, double green, double blue, double spec,
     RadPrimitive::setType("metal");
     std::vector<std::string> arg3 = { "0", "0", "0", "0", "0" };
     initArg(3, arg3);
-    setArg(3, stadic::toString(red), 0);
-    setArg(3, stadic::toString(green), 1);
-    setArg(3, stadic::toString(blue), 2);
-    setArg(3, stadic::toString(spec), 3);
-    setArg(3, stadic::toString(rough), 4);
+    setArg3(stadic::toString(red), 0);
+    setArg3(stadic::toString(green), 1);
+    setArg3(stadic::toString(blue), 2);
+    setArg3(stadic::toString(spec), 3);
+    setArg3(stadic::toString(rough), 4);
 }
 
 // Setters
@@ -235,179 +235,111 @@ TransMaterial::TransMaterial(double red, double green, double blue, double spec,
     RadPrimitive::setType("trans");
     std::vector<std::string> arg3 = { "0", "0", "0", "0", "0", "0", "0" };
     initArg(3, arg3);
-    setArg(3, stadic::toString(red), 0);
-    setArg(3, stadic::toString(green), 1);
-    setArg(3, stadic::toString(blue), 2);
-    setArg(3, stadic::toString(spec), 3);
-    setArg(3, stadic::toString(rough), 4);
-    setArg(3, stadic::toString(trans), 5);
-    setArg(3, stadic::toString(transpec), 6);
+    setArg3(stadic::toString(red), 0);
+    setArg3(stadic::toString(green), 1);
+    setArg3(stadic::toString(blue), 2);
+    setArg3(stadic::toString(spec), 3);
+    setArg3(stadic::toString(rough), 4);
+    setArg3(stadic::toString(trans), 5);
+    setArg3(stadic::toString(transpec), 6);
 
 }
 
 // Setters
 bool TransMaterial::setRed(double value)
 {
-    return setArg(3,stadic::toString(value),0);
+    return setArg3(stadic::toString(value), 0);
 }
 
 bool TransMaterial::setGreen(double value)
 {
-    return setArg(3,stadic::toString(value),1);
+    return setArg3(stadic::toString(value), 1);
 }
 
 bool TransMaterial::setBlue(double value)
 {
-    return setArg(3,stadic::toString(value),2);
+    return setArg3(stadic::toString(value), 2);
 }
 
 bool TransMaterial::setSpecularity(double value)
 {
-    return setArg(3,stadic::toString(value),3);
+    return setArg3(stadic::toString(value), 3);
 }
 
 bool TransMaterial::setRoughness(double value)
 {
-    return setArg(3,stadic::toString(value),4);
+    return setArg3(stadic::toString(value), 4);
 }
 
 bool TransMaterial::setTransmission(double value)
 {
     //This needs to convert transmission into transmissivity
-    return setArg(3,stadic::toString(value),5);
+    return setArg3(stadic::toString(value), 5);
 }
 
 bool TransMaterial::setTransmissivity(double value)
 {
-    return setArg(3,stadic::toString(value),5);
+    return setArg3(stadic::toString(value), 5);
 }
 
 bool TransMaterial::setTransSpecular(double value)
 {
-    return setArg(3,stadic::toString(value),6);
+    return setArg3(stadic::toString(value), 6);
 }
 
 // Getters
 double TransMaterial::red() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(0), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(0, "red");
 }
 
 double TransMaterial::green() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(1), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(1, "green");
 }
 
 double TransMaterial::blue() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(2), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(2, "blue");
 }
 
 double TransMaterial::specularity() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(3), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(3, "specularity");
 }
 
 double TransMaterial::roughness() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(4), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(4, "roughness");
 }
 
 double TransMaterial::transmissivity() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(5), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(5, "transmissivity");
 }
 
 double TransMaterial::transSpecular() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg3(6), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return arg3ToDouble(6, "transmitted specularity");
 }
 
-bool TransMaterial::validateArg(int number, std::string value, int position) const
+bool TransMaterial::validateArg3(const std::string &value, int position) const
 {
-    if(number==3) {
-        switch (position){
-        case 0:
-            return checkValue(value, 0, 0, 1, "red");
-        case 1:
-            return checkValue(value, 1, 0, 1, "blue");
-        case 2:
-            return checkValue(value, 2, 0, 1, "green");
-        case 3:
-            return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
-        case 4:
-            return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
-        case 5:
-            return checkValue(value, 5, 0, 1, "transmissivity");
-        case 6:
-            return checkValue(value, 6, 0, 1, "transmitted specularity");
-        }
-    }
-    return false;
-}
-
-bool TransMaterial::validateArg(int number, std::vector<std::string> arg) const
-{
-    if(number==3) {
-        if(arg.size() != 7) {
-            return false;
-        }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
+    switch(position){
+    case 0:
+        return checkValue(value, 0, 0, 1, "red");
+    case 1:
+        return checkValue(value, 1, 0, 1, "blue");
+    case 2:
+        return checkValue(value, 2, 0, 1, "green");
+    case 3:
+        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
+    case 4:
+        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
+    case 5:
+        return checkValue(value, 5, 0, 1, "transmissivity");
+    case 6:
+        return checkValue(value, 6, 0, 1, "transmitted specularity");
     }
     return false;
 }

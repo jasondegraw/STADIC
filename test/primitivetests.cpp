@@ -93,6 +93,23 @@ TEST(PrimitiveTests, Plastic)
 
 TEST(PrimitiveTests, Metal)
 {
+    // Test no argument constructor
+    stadic::MetalMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+
+    // Test bad arguments to constructor
+    stadic::MetalMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+
+    // Test regular construction
     stadic::MetalMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75);
     EXPECT_EQ(stadic::RadPrimitive::Metal, rad.type());
     EXPECT_EQ("metal", rad.typeString());
@@ -120,14 +137,33 @@ TEST(PrimitiveTests, Metal)
     EXPECT_EQ(0.1, rad.blue());
     EXPECT_EQ(0.5, rad.specularity());
     EXPECT_EQ(0.75, rad.roughness());
-    // Bad constructor args
-    stadic::MetalMaterial rad2(1.2, 0.8, 0.1, 0.5, 0.75);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0.8, rad2.green());
 }
 
 TEST(PrimitiveTests, Trans)
 {
+    // Test no argument constructor
+    stadic::TransMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+    EXPECT_EQ(0, noargs.transmissivity());
+    EXPECT_EQ(0, noargs.transSpecular());
+
+    // Test bad arguments to constructor
+    stadic::TransMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75, 1.2, 1.1);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+    EXPECT_EQ(0, badargs.transmissivity());
+    EXPECT_EQ(0, badargs.transSpecular());
+
+    // Test regular construction
     stadic::TransMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75, 0.2, 0.1);
     EXPECT_EQ(stadic::RadPrimitive::Trans, rad.type());
     EXPECT_EQ("trans", rad.typeString());
@@ -161,15 +197,9 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ(0.1, rad.transSpecular());
     // Bad constructor args
     stadic::TransMaterial rad2(1.2, 1.8, 1.1, 1.5, 1.75, 1.2, 1.1);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.green());
-    EXPECT_EQ(0, rad2.blue());
-    EXPECT_EQ(0, rad2.specularity());
-    EXPECT_EQ(0, rad2.roughness());
-    EXPECT_EQ(0, rad2.transmissivity());
-    EXPECT_EQ(0, rad2.transSpecular());
+    
 }
+
 TEST(PrimitiveTests, Glass)
 {
     // Test no argument constructor

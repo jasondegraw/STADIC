@@ -89,7 +89,8 @@ public:
     double blue() const;
     double specularity() const;
     double roughness() const;
-private:
+
+protected:
     bool validateArg3(const std::string &value, int position) const;
 };
 
@@ -120,9 +121,8 @@ public:
     double transmissivity() const;
     double transSpecular() const;
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    bool validateArg3(const std::string &value, int position) const;
 };
 
 //GLASS
@@ -148,7 +148,6 @@ public:
 protected:
     bool validateArg3(const std::string &value, int position) const;
     bool extendArg3() const { return true; }
-
 };
 
 //BSDF
@@ -171,9 +170,11 @@ public:
     double ux() const;
     double uy() const;
     double uz() const;
-private:
+
+protected:
    virtual bool validateArg(int number, std::string value, int position) const;
    virtual bool validateArg(int number, std::vector<std::string> value) const;
 };
+
 }
 #endif // MATERIALPRIMITIVES_H
