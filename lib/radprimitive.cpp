@@ -133,7 +133,7 @@ void RadPrimitive::setName(const std::string &name)
 
 bool RadPrimitive::setArg1(std::vector<std::string> vals)
 {
-    if(validateArg(1, vals)) {
+    if(validateArg1(vals)) {
         m_Arg1 = vals;
         return true;
     }
@@ -154,7 +154,7 @@ bool RadPrimitive::setArg1(const std::string &arg, int position)
 
 bool RadPrimitive::setArg2(std::vector<std::string> vals)
 {
-    if(validateArg(2,vals)) {
+    if(validateArg2(vals)) {
       m_Arg2=vals;
       return true;
     }
@@ -175,7 +175,7 @@ bool RadPrimitive::setArg2(const std::string &arg, int position)
 
 bool RadPrimitive::setArg3(std::vector<std::string> vals)
 {
-    if(validateArg(3,vals)) {
+    if(validateArg3(vals)) {
       m_Arg3=vals;
       return true;
     }
@@ -198,35 +198,6 @@ bool RadPrimitive::setArg3(const std::string &arg, int position)
         return true;
     } else {
         STADIC_LOG(Severity::Error, "Argument 3, position \'" + toString(position) + "\' is out of range.");
-    }
-    return false;
-}
-
-bool RadPrimitive::setArg(int number, const std::string &value, int position)
-{
-    std::vector<std::string> *arg;
-    switch(number) {
-    case 1:
-        arg = &m_Arg1;
-        break;
-    case 2:
-        arg = &m_Arg2;
-        break;
-    case 3:
-        arg = &m_Arg3;
-        break;
-    default:
-        // Error/warning message?
-        return false;
-    }
-    if(validateArg(number,value,position)) {
-        if(position>=arg->size()) {
-            arg->resize(position+1);
-        }
-        (*arg)[position] = value;
-        return true;
-    } else {
-        // Error/warning message?
     }
     return false;
 }
@@ -267,6 +238,40 @@ static std::string nextNonComment(std::stringstream &data)
         }
     }
     return std::string();
+}
+
+std::string RadPrimitive::toRad() const
+{
+    std::stringstream stream;
+    stream << modifier() << " " << typeString() << " " << name() << std::endl;
+    if(m_Arg1.size()>0) {
+        stream << m_Arg1.size();
+        for(const std::string &value : m_Arg1) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    if(m_Arg2.size()>0) {
+        stream << m_Arg2.size();
+        for(const std::string &value : m_Arg2) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    if(m_Arg3.size()>0) {
+        stream << m_Arg3.size();
+        for(const std::string &value : m_Arg3) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    return stream.str();
 }
 
 RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
@@ -311,7 +316,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
 
     int nargs;
     data>>string;   //Reads number of arguments from first line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
@@ -322,7 +327,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     }
 
     data>>string;   //Reads number of arguments from second line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
@@ -333,7 +338,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     }
 
     data>>string;   //Reads number of arguments from third line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
@@ -403,34 +408,6 @@ std::string RadPrimitive::getArg3(int position, const std::string &defaultValue)
     return m_Arg3[position];
 }
 
-std::string RadPrimitive::getArg(int number, int position) const
-{
-    switch(number) {
-    case 1:
-        return getArg1(position);
-    case 2:
-        return getArg2(position);
-    case 3:
-        return getArg3(position);
-    }
-    STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
-    // This return is to silence warnings about not all control paths returning a value
-    return std::string();
-}
-
-std::string RadPrimitive::getArg(int number, int position, const std::string &defaultValue) const
-{
-    switch(number) {
-    case 1:
-        return getArg1(position, defaultValue);
-    case 2:
-        return getArg2(position, defaultValue);
-    case 3:
-        return getArg3(position, defaultValue);
-    }
-    return defaultValue;
-}
-
 void RadPrimitive::initArg(int number, std::vector<std::string> arg)
 {
     switch(number) {
@@ -447,6 +424,42 @@ void RadPrimitive::initArg(int number, std::vector<std::string> arg)
         STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
         break;
     }
+}
+
+bool RadPrimitive::validateArg1(const std::vector<std::string> &arg) const 
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg1(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool RadPrimitive::validateArg2(const std::vector<std::string> &arg) const
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg2(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool RadPrimitive::validateArg3(const std::vector<std::string> &arg) const
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg3(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
 }
 
 bool RadPrimitive::checkDoubleValue(const std::string &value, double min, double max, const std::string &variable, double current) const

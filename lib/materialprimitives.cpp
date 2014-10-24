@@ -458,27 +458,27 @@ BSDFMaterial::BSDFMaterial(double thickness, std::string BSDFfile, double ux, do
 // Setters
 bool BSDFMaterial::setThickness(double value)
 {
-    return setArg(1,stadic::toString(value),0);
+    return setArg1(stadic::toString(value),0);
 }
 
 bool BSDFMaterial::setBSDFfile(std::string name)
 {
-    return setArg(1,name,1);
+    return setArg1(name, 1);
 }
 
 bool BSDFMaterial::setUX(double value)
 {
-    return setArg(1,stadic::toString(value),2);
+    return setArg1(stadic::toString(value), 2);
 }
 
 bool BSDFMaterial::setUY(double value)
 {
-    return setArg(1,stadic::toString(value),3);
+    return setArg1(stadic::toString(value), 3);
 }
 
 bool BSDFMaterial::setUZ(double value)
 {
-    return setArg(1,stadic::toString(value),4);
+    return setArg1(stadic::toString(value), 4);
 }
 
 // Getters

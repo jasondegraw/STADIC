@@ -75,8 +75,6 @@ public:
     virtual bool setArg3(std::vector<std::string> vals);                //Function to set the arguments on line three from a vector of strings
     virtual bool setArg3(const std::string &arg, int position);                //Function to set an argument on line three given the position of the argument
 
-    virtual bool setArg(int number, const std::string &value, int position);
-
     //Getters
     std::string modifier() const;                                       //Function that returns the modifier as a string
     Type type() const;                                                  //Function that returns the type as a type
@@ -92,9 +90,8 @@ public:
     virtual std::string getArg1(int position, const std::string &defaultValue) const; //!< Returns a given argument from the first line as a string or a default if the position is out of range
     virtual std::string getArg2(int position, const std::string &defaultValue) const; //!< Returns a given argument from the second line as a string or a default if the position is out of range
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
-    virtual std::string getArg(int number, int position) const; //!< Returns a given argument from a given line, throws for out of range values
-    virtual std::string getArg(int number, int position, const std::string &defaultValue) const; //!< Returns a given argument from a given line or a default if the number or position is out of range
 
+    std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
 
 protected:
@@ -109,16 +106,14 @@ protected:
     double argToDouble(int number, int position, const std::string &variable) const;
     double argToDouble(int number, int position, const std::string &variable, double defaultValue) const;
     virtual bool validateArg1(const std::string &value, int position) const { return false; }
-    virtual bool validateArg1(std::vector<std::string> value) const { return false; }
+    virtual bool validateArg1(const std::vector<std::string> &arg) const;
     virtual bool validateArg2(const std::string &value, int position) const { return false; }
-    virtual bool validateArg2(std::vector<std::string> value) const { return false; }
+    virtual bool validateArg2(const std::vector<std::string> &arg) const;
     virtual bool validateArg3(const std::string &value, int position) const { return false; }
-    virtual bool validateArg3(std::vector<std::string> value) const { return false; }
+    virtual bool validateArg3(const std::vector<std::string> &arg) const;
     virtual bool extendArg3() const { return false; }
     
 private:
-    virtual bool validateArg(int number, std::string value, int position) const {return true;}
-    virtual bool validateArg(int number, std::vector<std::string> value) const {return true;}
     static std::array<std::string,51> s_typeStrings;
     static Type typeFromString(const std::string &string);
 

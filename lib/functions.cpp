@@ -141,13 +141,6 @@ int toInteger(const std::string &string, bool *ok)
     return value;
 }
 
-std::string toString(double value)
-{
-    std::stringstream stream;
-    stream << value;
-    return stream.str();
-}
-
 boost::optional<double> getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
 {
     boost::optional<double> dVal;

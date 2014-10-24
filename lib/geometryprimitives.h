@@ -58,6 +58,7 @@ public:
 
 protected:
     virtual bool validateArg3(const std::string &value, int position) const;
+    virtual bool validateArg3(const std::vector<std::string> &arg) const;
 };
 
 //Sphere

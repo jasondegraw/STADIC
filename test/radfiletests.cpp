@@ -62,7 +62,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ("l_floor.0.1", radData.geometry().at(0)->name());
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
-  EXPECT_EQ(12, radData.geometry().at(0)->arg3().size());
+  ASSERT_EQ(12, radData.geometry().at(0)->arg3().size());
   EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(0)->arg3().at(0)));
   EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(3)));
   EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(6)));
@@ -192,4 +192,14 @@ TEST(RadFileTests, ParseComplicatedRadFile)
     EXPECT_EQ(112, radData.primitives().size());
     EXPECT_EQ(8, radData.materials().size());
     EXPECT_EQ(104, radData.geometry().size());
+}
+
+TEST(RadFileTests, WriteSimpleRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("Simple.rad"));
+    ASSERT_TRUE(radData.writeRadFile("simpletest.rad"));
+    stadic::RadFileData reread;
+    ASSERT_TRUE(reread.addRad("simpletest.rad"));
+    EXPECT_EQ(radData.primitives().size(), reread.primitives().size());
 }

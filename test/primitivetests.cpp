@@ -73,11 +73,7 @@ TEST(PrimitiveTests, Plastic)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
+    EXPECT_FALSE(rad.setArg3("Not a number",4));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -122,11 +118,6 @@ TEST(PrimitiveTests, Metal)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -176,13 +167,8 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
-    EXPECT_EQ("0.2", rad.getArg(3, 5));
-    EXPECT_EQ("0.1", rad.getArg(3, 6));
+    EXPECT_EQ("0.2", rad.getArg3(5));
+    EXPECT_EQ("0.1", rad.getArg3(6));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -287,12 +273,6 @@ TEST(PrimitiveTests, BSDF)
     EXPECT_EQ("-1", rad.getArg1(3));
     EXPECT_EQ("0", rad.getArg1(4));
     EXPECT_EQ(".", rad.getArg1(5));
-    EXPECT_EQ("0", rad.getArg(1, 0));
-    EXPECT_EQ("bsdf.xml", rad.getArg(1, 1));
-    EXPECT_EQ("0", rad.getArg(1, 2));
-    EXPECT_EQ("-1", rad.getArg(1, 3));
-    EXPECT_EQ("0", rad.getArg(1, 4));
-    EXPECT_EQ(".", rad.getArg(1, 5));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_EQ(0, rad.thickness());
@@ -338,18 +318,6 @@ TEST(PrimitiveTests, Polygon)
     EXPECT_EQ("0", rad.getArg3(9));
     EXPECT_EQ("120", rad.getArg3(10));
     EXPECT_EQ("0", rad.getArg3(11));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("120", rad.getArg(3, 3));
-    EXPECT_EQ("0", rad.getArg(3, 4));
-    EXPECT_EQ("0", rad.getArg(3, 5));
-    EXPECT_EQ("120", rad.getArg(3, 6));
-    EXPECT_EQ("120", rad.getArg(3, 7));
-    EXPECT_EQ("0", rad.getArg(3, 8));
-    EXPECT_EQ("0", rad.getArg(3, 9));
-    EXPECT_EQ("120", rad.getArg(3, 10));
-    EXPECT_EQ("0", rad.getArg(3, 11));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("sphere"));
     ASSERT_EQ(12, rad.points().size());
@@ -384,10 +352,6 @@ TEST(PrimitiveTests, Sphere)
     EXPECT_EQ("0", rad.getArg3(1));
     EXPECT_EQ("0", rad.getArg3(2));
     EXPECT_EQ("3", rad.getArg3(3));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("3", rad.getArg(3, 3));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     ASSERT_EQ(3, rad.centerPoint().size());
@@ -422,14 +386,6 @@ TEST(PrimitiveTests, Ring)
     EXPECT_EQ("1", rad.getArg3(5));
     EXPECT_EQ("0", rad.getArg3(6));
     EXPECT_EQ("6", rad.getArg3(7));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("0", rad.getArg(3, 3));
-    EXPECT_EQ("0", rad.getArg(3, 4));
-    EXPECT_EQ("1", rad.getArg(3, 5));
-    EXPECT_EQ("0", rad.getArg(3, 6));
-    EXPECT_EQ("6", rad.getArg(3, 7));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     ASSERT_EQ(3, rad.centerPoint().size());

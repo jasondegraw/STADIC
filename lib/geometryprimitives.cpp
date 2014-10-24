@@ -80,7 +80,6 @@ std::vector<double> PolygonGeometry::points() const
     return points;
 }
 
-
 //Protected
 bool PolygonGeometry::validateArg3(const std::string &value, int position) const 
 {
@@ -89,24 +88,20 @@ bool PolygonGeometry::validateArg3(const std::string &value, int position) const
     return ok;
 }
 
-/*
-bool PolygonGeometry::validateArg(int number, std::vector<std::string> arg) const
+bool PolygonGeometry::validateArg3(const std::vector<std::string> &arg) const
 {
-    if(number==3) {
-        if(arg.size()%3 != 0) {
+    if(arg.size()%3 != 0) {
+        return false;
+    }
+    for(std::string value : arg) {
+        bool ok;
+        double dval = stadic::toDouble(value, &ok);
+        if(!ok) {
             return false;
         }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok) {
-                return true;
-            }
-        }
     }
-    return false;
+    return true;
 }
-*/
 
 //Sphere
 SphereGeometry::SphereGeometry() : RadPrimitive()
@@ -244,7 +239,7 @@ bool RingGeometry::setCenterPoint(std::vector<double> centerPoint)
         return false;
     } else {
         for(int i=0;i<3;i++) {
-            if (!setArg3(stadic::toString(centerPoint[i]), i)){
+            if(!setArg3(stadic::toString(centerPoint[i]), i)){
                 return false;
             }
         }
@@ -259,7 +254,7 @@ bool RingGeometry::setSurfaceNormal(std::vector<double> surfaceNormal)
         return false;
     } else {
         for(int i=0;i<3;i++) {
-            if (!setArg(3, stadic::toString(surfaceNormal[i]), i+3)){
+            if(!setArg3(stadic::toString(surfaceNormal[i]), i+3)){
                 return false;
             }
         }
@@ -273,7 +268,7 @@ bool RingGeometry::setInnerRadius(double radius)
         STADIC_ERROR("The radius of a ring cannot be negative.");
         return false;
     } else {
-        if (setArg(3, stadic::toString(radius), 6)){
+        if(setArg3(stadic::toString(radius), 6)){
             return true;
         }
     }
@@ -285,7 +280,7 @@ bool RingGeometry::setOuterRadius(double radius){
         STADIC_ERROR("The radius of a ring cannot be negative.  At least one radii has to be greater than 0.");
         return false;
     } else {
-        if (setArg(3, stadic::toString(radius), 7)){
+        if(setArg3(stadic::toString(radius), 7)){
             return true;
         }
     }
@@ -314,13 +309,11 @@ std::vector<double> RingGeometry::surfaceNormal() const
 //Add getters and setters for R1 and R2, but only getters for inner and outer radius
 double RingGeometry::innerRadius() const
 {
-
     return toDouble(getArg3(6));
 }
 
 double RingGeometry::outerRadius() const
 {
-
     return toDouble(getArg3(7));
 }
 
