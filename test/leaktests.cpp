@@ -13,13 +13,13 @@
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
