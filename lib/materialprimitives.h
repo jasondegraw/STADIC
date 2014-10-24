@@ -172,8 +172,7 @@ public:
     double uz() const;
 
 protected:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+    bool validateArg1(const std::string &value, int position) const;
 };
 
 }

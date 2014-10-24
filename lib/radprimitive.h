@@ -65,17 +65,17 @@ public:
     bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type
 
     //Setters
-    void setModifier(std::string modifier);                             //Function to set the modifier
-    virtual bool setType(std::string type);                             //Function to set the type
-    void setName(std::string name);                                     //Function to set the name
+    void setModifier(const std::string &modifier);                             //Function to set the modifier
+    virtual bool setType(const std::string &type);                             //Function to set the type
+    void setName(const std::string &name);                                     //Function to set the name
     virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
-    virtual bool setArg1(std::string arg, int position);                //Function to set an argument on line one given the position of the argument
+    virtual bool setArg1(const std::string &arg, int position);                //Function to set an argument on line one given the position of the argument
     virtual bool setArg2(std::vector<std::string> vals);                //Function to set the arguments on line two from a vector of strings
-    virtual bool setArg2(std::string arg, int position);                //Function to set an argument on line two given the position of the argument
+    virtual bool setArg2(const std::string &arg, int position);                //Function to set an argument on line two given the position of the argument
     virtual bool setArg3(std::vector<std::string> vals);                //Function to set the arguments on line three from a vector of strings
-    virtual bool setArg3(std::string arg, int position);                //Function to set an argument on line three given the position of the argument
+    virtual bool setArg3(const std::string &arg, int position);                //Function to set an argument on line three given the position of the argument
 
-    virtual bool setArg(int number, std::string value, int position);
+    virtual bool setArg(int number, const std::string &value, int position);
 
     //Getters
     std::string modifier() const;                                       //Function that returns the modifier as a string
@@ -99,11 +99,15 @@ public:
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
-    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable) const;
-    bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, 
-        const std::string &variable) const;
-    double arg3ToDouble(int position, const std::string &variable) const;
-    double arg3ToDouble(int position, const std::string &variable, double defaultValue) const;
+    bool checkDoubleValue(const std::string &value, double min, double max, const std::string &variable, 
+        double current) const;
+    bool checkDoubleValue(const std::string &value, double min, double max, double recMin, double recMax,
+        const std::string &variable, double current) const;
+    bool checkDoubleValueMin(const std::string &value, double min, const std::string &variable,
+        double current, bool inclusive) const;
+    bool checkDoubleValue(const std::string &value, const std::string &variable, double current) const;
+    double argToDouble(int number, int position, const std::string &variable) const;
+    double argToDouble(int number, int position, const std::string &variable, double defaultValue) const;
     virtual bool validateArg1(const std::string &value, int position) const { return false; }
     virtual bool validateArg1(std::vector<std::string> value) const { return false; }
     virtual bool validateArg2(const std::string &value, int position) const { return false; }
@@ -116,7 +120,7 @@ private:
     virtual bool validateArg(int number, std::string value, int position) const {return true;}
     virtual bool validateArg(int number, std::vector<std::string> value) const {return true;}
     static std::array<std::string,51> s_typeStrings;
-    static Type typeFromString(std::string string);
+    static Type typeFromString(const std::string &string);
 
     std::string m_Modifier;                                             //Variable holding the modifier
     std::string m_TypeString;                                           //Variable holding the type

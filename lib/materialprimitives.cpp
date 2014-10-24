@@ -36,10 +36,10 @@
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
  * OF SUCH DAMAGE.
  ****************************************************************/
-
 #include "materialprimitives.h"
 #include "logging.h"
 #include "functions.h"
+
 namespace stadic{
 //PLASTIC
 PlasticMaterial::PlasticMaterial() : RadPrimitive()
@@ -90,42 +90,42 @@ bool PlasticMaterial::setRoughness(double value)
 // Getters
 double PlasticMaterial::red() const
 {
-    return arg3ToDouble(0, "red");
+    return argToDouble(3, 0, "red");
 }
 
 double PlasticMaterial::green() const
 {
-    return arg3ToDouble(1, "green");
+    return argToDouble(3, 1, "green");
 }
 
 double PlasticMaterial::blue() const
 {
-    return arg3ToDouble(2, "blue");
+    return argToDouble(3, 2, "blue");
 }
 
 double PlasticMaterial::specularity() const
 {
-    return arg3ToDouble(3, "specularity");
+    return argToDouble(3, 3, "specularity");
 }
 
 double PlasticMaterial::roughness() const
 {
-    return arg3ToDouble(4, "roughness");
+    return argToDouble(3, 4, "roughness");
 }
 
 bool PlasticMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position){
     case 0:
-        return checkValue(value, 0, 0, 1, "red");
+        return checkDoubleValue(value, 0, 1, "red", red());
     case 1:
-        return checkValue(value, 1, 0, 1, "green");
+        return checkDoubleValue(value, 0, 1, "green", green());
     case 2:
-        return checkValue(value, 2, 0, 1, "blue");
+        return checkDoubleValue(value, 0, 1, "blue", blue());
     case 3:
-        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
+        return checkDoubleValue(value, 0, 1, 0, 0.07, "specularity",specularity());
     case 4:
-        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
+        return checkDoubleValue(value, 0, 1, 0, 0.02, "roughness", roughness());
     }
     return false;
 }
@@ -181,42 +181,42 @@ bool MetalMaterial::setRoughness(double value)
 // Getters
 double MetalMaterial::red() const
 {
-    return arg3ToDouble(0, "red");
+    return argToDouble(3, 0, "red");
 }
 
 double MetalMaterial::green() const
 {
-    return arg3ToDouble(1, "green");
+    return argToDouble(3, 1, "green");
 }
 
 double MetalMaterial::blue() const
 {
-    return arg3ToDouble(2, "blue");
+    return argToDouble(3, 2, "blue");
 }
 
 double MetalMaterial::specularity() const
 {
-    return arg3ToDouble(3, "specularity");
+    return argToDouble(3, 3, "specularity");
 }
 
 double MetalMaterial::roughness() const
 {
-    return arg3ToDouble(4, "roughness");
+    return argToDouble(3, 4, "roughness");
 }
 
 bool MetalMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position) {
     case 0:
-        return checkValue(value, 0, 0, 1, "red");
+        return checkDoubleValue(value, 0, 1, "red", red());
     case 1:
-        return checkValue(value, 1, 0, 1, "blue");
+        return checkDoubleValue(value, 0, 1, "green", green());
     case 2:
-        return checkValue(value, 2, 0, 1, "green");
+        return checkDoubleValue(value, 0, 1, "blue", blue());
     case 3:
-        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
+        return checkDoubleValue(value, 0, 1, 0, 0.07, "specularity", specularity());
     case 4:
-        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
+        return checkDoubleValue(value, 0, 1, 0, 0.02, "roughness", roughness());
     }
     return false;
 }
@@ -274,6 +274,7 @@ bool TransMaterial::setRoughness(double value)
 bool TransMaterial::setTransmission(double value)
 {
     //This needs to convert transmission into transmissivity
+    STADIC_LOG(Severity::Fatal, "Transmission conversion is not yet available");
     return setArg3(stadic::toString(value), 5);
 }
 
@@ -290,56 +291,56 @@ bool TransMaterial::setTransSpecular(double value)
 // Getters
 double TransMaterial::red() const
 {
-    return arg3ToDouble(0, "red");
+    return argToDouble(3, 0, "red");
 }
 
 double TransMaterial::green() const
 {
-    return arg3ToDouble(1, "green");
+    return argToDouble(3, 1, "green");
 }
 
 double TransMaterial::blue() const
 {
-    return arg3ToDouble(2, "blue");
+    return argToDouble(3, 2, "blue");
 }
 
 double TransMaterial::specularity() const
 {
-    return arg3ToDouble(3, "specularity");
+    return argToDouble(3, 3, "specularity");
 }
 
 double TransMaterial::roughness() const
 {
-    return arg3ToDouble(4, "roughness");
+    return argToDouble(3, 4, "roughness");
 }
 
 double TransMaterial::transmissivity() const
 {
-    return arg3ToDouble(5, "transmissivity");
+    return argToDouble(3, 5, "transmissivity");
 }
 
 double TransMaterial::transSpecular() const
 {
-    return arg3ToDouble(6, "transmitted specularity");
+    return argToDouble(3, 6, "transmitted specularity");
 }
 
 bool TransMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position){
     case 0:
-        return checkValue(value, 0, 0, 1, "red");
+        return checkDoubleValue(value, 0, 1, "red", red());
     case 1:
-        return checkValue(value, 1, 0, 1, "blue");
+        return checkDoubleValue(value, 0, 1, "green", green());
     case 2:
-        return checkValue(value, 2, 0, 1, "green");
+        return checkDoubleValue(value, 0, 1, "blue", blue());
     case 3:
-        return checkValue(value, 3, 0, 1, 0, 0.07, "specularity");
+        return checkDoubleValue(value, 0, 1, 0, 0.07, "specularity", specularity());
     case 4:
-        return checkValue(value, 4, 0, 1, 0, 0.02, "roughness");
+        return checkDoubleValue(value, 0, 1, 0, 0.02, "roughness", roughness());
     case 5:
-        return checkValue(value, 5, 0, 1, "transmissivity");
+        return checkDoubleValue(value, 0, 1, "transmissivity", transmissivity());
     case 6:
-        return checkValue(value, 6, 0, 1, "transmitted specularity");
+        return checkDoubleValue(value, 0, 1, "transmitted specularity", transSpecular());
     }
     return false;
 }
@@ -399,35 +400,35 @@ bool GlassMaterial::setRefraction(double value)
 // Getters
 double GlassMaterial::redTrans() const
 {
-    return arg3ToDouble(0, "red transmissivity");
+    return argToDouble(3, 0, "red transmissivity");
 }
 
 double GlassMaterial::greenTrans() const
 {
-    return arg3ToDouble(1, "green transmissivity");
+    return argToDouble(3, 1, "green transmissivity");
 }
 
 double GlassMaterial::blueTrans() const
 {
-    return arg3ToDouble(2, "green transmissivity");
+    return argToDouble(3, 2, "green transmissivity");
 }
 
 double GlassMaterial::refraction() const
 {
-    return arg3ToDouble(3, "index of refraction", 1.52);
+    return argToDouble(3, 3, "index of refraction", 1.52);
 }
 
 bool GlassMaterial::validateArg3(const std::string &value, int position) const
 {
     switch(position){
     case 0:
-        return checkValue(value, 0, 0, 1, "red transmissivity");
+        return checkDoubleValue(value, 0, 1, "red transmissivity", redTrans());
     case 1:
-        return checkValue(value, 1, 0, 1, "blue transmissivity");
+        return checkDoubleValue(value, 0, 1, "green transmissivity", greenTrans());
     case 2:
-        return checkValue(value, 2, 0, 1, "green transmissivity");
+        return checkDoubleValue(value, 0, 1, "blue transmissivity", blueTrans());
     case 3:
-        return checkValue(value, 3, 0, 5, "index of refraction");
+        return checkDoubleValue(value, 0, 5, "index of refraction", refraction());
     }
     return false;
 }
@@ -444,12 +445,14 @@ BSDFMaterial::BSDFMaterial(double thickness, std::string BSDFfile, double ux, do
     : RadPrimitive()
 {
     RadPrimitive::setType("bsdf");
-    setArg(1,stadic::toString(thickness),0);
-    setArg(1,BSDFfile,1);
-    setArg(1,stadic::toString(ux),2);
-    setArg(1,stadic::toString(uy),3);
-    setArg(1,stadic::toString(uz),4);
-    setArg(1,".",5);
+    std::vector<std::string> arg1 = { "0", "null", "0", "0", "0", "." };
+    initArg(1, arg1);
+    setArg1(stadic::toString(thickness),0);
+    setArg1(BSDFfile, 1);
+    setArg1(stadic::toString(ux), 2);
+    setArg1(stadic::toString(uy), 3);
+    setArg1(stadic::toString(uz), 4);
+    setArg1(".", 5);
 }
 
 // Setters
@@ -481,14 +484,7 @@ bool BSDFMaterial::setUZ(double value)
 // Getters
 double BSDFMaterial::thickness() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg1(0), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(1, 0, "thickness");
 }
 
 std::string BSDFMaterial::bsdfFile() const
@@ -498,106 +494,42 @@ std::string BSDFMaterial::bsdfFile() const
 
 double BSDFMaterial::ux() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg1(2), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(1, 2, "x vector");
 }
 
 double BSDFMaterial::uy() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg1(3), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(1, 3, "y vector");
 }
 
 double BSDFMaterial::uz() const
 {
-    bool ok;
-    double value = stadic::toDouble(getArg1(4), &ok);
-    if(!ok) {
-        // This is bad and should *never* happen
-        // Probably need to issue a panicky error message
-        return 0;
-    }
-    return value;
+    return argToDouble(1, 4, "z vector");
 }
 
-bool BSDFMaterial::validateArg(int number, std::string value, int position) const
+bool BSDFMaterial::validateArg1(const std::string &value, int position) const
 {
-    if(number==1) {
-        bool ok;
-        double dval = 0;
-        if (position!=1){
-            dval=stadic::toDouble(value, &ok);
+    switch(position){
+    case 0:
+        return checkDoubleValue(value, "thickness", thickness());
+    case 1:
+        //This should test to make sure the file exists.
+        break;
+    case 2:
+        return checkDoubleValue(value, "x vector", ux());
+    case 3:
+        return checkDoubleValue(value, "y vector", uy());
+    case 4:
+        return checkDoubleValue(value, "z vector", uz());
+    case 5:
+        if(value!=".") {
+            STADIC_LOG(Severity::Error, "The last argument on the first line of the BSDF material\n\tshould be a period \".\".");
         }
-        switch (position){
-            case 0:
-                if (ok && dval>=0){
-                    return true;
-                }
-                break;
-            case 1:
-                //This should test to make sure the file exists.
-                return true;
-                break;
-            case 2:
-                if(ok) {
-                    return true;
-                }else{
-                    STADIC_ERROR("There was an error in the x vector for the BSDF material.");
-                }
-                break;
-            case 3:
-                if (ok){
-                    return true;
-                }else{
-                    STADIC_ERROR("There was an error in the y vector for the BSDF material.");
-                }
-                break;
-            case 4:
-                if (ok){
-                    return true;
-                }else{
-                    STADIC_ERROR("There was an error in the z vector for the BSDF material.");
-                }
-                break;
-            case 5:
-                if (value=="."){
-                    return true;
-                }else{
-                    STADIC_ERROR("The last argument on the first line of the BSDF material\n\tshould be a period \".\".");
-                }
-                break;
-        }
+        break;
+    default:
+        return false;
     }
-    return false;
-}
-
-bool BSDFMaterial::validateArg(int number, std::vector<std::string> arg) const
-{
-    if(number==1) {
-        if(arg.size() != 6) {
-            return false;
-        }
-        for(std::string value : arg) {
-            bool ok;
-            double dval = stadic::toDouble(value, &ok);
-            if(ok && dval >= 0 && dval <= 1.0) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return true;
 }
 
 }

@@ -261,10 +261,18 @@ TEST(PrimitiveTests, Glass)
     EXPECT_EQ(0.7, rad4.greenTrans());
     EXPECT_EQ(0.5, rad4.blueTrans());
     EXPECT_EQ(1.75, rad4.refraction());
+    EXPECT_FALSE(rad4.setRefraction(-1000));
 }
 
 TEST(PrimitiveTests, BSDF)
 {
+    // Test no argument constructor
+    stadic::BSDFMaterial noargs;
+    EXPECT_EQ(0, noargs.thickness());
+    EXPECT_EQ("null", noargs.bsdfFile());
+    EXPECT_EQ(0, noargs.ux());
+    EXPECT_EQ(0, noargs.uy());
+    EXPECT_EQ(0, noargs.uz());
 
     stadic::BSDFMaterial rad(0,"bsdf.xml", 0,-1,0);
     EXPECT_EQ(stadic::RadPrimitive::BSDF, rad.type());
