@@ -9,7 +9,7 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
