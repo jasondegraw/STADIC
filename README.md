@@ -23,7 +23,8 @@ STADIC is made up of a number of subprograms:
 Building
 --------
 
-STADIC is built with CMake (version 2.8 or higher) and is known to compile with
+STADIC is built with CMake (version 2.8 or higher) and is known to compile
+with the following compilers:
 
 * GCC 4.8.2 (Ubuntu 14.04)
 * MinGW GCC 4.8.2 (32 bit)
@@ -31,3 +32,10 @@ STADIC is built with CMake (version 2.8 or higher) and is known to compile with
 
 Usage
 -----
+
+Acknowledgements
+----------------
+
+The development of this software is supported by the Consortium for Building Energy 
+Innovation (CBEI) sponsored  by the U.S. Department of Energy under Award Number
+DE-EE0004261.
