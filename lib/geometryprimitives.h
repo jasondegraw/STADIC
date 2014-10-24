@@ -56,10 +56,8 @@ public:
     // Getters
     std::vector<double> points() const;                                             //Function that returns the points of a radiance polygon as a vector
 
-
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //Sphere
@@ -78,9 +76,8 @@ public:
     std::vector<double> centerPoint() const;                                            //Function that returns the center point of a sphere as a vector
     double radius() const;                                                              //Function that returns the radius of the sphere as a double
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //Ring
@@ -103,9 +100,8 @@ public:
     double innerRadius() const;                                                         //Function that returns the inner radius of the ring as a double
     double outerRadius() const;                                                         //Function that returns the outer radius of the ring as a double
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 }

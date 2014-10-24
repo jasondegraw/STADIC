@@ -66,7 +66,7 @@ public:
     double roughness() const;
 
 protected:
-    bool validateArg3(const std::string &value, int position) const;
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //METAL
@@ -91,7 +91,7 @@ public:
     double roughness() const;
 
 protected:
-    bool validateArg3(const std::string &value, int position) const;
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //TRANS
@@ -122,7 +122,7 @@ public:
     double transSpecular() const;
 
 protected:
-    bool validateArg3(const std::string &value, int position) const;
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //GLASS
@@ -146,8 +146,8 @@ public:
     double refraction() const;
 
 protected:
-    bool validateArg3(const std::string &value, int position) const;
-    bool extendArg3() const { return true; }
+    virtual bool validateArg3(const std::string &value, int position) const;
+    virtual bool extendArg3() const { return true; }
 };
 
 //BSDF
@@ -172,7 +172,7 @@ public:
     double uz() const;
 
 protected:
-    bool validateArg1(const std::string &value, int position) const;
+    virtual bool validateArg1(const std::string &value, int position) const;
 };
 
 }
