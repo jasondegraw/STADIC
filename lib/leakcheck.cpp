@@ -272,7 +272,7 @@ bool LeakCheck::runCalc(){
     std::vector<std::string> arguments2;
     arguments2.clear();
     arguments2.push_back("-e");
-    arguments2.push_back("\'$1=179*($1*0.265+$2*0.670+$3*0.065)\'");
+    arguments2.push_back(Process::quote("$1=179*($1*0.265+$2*0.670+$3*0.065)"));
     programName="rcalc";
     Process rcalc(programName,arguments2);
     rtrace.setStandardOutputProcess(&rcalc);

@@ -94,6 +94,7 @@ public:
     Process(const std::string &program, const std::vector<std::string> &args);
 
     std::string commandLine();
+    static std::string quote(const std::string &string);
 
     bool run();
     void start();

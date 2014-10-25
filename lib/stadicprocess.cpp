@@ -223,6 +223,15 @@ bool Process::setStandardOutputFile(const std::string &fileName)
 #endif
 }
 
+std::string Process::quote(const std::string &string)
+{
+#ifdef _WIN32
+    return "\"" + string + "\"";
+#else
+    return "\'" + string + "\'";
+#endif
+}
+
 std::string Process::commandLine()
 {
 #ifdef USE_QT
