@@ -104,8 +104,7 @@ bool LeakCheck::isEnclosed(){
 //Setters
 bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<files.size();i++){
-        FilePath radFile(files[i]);
-        if (!radFile.exists()){
+        if(!isFile(files[i])){
             STADIC_ERROR("The rad file named "+files[i]+" does not exist.");
             return false;
         }
