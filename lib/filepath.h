@@ -56,6 +56,10 @@ typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;
 
 namespace stadic{
 
+bool STADIC_API isDir(const std::string &dir);
+bool STADIC_API isFile(const std::string &file);
+bool STADIC_API exists(const std::string &path);
+
 class STADIC_API FilePath
 {
 public:

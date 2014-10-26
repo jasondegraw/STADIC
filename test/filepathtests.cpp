@@ -60,6 +60,10 @@ TEST(FilePathTests, Directory)
 #else
     testString = "/usr";
 #endif
+    EXPECT_TRUE(stadic::exists(testString));
+    EXPECT_TRUE(stadic::isDir(testString));
+    EXPECT_FALSE(stadic::isFile(testString));
+
     stadic::FilePath dir(testString);
     EXPECT_TRUE(dir.exists());
     EXPECT_TRUE(dir.isDir());
@@ -71,14 +75,20 @@ TEST(FilePathTests, Directory)
 #else
     testString = "/usr/";
 #endif
+    EXPECT_TRUE(stadic::exists(testString));
+    EXPECT_TRUE(stadic::isDir(testString));
+    EXPECT_FALSE(stadic::isFile(testString));
+
     stadic::FilePath dir1(testString);
     EXPECT_TRUE(dir1.exists());
     EXPECT_TRUE(dir1.isDir());
     EXPECT_FALSE(dir1.isFile());
     EXPECT_FALSE(dir1.isUpdated());
 
-    stadic::FilePath dir2("DOESNOTEXIST");
-    EXPECT_FALSE(dir2.exists());
+    testString = "HOPEFULLYNOBODYWOULDNAMEADIRECTORYTHIS";
+    EXPECT_FALSE(stadic::exists(testString));
+    EXPECT_FALSE(stadic::isDir(testString));
+    EXPECT_FALSE(stadic::isFile(testString));
 }
 
 TEST(FilePathTests, File)
@@ -92,6 +102,10 @@ TEST(FilePathTests, File)
     std::ofstream testOut(testString);
     testOut << "This is a test file";
     testOut.close();
+
+    EXPECT_TRUE(stadic::exists(testString));
+    EXPECT_TRUE(stadic::isFile(testString));
+    EXPECT_FALSE(stadic::isDir(testString));
 
     EXPECT_TRUE(file.exists());
     EXPECT_TRUE(file.isFile());

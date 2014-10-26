@@ -49,6 +49,51 @@
 #endif
 
 namespace stadic{
+
+bool isDir(const std::string &dir)
+{
+#ifdef _MSC_VER
+    DWORD result = GetFileAttributes(dir.c_str());
+    if(result != INVALID_FILE_ATTRIBUTES) {
+        return result & FILE_ATTRIBUTE_DIRECTORY;
+    }
+    return false;
+#else //POSIX
+    struct stat path;
+
+    if(stat(dir.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
+        return true;
+    }
+    return false;
+#endif
+}
+
+bool isFile(const std::string &file)
+{
+#ifdef _MSC_VER
+    DWORD result = GetFileAttributes(file.c_str());
+    if(result != INVALID_FILE_ATTRIBUTES) {
+        return !(result & FILE_ATTRIBUTE_DIRECTORY);
+    }
+    return false;
+#else //POSIX
+    struct stat path;
+
+    if(stat(file.c_str(), &path)==0 && S_ISREG(path.st_mode)){
+        return true;
+    }
+    return false;
+#endif
+}
+
+bool exists(const std::string &path)
+{
+    if(isDir(path)){
+        return true;
+    }
+    return isFile(path);
+}
+
 //*************************
 //FilePath
 //*************************
