@@ -1,7 +1,47 @@
+/****************************************************************
+ * Copyright (c) 2014, The Pennsylvania State University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms,
+ * with or without modification, are permitted for
+ * personal and commercial purposes provided that the
+ * following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the
+ *    above copyright notice, this list of conditions
+ *    and the following Disclaimer.
+ *
+ * 2. Redistribution in binary form must reproduce the
+ *    above copyright notice, this list of conditions
+ *    and the following disclaimer
+ *
+ * 3. Neither the name of The Pennsylvania State University
+ *    nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software
+ *    without the specific prior written permission of The
+ *    Pennsylvania State University
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
+ * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
+ * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ ****************************************************************/
+
 #include "logging.h"
 #include "gridmaker.h"
 #include "radprimitive.h"
 #include "functions.h"
+#include "stadicprocess.h"
 #include <iostream>
 #include <fstream>
 #include <boost/geometry.hpp>
@@ -32,6 +72,7 @@ GridMaker::GridMaker(std::vector<std::string> fileList)
     m_UseOffset=false;
     m_FinalPoints.clear();
     m_PolySetHeight.clear();
+    m_UseThreshold=false;
 }
 
 //Setters
@@ -67,6 +108,10 @@ void GridMaker::setOffsetZ(double z){
 }
 void GridMaker::setZHeight(double z){
     m_ZHeight=z;
+}
+void GridMaker::setThreshold(double val){
+    m_Threshold=val;
+    m_UseThreshold=true;
 }
 
 
@@ -294,13 +339,50 @@ bool GridMaker::insetPolygons(){
         boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon;
         boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon,distance_strategy,side_strategy,join_strategy,end_strategy,point_strategy);
         if (!boost::geometry::is_valid(tempPolygon)){
-            keepPolygon.push_back(false);
+            //Since this isn't a valid polygon, try to center the points on the polygon unless a threshold is
+            //  set by the user and both dimensions are smaller than the threshold
+            boost::geometry::model::box<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> > box;
+            boost::geometry::envelope(m_UnitedPolygon[i],box);
+            double minX=box.min_corner().get<0>();
+            double minY=box.min_corner().get<1>();
+            double maxX=box.max_corner().get<0>();
+            double maxY=box.max_corner().get<1>();
+            double deltaY=maxY-minY;
+            double deltaX=maxX-minX;
+            double minDist=std::min(deltaY, deltaX);
+
+            if (m_UseThreshold){
+                if (deltaY>m_Threshold ||deltaX>m_Threshold){
+                    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2((minDist/2-0.00001), (minDist/2-0.00001));
+                    boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon2;
+                    boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon2,distance_strategy2,side_strategy,join_strategy,end_strategy,point_strategy);
+                    if (!boost::geometry::is_valid(tempPolygon2)){
+                        keepPolygon.push_back(false);
+                    }else{
+                        keepPolygon.push_back(true);
+                        m_UnitedPolygon[i]=tempPolygon2;
+                    }
+                }else{
+                    keepPolygon.push_back(false);
+                }
+            }else{
+                boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2((minDist/2-0.00001), (minDist/2-0.00001));
+                boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon2;
+                boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon2,distance_strategy2,side_strategy,join_strategy,end_strategy,point_strategy);
+                if (!boost::geometry::is_valid(tempPolygon2)){
+                    keepPolygon.push_back(false);
+                }else{
+                    keepPolygon.push_back(true);
+                    m_UnitedPolygon[i]=tempPolygon2;
+                }
+
+            }
+
         }else{
             keepPolygon.push_back(true);
+            m_UnitedPolygon[i]=tempPolygon;
         }
-        m_UnitedPolygon[i]=tempPolygon;
         boost::geometry::correct(m_UnitedPolygon[i]);
-
     }
     for (int i=m_PolySetHeight.size()-1;i>=0;i--){
         if (keepPolygon[i]){
@@ -314,7 +396,7 @@ bool GridMaker::insetPolygons(){
         }
     }
     if (std::find(keepPolygon.begin(), keepPolygon.end(), false)!=keepPolygon.end()){
-        STADIC_LOG(Severity::Info, "Some surfaces were too small at certain heights to place valid points.\n\tTheses surfaces were removed from the grid making process.");
+        STADIC_LOG(Severity::Info, "Some surfaces were too small at certain heights to place valid points.\n\tThese surfaces were removed from the grid making process.");
     }
 
     /*
@@ -350,10 +432,21 @@ void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometr
     //std::clog<<"maxX="<<box.max_corner().get<0>()<<std::endl;
     //std::clog<<"maxY="<<box.max_corner().get<1>()<<std::endl;
     //std::clog<<"offset="<<m_Offset<<std::endl;
-    setMinX(box.min_corner().get<0>()-m_Offset*.1, set);
-    setMinY(box.min_corner().get<1>()-m_Offset*.1, set);
-    setMaxX(box.max_corner().get<0>()+m_Offset*.1, set);
-    setMaxY(box.max_corner().get<1>()+m_Offset*.1, set);
+    double minX=box.min_corner().get<0>();
+    double minY=box.min_corner().get<1>();
+    double maxX=box.max_corner().get<0>();
+    double maxY=box.max_corner().get<1>();
+    if ((maxX-minX)<m_Offset || (maxY-minY)<m_Offset){
+        setMinX(minX, set);
+        setMinY(minY, set);
+        setMaxX(maxX, set);
+        setMaxY(maxY, set);
+    }else{
+        setMinX(minX-m_Offset*.1, set);
+        setMinY(minY-m_Offset*.1, set);
+        setMaxX(maxX+m_Offset*.1, set);
+        setMaxY(maxY+m_Offset*.1, set);
+    }
     //std::clog<<"minX="<<m_MinX<<std::endl;
     //std::clog<<"minY="<<m_MinY<<std::endl;
     //std::clog<<"maxX="<<m_MaxX<<std::endl;

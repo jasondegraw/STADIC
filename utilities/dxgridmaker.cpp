@@ -1,3 +1,42 @@
+/****************************************************************
+ * Copyright (c) 2014, The Pennsylvania State University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms,
+ * with or without modification, are permitted for
+ * personal and commercial purposes provided that the
+ * following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the
+ *    above copyright notice, this list of conditions
+ *    and the following Disclaimer.
+ *
+ * 2. Redistribution in binary form must reproduce the
+ *    above copyright notice, this list of conditions
+ *    and the following disclaimer
+ *
+ * 3. Neither the name of The Pennsylvania State University
+ *    nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software
+ *    without the specific prior written permission of The
+ *    Pennsylvania State University
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
+ * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
+ * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ ****************************************************************/
+
 #include "gridmaker.h"
 #include "logging.h"
 #include <vector>
@@ -16,6 +55,7 @@ void usage(){
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
+    std::cerr<<"-t dist\tSet the threshold distance."<<std::endl;
     std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;

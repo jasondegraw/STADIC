@@ -6,8 +6,6 @@ enable_testing(true)
 
 include_directories(../lib ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-#qt5_add_resources(QRCS TestResource.qrc)
-
 add_executable(controltests controltests.cpp)
 add_test(controltests controltests)
 target_link_libraries(controltests stadic_core gtest gtest_main)
@@ -51,9 +49,13 @@ add_executable(functiontests functiontests.cpp)
 add_test(functiontests functiontests)
 target_link_libraries(functiontests stadic_core gtest gtest_main)
 
-add_executable(objectstests objectstests.cpp)
-add_test(objectstests objectstests)
-target_link_libraries(objectstests stadic_core gtest gtest_main)
+add_executable(filepathtests filepathtests.cpp)
+add_test(filepathtests filepathtests)
+target_link_libraries(filepathtests stadic_core gtest gtest_main)
+
+add_executable(processtests processtests.cpp)
+add_test(processtests processtests)
+target_link_libraries(processtests stadic_core gtest gtest_main)
 
 add_executable(analemmatests analemmatests.cpp)
 add_test(analemmatests analemmatests)

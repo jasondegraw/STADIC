@@ -15,10 +15,6 @@ elseif(MSVC)
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "18.0.21005.1")
     message(FATAL_ERROR "Visual Studio earlier than VS2013 is not supported")
   endif()
-  if(WIN32)
-    set(Boost_USE_STATIC_LIBS ON)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-  endif()
 elseif(Apple)
   # The checks to determine if the compiler is clang are all rather sketchy,
   # and maybe this should go before the g++ test above to get things right.
@@ -29,19 +25,9 @@ endif()
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#Boost
-
-find_package(Boost 1.56 COMPONENTS system filesystem REQUIRED)
+# Boost
+find_package(Boost 1.56 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-
-# Find includes in the build directories
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Turn on automatic invocation of the MOC
-set(CMAKE_AUTOMOC ON)
-
-# Find the QtWidgets library
-find_package(Qt5Widgets REQUIRED)
 
 add_subdirectory(lib)
 add_subdirectory(utilities)

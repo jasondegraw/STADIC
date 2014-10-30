@@ -1,3 +1,42 @@
+/****************************************************************
+ * Copyright (c) 2014, The Pennsylvania State University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms,
+ * with or without modification, are permitted for
+ * personal and commercial purposes provided that the
+ * following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the
+ *    above copyright notice, this list of conditions
+ *    and the following Disclaimer.
+ *
+ * 2. Redistribution in binary form must reproduce the
+ *    above copyright notice, this list of conditions
+ *    and the following disclaimer
+ *
+ * 3. Neither the name of The Pennsylvania State University
+ *    nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software
+ *    without the specific prior written permission of The
+ *    Pennsylvania State University
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
+ * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
+ * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ ****************************************************************/
+
 #ifndef GRIDMAKER_H
 #define GRIDMAKER_H
 
@@ -31,6 +70,7 @@ public:
     void setOffsetY(double y);                                                          //Function that sets an offset from the min and max y values
     void setOffsetZ(double z);                                                          //Function that sets a z offset from the average height of each polygon
     void setZHeight(double z);                                                          //Function that sets an absolute z height using world coordinates
+    void setThreshold(double val);
 
     //Getters
     //Points
@@ -73,6 +113,8 @@ private:
     bool m_useZOffset;                                          //Boolean for testing whether a z offset should be applied
     double m_Offset;                                            //Variable holding the uniform inset from the boundaries of the polygons described by the layer list
     bool m_UseOffset;                                           //Boolean for testing whether a unifrom offset should be applied
+    double m_Threshold;                                         //Variable holding the threshold distance for a polygon to be included in the points generation
+    bool m_UseThreshold;                                        //Boolean for testing whether to use the threshold distance
     std::string m_RadPolyFile;                                  //Variable holding the radiance polygon filename
     std::string m_RadPtsFile;                                   //Variable holding the radiance point-spheres filename
     std::string m_oconvFile;                                    //Variable holding the octree filename
@@ -107,10 +149,6 @@ private:
     bool writeRadPoints(std::string file);                      //Function for writing the points file as spheres
     bool runoconv(std::string file);                            //Function for running oconv
     bool runrpict(std::string vType);                           //Function for running rpict and ra_bmp
-
-signals:
-
-public slots:
 
 };
 

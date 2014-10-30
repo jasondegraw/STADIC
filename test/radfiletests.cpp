@@ -1,7 +1,47 @@
+/****************************************************************
+ * Copyright (c) 2014, The Pennsylvania State University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms,
+ * with or without modification, are permitted for
+ * personal and commercial purposes provided that the
+ * following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the
+ *    above copyright notice, this list of conditions
+ *    and the following Disclaimer.
+ *
+ * 2. Redistribution in binary form must reproduce the
+ *    above copyright notice, this list of conditions
+ *    and the following disclaimer
+ *
+ * 3. Neither the name of The Pennsylvania State University
+ *    nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software
+ *    without the specific prior written permission of The
+ *    Pennsylvania State University
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
+ * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
+ * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ ****************************************************************/
+
 #include "radfiledata.h"
 #include "gtest/gtest.h"
 #include <iostream>
 #include "materialprimitives.h"
+#include "functions.h"
 
 TEST(RadFileTests, ParseRadFile)
 {
@@ -23,10 +63,10 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
   EXPECT_EQ(12, radData.geometry().at(0)->arg3().size());
-  EXPECT_EQ(0, atof(radData.geometry().at(0)->arg3().at(0).c_str()));
-  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(3).c_str()));
-  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(6).c_str()));
-  EXPECT_EQ(240, atof(radData.geometry().at(0)->arg3().at(10).c_str()));
+  EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(0)->arg3().at(0)));
+  EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(3)));
+  EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(6)));
+  EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(10)));
 
   //Testing Last Polygon for contents
   EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifier());
@@ -35,10 +75,10 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg2().size());
   ASSERT_EQ(12, radData.geometry().at(radData.geometry().size()-1)->arg3().size());
-  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(0).c_str()));
-  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(3).c_str()));
-  EXPECT_EQ(240, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(6).c_str()));
-  EXPECT_EQ(0, atof(radData.geometry().at(radData.geometry().size()-1)->arg3().at(10).c_str()));
+  EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(radData.geometry().size()-1)->arg3().at(0)));
+  EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(radData.geometry().size()-1)->arg3().at(3)));
+  EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(radData.geometry().size()-1)->arg3().at(6)));
+  EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(radData.geometry().size()-1)->arg3().at(10)));
 
   //Testing first material for contents
   EXPECT_EQ("void", radData.materials().at(0)->modifier());
@@ -47,11 +87,11 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(0)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(0)->arg2().size());
   ASSERT_EQ(5, radData.materials().at(0)->arg3().size());
-  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(0).c_str()));
-  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(1).c_str()));
-  EXPECT_EQ(.5, atof(radData.materials().at(0)->arg3().at(2).c_str()));
-  EXPECT_EQ(0, atof(radData.materials().at(0)->arg3().at(3).c_str()));
-  EXPECT_EQ(0, atof(radData.materials().at(0)->arg3().at(4).c_str()));
+  EXPECT_EQ(.5, stadic::toDouble(radData.materials().at(0)->arg3().at(0)));
+  EXPECT_EQ(.5, stadic::toDouble(radData.materials().at(0)->arg3().at(1)));
+  EXPECT_EQ(.5, stadic::toDouble(radData.materials().at(0)->arg3().at(2)));
+  EXPECT_EQ(0, stadic::toDouble(radData.materials().at(0)->arg3().at(3)));
+  EXPECT_EQ(0, stadic::toDouble(radData.materials().at(0)->arg3().at(4)));
 
   //Testing second material for contents
   EXPECT_EQ("void", radData.materials().at(1)->modifier());
@@ -60,9 +100,9 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(1)->arg2().size());
   ASSERT_EQ(3, radData.materials().at(1)->arg3().size());
-  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(0).c_str()));
-  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(1).c_str()));
-  EXPECT_EQ(.65, atof(radData.materials().at(1)->arg3().at(2).c_str()));
+  EXPECT_EQ(.65, stadic::toDouble(radData.materials().at(1)->arg3().at(0)));
+  EXPECT_EQ(.65, stadic::toDouble(radData.materials().at(1)->arg3().at(1)));
+  EXPECT_EQ(.65, stadic::toDouble(radData.materials().at(1)->arg3().at(2)));
 
   //Testing last material for contents
   EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifier());
@@ -71,11 +111,11 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg1().size());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg2().size());
   ASSERT_EQ(5, radData.materials().at(radData.materials().size()-1)->arg3().size());
-  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(0).c_str()));
-  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(1).c_str()));
-  EXPECT_EQ(.8, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(2).c_str()));
-  EXPECT_EQ(0, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(3).c_str()));
-  EXPECT_EQ(0, atof(radData.materials().at(radData.materials().size()-1)->arg3().at(4).c_str()));
+  EXPECT_EQ(.8, stadic::toDouble(radData.materials().at(radData.materials().size()-1)->arg3().at(0)));
+  EXPECT_EQ(.8, stadic::toDouble(radData.materials().at(radData.materials().size()-1)->arg3().at(1)));
+  EXPECT_EQ(.8, stadic::toDouble(radData.materials().at(radData.materials().size()-1)->arg3().at(2)));
+  EXPECT_EQ(0, stadic::toDouble(radData.materials().at(radData.materials().size()-1)->arg3().at(3)));
+  EXPECT_EQ(0, stadic::toDouble(radData.materials().at(radData.materials().size()-1)->arg3().at(4)));
 
   //Test getting primitives by type
   shared_vector<stadic::PlasticMaterial> plastic = radData.getPrimitives<stadic::PlasticMaterial>();

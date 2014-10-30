@@ -37,43 +37,54 @@
  * OF SUCH DAMAGE.
  ****************************************************************/
 
-#include "logging.h"
-#include <iostream>
-#include <cstdlib>
-#include <stdexcept>
+#ifndef OBJECTS_H
+#define OBJECTS_H
+#include <string>
+#include <time.h>
+#include "stadicapi.h"
 
-void STADIC_ERROR(std::string mesg)
+#include <memory>
+#include <vector>
+
+#include "stadicapi.h"
+
+#ifdef _MSC_VER
+//struct WIN32_FILE_ATTRIBUTE_DATA;
+typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;
+//typedef struct _FILETIME FILETIME, *PFILETIME;
+#endif
+
+namespace stadic{
+
+class STADIC_API FilePath
 {
-    std::string string ="ERROR: "+mesg;
-    std::cerr << string << std::endl;
-}
+public:
+    FilePath(std::string path);
+    ~FilePath();
 
-void STADIC_WARNING(std::string mesg)
-{
-    std::string string="WARNING: "+mesg;
-    std::cerr << string << std::endl;
-}
+    //Setters
 
-void STADIC_LOG(stadic::Severity severity, std::string mesg)
-{
-    std::string string;
-    switch(severity) {
-    case stadic::Severity::Info: // Not an error, write out information
-        string = "INFO: "+mesg;
-        std::cerr << string << std::endl;
-        break;
-    case stadic::Severity::Warning: // Something is wrong, but can continue
-        string = "WARNING: "+mesg;
-        std::cerr << string << std::endl;
-        break;
-    case stadic::Severity::Error: // Something is wrong, cannot continue
-        string = "ERROR: "+mesg;
-        std::cerr << string << std::endl;
-        throw std::runtime_error(mesg);
-    default: //case stadic::Severity::Fatal:  // Something is really wrong, stop now!
-        string = "FATAL: "+mesg;
-        std::cerr << string << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
+    //Getters
+    std::string toString();
 
+    //Utilities
+    bool isDir();
+    bool isFile();
+    bool exists();
+    bool isUpdated();
+
+
+private:
+    std::string m_Path;
+#ifdef _MSC_VER
+    // This may be too much data - maybe just store a FILETIME?
+    WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;  // Use a pointer to avoid including Windows.h here
+#else
+    struct tm m_LastMod;
+#endif
+    void lastMod();
+
+};
+
+}
+#endif // OBJECTS_H

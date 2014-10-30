@@ -1,8 +1,48 @@
+/****************************************************************
+ * Copyright (c) 2014, The Pennsylvania State University
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms,
+ * with or without modification, are permitted for
+ * personal and commercial purposes provided that the
+ * following conditions are met:
+ *
+ * 1. Redistribution of source code must retain the
+ *    above copyright notice, this list of conditions
+ *    and the following Disclaimer.
+ *
+ * 2. Redistribution in binary form must reproduce the
+ *    above copyright notice, this list of conditions
+ *    and the following disclaimer
+ *
+ * 3. Neither the name of The Pennsylvania State University
+ *    nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software
+ *    without the specific prior written permission of The
+ *    Pennsylvania State University
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
+ * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
+ * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
+ * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ ****************************************************************/
+
 #include "leakcheck.h"
 #include "logging.h"
 #include <iostream>
 #include <fstream>
-#include "objects.h"
+#include "filepath.h"
+#include "stadicprocess.h"
 #include "gridmaker.h"
 #include "functions.h"
 
@@ -154,10 +194,14 @@ bool LeakCheck::xformModifiers(){
     xform.setStandardOutputFile("Mod.rad");
     xform.start();
 
-    //There should be a test in here that if it doesn't finish it returns false
     if (!xform.wait()){
-        STADIC_ERROR("The xform of the modifiers has failed.");
-        return false;
+        // This may be rather extreme, but can these failures be recovered from? Failure
+        // to find the program is pretty bad, and any other failure indicates misuse of the
+        // process class.
+        if(xform.state() == Process::BadProgram) {
+            STADIC_LOG(Severity::Fatal, "The xform program could not be found.");
+        }
+        STADIC_LOG(Severity::Fatal, "The xform of the modifiers has failed.");
     }
 
     return true;
@@ -228,17 +272,17 @@ bool LeakCheck::runCalc(){
     std::vector<std::string> arguments2;
     arguments2.clear();
     arguments2.push_back("-e");
-    arguments2.push_back("$1=179*($1*0.265+$2*0.670+$3*0.065)");
+    arguments2.push_back("\'$1=179*($1*0.265+$2*0.670+$3*0.065)\'");
     programName="rcalc";
     Process rcalc(programName,arguments2);
     rtrace.setStandardOutputProcess(&rcalc);
     rcalc.setStandardOutputFile("Final.res");
     rtrace.start();
+    rcalc.start();
     if(!rtrace.wait()){
         STADIC_ERROR("The running of rtrace has failed.");
         return false;
     }
-    rcalc.start();
     if(!rcalc.wait()){
         STADIC_ERROR("The running of rcalc has failed.");
         return false;

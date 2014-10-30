@@ -20,8 +20,9 @@ set(SRCS stadiccontrol.cpp
          materialprimitives.cpp
          leakcheck.cpp
          functions.cpp
-         objects.cpp
-         analemma.cpp)
+         filepath.cpp
+         analemma.cpp
+         stadicprocess.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -40,9 +41,8 @@ set(HDRS stadicapi.h
          materialprimitives.h
          leakcheck.h
          functions.h
-         objects.h
-         analemma.h)
+         filepath.h
+         analemma.h
+         stadicprocess.h)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS})
-
-target_link_libraries(stadic_core Qt5::Widgets ${Boost_LIBRARIES})
