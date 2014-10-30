@@ -1,0 +1,25 @@
+# Polygons for testing
+
+l_floor polygon l_floor.0.1
+0
+0
+12	0	0	0
+	240	0	0
+	240	240	0
+        0	240	0
+
+l_wall polygon l_wall.1.1
+0
+0
+11	240	0	0
+	240	0	120
+	240	240	120
+	240	240
+
+l_wall polygon l_wall.2.1
+0
+0
+12	240	240	0
+	240	240	120
+	0	240	120
+	0	240	0
