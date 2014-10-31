@@ -26,8 +26,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Boost
-find_package(Boost 1.56 REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
+set(USE_INSTALLED_BOOST OFF CACHE BOOL "Look for installed Boost")
+if(USE_INSTALLED_BOOST)
+  find_package(Boost 1.56 REQUIRED)
+  include_directories(${Boost_INCLUDE_DIR})
+else()
+  include_directories(${CMAKE_SOURCE_DIR}/boost-1.56.0-subset)
+endif()
 
 add_subdirectory(lib)
 add_subdirectory(utilities)

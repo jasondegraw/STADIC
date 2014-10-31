@@ -44,7 +44,6 @@
 #include <string>
 #include "functions.h"
 #include <boost/property_tree/json_parser.hpp>
-//#include <boost/foreach.hpp>
 
 namespace stadic {
 
