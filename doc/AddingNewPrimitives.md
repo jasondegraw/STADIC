@@ -21,6 +21,10 @@ All material primitive objects should be initialized with acceptable default val
 be initialized to have no contents, but must cause an error if the user attempts to write out the primitive
 without adding data to the primitive.
 
+We have been naming the primitives by appending the general primitive type to the Radiance name of the
+primitive. In this scheme the "plastic" primitive is PlasticMaterial, the "polygon" primitive is
+PolygonGeometry, and so on.
+
 Add Basic Tests
 ---------------
 
@@ -37,5 +41,34 @@ important things is to make sure that validation works.
 Connect To I/O
 --------------
 
+The individual primitives are read into memory in a static RadPrimitive method called fromRad (see
+radprimitive.cpp). The important part that needs to be modified is a switch statement in the middle
+of the function:
+
+    switch(typeFromString(list[1])) {
+    case Polygon:
+        rad = new PolygonGeometry();
+        break;
+    case Plastic:
+        rad = new PlasticMaterial();
+        break;
+    case BSDF:
+        rad = new BSDFMaterial();
+        break;
+    /*  ... others ... */
+    default:
+        rad = new RadPrimitive();
+        rad->setType(list[1]);
+        break;
+    }
+
+The switch statement operates on the Type enumeration defined in the RadPrimitive class in radprimitives.h,
+so the first step is to make sure that primitive is represented there and in the type strings array so that
+the switch statement will work properly. Then add the new primitive in as a case statement.
+
 Test I/O
 --------
+
+Add a test (or tests) in radfiletests.cpp that verifies that the objects are read correctly and are actually
+the correct object. The test (or tests) should make sure that both correct and incorrect input are correctly
+handled.
