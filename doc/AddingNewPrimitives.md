@@ -71,4 +71,24 @@ Test I/O
 
 Add a test (or tests) in radfiletests.cpp that verifies that the objects are read correctly and are actually
 the correct object. The test (or tests) should make sure that both correct and incorrect input are correctly
-handled.
+handled. In this instance, "incorrect input" is input that can be read as a primitive but is not correct for
+the particular primitive. For example, a plastic primitive's third set of arguments is supposed to have five
+items in it (red, green, blue, specularity, roughness). This could appear in the input file as:
+
+    5 0.5 0.5 0.5 0.05 0.01
+
+Examples of incorrect input for a plastic primitive would be
+
+    5 1.5 0.5 0.5 0.05 0.01
+
+(the red value is too large) and
+
+    4 1.5 0.5 0.5 0.05
+    
+(there is no roughness). These are both legal inputs in the sense that the input is internally consistent
+as a Radiance primitive, but the values are wrong for a plastic. However, this is not what we're looking for:
+
+    5 0.5 0.5 0.5 0.05    # Don't do this!
+
+This is not the kind of incorrect input that will test whether the code correctly recognizes a plastic type,
+but is more likely testing how the code handles malformed input. Don't test that here - it is tested elsewhere.
