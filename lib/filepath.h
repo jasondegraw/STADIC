@@ -48,43 +48,11 @@
 
 #include "stadicapi.h"
 
-#ifdef _MSC_VER
-//struct WIN32_FILE_ATTRIBUTE_DATA;
-typedef struct _WIN32_FILE_ATTRIBUTE_DATA  WIN32_FILE_ATTRIBUTE_DATA;
-//typedef struct _FILETIME FILETIME, *PFILETIME;
-#endif
-
 namespace stadic{
 
-class STADIC_API FilePath
-{
-public:
-    FilePath(std::string path);
-    ~FilePath();
-
-    //Setters
-
-    //Getters
-    std::string toString();
-
-    //Utilities
-    bool isDir();
-    bool isFile();
-    bool exists();
-    bool isUpdated();
-
-
-private:
-    std::string m_Path;
-#ifdef _MSC_VER
-    // This may be too much data - maybe just store a FILETIME?
-    WIN32_FILE_ATTRIBUTE_DATA *m_fileAttr;  // Use a pointer to avoid including Windows.h here
-#else
-    struct tm m_LastMod;
-#endif
-    void lastMod();
-
-};
+bool STADIC_API isDir(const std::string &dir);
+bool STADIC_API isFile(const std::string &file);
+bool STADIC_API exists(const std::string &path);
 
 }
 #endif // OBJECTS_H
