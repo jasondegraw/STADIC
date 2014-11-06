@@ -69,14 +69,14 @@ TEST(AnalemmaTests, TestLancaster)
             EXPECT_EQ("0",vals[3]);
             EXPECT_EQ("0",vals[4]);
             EXPECT_EQ("4",vals[5]);
-            EXPECT_EQ("0.963768",vals[6]);
-            EXPECT_EQ("0.250951",vals[7]);
-            EXPECT_EQ("0.0904094",vals[8]);
+            EXPECT_EQ("0.950637",vals[6]);
+            EXPECT_EQ("0.299937",vals[7]);
+            EXPECT_EQ("0.0795396",vals[8]);
             EXPECT_EQ("0.533",vals[9]);
         }
     }
     iFile.close();
-    EXPECT_EQ(1511, counter);
+    EXPECT_EQ(1621, counter);
     //EXPECT_NEAR(1500,counter,15);
     iFile.open("sunsMat.rad");
     ASSERT_TRUE(iFile.is_open());
@@ -100,24 +100,24 @@ TEST(AnalemmaTests, TestLancaster)
         }
     }
     iFile.close();
-    EXPECT_EQ(1511, counter);
+    EXPECT_EQ(1621, counter);
     iFile.open("suns.smx");
     ASSERT_TRUE(iFile.is_open());
     counter=0;
     while (std::getline(iFile, line)){
         counter++;
-        if (counter==5838){
+        if (counter==2574){
             std::vector<std::string> vals;
             vals=stadic::trimmedSplit(line,'\t');
             ASSERT_EQ(3,vals.size());
-            EXPECT_EQ("1.54e+004",vals[0]);
-            EXPECT_EQ("1.54e+004",vals[1]);
-            EXPECT_EQ("1.54e+004",vals[2]);
+            EXPECT_EQ("1.15e+005",vals[0]);
+            EXPECT_EQ("1.15e+005",vals[1]);
+            EXPECT_EQ("1.15e+005",vals[2]);
 
         }
     }
     iFile.close();
-    EXPECT_EQ(13236360, counter);
+    EXPECT_EQ(14199960, counter);
 
 
 
