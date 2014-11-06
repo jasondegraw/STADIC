@@ -1,3 +1,47 @@
+## Radiance geometry file "<stdout>"
+## Converted by dxf2rad 0.9: Fri Oct 03 10:58:05 2014
+## dxf2rad complicated.dxf
+
+void plastic l_intwall
+0
+0
+5 .5 .5 .5 0 0
+
+void plastic l_groundfloor
+0
+0
+5 .3 .3 .3 0 0
+
+void plastic l_firstfloor
+0
+0
+5 .4 .3 .4 0 0
+
+void plastic l_secondfloor
+0
+0
+5 .3 .6 .6 0 0
+
+void plastic l_stairs
+0
+0
+5 .3 .7 .3 0 0
+
+void glass l_curtainwall
+0
+0
+3 .5 .5 .5
+
+void glass l_railing
+0
+0
+3 .3 .5 .8
+
+void plastic l_ceiling
+0
+0
+5 .8 .8 .8 0 0 
+
 l_intwall polygon l_intwall.0.1
 0
 0

@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -62,7 +62,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ("l_floor.0.1", radData.geometry().at(0)->name());
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
   EXPECT_EQ(0, radData.geometry().at(0)->arg2().size());
-  EXPECT_EQ(12, radData.geometry().at(0)->arg3().size());
+  ASSERT_EQ(12, radData.geometry().at(0)->arg3().size());
   EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(0)->arg3().at(0)));
   EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(3)));
   EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(6)));
@@ -183,4 +183,23 @@ TEST(RadFileTests, SplitRadFile)
   ASSERT_EQ(38, splitLayers.second->primitives().size());
   */
     ASSERT_TRUE(false);
+}
+
+TEST(RadFileTests, ParseComplicatedRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("complicated.rad"));
+    EXPECT_EQ(112, radData.primitives().size());
+    EXPECT_EQ(8, radData.materials().size());
+    EXPECT_EQ(104, radData.geometry().size());
+}
+
+TEST(RadFileTests, WriteSimpleRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("Simple.rad"));
+    ASSERT_TRUE(radData.writeRadFile("simpletest.rad"));
+    stadic::RadFileData reread;
+    ASSERT_TRUE(reread.addRad("simpletest.rad"));
+    EXPECT_EQ(radData.primitives().size(), reread.primitives().size());
 }

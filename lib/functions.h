@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -41,6 +41,7 @@
 #define FUNCTIONS_H
 #include <string>
 #include <vector>
+#include <sstream>
 #include "stadicapi.h"
 #include <boost/property_tree/ptree.hpp>
 #include "logging.h"
@@ -51,7 +52,13 @@ std::vector<std::string> STADIC_API trimmedSplit(std::string line, char delimite
 std::string STADIC_API trim(std::string string);                                                //Function that removes whitespace from either end of a string
 double STADIC_API toDouble(const std::string &string, bool *ok = nullptr);                      //Function that takes a string and returns a double
 int STADIC_API toInteger(const std::string &string, bool *ok = nullptr);
-std::string STADIC_API toString(double value);                                                  //Function that takes a double and returns a string
+template <typename T> std::string toString(T value)  //Function that takes a double and returns a string
+{
+    std::stringstream stream;
+    stream << value;
+    return stream.str();
+}
+
 
 //******************
 //Boost ptree functions

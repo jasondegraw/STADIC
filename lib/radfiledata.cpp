@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -38,6 +38,7 @@
  ****************************************************************/
 
 #include "radfiledata.h"
+#include "functions.h"
 #include "logging.h"
 #include <fstream>
 #include <sstream>
@@ -56,7 +57,8 @@ RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_Prim
 }
 
 //Setters
-bool RadFileData::addRad(std::string file){
+bool RadFileData::addRad(std::string file)
+{
     std::ifstream iFile;
     iFile.open(file);
     if (!iFile.is_open()){
@@ -182,7 +184,8 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 }
 */
 
-bool RadFileData::blackOutLayer(std::string layer){
+bool RadFileData::blackOutLayer(std::string layer)
+{
     for(int i=0;i<m_Primitives.size();i++) {
         if(m_Primitives[i]->modifier()==layer) {
             m_Primitives[i]->setModifier("black");
@@ -191,37 +194,44 @@ bool RadFileData::blackOutLayer(std::string layer){
     return true;
 }
 
-bool RadFileData::writeRadFile(std::string file){
+bool RadFileData::writeRadFile(std::string file)
+{
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
-        STADIC_ERROR("The opening of the rad file named " + file + " has failed.");
-        return false;
+        STADIC_LOG(Severity::Error, "The opening of the rad file named " + file + " has failed.");
     }
+
+    // Write a header
+    oFile << "## Radiance geometry file \"" + file + "\"" << std::endl;
+    // It would be nice to write out more detail about what is going on here. A minimum would be
+    // to write the date, time and the version of the library. We could also include the
+    // filenames of any files that were added with addRad (but we'd need to start storing that).
+
     shared_vector<RadPrimitive> primitives=materials();
-    for (int i=0;i<primitives.size();i++){
-        oFile<<std::endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<std::endl;
-        oFile<<primitives[i]->arg1().size();
-        if (primitives[i]->arg1().size()>0){
-            for (int j=0;j<primitives[i]->arg1().size();j++){
-                oFile<<" "<<primitives[i]->arg1()[j];
-            }
+    size_t count = primitives.size();
+    if(count > 0) {
+        oFile << "## Materials" << std::endl;
+        for(auto ptr : primitives) {
+            oFile << ptr->toRad() << std::endl;
         }
-        oFile<<std::endl;
     }
 
     primitives=geometry();
-    for (int i=0;i<primitives.size();i++){
-        oFile<<std::endl<<primitives[i]->modifier()<<" "<<primitives[i]->type()<<" "<<primitives[i]->name()<<std::endl;
-        oFile<<primitives[i]->arg1().size();
-        if (primitives[i]->arg1().size()>0){
-            for (int j=0;j<primitives[i]->arg1().size();j++){
-                oFile<<" "<<primitives[i]->arg1()[j];
-            }
+    count += primitives.size();
+    if(primitives.size() > 0) {
+        oFile << "## Geometry" << std::endl;
+        for(auto ptr : primitives) {
+            oFile << ptr->toRad() << std::endl;
         }
-        oFile<<std::endl;
     }
-    oFile.close();
+
+    if(count != m_Primitives.size()) {
+        STADIC_LOG(Severity::Warning, "Only materials and geometry were written to " + file + ", "
+            + toString(m_Primitives.size() - count) + " primitives were not written out");
+    }
+
+    oFile << "## End of Radiance geometry file \"" + file + "\"" << std::endl;
 
     return true;
 }

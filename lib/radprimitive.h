@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -65,17 +65,15 @@ public:
     bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type
 
     //Setters
-    void setModifier(std::string modifier);                             //Function to set the modifier
-    virtual bool setType(std::string type);                             //Function to set the type
-    void setName(std::string name);                                     //Function to set the name
-    bool setArg1(std::vector<std::string> vals);                        //Function to set the argumens on line one from a vector of strings
-    bool setArg1(std::string arg, int position);                        //Function to set an argument on line one given the position of the argument
-    bool setArg2(std::vector<std::string> vals);                        //Function to set the arguments on line two from a vector of strings
-    bool setArg2(std::string arg, int position);                        //Function to set an argument on line two given the position of the argument
-    bool setArg3(std::vector<std::string> vals);                        //Function to set the arguments on line three from a vector of strings
-    bool setArg3(std::string arg, int position);                        //Function to set an argument on line three given the position of the argument
-
-    virtual bool setArg(int number, std::string value, int position);
+    void setModifier(const std::string &modifier);                             //Function to set the modifier
+    virtual bool setType(const std::string &type);                             //Function to set the type
+    void setName(const std::string &name);                                     //Function to set the name
+    virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
+    virtual bool setArg1(const std::string &arg, int position);                //Function to set an argument on line one given the position of the argument
+    virtual bool setArg2(std::vector<std::string> vals);                //Function to set the arguments on line two from a vector of strings
+    virtual bool setArg2(const std::string &arg, int position);                //Function to set an argument on line two given the position of the argument
+    virtual bool setArg3(std::vector<std::string> vals);                //Function to set the arguments on line three from a vector of strings
+    virtual bool setArg3(const std::string &arg, int position);                //Function to set an argument on line three given the position of the argument
 
     //Getters
     std::string modifier() const;                                       //Function that returns the modifier as a string
@@ -86,23 +84,38 @@ public:
     std::vector<std::string> arg2() const;                              //Function that returns the second line of arguments as a vector
     std::vector<std::string> arg3() const;                              //Function that returns the third line of arguments as a vector
 
-    virtual std::string getArg1(int position) const;                    //Function that returns a given argument from the first line as a string
-    virtual std::string getArg2(int position) const;                    //Function that returns a given argument from the second line as a string
-    virtual std::string getArg3(int position) const;                    //Function that returns a given argument from the third line as a string
-    virtual std::string getArg(int number, int position) const;         //Function that returns a given argument from a given line
+    virtual std::string getArg1(int position) const; //!< Returns a given argument from the first line as a string, throws for out of range values
+    virtual std::string getArg2(int position) const; //!< Returns a given argument from the second line as a string, throws for out of range values
+    virtual std::string getArg3(int position) const; //!< Returns a given argument from the third line as a string, throws for out of range values
+    virtual std::string getArg1(int position, const std::string &defaultValue) const; //!< Returns a given argument from the first line as a string or a default if the position is out of range
+    virtual std::string getArg2(int position, const std::string &defaultValue) const; //!< Returns a given argument from the second line as a string or a default if the position is out of range
+    virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
+    std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
-    bool checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const;
-    bool checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const;
-
+    bool checkDoubleValue(const std::string &value, double min, double max, const std::string &variable, 
+        double current) const;
+    bool checkDoubleValue(const std::string &value, double min, double max, double recMin, double recMax,
+        const std::string &variable, double current) const;
+    bool checkDoubleValueMin(const std::string &value, double min, const std::string &variable,
+        double current, bool inclusive) const;
+    bool checkDoubleValue(const std::string &value, const std::string &variable, double current) const;
+    double argToDouble(int number, int position, const std::string &variable) const;
+    double argToDouble(int number, int position, const std::string &variable, double defaultValue) const;
+    virtual bool validateArg1(const std::string &value, int position) const { return false; }
+    virtual bool validateArg1(const std::vector<std::string> &arg) const;
+    virtual bool validateArg2(const std::string &value, int position) const { return false; }
+    virtual bool validateArg2(const std::vector<std::string> &arg) const;
+    virtual bool validateArg3(const std::string &value, int position) const { return false; }
+    virtual bool validateArg3(const std::vector<std::string> &arg) const;
+    virtual bool extendArg3() const { return false; }
+    
 private:
-    virtual bool validateArg(int number, std::string value, int position) const {return true;}
-    virtual bool validateArg(int number, std::vector<std::string> value) const {return true;}
     static std::array<std::string,51> s_typeStrings;
-    static Type typeFromString(std::string string);
+    static Type typeFromString(const std::string &string);
 
     std::string m_Modifier;                                             //Variable holding the modifier
     std::string m_TypeString;                                           //Variable holding the type
