@@ -203,3 +203,33 @@ TEST(RadFileTests, WriteSimpleRadFile)
     ASSERT_TRUE(reread.addRad("simpletest.rad"));
     EXPECT_EQ(radData.primitives().size(), reread.primitives().size());
 }
+
+TEST(RadFileTests, PlasticTest)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("plasticmaterial.rad"));
+    ASSERT_EQ(3, radData.primitives().size());
+    //stadic::PlasticMaterial *plastic = dynamic_cast<stadic::PlasticMaterial>(radData.primitives()[])
+    auto plastic = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[0]);
+    ASSERT_TRUE(plastic);
+    EXPECT_EQ(0.5, plastic->red());
+    EXPECT_EQ(0.5, plastic->green());
+    EXPECT_EQ(0.5, plastic->blue());
+    EXPECT_EQ(0, plastic->roughness());
+    EXPECT_EQ(0, plastic->specularity());
+    plastic = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[1]);
+    ASSERT_TRUE(plastic);
+    EXPECT_EQ(0, plastic->red());
+    EXPECT_EQ(0, plastic->green());
+    EXPECT_EQ(0, plastic->blue());
+    EXPECT_EQ(0, plastic->roughness());
+    EXPECT_EQ(0, plastic->specularity());
+    plastic = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[2]);
+    ASSERT_TRUE(plastic);
+    EXPECT_EQ(0.25, plastic->red());
+    EXPECT_EQ(0.25, plastic->green());
+    EXPECT_EQ(0.25, plastic->blue());
+    EXPECT_EQ(0, plastic->roughness());
+    EXPECT_EQ(0, plastic->specularity());
+
+}
