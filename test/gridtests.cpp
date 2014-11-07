@@ -80,7 +80,7 @@ TEST(GridTests, SimpleOffset){
     ASSERT_TRUE(grid.makeGrid());
 }
 
-TEST(GridTests, Complicated)
+TEST(GridTests, ComplicatedThreshold)
 {
     std::vector<std::string> files;
     files.clear();
@@ -100,10 +100,9 @@ TEST(GridTests, Complicated)
     grid.setOffsetZ(30);
     grid.setThreshold(73);      //This line prevents the stairs (@72" long) from being included in the points generation
     ASSERT_TRUE(grid.makeGrid());
-    ASSERT_TRUE(grid.writePTS("complicatedgrid.pts"));
-    ASSERT_TRUE(grid.viewPTS("", "se"));
+    ASSERT_TRUE(grid.writePTS("complicatedgrid1.pts"));
     std::ifstream iFile;
-    iFile.open("complicatedgrid.pts");
+    iFile.open("complicatedgrid1.pts");
     ASSERT_TRUE(iFile.is_open());
     std::string line;
     int counter=0;
@@ -146,8 +145,8 @@ TEST(GridTests, Complicated)
             std::vector<std::string> vals;
             vals=stadic::trimmedSplit(line,' ');
             ASSERT_EQ(6,vals.size());
-            EXPECT_EQ("24.3022",vals[0]);
-            EXPECT_EQ("441.087",vals[1]);
+            EXPECT_EQ("21.9072",vals[0]);
+            EXPECT_EQ("438.692",vals[1]);
             EXPECT_EQ("104",vals[2]);
             EXPECT_EQ("0",vals[3]);
             EXPECT_EQ("0",vals[4]);
@@ -179,3 +178,201 @@ TEST(GridTests, Complicated)
     iFile.close();
     EXPECT_EQ(1554, counter);
 }
+
+TEST(GridTests, ComplicatedNoStairs)
+{
+    std::vector<std::string> files;
+    files.clear();
+    files.push_back("complicated.rad");
+    stadic::GridMaker grid(files);
+
+    std::vector<std::string> layers;
+    layers.clear();
+    layers.push_back("l_groundfloor");
+    layers.push_back("l_firstfloor");
+    layers.push_back("l_secondfloor");
+    grid.setLayerNames(layers);
+    grid.setOffset(24);
+    grid.setSpaceX(24);
+    grid.setSpaceY(24);
+    grid.setOffsetZ(30);
+    ASSERT_TRUE(grid.makeGrid());
+    ASSERT_TRUE(grid.writePTS("complicatedgrid2.pts"));
+    std::ifstream iFile;
+    iFile.open("complicatedgrid2.pts");
+    ASSERT_TRUE(iFile.is_open());
+    std::string line;
+    int counter=0;
+    while (std::getline(iFile, line)){
+        counter++;
+        if (counter==1){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("24",vals[0]);
+            EXPECT_EQ("24",vals[1]);
+            EXPECT_EQ("30",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==58){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("48",vals[0]);
+            EXPECT_EQ("696",vals[1]);
+            EXPECT_EQ("30",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1131){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("936",vals[0]);
+            EXPECT_EQ("696",vals[1]);
+            EXPECT_EQ("30",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1132){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("24",vals[0]);
+            EXPECT_EQ("283.105",vals[1]);
+            EXPECT_EQ("174",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1359){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("24",vals[0]);
+            EXPECT_EQ("660.087",vals[1]);
+            EXPECT_EQ("318",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1550){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("936",vals[0]);
+            EXPECT_EQ("684.087",vals[1]);
+            EXPECT_EQ("318",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+    }
+    iFile.close();
+    EXPECT_EQ(1550, counter);
+}
+
+
+TEST(GridTests, ComplicatedNoThreshold)
+{
+    std::vector<std::string> files;
+    files.clear();
+    files.push_back("complicated.rad");
+    stadic::GridMaker grid(files);
+
+    std::vector<std::string> layers;
+    layers.clear();
+    layers.push_back("l_groundfloor");
+    layers.push_back("l_firstfloor");
+    layers.push_back("l_secondfloor");
+    layers.push_back("l_stairs");
+    grid.setLayerNames(layers);
+    grid.setOffset(24);
+    grid.setSpaceX(24);
+    grid.setSpaceY(24);
+    grid.setOffsetZ(30);
+    ASSERT_TRUE(grid.makeGrid());
+    ASSERT_TRUE(grid.writePTS("complicatedgrid3.pts"));
+    ASSERT_TRUE(grid.viewPTS("", "se"));
+    std::ifstream iFile;
+    iFile.open("complicatedgrid3.pts");
+    ASSERT_TRUE(iFile.is_open());
+    std::string line;
+    int counter=0;
+    while (std::getline(iFile, line)){
+        counter++;
+        if (counter==1){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("5.79722",vals[0]);
+            EXPECT_EQ("558.582",vals[1]);
+            EXPECT_EQ("167",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==58){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("48",vals[0]);
+            EXPECT_EQ("624",vals[1]);
+            EXPECT_EQ("30",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1134){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("936",vals[0]);
+            EXPECT_EQ("696",vals[1]);
+            EXPECT_EQ("30",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1135){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("5.79722",vals[0]);
+            EXPECT_EQ("547.582",vals[1]);
+            EXPECT_EQ("160",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1359){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("408",vals[0]);
+            EXPECT_EQ("595.105",vals[1]);
+            EXPECT_EQ("174",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+        if (counter==1668){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("936",vals[0]);
+            EXPECT_EQ("684.087",vals[1]);
+            EXPECT_EQ("318",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+    }
+    iFile.close();
+    EXPECT_EQ(1668, counter);
+}
+
