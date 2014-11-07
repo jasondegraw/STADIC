@@ -399,3 +399,4 @@ TEST(PrimitiveTests, Ring)
     EXPECT_EQ(0, rad.innerRadius());
     EXPECT_EQ(6, rad.outerRadius());
 }
+
