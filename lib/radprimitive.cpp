@@ -47,15 +47,15 @@
 namespace stadic {
 
 std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
-                                                      "cylinder", "tube", "ring", "instance", "mesh", "light",
-                                                      "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
-                                                      "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
-                                                      "mist", "dielectric", "interface", "glass", "plasfunc",
-                                                      "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
-                                                      "transdata", "bsdf", "antimatter", "texfunc", "texdata",
-                                                      "colorfunc", "brightfunc", "colordata", "brightdata",
-                                                      "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
-                                                      "mixpict", "mixtext", "unknown"};
+                                                          "cylinder", "tube", "ring", "instance", "mesh", "light",
+                                                          "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
+                                                          "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
+                                                          "mist", "dielectric", "interface", "glass", "plasfunc",
+                                                          "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
+                                                          "transdata", "bsdf", "antimatter", "texfunc", "texdata",
+                                                          "colorfunc", "brightfunc", "colordata", "brightdata",
+                                                          "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
+                                                          "mixpict", "mixtext", "unknown"};
 
 RadPrimitive::RadPrimitive()
 {

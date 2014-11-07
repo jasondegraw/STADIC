@@ -41,6 +41,7 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include "materialprimitives.h"
+#include "geometryprimitives.h"
 #include "functions.h"
 
 TEST(RadFileTests, ParseRadFile)
@@ -209,7 +210,6 @@ TEST(RadFileTests, PlasticTest)
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("plasticmaterial.rad"));
     ASSERT_EQ(3, radData.primitives().size());
-    //stadic::PlasticMaterial *plastic = dynamic_cast<stadic::PlasticMaterial>(radData.primitives()[])
     auto plastic = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[0]);
     ASSERT_TRUE(plastic);
     EXPECT_EQ(0.5, plastic->red());
@@ -231,5 +231,22 @@ TEST(RadFileTests, PlasticTest)
     EXPECT_EQ(0.25, plastic->blue());
     EXPECT_EQ(0, plastic->roughness());
     EXPECT_EQ(0, plastic->specularity());
+
+}
+
+TEST(RadFileTests, PolygonTest)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("polygongeometry.rad"));
+    ASSERT_EQ(3, radData.primitives().size());
+    auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[0]);
+    ASSERT_TRUE(primitive);
+    ASSERT_EQ(12, primitive->arg3().size());
+    primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[1]);
+    ASSERT_TRUE(primitive);
+    ASSERT_EQ(0, primitive->arg3().size());
+    primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[2]);
+    ASSERT_TRUE(primitive);
+    ASSERT_EQ(12, primitive->arg3().size());
 
 }
