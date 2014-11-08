@@ -69,11 +69,15 @@ bool RadFileData::addRad(std::string file)
     data<<iFile.rdbuf();
     shared_vector<RadPrimitive> primitives;
     while (!data.eof()) {
-        RadPrimitive *primitive = RadPrimitive::fromRad(data);
-        if(primitive == nullptr) {
-            break;
+        try {
+            RadPrimitive *primitive = RadPrimitive::fromRad(data);
+            if(primitive == nullptr) {
+                break;
+            }
+            primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
+        } catch(const std::runtime_error &) {
+            return false;
         }
-        primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
     }
     iFile.close();
     if(primitives.size() == 0) {

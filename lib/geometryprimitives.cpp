@@ -91,6 +91,7 @@ bool PolygonGeometry::validateArg3(const std::string &value, int position) const
 bool PolygonGeometry::validateArg3(const std::vector<std::string> &arg) const
 {
     if(arg.size()%3 != 0) {
+        STADIC_LOG(Severity::Warning, "The setting of the polygon points has failed - argument size must be a multiple of 3.");
         return false;
     }
     for(std::string value : arg) {

@@ -207,9 +207,9 @@ TEST(RadFileTests, WriteSimpleRadFile)
 
 TEST(RadFileTests, PlasticTest)
 {
-    stadic::RadFileData radData;
-    ASSERT_TRUE(radData.addRad("plasticmaterial.rad"));
-    ASSERT_EQ(1, radData.primitives().size());
+    stadic::RadFileData radData,badData;
+    ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
+    ASSERT_EQ(3, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[0]);
     ASSERT_FALSE(!primitive);
     EXPECT_EQ("void", primitive->modifier());
@@ -219,49 +219,40 @@ TEST(RadFileTests, PlasticTest)
     EXPECT_EQ(0.5, primitive->blue());
     EXPECT_EQ(0, primitive->roughness());
     EXPECT_EQ(0, primitive->specularity());
-    /*
-    primitive = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[1]);
+
+    EXPECT_FALSE(badData.addRad("badplasticmaterial.rad"));
+    EXPECT_EQ(0, badData.primitives().size());
+}
+
+TEST(RadFileTests, GlassTest)
+{
+    stadic::RadFileData radData, badData;
+    ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
+    ASSERT_EQ(3, radData.primitives().size());
+    auto primitive = std::dynamic_pointer_cast<stadic::GlassMaterial>(radData.primitives()[1]);
     ASSERT_FALSE(!primitive);
     EXPECT_EQ("void", primitive->modifier());
-    EXPECT_EQ("l_extwall", primitive->name());
-    EXPECT_EQ(0, primitive->red());
-    EXPECT_EQ(0, primitive->green());
-    EXPECT_EQ(0, primitive->blue());
-    EXPECT_EQ(0, primitive->roughness());
-    EXPECT_EQ(0, primitive->specularity());
-    primitive = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[2]);
-    ASSERT_FALSE(!primitive);
-    EXPECT_EQ("void", primitive->modifier());
-    EXPECT_EQ("l_floor", primitive->name());
-    EXPECT_EQ(0.25, primitive->red());
-    EXPECT_EQ(0.25, primitive->green());
-    EXPECT_EQ(0.25, primitive->blue());
-    EXPECT_EQ(0, primitive->roughness());
-    EXPECT_EQ(0, primitive->specularity());
-    */
+    EXPECT_EQ("l_window", primitive->name());
+    EXPECT_EQ(0.65, primitive->redTrans());
+    EXPECT_EQ(0.65, primitive->greenTrans());
+    EXPECT_EQ(0.65, primitive->blueTrans());
+
+    EXPECT_FALSE(badData.addRad("badglassmaterial.rad"));
+    EXPECT_EQ(0, badData.primitives().size());
 }
 
 TEST(RadFileTests, PolygonTest)
 {
-    stadic::RadFileData radData;
-    ASSERT_TRUE(radData.addRad("polygongeometry.rad"));
-    ASSERT_EQ(1, radData.primitives().size());
-    auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[0]);
-    ASSERT_FALSE(!primitive);
-    ASSERT_EQ(12, primitive->arg3().size());
-    EXPECT_EQ("l_floor", primitive->modifier());
-    EXPECT_EQ("l_floor.0.1", primitive->name());
-    /*
-    primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[1]);
-    ASSERT_FALSE(!primitive);
-    ASSERT_EQ(0, primitive->arg3().size());
-    EXPECT_EQ("l_wall", primitive->modifier());
-    EXPECT_EQ("l_wall.1.1", primitive->name());
-    primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[2]);
+    stadic::RadFileData radData,badData;
+    ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
+    ASSERT_EQ(3, radData.primitives().size());
+    auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[2]);
     ASSERT_FALSE(!primitive);
     ASSERT_EQ(12, primitive->arg3().size());
     EXPECT_EQ("l_wall", primitive->modifier());
     EXPECT_EQ("l_wall.2.1", primitive->name());
-    */
+
+    EXPECT_FALSE(badData.addRad("badpolygongeometry.rad"));
+    EXPECT_EQ(0, badData.primitives().size());
 }
 

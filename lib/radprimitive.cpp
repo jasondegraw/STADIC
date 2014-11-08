@@ -324,9 +324,9 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
             args.push_back(string);
         }
         if(!rad->setArg1(args)) {
-            STADIC_LOG(Severity::Warning, "Incorrect input in argument line 1 for " + list[1] + " primitive, identifier "
-                + list[2]);
             delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in first argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
             return nullptr;
         }
     }
@@ -340,9 +340,9 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
             args.push_back(string);
         }
         if(!rad->setArg2(args)) {
-            STADIC_LOG(Severity::Warning, "Incorrect input in argument line 2 for " + list[1] + " primitive, identifier "
-                + list[2]);
             delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in second argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
             return nullptr;
         }
     }
@@ -356,9 +356,9 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
             args.push_back(string);
         }
         if(!rad->setArg3(args)) {
-            STADIC_LOG(Severity::Warning, "Incorrect input in argument line 3 for " + list[1] + " primitive, identifier "
-                + list[2]);
             delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in third argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
             return nullptr;
         }
     }
