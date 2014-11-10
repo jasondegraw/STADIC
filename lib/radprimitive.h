@@ -47,6 +47,8 @@
 #include <sstream>
 
 #include "stadicapi.h"
+#include "functions.h"
+#include "logging.h"
 
 namespace stadic {
 
@@ -105,11 +107,26 @@ protected:
     bool checkDoubleValue(const std::string &value, const std::string &variable, double current) const;
     double argToDouble(int number, int position, const std::string &variable) const;
     double argToDouble(int number, int position, const std::string &variable, double defaultValue) const;
-    virtual bool validateArg1(const std::string &value, int position) const { return false; }
+    virtual bool validateArg1(const std::string &value, int position) const 
+    {
+        STADIC_LOG(Severity::Warning, "A " + typeString() + " primitive has no first argument in position "
+            + stadic::toString(position));
+        return false;
+    }
     virtual bool validateArg1(const std::vector<std::string> &arg) const;
-    virtual bool validateArg2(const std::string &value, int position) const { return false; }
+    virtual bool validateArg2(const std::string &value, int position) const
+    {
+        STADIC_LOG(Severity::Warning, "A " + typeString() + " primitive has no second argument in position "
+            + stadic::toString(position));
+        return false;
+    }
     virtual bool validateArg2(const std::vector<std::string> &arg) const;
-    virtual bool validateArg3(const std::string &value, int position) const { return false; }
+    virtual bool validateArg3(const std::string &value, int position) const
+    {
+        STADIC_LOG(Severity::Warning, "A " + typeString() + " primitive has no third argument in position "
+            + stadic::toString(position));
+        return false;
+    }
     virtual bool validateArg3(const std::vector<std::string> &arg) const;
     virtual bool extendArg3() const { return false; }
     

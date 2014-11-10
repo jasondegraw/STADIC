@@ -126,10 +126,11 @@ bool PlasticMaterial::validateArg3(const std::string &value, int position) const
         return checkDoubleValue(value, 0, 1, 0, 0.07, "specularity",specularity());
     case 4:
         return checkDoubleValue(value, 0, 1, 0, 0.02, "roughness", roughness());
+    default:
+        STADIC_LOG(Severity::Warning, "A plastic primitive has no third argument in position " + stadic::toString(position));
     }
     return false;
 }
-
 
 //METAL
 MetalMaterial::MetalMaterial() : RadPrimitive()
@@ -217,6 +218,8 @@ bool MetalMaterial::validateArg3(const std::string &value, int position) const
         return checkDoubleValue(value, 0, 1, 0, 0.07, "specularity", specularity());
     case 4:
         return checkDoubleValue(value, 0, 1, 0, 0.02, "roughness", roughness());
+    default:
+        STADIC_LOG(Severity::Warning, "A metal primitive has no third argument in position " + stadic::toString(position));
     }
     return false;
 }
@@ -341,6 +344,8 @@ bool TransMaterial::validateArg3(const std::string &value, int position) const
         return checkDoubleValue(value, 0, 1, "transmissivity", transmissivity());
     case 6:
         return checkDoubleValue(value, 0, 1, "transmitted specularity", transSpecular());
+    default:
+        STADIC_LOG(Severity::Warning, "A trans primitive has no third argument in position " + stadic::toString(position));
     }
     return false;
 }
@@ -429,6 +434,8 @@ bool GlassMaterial::validateArg3(const std::string &value, int position) const
         return checkDoubleValue(value, 0, 1, "blue transmissivity", blueTrans());
     case 3:
         return checkDoubleValue(value, 0, 5, "index of refraction", refraction());
+    default:
+        STADIC_LOG(Severity::Warning, "A glass primitive has no third argument in position " + stadic::toString(position));
     }
     return false;
 }
@@ -527,6 +534,7 @@ bool BSDFMaterial::validateArg1(const std::string &value, int position) const
         }
         break;
     default:
+        STADIC_LOG(Severity::Warning, "A bsdf primitive has no first argument in position " + stadic::toString(position));
         return false;
     }
     return true;

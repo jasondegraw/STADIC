@@ -45,6 +45,9 @@ add_custom_command(TARGET radfiletests POST_BUILD
                    ${CMAKE_SOURCE_DIR}/test/resources/badplasticmaterial.rad $<TARGET_FILE_DIR:radfiletests>)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_SOURCE_DIR}/test/resources/badmetalmaterial.rad $<TARGET_FILE_DIR:radfiletests>)
+add_custom_command(TARGET radfiletests POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/badglassmaterial.rad $<TARGET_FILE_DIR:radfiletests>)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
