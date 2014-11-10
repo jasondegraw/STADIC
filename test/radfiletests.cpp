@@ -209,7 +209,7 @@ TEST(RadFileTests, PlasticTest)
 {
     stadic::RadFileData radData,badData;
     ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
-    ASSERT_EQ(4, radData.primitives().size());
+    ASSERT_EQ(5, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[0]);
     ASSERT_FALSE(!primitive);
     EXPECT_EQ("void", primitive->modifier());
@@ -228,7 +228,7 @@ TEST(RadFileTests, MetalTest)
 {
     stadic::RadFileData radData, badData;
     ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
-    ASSERT_EQ(4, radData.primitives().size());
+    ASSERT_EQ(5, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::MetalMaterial>(radData.primitives()[1]);
     ASSERT_FALSE(!primitive);
     EXPECT_EQ("void", primitive->modifier());
@@ -247,7 +247,7 @@ TEST(RadFileTests, GlassTest)
 {
     stadic::RadFileData radData, badData;
     ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
-    ASSERT_EQ(4, radData.primitives().size());
+    ASSERT_EQ(5, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::GlassMaterial>(radData.primitives()[2]);
     ASSERT_FALSE(!primitive);
     EXPECT_EQ("void", primitive->modifier());
@@ -260,12 +260,33 @@ TEST(RadFileTests, GlassTest)
     EXPECT_EQ(0, badData.primitives().size());
 }
 
+TEST(RadFileTests, TransTest)
+{
+    stadic::RadFileData radData, badData;
+    ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
+    ASSERT_EQ(5, radData.primitives().size());
+    auto primitive = std::dynamic_pointer_cast<stadic::TransMaterial>(radData.primitives()[3]);
+    ASSERT_FALSE(!primitive);
+    EXPECT_EQ("void", primitive->modifier());
+    EXPECT_EQ("l_trans", primitive->name());
+    EXPECT_EQ(0.75, primitive->red());
+    EXPECT_EQ(0.75, primitive->green());
+    EXPECT_EQ(0.75, primitive->blue());
+    EXPECT_EQ(0.01, primitive->specularity());
+    EXPECT_EQ(0.01, primitive->roughness());
+    EXPECT_EQ(0.02, primitive->transmissivity());
+    EXPECT_EQ(0.03, primitive->transSpecular());
+
+    EXPECT_FALSE(badData.addRad("badtransmaterial.rad"));
+    EXPECT_EQ(0, badData.primitives().size());
+}
+
 TEST(RadFileTests, PolygonTest)
 {
     stadic::RadFileData radData,badData;
     ASSERT_TRUE(radData.addRad("supportedprimitives.rad"));
-    ASSERT_EQ(4, radData.primitives().size());
-    auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[3]);
+    ASSERT_EQ(5, radData.primitives().size());
+    auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[4]);
     ASSERT_FALSE(!primitive);
     ASSERT_EQ(12, primitive->arg3().size());
     EXPECT_EQ("l_wall", primitive->modifier());

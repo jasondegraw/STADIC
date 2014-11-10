@@ -15,6 +15,11 @@ void glass l_window
 0
 3 .65 .65 .65
 
+void trans l_trans
+0
+0
+7 0.75 0.75 0.75 0.01 0.01 0.02 0.03
+
 l_wall polygon l_wall.2.1
 0
 0

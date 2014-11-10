@@ -51,6 +51,9 @@ add_custom_command(TARGET radfiletests POST_BUILD
                    ${CMAKE_SOURCE_DIR}/test/resources/badglassmaterial.rad $<TARGET_FILE_DIR:radfiletests>)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_SOURCE_DIR}/test/resources/badtransmaterial.rad $<TARGET_FILE_DIR:radfiletests>)
+add_custom_command(TARGET radfiletests POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/badpolygongeometry.rad $<TARGET_FILE_DIR:radfiletests>)
 
 add_executable(leaktests leaktests.cpp)
