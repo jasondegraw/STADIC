@@ -71,9 +71,11 @@ Test I/O
 
 Add a test (or tests) in radfiletests.cpp that verifies that the objects are read correctly and are actually
 the correct object. The test (or tests) should make sure that both correct and incorrect input are correctly
-handled. In this instance, "incorrect input" is input that can be read as a primitive but is not correct for
-the particular primitive. For example, a plastic primitive's third set of arguments is supposed to have five
-items in it (red, green, blue, specularity, roughness). This could appear in the input file as:
+handled. To test correct input, add a new correct primitive to "supportedprimitives.rad" and add a separate
+file for incorrect input (e.g. badglassmaterial.rad). In this context, "incorrect input" is input that can 
+be read as a primitive but is not correct for the particular primitive. For example, a plastic primitive's 
+third set of arguments is supposed to have five items in it (red, green, blue, specularity, roughness). This
+could appear in the input file as:
 
     5 0.5 0.5 0.5 0.05 0.01
 
