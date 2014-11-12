@@ -79,7 +79,7 @@ could appear in the input file as:
 
     5 0.5 0.5 0.5 0.05 0.01
 
-Examples of incorrect input for a plastic primitive would be
+Examples of incorrect, but consistent, input for a plastic primitive would be
 
     5 1.5 0.5 0.5 0.05 0.01
 
