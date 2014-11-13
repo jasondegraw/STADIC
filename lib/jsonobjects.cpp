@@ -135,4 +135,37 @@ boost::optional<JsonObject> getObject(const JsonObject &json, const std::string 
     return boost::optional<boost::property_tree::ptree>(treeVal);
 }
 
+boost::optional<double> asDouble(const JsonObject &json, const std::string &errorBad, Severity severity)
+{
+    boost::optional<double> dVal;
+    try{
+        dVal = json.get<double>("");
+    } catch(const boost::property_tree::ptree_bad_data &){
+        STADIC_LOG(severity, errorBad);
+    }
+    return dVal;
+}
+
+boost::optional<int> asInt(const JsonObject &json, const std::string &errorBad, Severity severity)
+{
+    boost::optional<int> iVal;
+    try{
+        iVal = json.get<int>("");
+    } catch(const boost::property_tree::ptree_bad_data &){
+        STADIC_LOG(severity, errorBad);
+    }
+    return iVal;
+}
+
+boost::optional<std::string> asString(const JsonObject &json, const std::string &errorBad, Severity severity)
+{
+    boost::optional<std::string> sVal;
+    try{
+        sVal = json.get<std::string>("");
+    } catch(const boost::property_tree::ptree_bad_data &) {
+        STADIC_LOG(severity, errorBad);
+    }
+    return sVal;
+}
+
 }

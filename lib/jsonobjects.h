@@ -63,6 +63,10 @@ boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const s
 boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, Severity severity);
 
+boost::optional<double> STADIC_API asDouble(const JsonObject &json, const std::string &errorBad, Severity severity);
+boost::optional<int> STADIC_API asInt(const JsonObject &json, const std::string &errorBad, Severity severity);
+boost::optional<std::string> STADIC_API asString(const JsonObject &json, const std::string &errorBad, Severity severity);
+
 }
 
 #endif

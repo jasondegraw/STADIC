@@ -158,24 +158,19 @@ bool ShadeControl::readAutoProf(const JsonObject &json, std::string method){
         if (!setElevationAzimuth(dVal.get())){
             return false;
         }
-        dVal.reset();
     }
     treeVal=getObject(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
         for(auto &v : treeVal.get()){
-            dVal=getDouble(v.second, "", "", "", Severity::Fatal);
+            dVal = asDouble(v.second, "There was a problem reading the angle_settings key.", Severity::Fatal);
             if (dVal){
                 if (!setAngleSettings(dVal.get())){
                     return false;
                 }
-            }else{
-                STADIC_LOG(Severity::Warning, "There was a problem reading the angle_settings key.");
             }
-            dVal.reset();
         }
-        treeVal.reset();
     }
     return true;
 }

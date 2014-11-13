@@ -130,11 +130,9 @@ bool WindowGroup::parseJson(const JsonObject &json){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
         }else{
             for(auto &v : treeVal.get()){
-                sVal = getString(v.second, "", "", "", Severity::Fatal);
+                sVal = asString(v.second, "There was a problem reading the bsdf_base_layers key for window group "+name()+".", Severity::Fatal);
                 if (sVal){
                     m_BSDFBaseLayers.push_back(sVal.get());
-                }else{
-                    STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_base_layers key for window group "+name()+".");
                 }
             }
         }
@@ -145,11 +143,9 @@ bool WindowGroup::parseJson(const JsonObject &json){
         return false;
     }else{
         for(auto &v : treeVal.get()){
-            sVal=getString(v.second, "", "", "", Severity::Fatal);
+            sVal = asString(v.second, "There was a problem reading the glazing_layers key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_GlazingLayers.push_back(sVal.get());
-            }else{
-                STADIC_LOG(Severity::Warning, "There was a problem reading the glazing_layers key for window group "+name()+".");
             }
         }
     }
@@ -159,11 +155,9 @@ bool WindowGroup::parseJson(const JsonObject &json){
         STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
     }else{
         for(auto &v : treeVal.get()){
-            sVal=getString(v.second, "", "", "", Severity::Fatal);
+            sVal = asString(v.second, "There was a problem reading the shade_settings key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_ShadeSettingGeometry.push_back(sVal.get());
-            }else{
-                STADIC_LOG(Severity::Warning, "There was a problem reading the shade_settings key for window group "+name()+".");
             }
         }
     }
@@ -187,11 +181,9 @@ bool WindowGroup::parseJson(const JsonObject &json){
             for(auto &v : treeVal.get()){
                 std::vector<std::string> tempVector;
                 for (auto &v2 : v.second){
-                    sVal=getString(v2.second, "", "", "", Severity::Fatal);
+                    sVal = asString(v2.second, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".", Severity::Fatal);
                     if (sVal){
                         tempVector.push_back(sVal.get());
-                    }else{
-                        STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".");
                     }
                 }
                 m_BSDFSettingLayers.push_back(tempVector);
