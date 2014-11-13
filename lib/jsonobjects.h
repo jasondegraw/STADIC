@@ -37,27 +37,29 @@
  * OF SUCH DAMAGE.
  ****************************************************************/
 
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
-#include <string>
-#include <vector>
-#include <sstream>
-#include "stadicapi.h"
+#ifndef JSONOBJECTS_H
+#define JSONOBJECTS_H
+
 #include <boost/property_tree/ptree.hpp>
+
+#include "stadicapi.h"
 #include "logging.h"
-namespace stadic{
 
-std::vector<std::string> STADIC_API split(std::string line, char delimiter);                    //Function that splits a string given a delimiter
-std::vector<std::string> STADIC_API trimmedSplit(std::string line, char delimiter);             //Function that trims and splits a string given a delimiter
-std::string STADIC_API trim(std::string string);                                                //Function that removes whitespace from either end of a string
-double STADIC_API toDouble(const std::string &string, bool *ok = nullptr);                      //Function that takes a string and returns a double
-int STADIC_API toInteger(const std::string &string, bool *ok = nullptr);
-template <typename T> std::string toString(T value)  //Function that takes a double and returns a string
-{
-    std::stringstream stream;
-    stream << value;
-    return stream.str();
+namespace stadic {
+
+typedef boost::property_tree::ptree JsonObject;
+
+boost::optional<double> STADIC_API getDouble(const JsonObject &json, const std::string &key,
+    const std::string &errorMissing, const std::string &errorBad, Severity severity);
+boost::optional<int> STADIC_API getInt(const JsonObject &json, const std::string &key, const std::string &errorMissing,
+    const std::string &errorBad, Severity severity);
+boost::optional<std::string> STADIC_API getString(const JsonObject &json, const std::string &key,
+    const std::string &errorMissing, const std::string &errorBad, Severity severity);
+boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key, const std::string &errorMissing,
+    const std::string &errorBad, Severity severity);
+boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key,
+    const std::string &errorMissing, Severity severity);
+
 }
 
-}
-#endif // FUNCTIONS_H
+#endif

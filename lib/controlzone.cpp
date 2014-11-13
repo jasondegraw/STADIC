@@ -471,7 +471,7 @@ std::vector<std::vector<double> > ControlZone::luminaireLayout()
     return m_LuminaireLayout;
 }
 
-bool ControlZone::parseJson (const boost::property_tree::ptree json){
+bool ControlZone::parseJson (const JsonObject &json){
     boost::optional<boost::property_tree::ptree> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
@@ -496,7 +496,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         sVal.reset();
     }
     if (json.find("sensor")!=json.not_found()){
-        treeVal=getTree(json, "sensor", "The key \"sensor\" was not found with control zone named "+name()+".", Severity::Error);
+        treeVal=getObject(json, "sensor", "The key \"sensor\" was not found with control zone named "+name()+".", Severity::Error);
         if (!treeVal){
             return false;
         }else{
@@ -518,7 +518,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
                 sVal.reset();
             }
             boost::optional<boost::property_tree::ptree> treeVal2;
-            treeVal2=getTree(treeVal.get(), "location", "The key \"location\" was not found with control zone named "+name()+".", Severity::Error);
+            treeVal2=getObject(treeVal.get(), "location", "The key \"location\" was not found with control zone named "+name()+".", Severity::Error);
             if (!treeVal2){
                 return false;
             }else{
@@ -606,7 +606,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
                     sVal.reset();
                 }
             }else if (cpMethod()=="user"){
-                treeVal=getTree(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
+                treeVal=getObject(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
                 if (!treeVal){
                     return false;
                 }else{
@@ -627,7 +627,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         }
     }
     if (json.find("open_dimming")!=json.not_found()){
-        treeVal=getTree(json, "open_dimming", "", Severity::Fatal);
+        treeVal=getObject(json, "open_dimming", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -664,7 +664,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
     }
 
     if (json.find("closed_proportional")!=json.not_found()){
-        treeVal=getTree(json, "closed_proportional", "", Severity::Fatal);
+        treeVal=getObject(json, "closed_proportional", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -700,7 +700,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         treeVal.reset();
     }
     if (json.find("constant_setpoint")!=json.not_found()){
-        treeVal=getTree(json, "constant_setpoint", "", Severity::Fatal);
+        treeVal=getObject(json, "constant_setpoint", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -723,7 +723,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         treeVal.reset();
     }
     if (json.find("open_switching")!=json.not_found()){
-        treeVal=getTree(json, "open_switching", "", Severity::Fatal);
+        treeVal=getObject(json, "open_switching", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -746,7 +746,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         treeVal.reset();
     }
     if (json.find("closed_switching")!=json.not_found()){
-        treeVal=getTree(json, "closed_switching", "", Severity::Fatal);
+        treeVal=getObject(json, "closed_switching", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -769,7 +769,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         treeVal.reset();
     }
     if (json.find("user_defined_1")!=json.not_found()){
-        treeVal=getTree(json, "user_defined_1", "", Severity::Fatal);
+        treeVal=getObject(json, "user_defined_1", "", Severity::Fatal);
         if (!treeVal){
             return false;
         }else{
@@ -802,7 +802,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
     if (algorithm()=="null"){
         STADIC_LOG(Severity::Warning, "There is no algorithm specified for the control zone named \""+name()+"\".");
     }
-    treeVal=getTree(json, "luminaire_information", "The key \"luminaire_information\" is missing for the control zone named "+name()+".", Severity::Error);
+    treeVal=getObject(json, "luminaire_information", "The key \"luminaire_information\" is missing for the control zone named "+name()+".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -833,7 +833,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         }
         treeVal.reset();
     }
-    treeVal=getTree(json, "ballast_driver_information", "The key \"ballast_driver_information\" is missing for the control zone named "+name()+".", Severity::Error);
+    treeVal=getObject(json, "ballast_driver_information", "The key \"ballast_driver_information\" is missing for the control zone named "+name()+".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -894,7 +894,7 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
         treeVal.reset();
     }
 
-    treeVal=getTree(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
+    treeVal=getObject(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
     if (!treeVal){
         return false;
     }else{

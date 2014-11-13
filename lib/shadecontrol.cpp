@@ -41,6 +41,7 @@
 #include "logging.h"
 #include <iostream>
 #include "functions.h"
+#include "jsonobjects.h"
 #include <boost/optional.hpp>
 
 namespace stadic {
@@ -159,7 +160,7 @@ bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::st
         }
         dVal.reset();
     }
-    treeVal=getTree(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getObject(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -183,7 +184,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
     boost::optional<boost::property_tree::ptree> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
-    treeVal=getTree(json, "sensor", "The key \"sensor\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getObject(json, "sensor", "The key \"sensor\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -205,7 +206,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
             sVal.reset();
         }
         boost::optional<boost::property_tree::ptree> treeVal2;
-        treeVal2=getTree(treeVal.get(), "location", "The key \"location\" was not found with control method \""+method+"\".", Severity::Error);
+        treeVal2=getObject(treeVal.get(), "location", "The key \"location\" was not found with control method \""+method+"\".", Severity::Error);
         if (!treeVal2){
             return false;
         }else{
@@ -265,7 +266,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
         }
     }
     treeVal.reset();
-    treeVal=getTree(json,"signal_settings", "The key \"signal_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getObject(json,"signal_settings", "The key \"signal_settings\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{

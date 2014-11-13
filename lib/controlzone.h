@@ -42,7 +42,7 @@
 
 #include <vector>
 #include <string>
-#include <boost/property_tree/ptree.hpp>
+#include "jsonobjects.h"
 
 #include "stadicapi.h"
 
@@ -52,7 +52,7 @@ class STADIC_API ControlZone
 {
 public:
     ControlZone();
-    bool parseJson (const boost::property_tree::ptree json);
+    bool parseJson (const JsonObject &json);
     
     //Setters
     void setName(const std::string &name);

@@ -43,6 +43,7 @@
 #include <iostream>
 #include <boost/optional.hpp>
 #include "functions.h"
+#include "jsonobjects.h"
 #include "logging.h"
 
 namespace stadic {
@@ -103,7 +104,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
     }
     boost::optional<std::string> sVal;
     boost::optional<bool> bVal;
-    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<JsonObject> treeVal;
 
     sVal=getString(json, "name", "The key \"name\" within window_groups does not appear in the STADIC Control File.", "The key \"name\" within window_groups is not a string.", Severity::Error);
     if (!sVal){
@@ -134,7 +135,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
         sVal.reset();
     }
     if (isBSDF()){
-        treeVal=getTree(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
+        treeVal=getObject(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
         }else{
@@ -151,7 +152,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
         }
     }
 
-    treeVal=getTree(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
+    treeVal=getObject(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -167,7 +168,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
         treeVal.reset();
     }
 
-    treeVal=getTree(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
+    treeVal=getObject(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
     if (!treeVal){
         STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
     }else{
@@ -184,7 +185,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
     }
 
     if (shadeSettingGeometry().size()>0){
-        treeVal=getTree(json, "shade_control", "The key \"shade_control\" within window group " + name() + " is missing.", Severity::Warning);
+        treeVal=getObject(json, "shade_control", "The key \"shade_control\" within window group " + name() + " is missing.", Severity::Warning);
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed there is no shade control needed for windows within window group "+name()+".");
         }else{
@@ -196,7 +197,7 @@ bool WindowGroup::parseJson(const boost::property_tree::ptree json){
     }
 
     if (isBSDF() && shadeSettingGeometry().size()>0){
-        treeVal=getTree(json, "bsdf_setting_layers", "The key \"bsdf_setting_layers\" within window group " + name() + " is missing.", Severity::Info);
+        treeVal=getObject(json, "bsdf_setting_layers", "The key \"bsdf_setting_layers\" within window group " + name() + " is missing.", Severity::Info);
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
         }else{

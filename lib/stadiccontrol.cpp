@@ -721,7 +721,7 @@ bool Control::parseJson(std::string file){
         sVal.reset();
     }
 
-    treeVal=getTree(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
+    treeVal=getObject(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -820,7 +820,7 @@ bool Control::parseJson(std::string file){
         bVal.reset();
     }
 
-    treeVal=getTree(json, "radiance_parameters", "The key \"radiance_parameters\" does not appear in the STADIC Control File.", Severity::Info);
+    treeVal=getObject(json, "radiance_parameters", "The key \"radiance_parameters\" does not appear in the STADIC Control File.", Severity::Info);
     if (!treeVal){
         STADIC_LOG(Severity::Info, "The default radiance parameters will be set.");
         if (!setDefaultRadianceParameters()){
@@ -989,7 +989,7 @@ bool Control::parseJson(std::string file){
     //******************
     //Lighting Control
     //******************
-    treeVal=getTree(json, "control_zones", "The key \"control_zones\" does not appear in the STADIC Control File.", Severity::Error);
+    treeVal=getObject(json, "control_zones", "The key \"control_zones\" does not appear in the STADIC Control File.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -1007,7 +1007,7 @@ bool Control::parseJson(std::string file){
     //******************
     //Metrics
     //******************
-    treeVal=getTree(json, "sDA", "The key \"sDA\" does not appear in the STADIC Control File.", Severity::Info);
+    treeVal=getObject(json, "sDA", "The key \"sDA\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double illum, frac, startTime, endTime;
         dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" is missing under sDA.", "The key \"illuminance\" does not contain a number.", Severity::Warning);
@@ -1047,7 +1047,7 @@ bool Control::parseJson(std::string file){
     }
     treeVal.reset();
 
-    treeVal=getTree(json, "occupied_sDA", "The key \"occupied_sDA\" does not appear in the STADIC Control File.", Severity::Info);
+    treeVal=getObject(json, "occupied_sDA", "The key \"occupied_sDA\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double illum, frac;
         dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" is missing under occupied_sDA.", "The key \"illuminance\" does not contain a number.", Severity::Warning);
@@ -1094,7 +1094,7 @@ bool Control::parseJson(std::string file){
     }
     bVal.reset();
 
-    treeVal=getTree(json, "UDI", "The key \"UDI\" does not appear in the STADIC Control File.", Severity::Info);
+    treeVal=getObject(json, "UDI", "The key \"UDI\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double minimum, maximum;
         dVal=getDouble(treeVal.get(), "minimum", "The key \"minimum\" is missing under UDI.", "The key \"minimum\" does not contain a number.", Severity::Warning);
