@@ -148,8 +148,8 @@ std::string ShadeControl::sensorFile(){
     return m_SensorFile;
 }
 
-bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::string method){
-    boost::optional<boost::property_tree::ptree> treeVal;
+bool ShadeControl::readAutoProf(const JsonObject &json, std::string method){
+    boost::optional<JsonObject> treeVal;
     boost::optional<double> dVal;
     dVal=getDouble(json, "elevation_azimuth", "The key \"elevation_azimuth\" was not found with control method \""+method+"\".","The key \"elevation_azimuth\" does not contain a number.", Severity::Error);
     if (!dVal){
@@ -164,7 +164,7 @@ bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::st
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             dVal=getDouble(v.second, "", "", "", Severity::Fatal);
             if (dVal){
                 if (!setAngleSettings(dVal.get())){
@@ -180,7 +180,7 @@ bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::st
     return true;
 }
 
-bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::string method){
+bool ShadeControl::readAutoSign(const JsonObject &json, std::string method){
     boost::optional<boost::property_tree::ptree> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
@@ -270,7 +270,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             dVal=getDouble(v.second, "", "", "", Severity::Fatal);
             if (dVal){
                 if (!setSignalSettings(dVal.get())){
@@ -292,7 +292,7 @@ bool ShadeControl::parseJson(const JsonObject &json){
         return false;
     }
     boost::optional<std::string> sVal;
-    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<JsonObject> treeVal;
     sVal=getString(json, "method", "The key \"method\" does not appear in the STADIC Control File for shade control.", "The key \"method\" is not a string." ,Severity::Info);
     if (!sVal){
         STADIC_LOG(Severity::Error, "There was a proble with the keyword \"method\".");

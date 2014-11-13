@@ -111,20 +111,10 @@ bool WindowGroup::parseJson(const JsonObject &json){
         return false;
     }else{
         setName(sVal.get());
-        sVal.reset();
     }
-    if (json.find("BSDF")!=json.not_found()){
-        bVal=getBool(json, "BSDF", "The key \"BSDF\" within window group " +name()+ " is missing.", "The key \"BSDF\" within window group " + name() + " is not a bool.", Severity::Info);
-        if (!bVal){
-            STADIC_LOG(Severity::Info, "It is assumed there are no BSDFs for window group "+name()+".");
-            setBSDF(false);
-        }else{
-            setBSDF(bVal.get());
-            bVal.reset();
-        }
-    }else{
-        setBSDF(false);
-    }
+
+    bVal = getBool(json, "BSDF", false, "The key \"BSDF\" within window group " + name() + " is not a bool, assuming no BSDFs for window group " + name() + ".", Severity::Info);
+    setBSDF(bVal.get());
 
     sVal=getString(json, "base_geometry", "The key \"base_geometry\" within window group "+name()+" is missing.", "The key \"base_geometry\" within window group " + name() + " is not a string.", Severity::Info);
     if (!sVal){
@@ -132,23 +122,21 @@ bool WindowGroup::parseJson(const JsonObject &json){
         setBaseGeometry("empty.rad");
     }else{
         setBaseGeometry(sVal.get());
-        sVal.reset();
     }
+
     if (isBSDF()){
         treeVal=getObject(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
         }else{
-            for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            for(auto &v : treeVal.get()){
                 sVal = getString(v.second, "", "", "", Severity::Fatal);
                 if (sVal){
                     m_BSDFBaseLayers.push_back(sVal.get());
                 }else{
                     STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_base_layers key for window group "+name()+".");
                 }
-                sVal.reset();
             }
-            treeVal.reset();
         }
     }
 
@@ -156,32 +144,28 @@ bool WindowGroup::parseJson(const JsonObject &json){
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             sVal=getString(v.second, "", "", "", Severity::Fatal);
             if (sVal){
                 m_GlazingLayers.push_back(sVal.get());
             }else{
                 STADIC_LOG(Severity::Warning, "There was a problem reading the glazing_layers key for window group "+name()+".");
             }
-            sVal.reset();
         }
-        treeVal.reset();
     }
 
     treeVal=getObject(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
     if (!treeVal){
         STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             sVal=getString(v.second, "", "", "", Severity::Fatal);
             if (sVal){
                 m_ShadeSettingGeometry.push_back(sVal.get());
             }else{
                 STADIC_LOG(Severity::Warning, "There was a problem reading the shade_settings key for window group "+name()+".");
             }
-            sVal.reset();
         }
-        treeVal.reset();
     }
 
     if (shadeSettingGeometry().size()>0){
@@ -192,7 +176,6 @@ bool WindowGroup::parseJson(const JsonObject &json){
             if (!m_ShadeControl.parseJson(treeVal.get())){
                 return false;
             }
-            treeVal.reset();
         }
     }
 
@@ -201,20 +184,18 @@ bool WindowGroup::parseJson(const JsonObject &json){
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
         }else{
-            for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+            for(auto &v : treeVal.get()){
                 std::vector<std::string> tempVector;
-                for (boost::property_tree::ptree::value_type &v2 : v.second){
+                for (auto &v2 : v.second){
                     sVal=getString(v2.second, "", "", "", Severity::Fatal);
                     if (sVal){
                         tempVector.push_back(sVal.get());
                     }else{
                         STADIC_LOG(Severity::Warning, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".");
                     }
-                    sVal.reset();
                 }
                 m_BSDFSettingLayers.push_back(tempVector);
             }
-            treeVal.reset();
         }
     }
     return true;
