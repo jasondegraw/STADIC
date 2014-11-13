@@ -97,6 +97,17 @@ boost::optional<bool> getBool(const JsonObject &json, const std::string &key, co
     return bVal;
 }
 
+boost::optional<JsonObject> getObject(const JsonObject &json, const std::string &key)
+{
+    boost::property_tree::ptree treeVal;
+    try {
+        treeVal = json.get_child(key);
+    } catch(const boost::property_tree::ptree_bad_path &) {
+        return boost::none;
+    }
+    return boost::optional<boost::property_tree::ptree>(treeVal);
+}
+
 boost::optional<JsonObject> getObject(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, Severity severity)
 {

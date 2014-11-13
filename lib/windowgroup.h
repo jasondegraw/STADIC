@@ -44,7 +44,7 @@
 #include <vector>
 #include "shadecontrol.h"
 #include "stadicapi.h"
-#include <boost/property_tree/ptree.hpp>
+#include "jsonobjects.h"
 
 namespace stadic {
 
@@ -53,7 +53,7 @@ class STADIC_API WindowGroup
 public:
     WindowGroup();
     //bool parseJson(const QJsonObject &object);
-    bool parseJson(const boost::property_tree::ptree json);
+    bool parseJson(const JsonObject &json);
 
     //  Setters
     void setName(const std::string &name);

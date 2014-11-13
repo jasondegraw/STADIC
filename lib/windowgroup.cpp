@@ -97,7 +97,7 @@ ShadeControl* WindowGroup::shadeControl()
     return &m_ShadeControl;
 }
 
-bool WindowGroup::parseJson(const boost::property_tree::ptree json){
+bool WindowGroup::parseJson(const JsonObject &json){
     if (json.empty()){
         STADIC_LOG(Severity::Error, "The window group does not contain data.");
         return false;

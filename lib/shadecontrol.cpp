@@ -286,7 +286,7 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
     return true;
 }
 
-bool ShadeControl::parseJson (const boost::property_tree::ptree &json){
+bool ShadeControl::parseJson(const JsonObject &json){
     if (json.empty()){
         STADIC_LOG(Severity::Error, "The window group does not contain data.");
         return false;

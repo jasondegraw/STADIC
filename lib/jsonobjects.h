@@ -57,6 +57,7 @@ boost::optional<std::string> STADIC_API getString(const JsonObject &json, const 
     const std::string &errorMissing, const std::string &errorBad, Severity severity);
 boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity);
+boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key);
 boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, Severity severity);
 
