@@ -28,21 +28,21 @@ Set the csv formatted output file name to
 .TP
 .BI -f \ name
 Set the input file name containing the RADIANCE primitives to 
-.I name.
+.IR name .
 Multiple files may be listed, however each file must have the '-f' option 
 preceding it.
 .TP
 .BI -l \ name
 Set the layer name that will be used to find the polygons for use in creating
 the analysis grid to 
-.I name.
+.IR name .
 This layer name is equivalent to the modifier for the RADIANCE primitive of 
 interest.  Multiple layer names may be listed, however each name must have 
 the '-l' option preceding it.
 .TP
 .BI -o \ val
 Set the overall offset to 
-.I val.
+.IR val .
 A positive value will create an inset of the chosen polygons after they have
 been joined together.  This will create a shape similar to that of the joined
 polygons only smaller.  This may be useful for ignoring circulation space at
@@ -50,34 +50,33 @@ the boundary of a room.
 .TP
 .BI -ox \ val
 Set the offset in the x direction to 
-.I
-val.
+.IR val .
 The minimum and maximum x coordinate values for the bounding box of the
 chosen polygons will changed by this value.
 A positive value will move the extents towards the middle of the polygon.
 .TP
 .BI -oy \ val
 Set the offset in the y direction to 
-.I val.
+.IR val .
 The minimum and maximum y coordinate values for the bounding box of the chosen
 polygons will changed by this value.
 A positive value will move the extents towards the middle of the polygon.
 .TP
 .BI -oz \ val
 Set the offset in the z direction to 
-.I val.
+.IR val .
 The height of each analysis point will be set based on the average z height
 of the polygon for which it was created.
 .TP
 .BI -r \ name
 Set the output file name to  
-.I name.
+.IR name .
 The default output is the standard output.  The output will be sent to the
 standard output if this option is not set.
 .TP
 .BI -sx \ val
 Set the spacing in the x direction to 
-.I val.
+.IR val .
 This option is required.
 .TP
 .BI -sy \ val
@@ -87,17 +86,17 @@ This option is required.
 .TP
 .BI -t \ val
 Set the threshold distance to  
-.I val.
+.IR val .
 This option allows for geometry, that would be invalid due to offsets, to be
 ignored if the both dimensions are less than
-.I val.
+.IR val .
 This could be useful for ignoring stair treads, but allowing larger polygons
 with the same layer name.
 .TP
 .BI -vne \ location
 Set the directory that the files should be placed for creating a north-east
 isometric bitmap to  
-.I location.
+.IR location .
 This creates a preview of the analysis points as red spheres along with the
 geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
 and ra_bmp. A file named 'grid.bmp' will be found within 
@@ -108,7 +107,7 @@ levels.
 .BI -vnw \ location
 Set the directory that the files should be placed for creating a north-west
 isometric bitmap to  
-.I location.
+.IR location .
 This creates a preview of the analysis points as red spheres along with the
 geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
 and ra_bmp. A file named 'grid.bmp' will be found within 
@@ -119,7 +118,7 @@ levels.
 .BI -vp \ location
 Set the directory that the files should be placed for creating a parallel
 projection bitmap to  
-.I location.
+.IR location .
 This creates a preview of the analysis points as red spheres along with the
 geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
 and ra_bmp. A file named 'grid.bmp' will be found within 
@@ -128,8 +127,8 @@ upon completion.  This view is useful for single plane points.
 .TP
 .BI -vse \ location
 Set the directory that the files should be placed for creating a south-east
- isometric bitmap to  
-.I location.
+isometric bitmap to  
+.IR location .
 This creates a preview of the analysis points as red spheres along with the
 geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
 and ra_bmp. A file named 'grid.bmp'will be found within 
@@ -140,20 +139,20 @@ levels.
 .BI -vsw \ location
 Set the directory that the files should be placed for creating a south-west
 isometric bitmap to  
-.I location.
+.IR location .
 This creates a preview of the analysis points as red spheres along with the
 geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
- and ra_bmp. A file named 'grid.bmp' will be found within 
+and ra_bmp. A file named 'grid.bmp' will be found within 
 .I location
 upon completion.  This view is useful for overlapping geometry at multiple
 levels.
 .TP
 .BI -z \ val
 Set the absolute height of the analysis points to 
-.I val.
+.IR val .
 This is a global setting for all points.  Each of the created points will be
 set to the global value of 
-.I val.
+.IR val .
 .SH EXAMPLES
 To create a points file that is written to the standard output with spacing
 of 24 units in both directions and an inset of 24 units around the boundary
