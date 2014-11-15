@@ -14,111 +14,158 @@ Output for each point is:
 
 	xorg yorg zorg xdir ydir zdir
 .PP
-The points file will be generated from the geometry described by the chosen modifiers.
-The points will then be evenly distributed based on a spacing in the x and y directions as well
-as offsets from the boundaries of the geometry.	
+The points file will be generated from the geometry described by the chosen
+modifiers.  The points will then be evenly distributed based on a spacing in
+the x and y directions as well as offsets from the boundaries of the geometry.	
 .PP
 Options are given on the command line.
 All options are followed by one argument, which must be
 separated from the option by white space.
 .TP 10n
-.BI -f name
+.BI -csv \ name
+Set the csv formatted output file name to  
+.I name.
+.TP
+.BI -f \ name
 Set the input file name containing the RADIANCE primitives to 
-.I name
-.  Multiple files may be listed, however each file must have the '-f' option preceding it.
+.I name.
+Multiple files may be listed, however each file must have the '-f' option 
+preceding it.
 .TP
-.BI -sx \ val
-Set the spacing in the x direction to 
-.I val .  '-sx' is required.
+.BI -l \ name
+Set the layer name that will be used to find the polygons for use in creating
+the analysis grid to 
+.I name.
+This layer name is equivalent to the modifier for the RADIANCE primitive of 
+interest.  Multiple layer names may be listed, however each name must have 
+the '-l' option preceding it.
 .TP
-.BI -sy \ val
-Set the spacing in the y direction to 
-.I val .  '-sy' is required.
+.BI -o \ val
+Set the overall offset to 
+.I val.
+A positive value will create an inset of the chosen polygons after they have
+been joined together.  This will create a shape similar to that of the joined
+polygons only smaller.  This may be useful for ignoring circulation space at
+the boundary of a room.
 .TP
 .BI -ox \ val
 Set the offset in the x direction to 
-.I val .  The minimum and maximum x coordinate values for the bounding box of the chosen polygons will changed by this value.
+.I
+val.
+The minimum and maximum x coordinate values for the bounding box of the
+chosen polygons will changed by this value.
 A positive value will move the extents towards the middle of the polygon.
 .TP
 .BI -oy \ val
 Set the offset in the y direction to 
-.I val .  The minimum and maximum y coordinate values for the bounding box of the chosen polygons will changed by this value.
+.I val.
+The minimum and maximum y coordinate values for the bounding box of the chosen
+polygons will changed by this value.
 A positive value will move the extents towards the middle of the polygon.
-.TP
-.BI -o \ val
-Set the overall offset to 
-.I val .  A positive value will create an inset of the chosen polygons after they have been joined together.
-This will create a shape similar to that of the joined polygons only smaller. This may be useful for ignoring circulation space
-at the boundary of a room.
 .TP
 .BI -oz \ val
 Set the offset in the z direction to 
-.I val .  The height of each analysis point will be set based on the average z height of the polygon for which it was created.
-.TP
-.BI -z \ val
-Set the absolute height of the analysis points to 
-.I val .  This is a global setting for all points.  Each of the created points will be set to the global value of 
-.I val .
-.TP
-.BI -l \ name
-Set the layer name that will be used to find the polygons for use in creating the analysis grid to 
-.I name .  This layer name is equivalent to the modifier for the RADIANCE primitive of interest.  Multiple layer names may 
-be listed, however each name must have the '-l' option preceding it.
-.TP
-.BI -t \ val
-Set the threshold distance to  
-.I val .  This option allows for geometry, that would be invalid due to offsets, to be ignored if the both dimensions are less than
-.I val .  This could be useful for ignoring stair treads, but allowing larger polygons with the same layer name.
+.I val.
+The height of each analysis point will be set based on the average z height
+of the polygon for which it was created.
 .TP
 .BI -r \ name
 Set the output file name to  
-.I name .  The default output is the standard output.  The output will be sent to the standard output if this option is not set.
+.I name.
+The default output is the standard output.  The output will be sent to the
+standard output if this option is not set.
 .TP
-.BI -vp \ location
-Set the directory that the files should be placed for creating a parallel projection bitmap to  
-.I location .  This creates a preview of the analysis points as red spheres along with the geometry within the chosen layers.
-This preview requires oconv, rpict, pfilt, and ra_bmp. A file named 'grid.bmp' will be found within 
-.I location upon completion.  This view is useful for single plane points. 
+.BI -sx \ val
+Set the spacing in the x direction to 
+.I val.
+This option is required.
 .TP
-.BI -vse \ location
-Set the directory that the files should be placed for creating a south-east isometric bitmap to  
-.I location .  This creates a preview of the analysis points as red spheres along with the geometry within the chosen layers.
-This preview requires oconv, rpict, pfilt, and ra_bmp. A file named 'grid.bmp' will be found within 
-.I location upon completion.  This view is useful for overlapping geometry at multiple levels.
+.BI -sy \ val
+Set the spacing in the y direction to 
+.I val.
+This option is required.
 .TP
-.BI -vsw \ location
-Set the directory that the files should be placed for creating a south-west isometric bitmap to  
-.I location .  This creates a preview of the analysis points as red spheres along with the geometry within the chosen layers.
-This preview requires oconv, rpict, pfilt, and ra_bmp. A file named 'grid.bmp' will be found within 
-.I location upon completion.  This view is useful for overlapping geometry at multiple levels.
+.BI -t \ val
+Set the threshold distance to  
+.I val.
+This option allows for geometry, that would be invalid due to offsets, to be
+ignored if the both dimensions are less than
+.I val.
+This could be useful for ignoring stair treads, but allowing larger polygons
+with the same layer name.
 .TP
 .BI -vne \ location
-Set the directory that the files should be placed for creating a north-east isometric bitmap to  
-.I location .  This creates a preview of the analysis points as red spheres along with the geometry within the chosen layers.
-This preview requires oconv, rpict, pfilt, and ra_bmp. A file named 'grid.bmp' will be found within 
-.I location upon completion.  This view is useful for overlapping geometry at multiple levels.
+Set the directory that the files should be placed for creating a north-east
+isometric bitmap to  
+.I location.
+This creates a preview of the analysis points as red spheres along with the
+geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
+and ra_bmp. A file named 'grid.bmp' will be found within 
+.I location
+upon completion.  This view is useful for overlapping geometry at multiple
+levels.
 .TP
 .BI -vnw \ location
-Set the directory that the files should be placed for creating a north-west isometric bitmap to  
-.I location .  This creates a preview of the analysis points as red spheres along with the geometry within the chosen layers.
-This preview requires oconv, rpict, pfilt, and ra_bmp. A file named 'grid.bmp' will be found within 
-.I location upon completion.  This view is useful for overlapping geometry at multiple levels.
+Set the directory that the files should be placed for creating a north-west
+isometric bitmap to  
+.I location.
+This creates a preview of the analysis points as red spheres along with the
+geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
+and ra_bmp. A file named 'grid.bmp' will be found within 
+.I location
+upon completion.  This view is useful for overlapping geometry at multiple
+levels.
 .TP
-.BI -csv \ name
-Set the csv formatted output file name to  
-.I name .
+.BI -vp \ location
+Set the directory that the files should be placed for creating a parallel
+projection bitmap to  
+.I location.
+This creates a preview of the analysis points as red spheres along with the
+geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
+and ra_bmp. A file named 'grid.bmp' will be found within 
+.I location
+upon completion.  This view is useful for single plane points.
 .TP
+.BI -vse \ location
+Set the directory that the files should be placed for creating a south-east
+ isometric bitmap to  
+.I location.
+This creates a preview of the analysis points as red spheres along with the
+geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
+and ra_bmp. A file named 'grid.bmp'will be found within 
+.I location
+upon completion.  This view is useful for overlapping geometry at multiple
+levels.
+.TP
+.BI -vsw \ location
+Set the directory that the files should be placed for creating a south-west
+isometric bitmap to  
+.I location.
+This creates a preview of the analysis points as red spheres along with the
+geometry within the chosen layers.  This preview requires oconv, rpict, pfilt,
+ and ra_bmp. A file named 'grid.bmp' will be found within 
+.I location
+upon completion.  This view is useful for overlapping geometry at multiple
+levels.
+.TP
+.BI -z \ val
+Set the absolute height of the analysis points to 
+.I val.
+This is a global setting for all points.  Each of the created points will be
+set to the global value of 
+.I val.
 .SH EXAMPLES
-To create a points file that is written to the standard output with spacing of 24 units in both directions and an inset of 24 units around the 
-boundary of the polygons and the points placed at a height of 30 units above the polygons named 'floor':
+To create a points file that is written to the standard output with spacing
+of 24 units in both directions and an inset of 24 units around the boundary
+of the polygons and the points placed at a height of 30 units above the 
+polygons named 'floor':
 .IP "" .2i
 dxgridmaker \-f scene.rad \-sx 24 \-sy 24 \-o 24 \-oz 30 \-l floor > grid.pts
 .PP
-To create a points file that is written to a chosen file location and an absolute z height using a bounding box offset:
+To create a points file that is written to a chosen file location and an absolute
+z height using a bounding box offset:
 .IP "" .2i
 dxgridmaker \-f scene.rad \-sx 2 \-sy 2 \-ox 1 \-oy 1 \-z 2.5 \-l floor \-l floor2 \-r calcpoints.pts
-.SH ENVIRONMENT
-RAYPATH		the directories to check for auxiliary files.
 .SH AUTHOR
 Craig Casey
 .SH "SEE ALSO"
