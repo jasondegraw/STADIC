@@ -1,0 +1,17 @@
+# Metal materials for testing
+
+void trans l_trans0
+0
+0
+7 0.75 0.75 0.75 0.01 0.01 0.02 0.03
+
+void trans l_trans1
+0
+0
+7 0.75 0.75 0.75 0.01 0.01 100.0 0.03
+
+void trans l_trans2
+0
+0
+7 0.5 0.5 0.5 0.01 0.01 0.02 0.03
+

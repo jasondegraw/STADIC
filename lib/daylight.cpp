@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -179,8 +179,8 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
         nSuns=5185;
     }
 
-    FilePath tempFile=model->tmpFolder()+model->projectName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
-    if (!tempFile.exists()){
+    std::string tempFile=model->tmpFolder()+model->projectName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
+    if(!isFile(tempFile)){
         arguments.clear();
         arguments.push_back(std::to_string(nSuns));
         std::string cntProgram="cnt";
@@ -688,8 +688,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }else if (model->sunDivisions()==6){
         nSuns=5185;
     } 
-    FilePath tempFile=model->tmpFolder()+model->projectName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
-    if (!tempFile.exists()){
+    std::string tempFile=model->tmpFolder()+model->projectName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
+    if(!isFile(tempFile)){
         arguments.clear();
         arguments.push_back(std::to_string(nSuns));
         std::string cntProgram="cnt";
@@ -1866,16 +1866,14 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         FinalIllFileName=model->projectFolder()+model->resultsFolder()+model->projectName()+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
         DaylightIlluminanceData baseIll;
-        FilePath checkFile(tempFileName);
-        if (checkFile.isFile()){
+        if(isFile(tempFileName)){
             if (!baseIll.parse(tempFileName,model->weaDataFile())){
                 return false;
             }
             if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
                 for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
                     tempFileName==model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+".ill";
-                    FilePath checkFile2(tempFileName);
-                    if (checkFile2.isFile()){
+                    if(isFile(tempFileName)){
                         if (!baseIll.addIllFile(tempFileName)){
                             return false;
                         }
@@ -1885,8 +1883,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             baseIll.writeIllFileLux(FinalIllFileName);
         }else{
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
-            FilePath checkFile2(tempFileName);
-            if (checkFile2.isFile()){
+            if(isFile(tempFileName)){
                 if (!baseIll.parse(tempFileName, model->weaDataFile())){
                     return false;
                 }
@@ -1908,8 +1905,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             DaylightIlluminanceData settingIll;
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
             FinalIllFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
-            FilePath checkFile2(tempFileName);
-            if (checkFile2.isFile()){
+            if(isFile(tempFileName)){
                 if (!settingIll.parse(tempFileName,model->weaDataFile())){
                     return false;
                 }
@@ -1922,8 +1918,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                 settingIll.writeIllFileLux(FinalIllFileName);
             }else{
                 tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
-                FilePath checkFile3(tempFileName);
-                if (checkFile3.isFile()){
+                if(isFile(tempFileName)){
                     if (!settingIll.parse(tempFileName,model->weaDataFile())){
                         return false;
                     }

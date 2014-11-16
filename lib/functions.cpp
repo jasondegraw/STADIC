@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -88,6 +88,9 @@ std::vector<std::string> trimmedSplit(std::string line, char delimiter)
 std::string trim(std::string string)
 {
     std::size_t found=string.find_first_not_of(" \t\f\v\n\r");
+    if(found >= string.length()) {
+        return std::string();
+    }
     if (found!=string.npos){
         string.erase(string.begin(),string.begin()+found);
     }
@@ -137,80 +140,5 @@ int toInteger(const std::string &string, bool *ok)
     }
     return value;
 }
-
-std::string toString(double value)
-{
-    std::stringstream stream;
-    stream << value;
-    return stream.str();
-}
-
-boost::optional<double> getDouble(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<double> dVal;
-    try{
-        dVal=json.get<double>(key);
-    } catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-    } catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-    }
-    return dVal;
-}
-
-boost::optional<int> getInt(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<int> iVal;
-    try{
-        iVal=json.get<int>(key);
-    } catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-    } catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-    }
-    return iVal;
-}
-
-boost::optional<std::string> getString(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<std::string> sVal;
-    try{
-        sVal=json.get<std::string>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-    }
-    return sVal;
-}
-
-boost::optional<bool> getBool(boost::property_tree::ptree json, std::string key, std::string errorMissing, std::string errorBad, Severity severity)
-{
-    boost::optional<bool> bVal;
-    try{
-        bVal=json.get<bool>(key);
-    }catch (const boost::property_tree::ptree_bad_path &){
-        STADIC_LOG(severity, errorMissing);
-    }catch (const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-    }
-    return bVal;
-}
-
-boost::optional<boost::property_tree::ptree> getTree(boost::property_tree::ptree json, std::string key, std::string errorMissing, Severity severity)
-{
-    boost::property_tree::ptree treeVal;
-    try {
-        treeVal = json.get_child(key);
-    } catch(const boost::property_tree::ptree_bad_path &) {
-        STADIC_LOG(severity, errorMissing);
-        return boost::none;
-    }
-    return boost::optional<boost::property_tree::ptree>(treeVal);
-}
-
-
-
-
 
 }

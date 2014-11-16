@@ -1,0 +1,17 @@
+# Glass materials for testing
+
+void glass l_window
+0
+0
+3 .65 .65 .65
+
+void glass l_windoooooow
+0
+0
+3 .65 .65 6.5
+
+void glass l_other
+0
+0
+3 .65 .65 .65
+

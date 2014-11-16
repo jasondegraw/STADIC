@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(lib)
 
-include_directories("../")
+#include_directories("../" "../dependencies/jsoncpp")
+
+set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
 
 set(SRCS stadiccontrol.cpp
          windowgroup.cpp
@@ -22,7 +24,8 @@ set(SRCS stadiccontrol.cpp
          functions.cpp
          filepath.cpp
          analemma.cpp
-         stadicprocess.cpp)
+         stadicprocess.cpp
+         jsonobjects.cpp)
 		 
 set(HDRS stadicapi.h
          stadiccontrol.h
@@ -43,6 +46,7 @@ set(HDRS stadicapi.h
          functions.h
          filepath.h
          analemma.h
-         stadicprocess.h)
+         stadicprocess.h
+         jsonobjects.h)
 
-add_library(stadic_core SHARED ${HDRS} ${SRCS})
+ add_library(stadic_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})

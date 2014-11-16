@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -44,6 +44,23 @@
 
 TEST(PrimitiveTests, Plastic)
 {
+    // Test no argument constructor
+    stadic::PlasticMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+
+    // Test bad arguments to constructor
+    stadic::PlasticMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+
+    // Test regular construction
     stadic::PlasticMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75);
     EXPECT_EQ(stadic::RadPrimitive::Plastic, rad.type());
     EXPECT_EQ("plastic", rad.typeString());
@@ -56,11 +73,7 @@ TEST(PrimitiveTests, Plastic)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
+    EXPECT_FALSE(rad.setArg3("Not a number",4));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -71,18 +84,28 @@ TEST(PrimitiveTests, Plastic)
     EXPECT_EQ(0.1, rad.blue());
     EXPECT_EQ(0.5, rad.specularity());
     EXPECT_EQ(0.75, rad.roughness());
-    // Bad constructor args
-    stadic::PlasticMaterial rad2(1.2, 1.8, 1.1, 1.5, 1.75);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.green());
-    EXPECT_EQ(0, rad2.blue());
-    EXPECT_EQ(0, rad2.specularity());
-    EXPECT_EQ(0, rad2.roughness());
+ 
 }
 
 TEST(PrimitiveTests, Metal)
 {
+    // Test no argument constructor
+    stadic::MetalMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+
+    // Test bad arguments to constructor
+    stadic::MetalMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+
+    // Test regular construction
     stadic::MetalMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75);
     EXPECT_EQ(stadic::RadPrimitive::Metal, rad.type());
     EXPECT_EQ("metal", rad.typeString());
@@ -95,11 +118,6 @@ TEST(PrimitiveTests, Metal)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -110,14 +128,33 @@ TEST(PrimitiveTests, Metal)
     EXPECT_EQ(0.1, rad.blue());
     EXPECT_EQ(0.5, rad.specularity());
     EXPECT_EQ(0.75, rad.roughness());
-    // Bad constructor args
-    stadic::MetalMaterial rad2(1.2, 0.8, 0.1, 0.5, 0.75);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0.8, rad2.green());
 }
 
 TEST(PrimitiveTests, Trans)
 {
+    // Test no argument constructor
+    stadic::TransMaterial noargs;
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.red());
+    EXPECT_EQ(0, noargs.green());
+    EXPECT_EQ(0, noargs.blue());
+    EXPECT_EQ(0, noargs.specularity());
+    EXPECT_EQ(0, noargs.roughness());
+    EXPECT_EQ(0, noargs.transmissivity());
+    EXPECT_EQ(0, noargs.transSpecular());
+
+    // Test bad arguments to constructor
+    stadic::TransMaterial badargs(1.2, 1.8, 1.1, 1.5, 1.75, 1.2, 1.1);
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.red());
+    EXPECT_EQ(0, badargs.green());
+    EXPECT_EQ(0, badargs.blue());
+    EXPECT_EQ(0, badargs.specularity());
+    EXPECT_EQ(0, badargs.roughness());
+    EXPECT_EQ(0, badargs.transmissivity());
+    EXPECT_EQ(0, badargs.transSpecular());
+
+    // Test regular construction
     stadic::TransMaterial rad(0.2, 0.8, 0.1, 0.5, 0.75, 0.2, 0.1);
     EXPECT_EQ(stadic::RadPrimitive::Trans, rad.type());
     EXPECT_EQ("trans", rad.typeString());
@@ -130,13 +167,8 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ("0.1", rad.getArg3(2));
     EXPECT_EQ("0.5", rad.getArg3(3));
     EXPECT_EQ("0.75", rad.getArg3(4));
-    EXPECT_EQ("0.2", rad.getArg(3, 0));
-    EXPECT_EQ("0.8", rad.getArg(3, 1));
-    EXPECT_EQ("0.1", rad.getArg(3, 2));
-    EXPECT_EQ("0.5", rad.getArg(3, 3));
-    EXPECT_EQ("0.75", rad.getArg(3, 4));
-    EXPECT_EQ("0.2", rad.getArg(3, 5));
-    EXPECT_EQ("0.1", rad.getArg(3, 6));
+    EXPECT_EQ("0.2", rad.getArg3(5));
+    EXPECT_EQ("0.1", rad.getArg3(6));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_FALSE(rad.setRed(250));
@@ -151,44 +183,82 @@ TEST(PrimitiveTests, Trans)
     EXPECT_EQ(0.1, rad.transSpecular());
     // Bad constructor args
     stadic::TransMaterial rad2(1.2, 1.8, 1.1, 1.5, 1.75, 1.2, 1.1);
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.red());
-    EXPECT_EQ(0, rad2.green());
-    EXPECT_EQ(0, rad2.blue());
-    EXPECT_EQ(0, rad2.specularity());
-    EXPECT_EQ(0, rad2.roughness());
-    EXPECT_EQ(0, rad2.transmissivity());
-    EXPECT_EQ(0, rad2.transSpecular());
+    
 }
-TEST(PrimitiveTests, glass)
-{
 
+TEST(PrimitiveTests, Glass)
+{
+    // Test no argument constructor
+    stadic::GlassMaterial noargs;
+    EXPECT_EQ(0, noargs.redTrans());
+    EXPECT_EQ(0, noargs.greenTrans());
+    EXPECT_EQ(0, noargs.blueTrans());
+    EXPECT_EQ(1.52, noargs.refraction());
+
+    // Test bad arguments to constructor
+    stadic::GlassMaterial badargs(1.6, 1.7, 1.5);
+    EXPECT_EQ(0, badargs.redTrans());
+    EXPECT_EQ(0, badargs.greenTrans());
+    EXPECT_EQ(0, badargs.blueTrans());
+    EXPECT_EQ(1.52, badargs.refraction());
+
+    // Test 3 arguments to constructor
     stadic::GlassMaterial rad(0.6, 0.7, 0.5);
     EXPECT_EQ(stadic::RadPrimitive::Glass, rad.type());
     EXPECT_EQ("glass", rad.typeString());
-    // Arg checks
     EXPECT_EQ(0, rad.arg1().size());
     EXPECT_EQ(0, rad.arg2().size());
-    ASSERT_EQ(4, rad.arg3().size());
+    ASSERT_EQ(3, rad.arg3().size());
     EXPECT_EQ("0.6", rad.getArg3(0));
     EXPECT_EQ("0.7", rad.getArg3(1));
     EXPECT_EQ("0.5", rad.getArg3(2));
-    EXPECT_EQ("1.52", rad.getArg3(3));
-    EXPECT_EQ("0.6", rad.getArg(3, 0));
-    EXPECT_EQ("0.7", rad.getArg(3, 1));
-    EXPECT_EQ("0.5", rad.getArg(3, 2));
-    EXPECT_EQ("1.52", rad.getArg(3, 3));
 
-    // Miscellaneous checks
+    // Expand the third argument list by one
+    EXPECT_EQ(1.52, rad.refraction());
+    rad.setRefraction(1.51);
+    ASSERT_EQ(4, rad.arg3().size());
+    EXPECT_EQ(1.51, rad.refraction());
+
+    // Test getters and setters
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_EQ(0.6, rad.redTrans());
     EXPECT_EQ(0.7, rad.greenTrans());
     EXPECT_EQ(0.5, rad.blueTrans());
-    EXPECT_EQ(1.52, rad.refraction());
+    EXPECT_EQ(1.51, rad.refraction());
+    EXPECT_FALSE(rad.setRedTrans(1.7));
+    EXPECT_FALSE(rad.setGreenTrans(-300));
+    EXPECT_FALSE(rad.setBlueTrans(4000));
+    EXPECT_EQ(0.6, rad.redTrans());
+    EXPECT_EQ(0.7, rad.greenTrans());
+    EXPECT_EQ(0.5, rad.blueTrans());
+
+    // Test 4 arguments to constructor
+    stadic::GlassMaterial rad4(0.6, 0.7, 0.5, 1.75);
+    EXPECT_EQ(stadic::RadPrimitive::Glass, rad4.type());
+    EXPECT_EQ("glass", rad4.typeString());
+    EXPECT_EQ(0, rad4.arg1().size());
+    EXPECT_EQ(0, rad4.arg2().size());
+    ASSERT_EQ(4, rad4.arg3().size());
+    EXPECT_EQ("0.6", rad4.getArg3(0));
+    EXPECT_EQ("0.7", rad4.getArg3(1));
+    EXPECT_EQ("0.5", rad4.getArg3(2));
+    EXPECT_EQ("1.75", rad4.getArg3(3));
+    EXPECT_EQ(0.6, rad4.redTrans());
+    EXPECT_EQ(0.7, rad4.greenTrans());
+    EXPECT_EQ(0.5, rad4.blueTrans());
+    EXPECT_EQ(1.75, rad4.refraction());
+    EXPECT_FALSE(rad4.setRefraction(-1000));
 }
 
 TEST(PrimitiveTests, BSDF)
 {
+    // Test no argument constructor
+    stadic::BSDFMaterial noargs;
+    EXPECT_EQ(0, noargs.thickness());
+    EXPECT_EQ("null", noargs.bsdfFile());
+    EXPECT_EQ(0, noargs.ux());
+    EXPECT_EQ(0, noargs.uy());
+    EXPECT_EQ(0, noargs.uz());
 
     stadic::BSDFMaterial rad(0,"bsdf.xml", 0,-1,0);
     EXPECT_EQ(stadic::RadPrimitive::BSDF, rad.type());
@@ -203,12 +273,6 @@ TEST(PrimitiveTests, BSDF)
     EXPECT_EQ("-1", rad.getArg1(3));
     EXPECT_EQ("0", rad.getArg1(4));
     EXPECT_EQ(".", rad.getArg1(5));
-    EXPECT_EQ("0", rad.getArg(1, 0));
-    EXPECT_EQ("bsdf.xml", rad.getArg(1, 1));
-    EXPECT_EQ("0", rad.getArg(1, 2));
-    EXPECT_EQ("-1", rad.getArg(1, 3));
-    EXPECT_EQ("0", rad.getArg(1, 4));
-    EXPECT_EQ(".", rad.getArg(1, 5));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     EXPECT_EQ(0, rad.thickness());
@@ -254,18 +318,6 @@ TEST(PrimitiveTests, Polygon)
     EXPECT_EQ("0", rad.getArg3(9));
     EXPECT_EQ("120", rad.getArg3(10));
     EXPECT_EQ("0", rad.getArg3(11));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("120", rad.getArg(3, 3));
-    EXPECT_EQ("0", rad.getArg(3, 4));
-    EXPECT_EQ("0", rad.getArg(3, 5));
-    EXPECT_EQ("120", rad.getArg(3, 6));
-    EXPECT_EQ("120", rad.getArg(3, 7));
-    EXPECT_EQ("0", rad.getArg(3, 8));
-    EXPECT_EQ("0", rad.getArg(3, 9));
-    EXPECT_EQ("120", rad.getArg(3, 10));
-    EXPECT_EQ("0", rad.getArg(3, 11));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("sphere"));
     ASSERT_EQ(12, rad.points().size());
@@ -300,10 +352,6 @@ TEST(PrimitiveTests, Sphere)
     EXPECT_EQ("0", rad.getArg3(1));
     EXPECT_EQ("0", rad.getArg3(2));
     EXPECT_EQ("3", rad.getArg3(3));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("3", rad.getArg(3, 3));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     ASSERT_EQ(3, rad.centerPoint().size());
@@ -338,14 +386,6 @@ TEST(PrimitiveTests, Ring)
     EXPECT_EQ("1", rad.getArg3(5));
     EXPECT_EQ("0", rad.getArg3(6));
     EXPECT_EQ("6", rad.getArg3(7));
-    EXPECT_EQ("0", rad.getArg(3, 0));
-    EXPECT_EQ("0", rad.getArg(3, 1));
-    EXPECT_EQ("0", rad.getArg(3, 2));
-    EXPECT_EQ("0", rad.getArg(3, 3));
-    EXPECT_EQ("0", rad.getArg(3, 4));
-    EXPECT_EQ("1", rad.getArg(3, 5));
-    EXPECT_EQ("0", rad.getArg(3, 6));
-    EXPECT_EQ("6", rad.getArg(3, 7));
     // Miscellaneous checks
     EXPECT_FALSE(rad.setType("polygon"));
     ASSERT_EQ(3, rad.centerPoint().size());
@@ -359,3 +399,4 @@ TEST(PrimitiveTests, Ring)
     EXPECT_EQ(0, rad.innerRadius());
     EXPECT_EQ(6, rad.outerRadius());
 }
+

@@ -1,0 +1,29 @@
+# Supported primitives for testing
+
+void plastic l_wall
+0
+0
+5 .5 .5 .5 0 0
+
+void metal l_metal
+0
+0
+5 0.75 0.75 0.75 0.01 0.01
+
+void glass l_window
+0
+0
+3 .65 .65 .65
+
+void trans l_trans
+0
+0
+7 0.75 0.75 0.75 0.01 0.01 0.02 0.03
+
+l_wall polygon l_wall.2.1
+0
+0
+12	240	240	0
+	240	240	120
+	0	240	120
+	0	240	0

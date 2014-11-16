@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -41,6 +41,7 @@
 #include "logging.h"
 #include <iostream>
 #include "functions.h"
+#include "jsonobjects.h"
 #include <boost/optional.hpp>
 
 namespace stadic {
@@ -125,30 +126,44 @@ void ShadeControl::setSensorFile(std::string file){
 
 
 //Getters
-std::string ShadeControl::controlMethod(){
+std::string ShadeControl::controlMethod()
+{
     return m_Method;
 }
-double ShadeControl::elevationAzimuth(){
+
+double ShadeControl::elevationAzimuth()
+{
     return m_ElevationAzimuth;
 }
-std::vector<double> ShadeControl::angleSettings(){
+
+std::vector<double> ShadeControl::angleSettings()
+{
     return m_AngleSettings;
 }
-std::vector<double> ShadeControl::location(){
+
+std::vector<double> ShadeControl::location()
+{
     return m_Location;
 }
-std::vector<double> ShadeControl::signalSettings(){
+
+std::vector<double> ShadeControl::signalSettings()
+{
     return m_SignalSettings;
 }
-std::string ShadeControl::sensorType(){
+
+std::string ShadeControl::sensorType()
+{
     return m_SensorType;
 }
-std::string ShadeControl::sensorFile(){
+
+std::string ShadeControl::sensorFile()
+{
     return m_SensorFile;
 }
 
-bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::string method){
-    boost::optional<boost::property_tree::ptree> treeVal;
+bool ShadeControl::readAutoProf(const JsonObject &json, std::string method)
+{
+    boost::optional<JsonObject> treeVal;
     boost::optional<double> dVal;
     dVal=getDouble(json, "elevation_azimuth", "The key \"elevation_azimuth\" was not found with control method \""+method+"\".","The key \"elevation_azimuth\" does not contain a number.", Severity::Error);
     if (!dVal){
@@ -157,33 +172,28 @@ bool ShadeControl::readAutoProf(const boost::property_tree::ptree &json, std::st
         if (!setElevationAzimuth(dVal.get())){
             return false;
         }
-        dVal.reset();
     }
-    treeVal=getTree(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getArray(json,"angle_settings", "The key \"angle_settings\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
-            dVal=getDouble(v.second, "", "", "", Severity::Fatal);
+        for(auto &v : treeVal.get()){
+            dVal = asDouble(v, "There was a problem reading the angle_settings key.", Severity::Fatal);
             if (dVal){
                 if (!setAngleSettings(dVal.get())){
                     return false;
                 }
-            }else{
-                STADIC_LOG(Severity::Warning, "There was a problem reading the angle_settings key.");
             }
-            dVal.reset();
         }
-        treeVal.reset();
     }
     return true;
 }
 
-bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::string method){
-    boost::optional<boost::property_tree::ptree> treeVal;
+bool ShadeControl::readAutoSign(const JsonObject &json, std::string method){
+    boost::optional<JsonObject> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
-    treeVal=getTree(json, "sensor", "The key \"sensor\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getObject(json, "sensor", "The key \"sensor\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -204,8 +214,8 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
             setSensorFile(sVal.get());
             sVal.reset();
         }
-        boost::optional<boost::property_tree::ptree> treeVal2;
-        treeVal2=getTree(treeVal.get(), "location", "The key \"location\" was not found with control method \""+method+"\".", Severity::Error);
+        boost::optional<JsonObject> treeVal2;
+        treeVal2=getObject(treeVal.get(), "location", "The key \"location\" was not found with control method \""+method+"\".", Severity::Error);
         if (!treeVal2){
             return false;
         }else{
@@ -265,18 +275,18 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
         }
     }
     treeVal.reset();
-    treeVal=getTree(json,"signal_settings", "The key \"signal_settings\" was not found with control method \""+method+"\".", Severity::Error);
+    treeVal=getArray(json,"signal_settings", "The key \"signal_settings\" was not found with control method \""+method+"\".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
-            dVal=getDouble(v.second, "", "", "", Severity::Fatal);
+        for(auto &v : treeVal.get()){
+            dVal=asDouble(v, "Signal setting value is not a double", Severity::Fatal);
             if (dVal){
                 if (!setSignalSettings(dVal.get())){
                     return false;
                 }
             }else{
-                STADIC_LOG(Severity::Warning, "There was a problem reading the signal_settings key.");
+                STADIC_LOG(Severity::Warning, "There was a problem reading the signal_settings.");
             }
             dVal.reset();
         }
@@ -285,13 +295,13 @@ bool ShadeControl::readAutoSign(const boost::property_tree::ptree &json, std::st
     return true;
 }
 
-bool ShadeControl::parseJson (const boost::property_tree::ptree &json){
+bool ShadeControl::parseJson(const JsonObject &json){
     if (json.empty()){
         STADIC_LOG(Severity::Error, "The window group does not contain data.");
         return false;
     }
     boost::optional<std::string> sVal;
-    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<JsonObject> treeVal;
     sVal=getString(json, "method", "The key \"method\" does not appear in the STADIC Control File for shade control.", "The key \"method\" is not a string." ,Severity::Info);
     if (!sVal){
         STADIC_LOG(Severity::Error, "There was a proble with the keyword \"method\".");

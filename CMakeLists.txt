@@ -34,6 +34,9 @@ else()
   include_directories(${CMAKE_SOURCE_DIR}/boost-1.56.0-subset)
 endif()
 
+# JSON Dependency
+include_directories("dependencies/jsoncpp/")
+
 add_subdirectory(lib)
 add_subdirectory(utilities)
 

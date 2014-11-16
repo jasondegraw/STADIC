@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -64,10 +64,11 @@ public:
     double blue() const;
     double specularity() const;
     double roughness() const;
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
+
 //METAL
 class STADIC_API MetalMaterial : public RadPrimitive
 {
@@ -88,10 +89,11 @@ public:
     double blue() const;
     double specularity() const;
     double roughness() const;
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
+
 //TRANS
 class STADIC_API TransMaterial : public RadPrimitive
 {
@@ -119,16 +121,17 @@ public:
     double transmissivity() const;
     double transSpecular() const;
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
+
 //GLASS
 class STADIC_API GlassMaterial : public RadPrimitive
 {
 public:
     GlassMaterial();
-    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac=1.52);
+    GlassMaterial(double redTrans, double greenTrans, double blueTrans);
+    GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac);
     // Setters
     bool setType(std::string){return false;}
     bool setRedTrans(double value);
@@ -142,10 +145,11 @@ public:
     double blueTrans() const;
     double refraction() const;
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
+    virtual bool extendArg3() const { return true; }
 };
+
 //BSDF
 class STADIC_API BSDFMaterial : public RadPrimitive
 {
@@ -166,9 +170,10 @@ public:
     double ux() const;
     double uy() const;
     double uz() const;
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+
+protected:
+    virtual bool validateArg1(const std::string &value, int position) const;
 };
+
 }
 #endif // MATERIALPRIMITIVES_H

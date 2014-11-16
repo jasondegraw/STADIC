@@ -21,6 +21,10 @@ All material primitive objects should be initialized with acceptable default val
 be initialized to have no contents, but must cause an error if the user attempts to write out the primitive
 without adding data to the primitive.
 
+We have been naming the primitives by appending the general primitive type to the Radiance name of the
+primitive. In this scheme the "plastic" primitive is PlasticMaterial, the "polygon" primitive is
+PolygonGeometry, and so on.
+
 Add Basic Tests
 ---------------
 
@@ -37,5 +41,56 @@ important things is to make sure that validation works.
 Connect To I/O
 --------------
 
+The individual primitives are read into memory in a static RadPrimitive method called fromRad (see
+radprimitive.cpp). The important part that needs to be modified is a switch statement in the middle
+of the function:
+
+    switch(typeFromString(list[1])) {
+    case Polygon:
+        rad = new PolygonGeometry();
+        break;
+    case Plastic:
+        rad = new PlasticMaterial();
+        break;
+    case BSDF:
+        rad = new BSDFMaterial();
+        break;
+    /*  ... others ... */
+    default:
+        rad = new RadPrimitive();
+        rad->setType(list[1]);
+        break;
+    }
+
+The switch statement operates on the Type enumeration defined in the RadPrimitive class in radprimitives.h,
+so the first step is to make sure that primitive is represented there and in the type strings array so that
+the switch statement will work properly. Then add the new primitive in as a case statement.
+
 Test I/O
 --------
+
+Add a test (or tests) in radfiletests.cpp that verifies that the objects are read correctly and are actually
+the correct object. The test (or tests) should make sure that both correct and incorrect input are correctly
+handled. To test correct input, add a new correct primitive to "supportedprimitives.rad" and add a separate
+file for incorrect input (e.g. badglassmaterial.rad). In this context, "incorrect input" is input that can 
+be read as a primitive but is not correct for the particular primitive. For example, a plastic primitive's 
+third set of arguments is supposed to have five items in it (red, green, blue, specularity, roughness). This
+could appear in the input file as:
+
+    5 0.5 0.5 0.5 0.05 0.01
+
+Examples of incorrect, but consistent, input for a plastic primitive would be
+
+    5 1.5 0.5 0.5 0.05 0.01
+
+(the red value is too large) and
+
+    4 1.5 0.5 0.5 0.05
+    
+(there is no roughness). These are both legal inputs in the sense that the input is internally consistent
+as a Radiance primitive, but the values are wrong for a plastic. However, this is not what we're looking for:
+
+    5 0.5 0.5 0.5 0.05    # Don't do this!
+
+This is not the kind of incorrect input that will test whether the code correctly recognizes a plastic type,
+but is more likely testing how the code handles malformed input. Don't test that here - it is tested elsewhere.

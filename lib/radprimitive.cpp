@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -47,15 +47,15 @@
 namespace stadic {
 
 std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
-                                                      "cylinder", "tube", "ring", "instance", "mesh", "light",
-                                                      "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
-                                                      "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
-                                                      "mist", "dielectric", "interface", "glass", "plasfunc",
-                                                      "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
-                                                      "transdata", "bsdf", "antimatter", "texfunc", "texdata",
-                                                      "colorfunc", "brightfunc", "colordata", "brightdata",
-                                                      "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
-                                                      "mixpict", "mixtext", "unknown"};
+                                                          "cylinder", "tube", "ring", "instance", "mesh", "light",
+                                                          "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
+                                                          "plastic", "metal", "trans", "plastic2", "metal2", "trans2",
+                                                          "mist", "dielectric", "interface", "glass", "plasfunc",
+                                                          "metfunc", "transfunc", "brtdfunc", "plasdata", "metdata",
+                                                          "transdata", "bsdf", "antimatter", "texfunc", "texdata",
+                                                          "colorfunc", "brightfunc", "colordata", "brightdata",
+                                                          "colorpict", "colortext", "brighttext", "mixfunc", "mixdata",
+                                                          "mixpict", "mixtext", "unknown"};
 
 RadPrimitive::RadPrimitive()
 {
@@ -115,28 +115,35 @@ bool RadPrimitive::isMaterial() const
 }
 
 //Setters
-void RadPrimitive::setModifier(std::string modifier){
+void RadPrimitive::setModifier(const std::string &modifier)
+{
     m_Modifier=modifier;
 }
 
-bool RadPrimitive::setType(std::string type){
+bool RadPrimitive::setType(const std::string &type)
+{
     m_TypeString=type;
     return true;
 }
-void RadPrimitive::setName(std::string name){
+
+void RadPrimitive::setName(const std::string &name)
+{
     m_Name=name;
 }
 
-bool RadPrimitive::setArg1(std::vector<std::string> vals){
-    if(validateArg(1,vals)) {
-      m_Arg1=vals;
-      return true;
+bool RadPrimitive::setArg1(std::vector<std::string> vals)
+{
+    if(validateArg1(vals)) {
+        m_Arg1 = vals;
+        return true;
     }
     return false;
 }
-bool RadPrimitive::setArg1(std::string arg, int position) {
+
+bool RadPrimitive::setArg1(const std::string &arg, int position)
+{
     if(position<m_Arg1.size()) {
-        if(!validateArg(1,arg,position)) {
+        if(!validateArg1(arg,position)) {
             return false;
         }
         m_Arg1[position] = arg;
@@ -144,16 +151,20 @@ bool RadPrimitive::setArg1(std::string arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg2(std::vector<std::string> vals){
-    if(validateArg(2,vals)) {
+
+bool RadPrimitive::setArg2(std::vector<std::string> vals)
+{
+    if(validateArg2(vals)) {
       m_Arg2=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg2(std::string arg, int position) {
+
+bool RadPrimitive::setArg2(const std::string &arg, int position)
+{
     if(position<m_Arg2.size()) {
-        if(!validateArg(2,arg,position)) {
+        if(!validateArg2(arg,position)) {
             return false;
         }
         m_Arg2[position] = arg;
@@ -161,49 +172,32 @@ bool RadPrimitive::setArg2(std::string arg, int position) {
     }
     return false;
 }
-bool RadPrimitive::setArg3(std::vector<std::string> vals){
-    if(validateArg(3,vals)) {
+
+bool RadPrimitive::setArg3(std::vector<std::string> vals)
+{
+    if(validateArg3(vals)) {
       m_Arg3=vals;
       return true;
     }
     return false;
 }
-bool RadPrimitive::setArg3(std::string arg, int position) {
+
+bool RadPrimitive::setArg3(const std::string &arg, int position)
+{
     if(position<m_Arg3.size()) {
-        if(!validateArg(3,arg,position)) {
+        if(!validateArg3(arg,position)) {
             return false;
         }
         m_Arg3[position] = arg;
         return true;
-    }
-    return false;
-}
-
-bool RadPrimitive::setArg(int number, std::string value, int position)
-{
-    std::vector<std::string> *arg;
-    switch(number) {
-    case 1:
-        arg = &m_Arg1;
-        break;
-    case 2:
-        arg = &m_Arg2;
-        break;
-    case 3:
-        arg = &m_Arg3;
-        break;
-    default:
-        // Error/warning message?
-        return false;
-    }
-    if(validateArg(number,value,position)) {
-        if(position>=arg->size()) {
-            arg->resize(position+1);
+    } else if(position == m_Arg3.size() && extendArg3()) { // Allow for possible extension of the vector by one
+        if(!validateArg3(arg, position)) {
+            return false;
         }
-        (*arg)[position] = value;
+        m_Arg3.push_back(arg);
         return true;
     } else {
-        // Error/warning message?
+        STADIC_LOG(Severity::Error, "Argument 3, position \'" + toString(position) + "\' is out of range.");
     }
     return false;
 }
@@ -233,19 +227,51 @@ std::vector<std::string> RadPrimitive::arg3() const{
 
 static std::string nextNonComment(std::stringstream &data)
 {
-  std::string string;
-  while(!data.eof()) {
-    std::getline(data,string);
-    string = trim(string);
-    //std::cout << "### " << string.toStdString() << std::endl;
-    if(!string.empty()) {
-        if(string.find('#')==string.npos){
-            return string;
+    std::string string;
+    while(!data.eof()) {
+        std::getline(data, string);
+        string = trim(string);
+        if(!string.empty()) {
+            if(string.find('#')==string.npos){
+                return string;
+            }
         }
     }
-  }
-  std::string empty;
-  return empty;
+    return std::string();
+}
+
+std::string RadPrimitive::toRad() const
+{
+    std::stringstream stream;
+    stream << modifier() << " " << typeString() << " " << name() << std::endl;
+    if(m_Arg1.size()>0) {
+        stream << m_Arg1.size();
+        for(const std::string &value : m_Arg1) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    if(m_Arg2.size()>0) {
+        stream << m_Arg2.size();
+        for(const std::string &value : m_Arg2) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    if(m_Arg3.size()>0) {
+        stream << m_Arg3.size();
+        for(const std::string &value : m_Arg3) {
+            stream <<" "<<value;
+        }
+        stream << std::endl;
+    } else {
+        stream << 0 << std::endl;
+    }
+    return stream.str();
 }
 
 RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
@@ -256,7 +282,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     if (string.empty()){
         return nullptr;
     }
-    std::vector<std::string> list =trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
+    std::vector<std::string> list = trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
     if(list.size() != 3) {
         return nullptr;
     }
@@ -267,6 +293,15 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         break;
     case Plastic:
         rad = new PlasticMaterial();
+        break;
+    case Metal:
+        rad = new MetalMaterial();
+        break;
+    case Trans:
+        rad = new TransMaterial();
+        break;
+    case Glass:
+        rad = new GlassMaterial();
         break;
     case BSDF:
         rad = new BSDFMaterial();
@@ -281,41 +316,56 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
 
     int nargs;
     data>>string;   //Reads number of arguments from first line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
         }
-        rad->setArg1(args);
+        if(!rad->setArg1(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in first argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
     }
 
     data>>string;   //Reads number of arguments from second line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
         }
-        rad->setArg2(args);
+        if(!rad->setArg2(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in second argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
     }
 
     data>>string;   //Reads number of arguments from third line
-    nargs = atoi(string.c_str());
+    nargs = toInteger(string);
     if (nargs>0){
         std::vector<std::string> args;
         for (int i=0;i<nargs;i++){
             data>>string;
             args.push_back(string);
         }
-        rad->setArg3(args);
+        if(!rad->setArg3(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in third argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
     }
     return rad;
 }
 
-RadPrimitive::Type RadPrimitive::typeFromString(std::string string)
+RadPrimitive::Type RadPrimitive::typeFromString(const std::string &string)
 {
     for(unsigned i=0;i<s_typeStrings.size();i++) {
         if(s_typeStrings[i] == string) {
@@ -328,8 +378,7 @@ RadPrimitive::Type RadPrimitive::typeFromString(std::string string)
 std::string RadPrimitive::getArg1(int position) const
 {
     if(position<0 || position>=m_Arg1.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 1, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg1[position];
 }
@@ -337,8 +386,7 @@ std::string RadPrimitive::getArg1(int position) const
 std::string RadPrimitive::getArg2(int position) const
 {
     if(position<0 || position>=m_Arg2.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 2, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg2[position];
 }
@@ -346,25 +394,33 @@ std::string RadPrimitive::getArg2(int position) const
 std::string RadPrimitive::getArg3(int position) const
 {
     if(position<0 || position>=m_Arg3.size()) {
-        std::string empty;
-        return empty;
+        STADIC_LOG(Severity::Error, "Argument 3, position \'" + toString(position) + "\' is out of range.");
     }
     return m_Arg3[position];
 }
 
-std::string RadPrimitive::getArg(int number, int position) const
+std::string RadPrimitive::getArg1(int position, const std::string &defaultValue) const
 {
-    switch(number) {
-    case 1:
-        return getArg1(position);
-    case 2:
-        return getArg2(position);
-    case 3:
-        return getArg3(position);
+    if(position<0 || position>=m_Arg1.size()) {
+        return defaultValue;
     }
-    // Error/warning message?
-    std::string empty;
-    return empty;
+    return m_Arg1[position];
+}
+
+std::string RadPrimitive::getArg2(int position, const std::string &defaultValue) const
+{
+    if(position<0 || position>=m_Arg2.size()) {
+        return defaultValue;
+    }
+    return m_Arg2[position];
+}
+
+std::string RadPrimitive::getArg3(int position, const std::string &defaultValue) const
+{
+    if(position<0 || position>=m_Arg3.size()) {
+        return defaultValue;
+    }
+    return m_Arg3[position];
 }
 
 void RadPrimitive::initArg(int number, std::vector<std::string> arg)
@@ -380,48 +436,180 @@ void RadPrimitive::initArg(int number, std::vector<std::string> arg)
         m_Arg3 = arg;
         break;
     default:
-        // Error message?
+        STADIC_LOG(Severity::Error, "Argument number \'" + toString(number) + "\' is out of range.");
         break;
     }
 }
 
-bool RadPrimitive::checkValue(const std::string &value, int index, double min, double max, const std::string &variable, const std::string &object) const
+bool RadPrimitive::validateArg1(const std::vector<std::string> &arg) const 
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg1(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool RadPrimitive::validateArg2(const std::vector<std::string> &arg) const
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg2(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool RadPrimitive::validateArg3(const std::vector<std::string> &arg) const
+{
+    int i = 0;
+    for(const std::string &value : arg) {
+        if(!validateArg3(value, i)) {
+            return false;
+        }
+        i++;
+    }
+    return true;
+}
+
+bool RadPrimitive::checkDoubleValue(const std::string &value, double min, double max, const std::string &variable, double current) const
 {
     bool ok;
     double dval = stadic::toDouble(value, &ok);
     if(!ok) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " must be a floating point number, value remains " + getArg3(index) + ".");
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive must be a floating point number, value remains " + stadic::toString(current) + ".");
         return false;
     }
     if(dval < min) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be less than " + stadic::toString(min) + ", value remains " + getArg3(index) + ".");
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive cannot be less than " + stadic::toString(min) + ", value remains " + stadic::toString(current) + ".");
+        return false;
     } else if(dval > max) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be greater than " + stadic::toString(max) + ", value remains " + getArg3(index) + ".");
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive cannot be greater than " + stadic::toString(max) + ", value remains " + stadic::toString(current) + ".");
+        return false;
+    }
+    return true;
+}
+
+bool RadPrimitive::checkDoubleValue(const std::string &value, double min, double max,  double recMin, double recMax, 
+    const std::string &variable, double current) const
+{
+    bool ok;
+    double dval = stadic::toDouble(value, &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive must be a floating point number, value remains " + stadic::toString(current) + ".");
+        return false;
+    }
+    if(dval < min) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive cannot be less than " + stadic::toString(min) + ", value remains " + stadic::toString(current) + ".");
+    } else if(dval > max) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive cannot be greater than " + stadic::toString(max) + ", value remains " + stadic::toString(current) + ".");
     } else {
+        if(dval < recMin || dval > recMax) {
+            STADIC_LOG(Severity::Warning, "The suggested range for the " + variable 
+                + " value for a " + typeString() + " primitive is [" + stadic::toString(recMin) + "," + stadic::toString(recMax) + "].");
+        }
         return true;
     }
     return false;
 }
 
-bool RadPrimitive::checkValue(const std::string &value, int index, double min, double max, double recMin, double recMax, const std::string &variable, const std::string &object) const
+bool RadPrimitive::checkDoubleValueMin(const std::string &value, double min, const std::string &variable, double current, bool inclusive) const
 {
     bool ok;
     double dval = stadic::toDouble(value, &ok);
     if(!ok) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " must be a floating point number, value remains " + getArg3(index) + ".");
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive must be a floating point number, value remains " + stadic::toString(current) + ".");
         return false;
     }
-    if(dval < min) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be less than " + stadic::toString(min) + ", value remains " + getArg3(index) + ".");
-    } else if(dval > max) {
-        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + object + " cannot be greater than " + stadic::toString(max) + ", value remains " + getArg3(index) + ".");
-    } else {
-        if(dval < recMin || dval > recMax) {
-            STADIC_LOG(Severity::Warning, "The suggested range for the " + variable + " value for a " + object + " is [" + stadic::toString(recMin) + "," + stadic::toString(recMax) + "].");
+    if(inclusive) {
+        if(dval < min) {
+            STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+                + " primitive cannot be less than " + stadic::toString(min) + ", value remains " + stadic::toString(current) + ".");
+            return false;
         }
-        return true;
+    } else {
+        if(dval <= min) {
+            STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+                + " primitive must be greater than " + stadic::toString(min) + ", value remains " + stadic::toString(current) + ".");
+            return false;
+        }
     }
-    return false;
+    return true;
+}
+
+bool RadPrimitive::checkDoubleValue(const std::string &value, const std::string &variable, double current) const
+{
+    bool ok;
+    double dval = stadic::toDouble(value, &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
+            + " primitive must be a floating point number, value remains " + stadic::toString(current) + ".");
+        return false;
+    }
+    return true;
+}
+
+double RadPrimitive::argToDouble(int number, int position, const std::string &variable) const
+{
+    bool ok;
+    std::string string;
+    switch(number) {
+    case 1:
+        string = getArg1(position);
+        break;
+    case 2:
+        string = getArg2(position);
+        break;
+    case 3:
+        string = getArg3(position);
+        break;
+    default:
+        STADIC_LOG(Severity::Fatal, "Argument number " + stadic::toString(number) + " out of range for in " + typeString() + " primitive.");
+    }
+        
+    double value = stadic::toDouble(string, &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Fatal, "Corrupted " + variable + " value (\"" + getArg3(position) + "\" in argument list " + stadic::toString(number) + ", position "
+            + toString(position) + ") in " + typeString() + " primitive.");
+    }
+    return value;
+}
+
+double RadPrimitive::argToDouble(int number, int position, const std::string &variable, double defaultValue) const
+{
+    bool ok;
+    std::string string;
+    switch(number) {
+    case 1:
+        string = getArg1(position);
+        break;
+    case 2:
+        string = getArg2(position);
+        break;
+    case 3:
+        string = getArg3(position, stadic::toString(defaultValue));
+        break;
+    default:
+        STADIC_LOG(Severity::Fatal, "Argument number " + stadic::toString(number) + " out of range for in " + typeString() + " primitive.");
+    }
+    double value = stadic::toDouble(getArg3(position, stadic::toString(defaultValue)), &ok);
+    if(!ok) {
+        STADIC_LOG(Severity::Fatal, "Corrupted " + variable + " value (\"" + getArg3(position) + "\" in argument list 3, position "
+            + toString(position) + ") in " + typeString() + " primitive.");
+    }
+    return value;
 }
 
 }

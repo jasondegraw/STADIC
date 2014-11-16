@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -353,7 +353,8 @@ bool GridMaker::insetPolygons(){
 
             if (m_UseThreshold){
                 if (deltaY>m_Threshold ||deltaX>m_Threshold){
-                    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2((minDist/2-0.00001), (minDist/2-0.00001));
+                    //The following line has had the negatives introduced for the distance strategy.  These are not needed in the main buffer but are allowing this to work properly now.
+                    boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2(-(minDist/2-0.01), -(minDist/2-0.01));
                     boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon2;
                     boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon2,distance_strategy2,side_strategy,join_strategy,end_strategy,point_strategy);
                     if (!boost::geometry::is_valid(tempPolygon2)){
@@ -366,7 +367,8 @@ bool GridMaker::insetPolygons(){
                     keepPolygon.push_back(false);
                 }
             }else{
-                boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2((minDist/2-0.00001), (minDist/2-0.00001));
+                //The following line has had the negatives introduced for the distance strategy.  These are not needed in the main buffer but are allowing this to work properly now.
+                boost::geometry::strategy::buffer::distance_asymmetric<double> distance_strategy2(-(minDist/2-0.01), -(minDist/2-0.01));
                 boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> > tempPolygon2;
                 boost::geometry::buffer(m_UnitedPolygon[i],tempPolygon2,distance_strategy2,side_strategy,join_strategy,end_strategy,point_strategy);
                 if (!boost::geometry::is_valid(tempPolygon2)){
@@ -436,11 +438,11 @@ void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometr
     double minY=box.min_corner().get<1>();
     double maxX=box.max_corner().get<0>();
     double maxY=box.max_corner().get<1>();
-    if ((maxX-minX)<m_Offset || (maxY-minY)<m_Offset){
-        setMinX(minX, set);
-        setMinY(minY, set);
-        setMaxX(maxX, set);
-        setMaxY(maxY, set);
+    if ((maxX-minX)<std::abs(m_Offset) || (maxY-minY)<std::abs(m_Offset)){
+        setMinX(minX+.005, set);
+        setMinY(minY+.005, set);
+        setMaxX(maxX-.005, set);
+        setMaxY(maxY-.005, set);
     }else{
         setMinX(minX-m_Offset*.1, set);
         setMinY(minY-m_Offset*.1, set);
@@ -520,6 +522,10 @@ bool GridMaker::testPoints(){
                 y=y+spaceY();
             }
             x=x+spaceX();
+        }
+        if(m_PointSet.empty()){
+            STADIC_LOG(stadic::Severity::Error, "The points array has no pointsets.");
+            return false;
         }
         if (m_PointSet[i].empty()){
             std::cerr<<"The points array is empty."<<std::endl;

@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -104,8 +104,7 @@ bool LeakCheck::isEnclosed(){
 //Setters
 bool LeakCheck::setRadFile(std::vector<std::string> files){
     for (int i=0;i<files.size();i++){
-        FilePath radFile(files[i]);
-        if (!radFile.exists()){
+        if(!isFile(files[i])){
             STADIC_ERROR("The rad file named "+files[i]+" does not exist.");
             return false;
         }
@@ -272,7 +271,7 @@ bool LeakCheck::runCalc(){
     std::vector<std::string> arguments2;
     arguments2.clear();
     arguments2.push_back("-e");
-    arguments2.push_back("\'$1=179*($1*0.265+$2*0.670+$3*0.065)\'");
+    arguments2.push_back(Process::quote("$1=179*($1*0.265+$2*0.670+$3*0.065)"));
     programName="rcalc";
     Process rcalc(programName,arguments2);
     rtrace.setStandardOutputProcess(&rcalc);

@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -471,338 +471,277 @@ std::vector<std::vector<double> > ControlZone::luminaireLayout()
     return m_LuminaireLayout;
 }
 
-bool ControlZone::parseJson (const boost::property_tree::ptree json){
-    boost::optional<boost::property_tree::ptree> treeVal;
+bool ControlZone::parseJson (const JsonObject &json){
+    boost::optional<JsonObject> treeVal;
     boost::optional<double> dVal;
     boost::optional<std::string> sVal;
     boost::optional<int> iVal;
     boost::optional<bool> bVal;
 
     sVal=getString(json, "name", "The key \"name\" within control_zones does not appear in the STADIC Control File.", "The key \"name\" within control_zones is not a string.", Severity::Error);
-    if (!sVal){
+    if (!sVal) {
         return false;
-    }else{
+    } else {
         setName(sVal.get());
-        sVal.reset();
     }
 
     sVal=getString(json, "optimum_control", "The key\"optimum_control\" is not found within the control zone "+name()+".", "The key \"optimum_control\" does not contain a string.", Severity::Error);
-    if (!sVal){
+    if (!sVal) {
         return false;
-    }else{
+    } else {
         if (!setOptimumMethod(sVal.get())){
             return false;
         }
-        sVal.reset();
     }
-    if (json.find("sensor")!=json.not_found()){
-        treeVal=getTree(json, "sensor", "The key \"sensor\" was not found with control zone named "+name()+".", Severity::Error);
-        if (!treeVal){
-            return false;
-        }else{
-            sVal=getString(treeVal.get(), "sensor_type", "The key \"sensor_type\" is not found within \"sensor\" in the control zone named "+name()+".","The key \"sensor_type\" does not contain a string in one of the window groups.", Severity::Error);
-            if (!sVal){
-                return false;
-            }else{
-                if (!setSensorType(sVal.get())){
-                    return false;
-                }
-                sVal.reset();
-            }
 
-            sVal=getString(treeVal.get(), "sensor_file", "The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.","The key \"sensor_file\" does not contain a string in one of the window groups.", Severity::Error);
-            if (!sVal){
+    treeVal = getObject(json, "sensor");
+    if (treeVal) {
+        sVal = getString(treeVal.get(), "sensor_type", "The key \"sensor_type\" is not found within \"sensor\" in the control zone named "+name()+".", "The key \"sensor_type\" does not contain a string in one of the window groups.", Severity::Error);
+        if(!sVal) {
+            return false;
+        } else {
+            if(!setSensorType(sVal.get())){
                 return false;
-            }else{
-                setSensorFile(sVal.get());
-                sVal.reset();
-            }
-            boost::optional<boost::property_tree::ptree> treeVal2;
-            treeVal2=getTree(treeVal.get(), "location", "The key \"location\" was not found with control zone named "+name()+".", Severity::Error);
-            if (!treeVal2){
-                return false;
-            }else{
-                double x, y, z, xd, yd, zd, spin;
-                dVal=getDouble(treeVal2.get(), "x", "The key \"x\" was not found within \"location\".", "The key \"x\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    x=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "y", "The key \"y\" was not found within \"location\".", "The key \"y\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    y=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "z", "The key \"z\" was not found within \"location\".", "The key \"z\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    z=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "xd", "The key \"xd\" was not found within \"location\".", "The key \"xd\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    xd=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "yd", "The key \"yd\" was not found within \"location\".", "The key \"yd\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    yd=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "zd", "The key \"zd\" was not found within \"location\".", "The key \"zd\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    zd=dVal.get();
-                    dVal.reset();
-                }
-                dVal=getDouble(treeVal2.get(), "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
-                if (!dVal){
-                    return false;
-                }else{
-                    spin=dVal.get();
-                    dVal.reset();
-                }
-                if (!setSensorLocation(x, y, z, xd, yd, zd, spin)){
-                    return false;
-                }
             }
         }
-        treeVal.reset();
 
-        sVal=getString(json, "cp_method", "The key \"cp_method\" does not appear in the zone named \""+name()+"\".", "The key \"cp_method\" in the zone named \""+name()+"\" does not contain a string.", Severity::Info);
-        if (sVal){
-            if (!setCPMethod(sVal.get())){
+        sVal = getString(treeVal.get(), "sensor_file", "The key \"sensor_file\" is not found within \"sensor\" in one of the window groups.", "The key \"sensor_file\" does not contain a string in one of the window groups.", Severity::Error);
+        if(!sVal) {
+            return false;
+        } else {
+            setSensorFile(sVal.get());
+        }
+        boost::optional<JsonObject> treeVal2;
+        treeVal2 = getObject(treeVal.get(), "location", "The key \"location\" was not found with control zone named "+name()+".", Severity::Error);
+        if(!treeVal2) {
+            return false;
+        } else {
+            double x, y, z, xd, yd, zd, spin;
+            dVal = getDouble(treeVal2.get(), "x", "The key \"x\" was not found within \"location\".", "The key \"x\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                x = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "y", "The key \"y\" was not found within \"location\".", "The key \"y\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                y = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "z", "The key \"z\" was not found within \"location\".", "The key \"z\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                z = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "xd", "The key \"xd\" was not found within \"location\".", "The key \"xd\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                xd = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "yd", "The key \"yd\" was not found within \"location\".", "The key \"yd\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                yd = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "zd", "The key \"zd\" was not found within \"location\".", "The key \"zd\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                zd = dVal.get();
+            }
+            dVal = getDouble(treeVal2.get(), "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
+            if(!dVal) {
+                return false;
+            } else {
+                spin = dVal.get();
+            }
+            if(!setSensorLocation(x, y, z, xd, yd, zd, spin)){
                 return false;
             }
-            sVal.reset();
-            if (cpMethod()=="auto"){
-                iVal=getInt(json, "quantity", "The key \"quantity\" is needed with \"cp_method\" when auto is specified.", "The key \"quantity\" does not contain a number.", Severity::Error);
-                if (!iVal){
-                    return false;
-                }else{
-                    setNumCPs(iVal.get());
-                    iVal.reset();
-                }
-                dVal=getDouble(json, "target_percentage", "The key \"target_percentage\" is needed with \"cp_method\" when auto is specified.  A value of 0.10 will be assumed.", "The key \"target_percentage\" does not contain a number.  A value of 0.10 will be assumed.", Severity::Info);
-                if (!dVal){
-                    setTargetPercentage(0.1);
-                }else{
-                    setTargetPercentage(dVal.get());
-                    dVal.reset();
-                }
-                sVal=getString(json, "excluded_points", "No excluded points file is being used for the critical point analysis for control zone named \"" + name() + "\".", "The key \"excluded_points\" does not contain a string.", Severity::Info);
-                if (sVal){
-                    setExcludedPoints(sVal.get());
-                    sVal.reset();
-                }
-            }else if (cpMethod()=="user"){
-                treeVal=getTree(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
-                if (!treeVal){
-                    return false;
-                }else{
-                    for(boost::property_tree::ptree::value_type &v : treeVal.get()){
-                        iVal=getInt(v.second, "", "", "", Severity::Fatal);
-                        if (iVal){
-                            if (!setCriticalPoints(iVal.get())){
-                                return false;
-                            }
-                        }else{
-                            STADIC_LOG(Severity::Warning, "The key \"points\" has an entry that is not a number.");
+        }
+    }
+
+    sVal = getString(json, "cp_method", "The key \"cp_method\" does not appear in the zone named \""+name()+"\".", "The key \"cp_method\" in the zone named \""+name()+"\" does not contain a string.", Severity::Info);
+    if(sVal){
+        if(!setCPMethod(sVal.get())){
+            return false;
+        }
+        if(cpMethod()=="auto") {
+            iVal = getInt(json, "quantity", "The key \"quantity\" is needed with \"cp_method\" when auto is specified.", "The key \"quantity\" does not contain a number.", Severity::Error);
+            if(!iVal) {
+                return false;
+            } else {
+                setNumCPs(iVal.get());
+            }
+            dVal = getDouble(json, "target_percentage", "The key \"target_percentage\" is needed with \"cp_method\" when auto is specified.  A value of 0.10 will be assumed.", "The key \"target_percentage\" does not contain a number.  A value of 0.10 will be assumed.", Severity::Info);
+            if(!dVal) {
+                setTargetPercentage(0.1);
+            } else {
+                setTargetPercentage(dVal.get());
+            }
+            sVal = getString(json, "excluded_points", "No excluded points file is being used for the critical point analysis for control zone named \"" + name() + "\".", "The key \"excluded_points\" does not contain a string.", Severity::Info);
+            if(sVal) {
+                setExcludedPoints(sVal.get());
+            }
+        } else if(cpMethod()=="user"){
+            treeVal = getArray(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
+            if(!treeVal) {
+                return false;
+            } else {
+                for(auto &v : treeVal.get()){
+                    iVal = asInt(v, "The key \"points\" has an entry that is not a number.", Severity::Fatal);
+                    if(iVal){
+                        if(!setCriticalPoints(iVal.get())){
+                            return false;
                         }
-                        iVal.reset();
                     }
                 }
-                treeVal.reset();
             }
         }
-    }
-    if (json.find("open_dimming")!=json.not_found()){
-        treeVal=getTree(json, "open_dimming", "", Severity::Fatal);
-        if (!treeVal){
-            return false;
-        }else{
-            setAlgorithm("open_dimming");
-            dVal=getDouble(treeVal.get(), "maximum_bf_signal", "The key\"maximum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"maximum_bf_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setMaximumBFSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "minimum_bf_signal", "The key\"minimum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"minimum_bf_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setMinimumBFSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "off_signal", "The key\"off_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Info);
-            if (!dVal){
-                STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
-                setOffSignal(minimumBFSignal());
-            }else{
-                if (dVal.get()>minimumBFSignal()){
-                    STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
-                    setOffSignal(minimumBFSignal());
-                }else{
-                    setOffSignal(dVal.get());
-                }
-                dVal.reset();
-            }
-        }
-        treeVal.reset();
     }
 
-    if (json.find("closed_proportional")!=json.not_found()){
-        treeVal=getTree(json, "closed_proportional", "", Severity::Fatal);
-        if (!treeVal){
+    treeVal = getObject(json, "open_dimming");
+    if (treeVal){
+        setAlgorithm("open_dimming");
+        dVal = getDouble(treeVal.get(), "maximum_bf_signal", "The key\"maximum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"maximum_bf_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
             return false;
-        }else{
-            setAlgorithm("closed_proportional");
-            dVal=getDouble(treeVal.get(), "maximum_bf_signal", "The key\"maximum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"maximum_bf_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setMaximumBFSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "minimum_bf_signal", "The key\"minimum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"minimum_bf_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setMinimumBFSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "off_signal", "The key\"off_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Info);
-            if (!dVal){
+        } else {
+            setMaximumBFSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "minimum_bf_signal", "The key\"minimum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"minimum_bf_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
+            return false;
+        } else {
+            setMinimumBFSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "off_signal", "The key\"off_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Info);
+        if(!dVal) {
+            STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
+            setOffSignal(minimumBFSignal());
+        } else {
+            if(dVal.get()>minimumBFSignal()) {
                 STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
                 setOffSignal(minimumBFSignal());
-            }else{
-                if (dVal.get()>minimumBFSignal()){
-                    STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
-                    setOffSignal(minimumBFSignal());
-                }else{
-                    setOffSignal(dVal.get());
-                }
-                dVal.reset();
-            }
-        }
-        treeVal.reset();
-    }
-    if (json.find("constant_setpoint")!=json.not_found()){
-        treeVal=getTree(json, "constant_setpoint", "", Severity::Fatal);
-        if (!treeVal){
-            return false;
-        }else{
-            setAlgorithm("constant_setpoint");
-            dVal=getDouble(treeVal.get(), "setpoint_signal", "The key \"setpoint_signal\" is needed with the \"constant_setpoint\" algorithm.", "The key \"setpoint_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setSetpointSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"constant_setpoint\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
+            } else {
                 setOffSignal(dVal.get());
-                dVal.reset();
             }
         }
-        treeVal.reset();
     }
-    if (json.find("open_switching")!=json.not_found()){
-        treeVal=getTree(json, "open_switching", "", Severity::Fatal);
-        if (!treeVal){
+
+    treeVal = getObject(json, "closed_proportional");
+    if (treeVal) {
+        setAlgorithm("closed_proportional");
+        dVal = getDouble(treeVal.get(), "maximum_bf_signal", "The key\"maximum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"maximum_bf_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
             return false;
-        }else{
-            setAlgorithm("open_switching");
-            dVal=getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"open_switching\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
+        } else {
+            setMaximumBFSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "minimum_bf_signal", "The key\"minimum_bf_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"minimum_bf_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
+            return false;
+        } else {
+            setMinimumBFSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "off_signal", "The key\"off_signal\" is needed with the \"open_dimming\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Info);
+        if(!dVal) {
+            STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
+            setOffSignal(minimumBFSignal());
+        } else {
+            if(dVal.get()>minimumBFSignal()){
+                STADIC_LOG(Severity::Info, "The off signal in zone "+name()+" is being set to the minimum ballast factor signal.");
+                setOffSignal(minimumBFSignal());
+            } else {
                 setOffSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "on_signal", "The key \"on_signal\" is needed with the \"open_switching\" algorithm.", "The key \"on_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setOnSignal(dVal.get());
-                dVal.reset();
             }
         }
-        treeVal.reset();
     }
-    if (json.find("closed_switching")!=json.not_found()){
-        treeVal=getTree(json, "closed_switching", "", Severity::Fatal);
-        if (!treeVal){
+
+    treeVal = getObject(json, "constant_setpoint");
+    if (treeVal){
+        setAlgorithm("constant_setpoint");
+        dVal = getDouble(treeVal.get(), "setpoint_signal", "The key \"setpoint_signal\" is needed with the \"constant_setpoint\" algorithm.", "The key \"setpoint_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
             return false;
-        }else{
-            setAlgorithm("closed_switching");
-            dVal=getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"closed_switching\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setOffSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "on_signal", "The key \"on_signal\" is needed with the \"closed_switching\" algorithm.", "The key \"on_signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setOnSignal(dVal.get());
-                dVal.reset();
-            }
+        } else {
+            setSetpointSignal(dVal.get());
         }
-        treeVal.reset();
-    }
-    if (json.find("user_defined_1")!=json.not_found()){
-        treeVal=getTree(json, "user_defined_1", "", Severity::Fatal);
-        if (!treeVal){
+        dVal = getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"constant_setpoint\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
+        if(!dVal) {
             return false;
-        }else{
-            setAlgorithm("user_defined_1");
-            dVal=getDouble(treeVal.get(), "signal", "The key \"signal\" is needed with the \"user_defined_1\" algorithm.", "The key \"signal\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setSignal(dVal.get());
-                dVal.reset();
-            }
-            dVal=getDouble(treeVal.get(), "dimming_level", "The key \"dimming_level\" is needed with the \"user_defined_1\" algorithm.", "The key \"dimming_level\" does not contain a number.", Severity::Error);
-            if (!dVal){
-                return false;
-            }else{
-                setDimmingLevel(dVal.get());
-                dVal.reset();
-            }
-            sVal=getString(treeVal.get(), "signal_to_bf_file", "The key \"signal_to_bf_file\" is needed with the \"user_defined_1\" algorithm.", "The key \"signal_to_bf_file\" does not contain a string.", Severity::Error);
-            if (!sVal){
-                return false;
-            }else{
-                setSignalToBFFile(sVal.get());
-                sVal.reset();
-            }
+        } else {
+            setOffSignal(dVal.get());
         }
-        treeVal.reset();
     }
+        
+    treeVal = getObject(json, "open_switching");
+    if (treeVal){
+        setAlgorithm("open_switching");
+        dVal = getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"open_switching\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setOffSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "on_signal", "The key \"on_signal\" is needed with the \"open_switching\" algorithm.", "The key \"on_signal\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setOnSignal(dVal.get());
+        }
+    }
+
+    treeVal = getObject(json, "closed_switching");
+    if (treeVal){
+        setAlgorithm("closed_switching");
+        dVal = getDouble(treeVal.get(), "off_signal", "The key \"off_signal\" is needed with the \"closed_switching\" algorithm.", "The key \"off_signal\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setOffSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "on_signal", "The key \"on_signal\" is needed with the \"closed_switching\" algorithm.", "The key \"on_signal\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setOnSignal(dVal.get());
+        }
+    }
+        
+    treeVal = getObject(json, "user_defined_1");
+    if (treeVal){
+        setAlgorithm("user_defined_1");
+        dVal = getDouble(treeVal.get(), "signal", "The key \"signal\" is needed with the \"user_defined_1\" algorithm.", "The key \"signal\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setSignal(dVal.get());
+        }
+        dVal = getDouble(treeVal.get(), "dimming_level", "The key \"dimming_level\" is needed with the \"user_defined_1\" algorithm.", "The key \"dimming_level\" does not contain a number.", Severity::Error);
+        if(!dVal){
+            return false;
+        } else{
+            setDimmingLevel(dVal.get());
+        }
+        sVal = getString(treeVal.get(), "signal_to_bf_file", "The key \"signal_to_bf_file\" is needed with the \"user_defined_1\" algorithm.", "The key \"signal_to_bf_file\" does not contain a string.", Severity::Error);
+        if(!sVal){
+            return false;
+        } else{
+            setSignalToBFFile(sVal.get());
+        }
+    }
+     
     //After parsing for the algorithm test to see if the algorithm has been set.  Alert user if it hasn't been set
     if (algorithm()=="null"){
         STADIC_LOG(Severity::Warning, "There is no algorithm specified for the control zone named \""+name()+"\".");
     }
-    treeVal=getTree(json, "luminaire_information", "The key \"luminaire_information\" is missing for the control zone named "+name()+".", Severity::Error);
+
+    treeVal=getObject(json, "luminaire_information", "The key \"luminaire_information\" is missing for the control zone named "+name()+".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -811,7 +750,6 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
             return false;
         }else{
             setIESFile(sVal.get());
-            sVal.reset();
         }
         dVal=getDouble(treeVal.get(), "LLF", "The key \"LLF\" is needed within \"luminaire_information\".", "The key \"LLF\" is not a number.", Severity::Error);
         if (!dVal){
@@ -820,7 +758,6 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
             if (!setLLF(dVal.get())){
                 return false;
             }
-            dVal.reset();
         }
         dVal=getDouble(treeVal.get(), "lamp_lumens", "The key \"lamp_lumens\" is needed within \"luminaire_information\".",  "The key \"lamp_lumens\" is not a number.", Severity::Error);
         if (!dVal){
@@ -829,11 +766,10 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
             if (!setLampLumens(dVal.get())){
                 return false;
             }
-            dVal.reset();
         }
-        treeVal.reset();
     }
-    treeVal=getTree(json, "ballast_driver_information", "The key \"ballast_driver_information\" is missing for the control zone named "+name()+".", Severity::Error);
+
+    treeVal=getObject(json, "ballast_driver_information", "The key \"ballast_driver_information\" is missing for the control zone named "+name()+".", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -844,7 +780,6 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
             if (!setBallastType(sVal.get())){
                 return false;
             }
-            sVal.reset();
         }
         if (ballastType()=="linear_dimming"){
             dVal=getDouble(treeVal.get(), "bf_min", "The key \"bf_min\" is needed for ballast type \"linear_dimming\".", "The key \"bf_min\" is not a number.", Severity::Error);
@@ -852,28 +787,24 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
                 return false;
             }else{
                 setBFMin(dVal.get());
-                dVal.reset();
             }
             dVal=getDouble(treeVal.get(), "bf_max", "The key \"bf_max\" is needed for ballast type \"linear_dimming\".", "The key \"bf_max\" is not a number.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 setBFMax(dVal.get());
-                dVal.reset();
             }
             dVal=getDouble(treeVal.get(), "watts_max", "The key \"watts_max\" is needed for ballast type \"linear_dimming\".", "The key \"watts_max\" is not a number.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 setWattsMax(dVal.get());
-                dVal.reset();
             }
             dVal=getDouble(treeVal.get(), "watts_min", "The key \"watts_min\" is needed for ballast type \"linear_dimming\".", "The key \"watts_min\" is not a number.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 setWattsMin(dVal.get());
-                dVal.reset();
             }
         }else if (ballastType()=="non_dimming"){
             dVal=getDouble(treeVal.get(), "ballast_factor", "The key \"ballast_factor\" is needed for ballast type \"non_dimming\".", "The key \"ballast_factor\" is not a number.", Severity::Error);
@@ -881,73 +812,63 @@ bool ControlZone::parseJson (const boost::property_tree::ptree json){
                 return false;
             }else{
                 setBallastFactor(dVal.get());
-                dVal.reset();
             }
             dVal=getDouble(treeVal.get(), "watts", "The key \"watts\" is needed for ballast type \"non_dimming\".", "The key \"watts\" is not a number.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 setWatts(dVal.get());
-                dVal.reset();
             }
         }
-        treeVal.reset();
     }
 
-    treeVal=getTree(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
+    treeVal=getArray(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             double x, y, z, rot, tilt, spin;
-            dVal=getDouble(v.second, "x", "The key \"x\" must be found within the \"luminaire_layout\" entries.", "The key \"x\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "x", "The key \"x\" must be found within the \"luminaire_layout\" entries.", "The key \"x\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 x=dVal.get();
-                dVal.reset();
             }
-            dVal=getDouble(v.second, "y", "The key \"y\" was not found within \"luminaire_layout\".", "The key \"y\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "y", "The key \"y\" was not found within \"luminaire_layout\".", "The key \"y\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 y=dVal.get();
-                dVal.reset();
             }
-            dVal=getDouble(v.second, "z", "The key \"z\" was not found within \"luminaire_layout\".", "The key \"z\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "z", "The key \"z\" was not found within \"luminaire_layout\".", "The key \"z\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 z=dVal.get();
-                dVal.reset();
             }
-            dVal=getDouble(v.second, "rotation", "The key \"rotation\" was not found within \"luminaire_layout\".", "The key \"rotation\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "rotation", "The key \"rotation\" was not found within \"luminaire_layout\".", "The key \"rotation\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 rot=dVal.get();
-                dVal.reset();
             }
-            dVal=getDouble(v.second, "tilt", "The key \"tilt\" was not found within \"luminaire_layout\".", "The key \"tilt\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "tilt", "The key \"tilt\" was not found within \"luminaire_layout\".", "The key \"tilt\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 tilt=dVal.get();
-                dVal.reset();
             }
-            dVal=getDouble(v.second, "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 spin=dVal.get();
-                dVal.reset();
             }
             if(!setLuminaireLayout(x, y, z, rot, tilt, spin)){
                 return false;
             }
         }
     }
-    treeVal.reset();
     return true;
 }
 

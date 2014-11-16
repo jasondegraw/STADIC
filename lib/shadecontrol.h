@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -43,10 +43,8 @@
 #include <string>
 #include <vector>
 
-//#include <QJsonObject>
-#include <boost/property_tree/ptree.hpp>
-
 #include "stadicapi.h"
+#include "jsonobjects.h"
 
 namespace stadic {
 
@@ -54,8 +52,7 @@ class STADIC_API ShadeControl
 {
 public:
     explicit ShadeControl();
-    //bool parseJson(const QJsonObject &object);
-    bool parseJson (const boost::property_tree::ptree &json);
+    bool parseJson(const JsonObject &json);
 
     //Setters
     bool setMethod(std::string method);
@@ -77,8 +74,8 @@ public:
 
 
 private:
-    bool readAutoProf(const boost::property_tree::ptree &json, std::string method);
-    bool readAutoSign(const boost::property_tree::ptree &json, std::string method);
+    bool readAutoProf(const JsonObject &json, std::string method);
+    bool readAutoSign(const JsonObject &json, std::string method);
     std::string m_Method;
     double m_ElevationAzimuth;
     std::vector<double> m_AngleSettings;

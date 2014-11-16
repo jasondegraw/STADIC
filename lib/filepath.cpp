@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -49,42 +49,11 @@
 #endif
 
 namespace stadic{
-//*************************
-//FilePath
-//*************************
-FilePath::FilePath(std::string path)
-{
-    m_Path = path;
-#ifdef _MSC_VER
-    m_fileAttr = new WIN32_FILE_ATTRIBUTE_DATA;
-    GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr);
-#else
-    if (isFile()){
-        lastMod();
-    }
-#endif
-}
 
-FilePath::~FilePath()
+bool isDir(const std::string &dir)
 {
 #ifdef _MSC_VER
-    delete m_fileAttr;
-#endif
-}
-
-//Getters
-std::string FilePath::toString(){
-    return m_Path;
-}
-
-//Utilities
-bool FilePath::isDir(){
-#ifdef _MSC_VER
-    //WIN32_FILE_ATTRIBUTE_DATA fileAttr;
-    //if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, &fileAttr)) {
-    //    return fileAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
-    //}
-    DWORD result = GetFileAttributes(m_Path.c_str());
+    DWORD result = GetFileAttributes(dir.c_str());
     if(result != INVALID_FILE_ATTRIBUTES) {
         return result & FILE_ATTRIBUTE_DIRECTORY;
     }
@@ -92,16 +61,17 @@ bool FilePath::isDir(){
 #else //POSIX
     struct stat path;
 
-    if (stat(m_Path.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
+    if(stat(dir.c_str(), &path)==0 && S_ISDIR(path.st_mode)){
         return true;
     }
     return false;
 #endif
 }
 
-bool FilePath::isFile(){
+bool isFile(const std::string &file)
+{
 #ifdef _MSC_VER
-    DWORD result = GetFileAttributes(m_Path.c_str());
+    DWORD result = GetFileAttributes(file.c_str());
     if(result != INVALID_FILE_ATTRIBUTES) {
         return !(result & FILE_ATTRIBUTE_DIRECTORY);
     }
@@ -109,53 +79,19 @@ bool FilePath::isFile(){
 #else //POSIX
     struct stat path;
 
-    if (stat(m_Path.c_str(), &path)==0 && S_ISREG(path.st_mode)){
+    if(stat(file.c_str(), &path)==0 && S_ISREG(path.st_mode)){
         return true;
     }
     return false;
 #endif
 }
 
-bool FilePath::exists(){
-    if(isDir()){
+bool exists(const std::string &path)
+{
+    if(isDir(path)){
         return true;
     }
-    return isFile();
-    return false;
-}
-
-bool FilePath::isUpdated(){
-#ifdef _MSC_VER
-    FILETIME lastTime = m_fileAttr->ftLastWriteTime;
-    if(GetFileAttributesEx(m_Path.c_str(), GetFileExInfoStandard, m_fileAttr)) {
-        return CompareFileTime(&(m_fileAttr->ftLastWriteTime), &lastTime) > 0;
-    }
-    return false;
-#else //POSIX
-    if(isDir()) {
-        return false;
-    }
-    struct tm originalMod;
-    memcpy(&originalMod, &m_LastMod, sizeof(m_LastMod));
-    lastMod();
-    if (difftime(mktime(&m_LastMod),mktime(&originalMod))>0){
-        return true;
-    }
-    return false;
-#endif
-}
-
-//Private
-void FilePath::lastMod(){
-#ifdef _MSC_VER
-    // On Windows, this function is not needed.
-#else
-    struct stat path;
-    if (isFile()){
-        stat(m_Path.c_str(),&path);
-        localtime_r(&path.st_mtime, &m_LastMod);
-    }
-#endif
+    return isFile(path);
 }
 
 }

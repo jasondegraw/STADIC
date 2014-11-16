@@ -9,17 +9,17 @@
  *
  * 1. Redistribution of source code must retain the
  *    above copyright notice, this list of conditions
- *    and the following Disclaimer.
+ *    and the following disclaimer.
  *
  * 2. Redistribution in binary form must reproduce the
  *    above copyright notice, this list of conditions
- *    and the following disclaimer
+ *    and the following disclaimer.
  *
  * 3. Neither the name of The Pennsylvania State University
  *    nor the names of its contributors may be used to
  *    endorse or promote products derived from this software
  *    without the specific prior written permission of The
- *    Pennsylvania State University
+ *    Pennsylvania State University.
  *
  * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
  * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
@@ -56,10 +56,9 @@ public:
     // Getters
     std::vector<double> points() const;                                             //Function that returns the points of a radiance polygon as a vector
 
-
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
+    virtual bool validateArg3(const std::vector<std::string> &arg) const;
 };
 
 //Sphere
@@ -78,9 +77,8 @@ public:
     std::vector<double> centerPoint() const;                                            //Function that returns the center point of a sphere as a vector
     double radius() const;                                                              //Function that returns the radius of the sphere as a double
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 //Ring
@@ -103,9 +101,8 @@ public:
     double innerRadius() const;                                                         //Function that returns the inner radius of the ring as a double
     double outerRadius() const;                                                         //Function that returns the outer radius of the ring as a double
 
-private:
-   virtual bool validateArg(int number, std::string value, int position) const;
-   virtual bool validateArg(int number, std::vector<std::string> value) const;
+protected:
+    virtual bool validateArg3(const std::string &value, int position) const;
 };
 
 }
