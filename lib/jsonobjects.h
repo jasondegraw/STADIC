@@ -45,9 +45,13 @@
 #include "stadicapi.h"
 #include "logging.h"
 
+#include <json/json.h>
+
 namespace stadic {
 
 typedef boost::property_tree::ptree JsonObject;
+
+boost::optional<JsonObject> readJsonDocument(const std::string &filename);
 
 boost::optional<double> STADIC_API getDouble(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, const std::string &errorBad, Severity severity);

@@ -39,7 +39,29 @@
 
 #include "jsonobjects.h"
 
+#include <fstream>
+#include <boost/property_tree/json_parser.hpp>
+
 namespace stadic {
+
+boost::optional<JsonObject> readJsonDocument(const std::string &filename)
+{
+    std::ifstream iFile;
+    iFile.open(filename);
+    if(!iFile.is_open()){
+        return boost::none;
+    }
+    iFile.close();
+
+    boost::property_tree::ptree json;
+    boost::property_tree::read_json(filename, json);
+    if(json.empty()){
+        STADIC_LOG(Severity::Fatal, "The json file is empty");
+        return boost::none;
+    }
+
+    return boost::optional<JsonObject>(json);
+}
 
 boost::optional<double> getDouble(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)

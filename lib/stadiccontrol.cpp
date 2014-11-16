@@ -43,8 +43,6 @@
 #include <fstream>
 #include <string>
 #include "functions.h"
-#include <boost/property_tree/json_parser.hpp>
-//#include <boost/foreach.hpp>
 
 namespace stadic {
 
@@ -578,20 +576,17 @@ double Control::UDIMax(){
 //PARSER
 //******************
 
-bool Control::parseJson(std::string file){
-    std::fstream iFile;
-    iFile.open(file);
-    if (!iFile.is_open()){
-        return false;
-    }
-    iFile.close();
+bool Control::parseJson(const std::string &file)
+{
+    boost::optional<JsonObject> jsonOpt = readJsonDocument(file);
 
-    boost::property_tree::ptree json;
-    boost::property_tree::read_json(file, json);
-    if (json.empty()){
-        STADIC_LOG(Severity::Fatal, "The json file is empty");
+    if(!jsonOpt){
+        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\"");
         return false;
     }
+
+    JsonObject json = jsonOpt.get();
+
     //get_value_or(/*default*/);
     boost::optional<std::string> sVal;
     boost::optional<double> dVal;
@@ -603,7 +598,7 @@ bool Control::parseJson(std::string file){
     //Folder Information
     //******************
     sVal=getString(json, "project_name", "The key \"project_name\" does not appear in the STADIC Control File.", "The key \"project_name\" does not contain a string.", Severity::Error);
-    if (!sVal){
+    if(!sVal){
         return false;
     }else{
         setProjectName(sVal.get());
@@ -611,7 +606,7 @@ bool Control::parseJson(std::string file){
     }
 
     sVal=getString(json, "project_folder", "The key \"project_folder\" does not appear in the STADIC Control File.", "The key \"project_folder\" does not contain a string.", Severity::Error);
-    if (!sVal){
+    if(!sVal){
         return false;
     }else{
         setProjectFolder(sVal.get());
