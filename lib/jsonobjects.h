@@ -40,16 +40,17 @@
 #ifndef JSONOBJECTS_H
 #define JSONOBJECTS_H
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "stadicapi.h"
 #include "logging.h"
 
 #include <json/json.h>
+#include <boost/optional.hpp>
 
 namespace stadic {
 
-typedef boost::property_tree::ptree JsonObject;
+//typedef boost::property_tree::ptree JsonObject;
+
+typedef Json::Value JsonObject;
 
 boost::optional<JsonObject> readJsonDocument(const std::string &filename);
 
@@ -65,6 +66,9 @@ boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::stri
     const std::string &errorBad, Severity severity);
 boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key);
 boost::optional<JsonObject> STADIC_API getObject(const JsonObject &json, const std::string &key,
+    const std::string &errorMissing, Severity severity);
+boost::optional<JsonObject> STADIC_API getArray(const JsonObject &json, const std::string &key);
+boost::optional<JsonObject> STADIC_API getArray(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, Severity severity);
 
 boost::optional<double> STADIC_API asDouble(const JsonObject &json, const std::string &errorBad, Severity severity);

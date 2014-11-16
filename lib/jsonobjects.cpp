@@ -40,7 +40,6 @@
 #include "jsonobjects.h"
 
 #include <fstream>
-#include <boost/property_tree/json_parser.hpp>
 
 namespace stadic {
 
@@ -49,145 +48,167 @@ boost::optional<JsonObject> readJsonDocument(const std::string &filename)
     std::ifstream iFile;
     iFile.open(filename);
     if(!iFile.is_open()){
-        return boost::none;
-    }
-    iFile.close();
-
-    boost::property_tree::ptree json;
-    boost::property_tree::read_json(filename, json);
-    if(json.empty()){
-        STADIC_LOG(Severity::Fatal, "The json file is empty");
+        STADIC_LOG(Severity::Warning, "Failed to open json file \"" + filename + "\".");
         return boost::none;
     }
 
-    return boost::optional<JsonObject>(json);
+    Json::Reader reader;
+    JsonObject root;
+    bool success = reader.parse(iFile, root);
+    if(!success) {
+        STADIC_LOG(Severity::Warning, "Failed to parse json file \"" + filename + "\".");
+        return boost::none;
+    }
+
+    return boost::optional<JsonObject>(root);
 }
 
 boost::optional<double> getDouble(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
 {
-    boost::optional<double> dVal;
-    try{
-        dVal = json.get<double>(key);
-    } catch(const boost::property_tree::ptree_bad_path &){
+    JsonObject value = json[key];
+    if(value.isNull()) {
         STADIC_LOG(severity, errorMissing);
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    } else {
+        if(value.isDouble()) {
+            return boost::optional<double>(value.asDouble());
+        } else {
+            STADIC_LOG(severity, errorBad);
+        }
     }
-    return dVal;
+    return boost::none;
 }
 
 boost::optional<int> getInt(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
 {
-    boost::optional<int> iVal;
-    try{
-        iVal = json.get<int>(key);
-    } catch(const boost::property_tree::ptree_bad_path &){
+    JsonObject value = json[key];
+    if(value.isNull()) {
         STADIC_LOG(severity, errorMissing);
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    } else {
+        if(value.isInt()) {
+            return boost::optional<int>(value.asInt());
+        } else {
+            STADIC_LOG(severity, errorBad);
+        }
     }
-    return iVal;
+    return boost::none;
 }
 
 boost::optional<std::string> getString(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
 {
-    boost::optional<std::string> sVal;
-    try{
-        sVal = json.get<std::string>(key);
-    } catch(const boost::property_tree::ptree_bad_path &){
+    JsonObject value = json[key];
+    if(value.isNull()) {
         STADIC_LOG(severity, errorMissing);
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    } else {
+        if(value.isString()) {
+            return boost::optional<std::string>(value.asString());
+        } else {
+            STADIC_LOG(severity, errorBad);
+        }
     }
-    return sVal;
+    return boost::none;
 }
 
 boost::optional<bool> getBool(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
 {
-    boost::optional<bool> bVal;
-    try{
-        bVal = json.get<bool>(key);
-    } catch(const boost::property_tree::ptree_bad_path &){
+    JsonObject value = json[key];
+    if(value.isNull()) {
         STADIC_LOG(severity, errorMissing);
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    } else {
+        if(value.isBool()) {
+            return boost::optional<bool>(value.asBool());
+        } else {
+            STADIC_LOG(severity, errorBad);
+        }
     }
-    return bVal;
+    return boost::none;
 }
 
-boost::optional<bool> getBool(const JsonObject &json, const std::string &key, bool defaultValue, const std::string &errorBad, Severity severity)
+boost::optional<bool> getBool(const JsonObject &json, const std::string &key, bool defaultValue,
+    const std::string &errorBad, Severity severity)
 {
-    boost::optional<bool> bVal;
-    try{
-        bVal = json.get<bool>(key);
-    } catch(const boost::property_tree::ptree_bad_path &){
+    JsonObject value = json[key];
+    if(value.isNull()) {
         return boost::optional<bool>(defaultValue);
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
-        return boost::optional<bool>(defaultValue);
+    } else {
+        if(value.isBool()) {
+            return boost::optional<bool>(value.asBool());
+        } else {
+            STADIC_LOG(severity, errorBad);
+        }
     }
-    return bVal;
+    return boost::none;
 }
 
 boost::optional<JsonObject> getObject(const JsonObject &json, const std::string &key)
 {
-    boost::property_tree::ptree treeVal;
-    try {
-        treeVal = json.get_child(key);
-    } catch(const boost::property_tree::ptree_bad_path &) {
-        return boost::none;
+    JsonObject value = json[key];
+    if(!value.isNull()) {
+        return boost::optional<JsonObject>(value);
     }
-    return boost::optional<boost::property_tree::ptree>(treeVal);
+    return boost::none;
 }
 
 boost::optional<JsonObject> getObject(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, Severity severity)
 {
-    boost::property_tree::ptree treeVal;
-    try {
-        treeVal = json.get_child(key);
-    } catch(const boost::property_tree::ptree_bad_path &) {
-        STADIC_LOG(severity, errorMissing);
-        return boost::none;
+    JsonObject value = json[key];
+    if(!value.isNull()) {
+        return boost::optional<JsonObject>(value);
     }
-    return boost::optional<boost::property_tree::ptree>(treeVal);
+    STADIC_LOG(severity, errorMissing);
+    return boost::none;
+}
+
+boost::optional<JsonObject> getArray(const JsonObject &json, const std::string &key)
+{
+    JsonObject value = json[key];
+    if(!value.isNull()) {
+        if(value.isArray()) {
+            return boost::optional<JsonObject>(value);
+        }
+    }
+    return boost::none;
+}
+
+boost::optional<JsonObject> getArray(const JsonObject &json, const std::string &key,
+    const std::string &errorMissing, Severity severity)
+{
+    JsonObject value = json[key];
+    if(!value.isNull()) {
+        if(value.isArray()) {
+            return boost::optional<JsonObject>(value);
+        }
+    }
+    STADIC_LOG(severity, errorMissing);
+    return boost::none;
 }
 
 boost::optional<double> asDouble(const JsonObject &json, const std::string &errorBad, Severity severity)
 {
-    boost::optional<double> dVal;
-    try{
-        dVal = json.get<double>("");
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    if(json.isDouble()) {
+        return boost::optional<double>(json.asDouble());
     }
-    return dVal;
+    return boost::none;
 }
 
 boost::optional<int> asInt(const JsonObject &json, const std::string &errorBad, Severity severity)
 {
-    boost::optional<int> iVal;
-    try{
-        iVal = json.get<int>("");
-    } catch(const boost::property_tree::ptree_bad_data &){
-        STADIC_LOG(severity, errorBad);
+    if(json.isInt()) {
+        return boost::optional<int>(json.asInt());
     }
-    return iVal;
+    return boost::none;
 }
 
 boost::optional<std::string> asString(const JsonObject &json, const std::string &errorBad, Severity severity)
 {
-    boost::optional<std::string> sVal;
-    try{
-        sVal = json.get<std::string>("");
-    } catch(const boost::property_tree::ptree_bad_data &) {
-        STADIC_LOG(severity, errorBad);
+    if(json.isString()) {
+        return boost::optional<std::string>(json.asString());
     }
-    return sVal;
+    return boost::none;
 }
 
 }

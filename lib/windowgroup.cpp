@@ -117,20 +117,20 @@ bool WindowGroup::parseJson(const JsonObject &json){
     setBSDF(bVal.get());
 
     sVal=getString(json, "base_geometry", "The key \"base_geometry\" within window group "+name()+" is missing.", "The key \"base_geometry\" within window group " + name() + " is not a string.", Severity::Info);
-    if (!sVal){
+    if(!sVal) {
         STADIC_LOG(Severity::Info, "It is assumed there are is no base geometry for window group " +name()+".");
         setBaseGeometry("empty.rad");
-    }else{
+    } else {
         setBaseGeometry(sVal.get());
     }
 
     if (isBSDF()){
-        treeVal=getObject(json, "bsdf_base_layers", "The key \"bsdf_base_layers\" within window group " + name() + " is missing.", Severity::Info);
-        if (!treeVal){
+        treeVal=getArray(json, "bsdf_base_layers");
+        if(!treeVal) {
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
-        }else{
+        } else {
             for(auto &v : treeVal.get()){
-                sVal = asString(v.second, "There was a problem reading the bsdf_base_layers key for window group "+name()+".", Severity::Fatal);
+                sVal = asString(v, "There was a problem reading the bsdf_base_layers key for window group "+name()+".", Severity::Fatal);
                 if (sVal){
                     m_BSDFBaseLayers.push_back(sVal.get());
                 }
@@ -138,24 +138,24 @@ bool WindowGroup::parseJson(const JsonObject &json){
         }
     }
 
-    treeVal=getObject(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
-    if (!treeVal){
+    treeVal=getArray(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
+    if(!treeVal) {
         return false;
-    }else{
+    } else {
         for(auto &v : treeVal.get()){
-            sVal = asString(v.second, "There was a problem reading the glazing_layers key for window group "+name()+".", Severity::Fatal);
+            sVal = asString(v, "There was a problem reading the glazing_layers key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_GlazingLayers.push_back(sVal.get());
             }
         }
     }
 
-    treeVal=getObject(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
-    if (!treeVal){
+    treeVal=getArray(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
+    if(!treeVal){
         STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
     }else{
         for(auto &v : treeVal.get()){
-            sVal = asString(v.second, "There was a problem reading the shade_settings key for window group "+name()+".", Severity::Fatal);
+            sVal = asString(v, "There was a problem reading the shade_settings key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_ShadeSettingGeometry.push_back(sVal.get());
             }
@@ -174,14 +174,14 @@ bool WindowGroup::parseJson(const JsonObject &json){
     }
 
     if (isBSDF() && shadeSettingGeometry().size()>0){
-        treeVal=getObject(json, "bsdf_setting_layers", "The key \"bsdf_setting_layers\" within window group " + name() + " is missing.", Severity::Info);
+        treeVal=getArray(json, "bsdf_setting_layers");
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
         }else{
             for(auto &v : treeVal.get()){
                 std::vector<std::string> tempVector;
-                for (auto &v2 : v.second){
-                    sVal = asString(v2.second, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".", Severity::Fatal);
+                for (auto &v2 : v){
+                    sVal = asString(v2, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".", Severity::Fatal);
                     if (sVal){
                         tempVector.push_back(sVal.get());
                     }

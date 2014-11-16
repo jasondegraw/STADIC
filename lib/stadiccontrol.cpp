@@ -581,7 +581,7 @@ bool Control::parseJson(const std::string &file)
     boost::optional<JsonObject> jsonOpt = readJsonDocument(file);
 
     if(!jsonOpt){
-        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\"");
+        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\".");
         return false;
     }
 
@@ -592,7 +592,7 @@ bool Control::parseJson(const std::string &file)
     boost::optional<double> dVal;
     boost::optional<int> iVal;
     boost::optional<bool> bVal;
-    boost::optional<boost::property_tree::ptree> treeVal;
+    boost::optional<JsonObject> treeVal;
 
     //******************
     //Folder Information
@@ -716,13 +716,13 @@ bool Control::parseJson(const std::string &file)
         sVal.reset();
     }
 
-    treeVal=getObject(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
+    treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             WindowGroup WG;
-            if (WG.parseJson(v.second)){
+            if (WG.parseJson(v)){
                 m_WindowGroups.push_back(WG);
             }else{
                 return false;
@@ -988,9 +988,9 @@ bool Control::parseJson(const std::string &file)
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             ControlZone zone;
-            if (zone.parseJson(v.second)){
+            if (zone.parseJson(v)){
                 m_ControlZones.push_back(zone);
             }else{
                 return false;

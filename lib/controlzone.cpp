@@ -588,12 +588,12 @@ bool ControlZone::parseJson (const JsonObject &json){
                 setExcludedPoints(sVal.get());
             }
         } else if(cpMethod()=="user"){
-            treeVal = getObject(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
+            treeVal = getArray(json, "points", "The key \"points\" is needed with \"cp_method\" when user is specified.", Severity::Error);
             if(!treeVal) {
                 return false;
             } else {
                 for(auto &v : treeVal.get()){
-                    iVal = asInt(v.second, "The key \"points\" has an entry that is not a number.", Severity::Fatal);
+                    iVal = asInt(v, "The key \"points\" has an entry that is not a number.", Severity::Fatal);
                     if(iVal){
                         if(!setCriticalPoints(iVal.get())){
                             return false;
@@ -663,7 +663,7 @@ bool ControlZone::parseJson (const JsonObject &json){
     }
 
     treeVal = getObject(json, "constant_setpoint");
-    if (json.find("constant_setpoint")!=json.not_found()){
+    if (treeVal){
         setAlgorithm("constant_setpoint");
         dVal = getDouble(treeVal.get(), "setpoint_signal", "The key \"setpoint_signal\" is needed with the \"constant_setpoint\" algorithm.", "The key \"setpoint_signal\" does not contain a number.", Severity::Error);
         if(!dVal) {
@@ -822,43 +822,43 @@ bool ControlZone::parseJson (const JsonObject &json){
         }
     }
 
-    treeVal=getObject(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
+    treeVal=getArray(json, "luminaire_layout", "The key \"luminaire_layout\" is needed for a control zone.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
-        for(boost::property_tree::ptree::value_type &v : treeVal.get()){
+        for(auto &v : treeVal.get()){
             double x, y, z, rot, tilt, spin;
-            dVal=getDouble(v.second, "x", "The key \"x\" must be found within the \"luminaire_layout\" entries.", "The key \"x\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "x", "The key \"x\" must be found within the \"luminaire_layout\" entries.", "The key \"x\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 x=dVal.get();
             }
-            dVal=getDouble(v.second, "y", "The key \"y\" was not found within \"luminaire_layout\".", "The key \"y\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "y", "The key \"y\" was not found within \"luminaire_layout\".", "The key \"y\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 y=dVal.get();
             }
-            dVal=getDouble(v.second, "z", "The key \"z\" was not found within \"luminaire_layout\".", "The key \"z\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "z", "The key \"z\" was not found within \"luminaire_layout\".", "The key \"z\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 z=dVal.get();
             }
-            dVal=getDouble(v.second, "rotation", "The key \"rotation\" was not found within \"luminaire_layout\".", "The key \"rotation\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "rotation", "The key \"rotation\" was not found within \"luminaire_layout\".", "The key \"rotation\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 rot=dVal.get();
             }
-            dVal=getDouble(v.second, "tilt", "The key \"tilt\" was not found within \"luminaire_layout\".", "The key \"tilt\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "tilt", "The key \"tilt\" was not found within \"luminaire_layout\".", "The key \"tilt\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
                 tilt=dVal.get();
             }
-            dVal=getDouble(v.second, "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
+            dVal=getDouble(v, "spin_ccw", "The key \"spin_ccw\" was not found within \"location\".", "The key \"spin_ccw\" is not a double.", Severity::Error);
             if (!dVal){
                 return false;
             }else{
