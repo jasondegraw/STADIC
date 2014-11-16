@@ -44,8 +44,7 @@
 #include <vector>
 #include "windowgroup.h"
 #include "controlzone.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/optional/optional.hpp>
+#include <boost/optional.hpp>
 #include "logging.h"
 
 #include "stadicapi.h"

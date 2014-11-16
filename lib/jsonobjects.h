@@ -48,8 +48,6 @@
 
 namespace stadic {
 
-//typedef boost::property_tree::ptree JsonObject;
-
 typedef Json::Value JsonObject;
 
 boost::optional<JsonObject> readJsonDocument(const std::string &filename);

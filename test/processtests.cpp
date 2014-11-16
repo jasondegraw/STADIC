@@ -42,6 +42,7 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <fstream>
+#include <algorithm>
 #ifdef _WIN32
 #include <Windows.h>
 #else
