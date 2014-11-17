@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(lib)
 
-#include_directories("../" "../dependencies/jsoncpp")
-
 set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
 
 set(SRCS stadiccontrol.cpp
@@ -50,3 +48,4 @@ set(HDRS stadicapi.h
          jsonobjects.h)
 
  add_library(stadic_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
+ add_dependencies(stadic_core boost-geometry)

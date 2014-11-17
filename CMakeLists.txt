@@ -28,14 +28,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Boost
 set(USE_INSTALLED_BOOST OFF CACHE BOOL "Look for installed Boost")
 if(USE_INSTALLED_BOOST)
-  find_package(Boost 1.56 REQUIRED)
-  include_directories(${Boost_INCLUDE_DIR})
+  find_package(Boost 1.57 REQUIRED)
 else()
-  include_directories(${CMAKE_SOURCE_DIR}/boost-1.56.0-subset)
+  include(ExternalProject)
+  ExternalProject_Add(boost-geometry
+    URL ${CMAKE_SOURCE_DIR}/dependencies/boost-geometry.tar.gz
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND "")
+  set(Boost_INCLUDE_DIR ${CMAKE_BINARY_DIR}/boost-geometry-prefix/src/boost-geometry)
 endif()
+include_directories(${Boost_INCLUDE_DIR})
 
 # JSON Dependency
-include_directories("dependencies/jsoncpp/")
+include_directories("dependencies/jsoncpp")
 
 add_subdirectory(lib)
 add_subdirectory(utilities)
