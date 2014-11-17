@@ -32,7 +32,7 @@ if(USE_INSTALLED_BOOST)
 else()
   include(ExternalProject)
   ExternalProject_Add(boost-geometry
-    URL ${CMAKE_SOURCE_DIR}/dependencies/boost-geometry.tar.gz
+    URL ${CMAKE_SOURCE_DIR}/dependencies/boost-geometry-1_57.tar.gz
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND "")
