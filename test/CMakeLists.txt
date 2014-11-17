@@ -12,7 +12,7 @@ target_link_libraries(controltests stadic_core gtest gtest_main)
 # This is suboptimal, but it works
 add_custom_command(TARGET controltests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
-                   ${CMAKE_SOURCE_DIR}/test/resources/TestSControl.json $<TARGET_FILE_DIR:controltests>)
+                   ${CMAKE_SOURCE_DIR}/test/resources/control.json $<TARGET_FILE_DIR:controltests>)
 
 add_executable(weathertests weathertests.cpp)
 add_test(weathertests weathertests)
@@ -36,7 +36,7 @@ add_custom_command(TARGET radfiletests POST_BUILD
                    ${CMAKE_SOURCE_DIR}/test/resources/material.rad $<TARGET_FILE_DIR:radfiletests>)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
-                   ${CMAKE_SOURCE_DIR}/test/resources/Simple.rad $<TARGET_FILE_DIR:radfiletests>)
+                   ${CMAKE_SOURCE_DIR}/test/resources/simple.rad $<TARGET_FILE_DIR:radfiletests>)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/supportedprimitives.rad $<TARGET_FILE_DIR:radfiletests>)
@@ -61,7 +61,7 @@ add_test(leaktests leaktests)
 target_link_libraries(leaktests stadic_core gtest gtest_main)
 add_custom_command(TARGET leaktests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/test/resources/SimpleHole.rad $<TARGET_FILE_DIR:leaktests>)
+                    ${CMAKE_SOURCE_DIR}/test/resources/simplehole.rad $<TARGET_FILE_DIR:leaktests>)
 
 add_executable(functiontests functiontests.cpp)
 add_test(functiontests functiontests)
@@ -89,7 +89,15 @@ add_custom_command(TARGET gridtests POST_BUILD
                     ${CMAKE_SOURCE_DIR}/test/resources/complicated.rad $<TARGET_FILE_DIR:gridtests>)
 
 
-set(RESOURCES resources/SimpleHole.rad
+set(RESOURCES resources/simple.rad
+              resources/simplehole.rad
+              resources/material.rad
+              resources/supportedprimitives.rad
+              resources/badplasticmaterial.rad
+              badmetalmaterial.rad
+              resources/badglassmaterial.rad
+              resources/badtransmaterial.rad
+              resources/badpolygongeometry.rad
 			  resources/standard/SimpleStd.json
 			  resources/standard/data/Lancaster.wea
 			  resources/standard/rad/material.rad

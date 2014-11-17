@@ -44,7 +44,7 @@
 TEST(ControlTests, PTreeReadJson)
 {
   stadic::Control controlFile;
-  ASSERT_TRUE(controlFile.parseJson("TestSControl.json"));
+  ASSERT_TRUE(controlFile.parseJson("control.json"));
   EXPECT_EQ("prj1",controlFile.projectName());
   EXPECT_EQ("c:/example/", controlFile.projectFolder());
   EXPECT_EQ("tmp/", controlFile.tmpFolder());
