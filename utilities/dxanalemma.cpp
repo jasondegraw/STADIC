@@ -53,13 +53,9 @@ int main (int argc, char *argv[])
         usage();
     }
     std::string weaFile;
-    weaFile.clear();
     std::string matFile;
-    matFile.clear();
     std::string geoFile;
-    geoFile.clear();
     std::string smxFile;
-    smxFile.clear();
     double rotation=0;
 
     for (int i=1;i<argc;i++){
@@ -107,8 +103,6 @@ int main (int argc, char *argv[])
     if (!suns.genSun()){
         return EXIT_FAILURE;
     }
-
-
 
     return EXIT_SUCCESS;
 }

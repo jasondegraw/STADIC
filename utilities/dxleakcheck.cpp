@@ -56,12 +56,9 @@ int main (int argc, char *argv[])
         usage();
     }
     std::vector<std::string> radFiles;                   //  Variable holding the radiance geometry/material file names
-    radFiles.clear();
     std::vector<std::string> floorLayers;                //  Variable holding the floor layer names for testing whether the given point is in the polygons
-    floorLayers.clear();
     int unit;
     double reflectance=1;                   //  Variable holding the reflectance
-
 
     for (int i=1;i<argc;i++){
         if (argv[i]=="-f"){

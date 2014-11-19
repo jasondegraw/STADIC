@@ -71,17 +71,11 @@ int main (int argc, char *argv[])
         usage();
     }
     std::vector<std::string> fileName;
-    fileName.clear();
     std::string resultFile;
-    resultFile.clear();
     std::string csvFile;
-    csvFile.clear();
     std::string polyFile;
-    polyFile.clear();
     std::string viewLocation;
-    viewLocation.clear();
     std::string vType;
-    vType.clear();
     std::vector<std::string> layerNames;
     bool useZOffset=false;
     bool useOffset=false;
