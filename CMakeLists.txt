@@ -15,10 +15,10 @@ elseif(MSVC)
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "18.0.21005.1")
     message(FATAL_ERROR "Visual Studio earlier than VS2013 is not supported")
   endif()
-elseif(Apple)
-  # The checks to determine if the compiler is clang are all rather sketchy,
-  # and maybe this should go before the g++ test above to get things right.
-  # But for now skip the checks and assume everything will be Ok.
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # This check for clang seems to work, at least on Ubuntu. Not that much 
+  # else works on Ubuntu: had to add -I/usr/include/c++/4.8/ and 
+  # -I/usr/include/x86_64-linux-gnu/c++/4.8/ to get it to compile.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 endif()
 
