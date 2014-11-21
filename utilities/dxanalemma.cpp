@@ -43,8 +43,12 @@
 #include <string>
 
 void usage(){
-    std::cerr<<"dxgridmaker generates a points file for use in RADIANCE analysis programs.  The program allows any number of polygons and any number of layer names to be used for the placement of points.  grid_maker will then join all of the polygons and create an array of points within the bounding rectangle and tests each point to determine whether it is within the joined polygon.  These points will then be written out to a given file name for use as input to other programs.  It is assumed that the units of the radiance geometry file are the same as the input units for the spacing, offset, and Z height."<<std::endl;
-    std::cerr<<std::endl<<"-f name\tSet the input file to name. This file contains the radiance polygons that will be used for creating the analysis points.  This is a mandatory option."<<std::endl;
+    std::cerr<<"dxanalemma generates the necessary files for the five phase .smx file including a material and geometry file."<<std::endl;
+    std::cerr<<std::endl<<"-f name\tSet the input weather file to name. This file can either be an epw or tmy file."<<std::endl;
+    std::cerr<<"-m name\tSet the material file to name.  This is the output location for all of the sun materials."<<std::endl;
+    std::cerr<<"-g name\tSet the geometry file to name.  This is the output location for all of the sun geometry locations."<<std::endl;
+    std::cerr<<"-s name\tSet the output smx file to name.  This is the output location for the smx file which is needed for the direct sun portion of the five phase analysis."<<std::endl;
+    std::cerr<<"-r name\tSet the rotation of the building.  A positive angle will result in a counter-clockwise rotation of the building (a clockwise rotation of the sky).  This follows the right hand rule."<<std::endl;
 }
 
 int main (int argc, char *argv[])
