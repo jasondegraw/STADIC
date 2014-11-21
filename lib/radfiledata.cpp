@@ -44,6 +44,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <math.h>
 
 
 namespace stadic {
