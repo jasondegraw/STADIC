@@ -19,6 +19,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # This check for clang seems to work, at least on Ubuntu. Not that much 
   # else works on Ubuntu: had to add -I/usr/include/c++/4.8/ and 
   # -I/usr/include/x86_64-linux-gnu/c++/4.8/ to get it to compile.
+  # Mac works as well!
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 endif()
 
