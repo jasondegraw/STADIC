@@ -13,12 +13,12 @@ STADIC is based upon the Radiance ray-tracing software system.
 Programs
 --------
 
-STADIC is made up of a number of subprograms:
+STADIC is made up of a number of subprograms, including:
 
-* dxanalemma - (description)
-* dxdaylight - (description)
-* dxgridmaker - (description)
-* dxleakcheck - (description)
+* dxanalemma - generate the necessary files for a five phase analysis
+* dxdaylight - simulate the daylight for a space model
+* dxgridmaker - create an analysis grid from input Radiance geometry primitives
+* dxleakcheck - test whether a Radiance model represents an enclosed space
 	
 Building
 --------
@@ -50,9 +50,6 @@ is being used.
     
 4. Build the program. If CMake has found Google test, then the tests will be
 built. Otherwise, only the programs will be built.
-
-Usage
------
 
 Acknowledgements
 ----------------
