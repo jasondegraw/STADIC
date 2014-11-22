@@ -17,7 +17,7 @@ STADIC is made up of a number of subprograms, including:
 
 * dxanalemma - generate the necessary files for a five phase analysis
 * dxdaylight - simulate the daylight for a space model
-* dxgridmaker - create an analysis grid from input Radiance geometry primitives
+* dxgridmaker - create an analysis grid from Radiance geometry primitives
 * dxleakcheck - test whether a Radiance model represents an enclosed space
 	
 Building
@@ -29,6 +29,7 @@ with the following compilers:
 * GCC 4.8.2 (Ubuntu 14.04)
 * MinGW GCC 4.8.2 (32 bit)
 * Microsoft Visual Studio 2013
+* Clang 3.5 (XCode 6.1)
 
 To build the software, the general steps are as follows:
 
@@ -42,8 +43,8 @@ uncompress it in the source code directory as gtest-1.7.0.
 3. Run CMake to create project. For IDEs, the details depend upon the IDE that
 is being used.
 
-    a. Microsoft Visual Studio 2013: Run the CMake GUI to generate the solution
-    files, then open the .sln file with Visual Studio.
+    a. Visual Studio or XCode: Run the CMake GUI to generate the build files,
+    then open the .sln or .xcode file with the IDE.
 
     b. Qt Creator: Use the File/Open File or Project... menu item to select 
     STADIC's CMakeLists.txt file, then run CMake.
