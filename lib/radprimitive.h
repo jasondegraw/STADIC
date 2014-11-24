@@ -143,6 +143,27 @@ private:
 
 };
 
+class STADIC_API UnknownPrimitive : public RadPrimitive
+{
+public:
+    UnknownPrimitive()
+    {}
+
+protected:
+    virtual bool validateArg1(const std::string &, int) const
+    {
+        return true;
+    }
+    virtual bool validateArg2(const std::string &, int) const
+    {
+        return true;
+    }
+    virtual bool validateArg3(const std::string &, int) const
+    {
+        return true;
+    }
+};
+
 }
 
 #endif // RADPRIMITIVE_H

@@ -291,6 +291,9 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     case Polygon:
         rad = new PolygonGeometry();
         break;
+    //case Ring:
+    //    rad = new RingGeometry();
+    //    break;
     case Plastic:
         rad = new PlasticMaterial();
         break;
@@ -307,7 +310,8 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         rad = new BSDFMaterial();
         break;
     default:
-        rad = new RadPrimitive();
+        STADIC_LOG(Severity::Warning, "Unknown primitive \"" + list[1] + "\" in input.");
+        rad = new UnknownPrimitive();
         rad->setType(list[1]);
         break;
     }
