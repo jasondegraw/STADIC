@@ -37,7 +37,7 @@ To build the software, the general steps are as follows:
 compressed file and uncompress it.
 
 2. (Optional) Get the Google test framework. Download the source code of the
-Google test framework version 1.7.0 (code.google.com/p/googletest) and 
+Google test framework version 1.7.0 (https://code.google.com/p/googletest) and 
 uncompress it in the source code directory as gtest-1.7.0.
 
 3. Run CMake to create project. For IDEs, the details depend upon the IDE that
