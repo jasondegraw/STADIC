@@ -149,11 +149,11 @@ int main (int argc, char *argv[])
             csvFile=argv[i];
         }else if(std::strcmp(argv[i],"-t")==0){
             i++;
-            threshold==atof(argv[i]);
+            threshold=atof(argv[i]);
             useThreshold=true;
         }else{
             std::string temp=argv[i];
-            STADIC_WARNING("The argument "+temp+" is an unkown argument.");
+            STADIC_WARNING("The argument "+temp+" is an unkown argument.\n\tTry running with no arguments to get usage.");
         }
     }
     if (sx==0 ||sy==0){

@@ -272,7 +272,7 @@ bool Analemma::getSunPos()
                                     pvec[0]=m_SunLoc [m_ClosestSun [(aa-1)*24+i]] [0];
                                     pvec[1]=m_SunLoc [m_ClosestSun [(aa-1)*24+i]] [1];
                                     pvec[2]=m_SunLoc [m_ClosestSun [(aa-1)*24+i]] [2];
-                                    double p_dprod=dotProd(qvec,pvec);
+                                    //double p_dprod=dotProd(qvec,pvec);
 
                                     // If the closest sun is the current sun, put this sun into the ClosestSun array.
                                     if (q_dprod > dprod){
