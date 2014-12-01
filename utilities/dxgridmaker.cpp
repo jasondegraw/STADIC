@@ -79,7 +79,8 @@ int main (int argc, char *argv[])
     std::vector<std::string> layerNames;
     bool useZOffset=false;
     bool useOffset=false;
-    double sx, sy, ox, oy, oz, offset,z;
+    bool useThreshold=false;
+    double sx, sy, ox, oy, oz, offset,z, threshold;
     sx=0;
     sy=0;
     ox=0;
@@ -146,6 +147,10 @@ int main (int argc, char *argv[])
         }else if(std::strcmp(argv[i],"-csv")==0){
             i++;
             csvFile=argv[i];
+        }else if(std::strcmp(argv[i],"-t")==0){
+            i++;
+            threshold==atof(argv[i]);
+            useThreshold=true;
         }else{
             std::string temp=argv[i];
             STADIC_WARNING("The argument "+temp+" is an unkown argument.");
@@ -175,6 +180,9 @@ int main (int argc, char *argv[])
         grid.setOffsetZ(oz);
     }else{
     grid.setZHeight(z);
+    }
+    if (useThreshold){
+        grid.setThreshold(threshold);
     }
     if (!grid.makeGrid()){
         return EXIT_FAILURE;
