@@ -40,6 +40,7 @@
 #include "leakcheck.h"
 #include "logging.h"
 #include <iostream>
+#include <string>
 
 void usage(){
     std::cout<<"dxleakcheck tests a radiance model for whether the space is or is not fully enclosed.  The program allows any number of polygons and any number of layer names to be used for the placement of the analysis point.  dxleakcheck will then test to ensure that point is within the bouding area of the polygons for the specified layers.  The program will then simulate the model with a uniform sky to determine if any light enters the model."<<std::endl;
@@ -61,27 +62,27 @@ int main (int argc, char *argv[])
     double reflectance=1;                   //  Variable holding the reflectance
 
     for (int i=1;i<argc;i++){
-        if (argv[i]=="-f"){
+        if (std::strcmp(argv[i],"-f")==0){
             i++;
             radFiles.push_back(argv[i]);
-        }else if (argv[i]=="-u"){
+        }else if (std::strcmp(argv[i],"-u")==0){
             i++;
-            if (argv[i]=="in"){
+            if (std::strcmp(argv[i],"in")==0){
                 unit=0;
-            }else if (argv[i]=="ft"){
+            }else if (std::strcmp(argv[i],"ft")==0){
                 unit=1;
-            }else if (argv[i]=="mm"){
+            }else if (std::strcmp(argv[i],"mm")==0){
                 unit=2;
-            }else if (argv[i]=="m"){
+            }else if (std::strcmp(argv[i],"m")==0){
                 unit=3;
             }else{
-                usage;
+                usage();
                 EXIT_FAILURE;
             }
-        }else if(argv[i]=="-l"){
+        }else if(std::strcmp(argv[i],"-l")==0){
             i++;
             floorLayers.push_back(argv[i]);
-        }else if(argv[i]=="-r"){
+        }else if(std::strcmp(argv[i],"-r")==0){
             i++;
             reflectance=atof(argv[i]);
         }else{

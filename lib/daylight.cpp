@@ -1872,7 +1872,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
             if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
                 for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
-                    tempFileName==model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+".ill";
+                    tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+".ill";
                     if(isFile(tempFileName)){
                         if (!baseIll.addIllFile(tempFileName)){
                             return false;
