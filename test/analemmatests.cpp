@@ -110,9 +110,9 @@ TEST(AnalemmaTests, TestLancaster)
             std::vector<std::string> vals;
             vals=stadic::trimmedSplit(line,'\t');
             ASSERT_EQ(3,vals.size());
-            EXPECT_EQ("1.15e+005",vals[0]);
-            EXPECT_EQ("1.15e+005",vals[1]);
-            EXPECT_EQ("1.15e+005",vals[2]);
+            EXPECT_EQ("114977",vals[0]);
+            EXPECT_EQ("114977",vals[1]);
+            EXPECT_EQ("114977",vals[2]);
 
         }
     }
