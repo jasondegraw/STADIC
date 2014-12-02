@@ -55,7 +55,7 @@ void usage(){
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
-    std::cerr<<"-t dist\tSet the threshold distance."<<std::endl;
+    std::cerr<<"-t dist\tSet the threshold distance.  Should the polygons be too small after the offset, and the length as well as width of the polygon are less than the threshold, those polygons will be ignored.  If this value is not used, a centerline of points will be placed down the polygon."<<std::endl;
     std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;

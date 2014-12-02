@@ -535,9 +535,9 @@ bool Analemma::genSunMtx()
         STADIC_ERROR("There was a problem opening the smx file \""+m_SMXFile+"\".");
         return false;
     }
-    smx.setf(std::ios::scientific);
-    smx.setf(std::ios::fixed);
-    smx.precision(3);
+    //smx.setf(std::ios::scientific);
+    //smx.setf(std::ios::fixed);
+    //smx.precision(6);
     for (int j=0;j<m_numSuns;j++){
         for (int i=0;i<8760;i++){
             if (m_ClosestSun[i]==j){
