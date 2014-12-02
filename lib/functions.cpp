@@ -141,4 +141,54 @@ int toInteger(const std::string &string, bool *ok)
     return value;
 }
 
+// Break a string at every N characters and insert a new line.
+// This implementation relies on the current behavior of split
+// in breaking up consecutive spaces:
+//
+//   "two spaces:  " -> "two", "spaces", ""
+//
+// Consecutive spaces will be preserved, except at the beginning
+// of new lines. To get indentation, use the indent parameter.
+std::string wrapAtN(const std::string &text, unsigned N, unsigned indent, bool hangingIndent)
+{
+    std::string skip;
+    if(indent) {
+        skip = std::string(indent, ' ');
+    }
+    std::vector<std::string> list = split(text, ' ');
+    std::stringstream stream;
+    unsigned length = 0;
+    if(!hangingIndent) {
+        stream << skip;
+        length = indent;
+    }
+    for(std::string &entry : list) {
+        if(length + entry.size() < N) {
+            if(length + entry.size() == 0) {
+                continue;
+            }
+            stream << entry;
+            length += entry.size();
+            if(length + 1 < N) {
+                stream << " ";
+                length++;
+            } else {
+                stream << std::endl << skip;
+                length = indent;
+            }
+        } else {
+            stream << std::endl << skip << entry;
+            length = indent + entry.size();
+            if(length + 1 < N) {
+                stream << " ";
+                length++;
+            } else {
+                stream << std::endl << skip;
+                length = indent;
+            }
+        }
+    }
+    return stream.str();
+}
+
 }

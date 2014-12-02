@@ -57,6 +57,8 @@ template <typename T> std::string toString(T value)  //Function that takes a dou
     stream << value;
     return stream.str();
 }
+std::string STADIC_API wrapAtN(const std::string &text, unsigned N = 72, unsigned indent = 0,
+    bool hangingIndent = false);
 
 }
 #endif // FUNCTIONS_H
