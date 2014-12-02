@@ -642,8 +642,12 @@ bool GridMaker::runoconv(std::string file){
     Process oconv(oconvProgram,args);
     oconv.setStandardOutputFile(file);
     oconv.start();
+    
     if (!oconv.wait()){
-        return false;
+        if (oconv.state()==Process::BadProgram){
+            STADIC_LOG(Severity::Fatal, "The oconv program could not be found.");
+        }
+        STADIC_LOG(Severity::Fatal, "The creation of the octree has failed.");
     }
     return true;
 }
@@ -759,7 +763,10 @@ bool GridMaker::runrpict(std::string vType){
     rpict.setStandardOutputFile(picFile);
     rpict.start();
     if (!rpict.wait()){
-        return false;
+        if (rpict.state()==Process::BadProgram){
+            STADIC_LOG(Severity::Fatal, "The rpict program could not be found.");
+        }
+        STADIC_LOG(Severity::Fatal, "The creation of the picture has failed.");
     }
 
     std::string pfiltProgram="pfilt";
@@ -771,7 +778,10 @@ bool GridMaker::runrpict(std::string vType){
     pFilt.setStandardOutputFile(pfiltFile);
     pFilt.start();
     if (!pFilt.wait()){
-        return false;
+        if (pFilt.state()==Process::BadProgram){
+            STADIC_LOG(Severity::Fatal, "The pfilt program could not be found.");
+        }
+        STADIC_LOG(Severity::Fatal, "The filtering of the picture has failed.");
     }
 
     std::string bmpProgram="ra_bmp";
@@ -781,7 +791,10 @@ bool GridMaker::runrpict(std::string vType){
     raBMP.setStandardOutputFile(bmpFile);
     raBMP.start();
     if(!raBMP.wait()){
-        return false;
+        if (raBMP.state()==Process::BadProgram){
+            STADIC_LOG(Severity::Fatal, "The ra_bmp program could not be found.");
+        }
+        STADIC_LOG(Severity::Fatal, "The creation of the bitmap has failed.");
     }
     return true;
 }
