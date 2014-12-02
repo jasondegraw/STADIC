@@ -73,6 +73,7 @@ GridMaker::GridMaker(std::vector<std::string> fileList)
     m_FinalPoints.clear();
     m_PolySetHeight.clear();
     m_UseThreshold=false;
+    m_UseRotation=false;
 }
 
 //Setters
@@ -113,8 +114,12 @@ void GridMaker::setThreshold(double val){
     m_Threshold=val;
     m_UseThreshold=true;
 }
-
-
+void GridMaker::setRotation(double rot){
+    if (rot!=0){
+        m_rotation=rot;
+        m_UseRotation=true;
+    }
+}
 
 //Getters
 //InputData
@@ -457,6 +462,15 @@ void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometr
 }
 
 bool GridMaker::testPoints(){
+    if (m_UseRotation){
+        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2, 2> rotate(m_rotation);
+        for (int i=0;i<m_PolySetHeight.size();i++){
+            boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true> > rotatedSet;
+            boost::geometry::transform(m_UnitedPolygon[i],rotatedSet, rotate);
+            m_UnitedPolygon[i]=rotatedSet;
+        }
+    }
+    
     if (m_UseOffset){
         if (!insetPolygons()){
             return false;
@@ -544,7 +558,16 @@ void GridMaker::addTestPoints(double x, double y, int set){
     }
     std::vector<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> > tempVec;
     tempVec=m_PointSet[set];
-    tempVec.push_back(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y));
+    if(m_UseRotation){
+        boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> unRotated;
+        boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> rotated(x,y);
+        boost::geometry::strategy::transform::rotate_transformer<boost::geometry::degree, double, 2, 2> rotate(-m_rotation);
+        boost::geometry::transform(rotated,unRotated, rotate);
+        tempVec.push_back(unRotated);
+        
+    }else{
+        tempVec.push_back(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y));
+    }    
     m_PointSet[set]=tempVec;
 }
 

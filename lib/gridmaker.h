@@ -71,7 +71,8 @@ public:
     void setOffsetZ(double z);                                                          //Function that sets a z offset from the average height of each polygon
     void setZHeight(double z);                                                          //Function that sets an absolute z height using world coordinates
     void setThreshold(double val);
-
+    void setRotation(double rot);                                                       //Function that sets the rotation angle of the building (or space)
+    
     //Getters
     //Points
     //InputData
@@ -119,7 +120,9 @@ private:
     std::string m_RadPtsFile;                                   //Variable holding the radiance point-spheres filename
     std::string m_oconvFile;                                    //Variable holding the octree filename
     std::string m_picFile;                                      //Variable holding the pic file location
-
+    double m_rotation;                                          //Variable holding the building rotation angle (ccw is positive).
+    bool m_UseRotation;                                         //Boolean for testing whether to use rotation
+    
     //Dimensional
     std::vector<double> m_MinX;                                 //Vector holding the minimum x value per multipolygon set
     std::vector<double> m_MinY;                                 //Vector holding the minimum y value per multipolygon set
