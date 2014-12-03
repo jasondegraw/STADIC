@@ -50,7 +50,7 @@ public:
     PolygonGeometry(std::vector<double> points);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setPoints(std::vector<double> points);                                     //Function to set the points of a radiance polygon
 
     // Getters
@@ -69,7 +69,7 @@ public:
     SphereGeometry(std::vector<double> centerPoint, double radius);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setCenterPoint(std::vector<double> centerPoint);                               //Function to set the center point of the sphere
     bool setRadius(double radius);                                                      //Function to set the radius of the sphere
 
@@ -89,7 +89,7 @@ public:
     RingGeometry(std::vector<double> centerPoint, std::vector<double> surfaceNormal, double innerRadius, double outerRadius);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setCenterPoint(std::vector<double> centerPoint);                               //Function to set the center point of the ring
     bool setSurfaceNormal(std::vector<double> surfaceNormal);                           //Function to set the surface normal of the ring
     bool setInnerRadius(double radius);                                                 //Function to set the inner radius of the ring

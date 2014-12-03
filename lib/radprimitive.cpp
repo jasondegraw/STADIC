@@ -556,7 +556,7 @@ bool RadPrimitive::checkDoubleValueMin(const std::string &value, double min, con
 bool RadPrimitive::checkDoubleValue(const std::string &value, const std::string &variable, double current) const
 {
     bool ok;
-    double dval = stadic::toDouble(value, &ok);
+    stadic::toDouble(value, &ok);
     if(!ok) {
         STADIC_LOG(Severity::Warning, "The " + variable + " value for a " + typeString()
             + " primitive must be a floating point number, value remains " + stadic::toString(current) + ".");

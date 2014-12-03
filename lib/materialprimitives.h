@@ -77,7 +77,7 @@ public:
     MetalMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
@@ -102,7 +102,7 @@ public:
     TransMaterial(double red, double green, double blue, double spec, double rough, double trans, double transpec);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
@@ -133,7 +133,7 @@ public:
     GlassMaterial(double redTrans, double greenTrans, double blueTrans);
     GlassMaterial(double redTrans, double greenTrans, double blueTrans, double refrac);
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setRedTrans(double value);
     bool setGreenTrans(double value);
     bool setBlueTrans(double value);
@@ -158,7 +158,7 @@ public:
     BSDFMaterial(double thickness, std::string BSDFfile, double ux, double uy, double uz);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setThickness(double value);
     bool setBSDFfile(std::string name);
     bool setUX(double value);

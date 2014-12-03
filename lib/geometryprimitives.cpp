@@ -84,7 +84,7 @@ std::vector<double> PolygonGeometry::points() const
 bool PolygonGeometry::validateArg3(const std::string &value, int position) const 
 {
     bool ok;
-    double dval = stadic::toDouble(value, &ok);
+    stadic::toDouble(value, &ok);
     return ok;
 }
 
@@ -96,7 +96,7 @@ bool PolygonGeometry::validateArg3(const std::vector<std::string> &arg) const
     }
     for(std::string value : arg) {
         bool ok;
-        double dval = stadic::toDouble(value, &ok);
+        stadic::toDouble(value, &ok);
         if(!ok) {
             return false;
         }
@@ -168,7 +168,7 @@ double SphereGeometry::radius() const
 bool SphereGeometry::validateArg3(const std::string &value, int position) const
 {
     bool ok;
-    double dval = stadic::toDouble(value, &ok);
+    stadic::toDouble(value, &ok);
     if(ok){
         if(position<3){
             return true;
@@ -322,7 +322,7 @@ double RingGeometry::outerRadius() const
 bool RingGeometry::validateArg3(const std::string &value, int position) const
 {
     bool ok;
-    double dval = stadic::toDouble(value, &ok);
+    stadic::toDouble(value, &ok);
     if(ok){
         if(position<8){
             return true;
