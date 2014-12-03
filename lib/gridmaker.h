@@ -62,6 +62,7 @@ public:
 
     //InputData  These functions must be used before the utilities can be used.
     void setLayerNames(std::vector<std::string> layerList);                             //Function that sets the layer names via a list on which to place the grid
+    void setIdentifiers(std::vector<std::string> identifierList);                       //Function that sets the identifiers via a list on which to place the grid
     void addLayerName(std::string string);                                              //Function that adds a layer name on which to place the grid
     void setSpaceX(double x);                                                           //Function that sets the spacing in the x direction between points
     void setSpaceY(double y);                                                           //Function that sets the spacing in the y direction between points
@@ -77,6 +78,7 @@ public:
     //Points
     //InputData
     std::vector<std::string> layerNames();                                              //Function that returns the layer names in a vector
+    std::vector<std::string> identifiers();                                             //Function that returns the identifiers in a vector
     double spaceX();                                                                    //Function that returns the spacing in the x direction as a double
     double spaceY();                                                                    //Function that returns the spacing in the y direction as a double
     double offsetX();                                                                   //Function that returns the x offset as a double
@@ -103,7 +105,8 @@ private:
 
 
     //InputData
-    std::vector<std::string> m_LayerNames;                      //Vector hlding the layer names on which to place the grid
+    std::vector<std::string> m_LayerNames;                      //Vector holding the layer names on which to place the grid
+    std::vector<std::string> m_Identifiers;                     //Vector holding the identifiers on which to place the grid
     RadFileData m_RadFile;                                      //RadFileData object for handling the .rad files
     double m_SpaceX;                                            //Variable holding the spacing in the x direction
     double m_SpaceY;                                            //Variable holding the spacing in the y direction

@@ -56,6 +56,7 @@ void usage(){
     std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
     std::cerr<<"-t dist\tSet the threshold distance.  Should the polygons be too small after the offset, and the length as well as width of the polygon are less than the threshold, those polygons will be ignored.  If this value is not used, a centerline of points will be placed down the polygon."<<std::endl;
+    std::cerr<<"-rz val\tSet the angle of rotation to val.  A positive value should be used when the building (or space) is rotated ccw.  Setting the rotation allows the points to be aligned with the space.";
     std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
     std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;
@@ -80,7 +81,7 @@ int main (int argc, char *argv[])
     bool useZOffset=false;
     bool useOffset=false;
     bool useThreshold=false;
-    double sx, sy, ox, oy, oz, offset,z, threshold;
+    double sx, sy, ox, oy, oz, offset,z, threshold, rotation;
     sx=0;
     sy=0;
     ox=0;
@@ -88,6 +89,7 @@ int main (int argc, char *argv[])
     oz=0;
     offset=0;
     z=0;
+    rotation=0;
     for (int i=1;i<argc;i++){
         if (std::strcmp(argv[i],"-f")==0){
             i++;
@@ -151,6 +153,9 @@ int main (int argc, char *argv[])
             i++;
             threshold=atof(argv[i]);
             useThreshold=true;
+        }else if(std::strcmp(argv[i],"-rz")==0){
+            i++;
+            rotation=atof(argv[i]);
         }else{
             std::string temp=argv[i];
             STADIC_WARNING("The argument "+temp+" is an unkown argument.\n\tTry running with no arguments to get usage.");
@@ -183,6 +188,9 @@ int main (int argc, char *argv[])
     }
     if (useThreshold){
         grid.setThreshold(threshold);
+    }
+    if (rotation!=0){
+        grid.setRotation(rotation);
     }
     if (!grid.makeGrid()){
         return EXIT_FAILURE;

@@ -83,6 +83,9 @@ GridMaker::GridMaker(std::vector<std::string> fileList)
 void GridMaker::setLayerNames(std::vector<std::string> layerList){
     m_LayerNames=layerList;
 }
+void GridMaker::setIdentifiers(std::vector<std::string> identifierList){
+    m_Identifiers=identifierList;
+}
 void GridMaker::addLayerName(std::string string){
     m_LayerNames.push_back(string);
 }
@@ -274,9 +277,18 @@ bool GridMaker::parseRad(){
         if (boost::geometry::is_valid(tempPolygon)){
             //unite polygons that are the right layer name
             bool properName=false;
-            for (int j=0;j<m_LayerNames.size();j++){
-                if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
-                    properName=true;
+            if (m_LayerNames.size()>0){
+                for (int j=0;j<m_LayerNames.size();j++){
+                    if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                        properName=true;
+                    }
+                }
+            }
+            if (m_Identifiers.size()>0){
+                for (int j=0;j<m_Identifiers.size();j++){
+                    if (m_RadFile.geometry().at(i)->name().find(m_Identifiers[j])!=std::string::npos){
+                        properName=true;
+                    }
                 }
             }
             int setPos;

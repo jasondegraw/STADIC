@@ -435,3 +435,32 @@ TEST(GridTests, Diamond)
     iFile.close();
     EXPECT_EQ(36, counter);
 }
+TEST(GridTests, DiamondIdentifier)
+{
+    std::vector<std::string> files;
+    files.clear();
+    files.push_back("diamond.rad");
+    stadic::GridMaker grid(files);
+    std::vector<std::string> identifiers;
+    identifiers.clear();
+    identifiers.push_back("floor1");
+    grid.setLayerNames(identifiers);
+    grid.setOffset(1);
+    grid.setSpaceX(1);
+    grid.setSpaceY(1);
+    grid.setOffsetZ(2.5);
+    grid.setRotation(45);
+    ASSERT_TRUE(grid.makeGrid());
+    ASSERT_TRUE(grid.writePTS("diamondgrid.pts"));
+    std::ifstream iFile;
+    iFile.open("diamondgrid.pts");
+    ASSERT_TRUE(iFile.is_open());
+    std::string line;
+    int counter=0;
+    while (std::getline(iFile, line)){
+        counter++;
+    }
+    iFile.close();
+    EXPECT_EQ(36, counter);
+}
+
