@@ -518,7 +518,7 @@ bool GridMaker::testPoints(){
         STADIC_ERROR("The offsets cannot be determined, because the spacing and offset values are all 0.");
         return false;
     }
-    for (int i=0;i<m_PolySetHeight.size();i++){
+    for (int i=0;i<m_PolySetHeight.size();i++){      
         //Create vector of test points
         double x=m_MinX[i];
         while (x<=m_MaxX[i]){

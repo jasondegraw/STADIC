@@ -87,6 +87,9 @@ target_link_libraries(gridtests stadic_core gtest gtest_main)
 add_custom_command(TARGET gridtests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/complicated.rad $<TARGET_FILE_DIR:gridtests>)
+add_custom_command(TARGET gridtests POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy
+                    ${CMAKE_SOURCE_DIR}/test/resources/diamond.rad $<TARGET_FILE_DIR:gridtests>)
 
 
 set(RESOURCES resources/simple.rad

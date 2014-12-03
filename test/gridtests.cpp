@@ -375,4 +375,63 @@ TEST(GridTests, ComplicatedNoThreshold)
     iFile.close();
     EXPECT_EQ(1668, counter);
 }
-
+TEST(GridTests, Diamond)
+{
+    std::vector<std::string> files;
+    files.clear();
+    files.push_back("diamond.rad");
+    stadic::GridMaker grid(files);
+    std::vector<std::string> layers;
+    layers.clear();
+    layers.push_back("floor");
+    grid.setLayerNames(layers);
+    grid.setOffset(1);
+    grid.setSpaceX(1);
+    grid.setSpaceY(1);
+    grid.setOffsetZ(2.5);
+    grid.setRotation(45);
+    ASSERT_TRUE(grid.makeGrid());
+    ASSERT_TRUE(grid.writePTS("diamondgrid.pts"));
+    ASSERT_TRUE(grid.viewPTS("", "p"));
+    std::ifstream iFile;
+    iFile.open("diamondgrid.pts");
+    ASSERT_TRUE(iFile.is_open());
+    std::string line;
+    int counter=0;
+    while (std::getline(iFile, line)){
+        counter++;
+        if (counter==1){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("10",vals[0]);
+            EXPECT_EQ("1.41421",vals[1]);
+            EXPECT_EQ("2.5",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }else if (counter==7){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("10.7071",vals[0]);
+            EXPECT_EQ("2.12132",vals[1]);
+            EXPECT_EQ("2.5",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }else if (counter==36){
+            std::vector<std::string> vals;
+            vals=stadic::trimmedSplit(line,' ');
+            ASSERT_EQ(6,vals.size());
+            EXPECT_EQ("10",vals[0]);
+            EXPECT_EQ("8.48528",vals[1]);
+            EXPECT_EQ("2.5",vals[2]);
+            EXPECT_EQ("0",vals[3]);
+            EXPECT_EQ("0",vals[4]);
+            EXPECT_EQ("1",vals[5]);
+        }
+    }
+    iFile.close();
+    EXPECT_EQ(36, counter);
+}
