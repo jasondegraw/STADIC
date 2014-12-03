@@ -62,6 +62,8 @@ public:
                Texfunc, Texdata, Colorfunc, Brightfunc, Colordata, Brightdata, Colorpict, Colortext,
                Brighttext, Mixfunc, Mixdata, Mixpict, Mixtext, Unknown};
     RadPrimitive();
+    virtual ~RadPrimitive()
+    {}
 
     bool isGeometry() const;                                            //Boolean that determines whether the primitive is of a geometry type
     bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type

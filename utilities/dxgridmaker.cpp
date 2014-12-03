@@ -39,32 +39,65 @@
 
 #include "gridmaker.h"
 #include "logging.h"
+#include "functions.h"
 #include <vector>
 #include <iostream>
 #include <string>
 
-void usage(){
-    std::cerr<<"dxgridmaker generates a points file for use in RADIANCE analysis programs.  The program allows any number of polygons and any number of layer names to be used for the placement of points.  grid_maker will then join all of the polygons and create an array of points within the bounding rectangle and tests each point to determine whether it is within the joined polygon.  These points will then be written out to a given file name for use as input to other programs.  It is assumed that the units of the radiance geometry file are the same as the input units for the spacing, offset, and Z height."<<std::endl;
-    std::cerr<<std::endl<<"-f name\tSet the input file to name. This file contains the radiance polygons that will be used for creating the analysis points.  This is a mandatory option."<<std::endl;
-    std::cerr<<"-sx val\tSet the spacing in the x direction between the analysis points to val.  This is a mandatory option. "<<std::endl;
-    std::cerr<<"-sy val\tSet the spacing in the y direction between the analysis points to val.  This is a mandatory option."<<std::endl;
-    std::cerr<<"-ox val\tSet the offset in the x direction from the left side of the bounding rectangle to val."<<std::endl;
-    std::cerr<<"-oy val\tSet the offset in the y direction from the lower side of the bounding rectangle to val."<<std::endl;
-    std::cerr<<"-oz val\tSet the offset in the z direction from the average height of the floor polygons to val."<<std::endl;
-    std::cerr<<"-o val\tSet the offset for both the x and y direction from the perimeter of the floor polygons to val."<<std::endl;
-    std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
-    std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it."<<std::endl;
-    std::cerr<<"-i name\tSet the identifier sub-string that will be used to find the polygons for use in creating the analysis grid to name.  Multiple identifier sub-strings can be used, but each one must have a -i preceding it.";
-    std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
-    std::cerr<<"-t dist\tSet the threshold distance.  Should the polygons be too small after the offset, and the length as well as width of the polygon are less than the threshold, those polygons will be ignored.  If this value is not used, a centerline of points will be placed down the polygon."<<std::endl;
-    std::cerr<<"-rz val\tSet the angle of rotation to val.  A positive value should be used when the building (or space) is rotated ccw.  Setting the rotation allows the points to be aligned with the space.";
-    std::cerr<<"-vp location\tSet the location that the files should be placed for creating the parallel projection .bmp.  This should end in the directory separator."<<std::endl;
-    std::cerr<<"-vse location\tSet the location that the files should be placed for creating the South East isometric .bmp.  This should end in the directory separator."<<std::endl;
-    std::cerr<<"-vsw location\tSet the location that the files should be placed for creating the South West isometric .bmp.  This should end in the directory separator."<<std::endl;
-    std::cerr<<"-vne location\tSet the location that the files should be placed for creating the North East isometric .bmp.  This should end in the directory separator."<<std::endl;
-    std::cerr<<"-vnw location\tSet the location that the files should be placed for creating the North West isometric .bmp.  This should end in the directory separator."<<std::endl;
-    std::cerr<<"-p name\tSet the ouput for the joined polygon to name. This file contains the joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\"."<<std::endl;
-    std::cerr<<"-csv name\tSet the csv formatted output file to name.  This file contains the points file output in a csv format."<<std::endl;
+void usage()
+{
+    std::cerr << "Usage: dxgridmaker [OPTIONS]" << std::endl;
+    std::cerr << stadic::wrapAtN("Generate a points file for use in Radiance analysis programs.  The program"
+        " allows any number of polygons and any number of layer names to be used for the placement of points.  dxgridmaker"
+        " joins all of the polygons and creates an array of points within the bounding rectangle and tests each"
+        " point to determine whether it is within the joined polygon.  These points will then be written out"
+        " for use as input to other programs.  It is assumed that the units of the Radiance geometry file are"
+        " the same as the input units for the spacing, offset, and Z height.") << std::endl;
+
+    std::cerr << std::endl;
+    std::cerr << stadic::wrapAtN("-f name        Set the input file to name. This file contains the radiance polygons"
+        " that will be used for creating the analysis points.  This is a mandatory option.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-i name        Set the identifier sub-string that will be used to find the polygons"
+        " for use in creating the analysis grid to name.  Multiple identifier sub-strings can be used, but each one"
+        " must have a -i preceding it.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-sx val        Set the spacing in the x direction between the analysis points to"
+        " val.  This is a mandatory option.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-sy val        Set the spacing in the y direction between the analysis points to"
+        " val.  This is a mandatory option.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-ox val        Set the offset in the x direction from the left side of the"
+        " bounding rectangle to val.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-oy val        Set the offset in the y direction from the lower side of the bounding"
+        " rectangle to val.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-oz val        Set the offset in the z direction from the average height of the floor"
+        " polygons to val.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-o val         Set the offset for both the x and y direction from the perimeter of the"
+        " floor polygons to val.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-z val         Set the z height of the analysis points using world coordinates to val.",
+        72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-l name        Set the layer name that will be used to find the polygons for use in"
+        " creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding"
+        " it.  This is a mandatory option.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-r name        Set the output file to name.  This file contains a space separated file"
+        " in the following format per line:   x y z xd yd zd.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-rz val\tSet the angle of rotation to val.  A positive value should be used when the"
+        " building (or space) is rotated ccw.  Setting the rotation allows the points to be aligned with the space.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-t dist        Set the threshold distance.  Should the polygons be too small after the"
+        " offset, and the length as well as width of the polygon are less than the threshold, those polygons will be"
+        " ignored.  If this value is not used, a centerline of points will be placed down the polygon.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-vp location   Set the location that the files should be placed for creating the"
+        " parallel projection .bmp.  This should end in the directory separator.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-vse location  Set the location that the files should be placed for creating the South"
+        " East isometric .bmp.  This should end in the directory separator.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-vsw location  Set the location that the files should be placed for creating the South"
+        " West isometric .bmp.  This should end in the directory separator.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-vne location  Set the location that the files should be placed for creating the North"
+        " East isometric .bmp.  This should end in the directory separator.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-vnw location  Set the location that the files should be placed for creating the North"
+        " West isometric .bmp.  This should end in the directory separator.", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-p name        Set the ouput for the joined polygon to name. This file contains the"
+        " joined polygon in the radiance polygon format with a modifier of \"floor\" and an identifier of \"floor1\".", 72, 15, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-csv name      Set the csv formatted output file to name.  This file contains the points"
+        " file output in a csv format.", 72, 15, true) << std::endl;
 }
 
 int main (int argc, char *argv[])

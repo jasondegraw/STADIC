@@ -52,7 +52,7 @@ public:
     PlasticMaterial(double red, double green, double blue, double spec, double rough);
 
     // Setters
-    bool setType(std::string){return false;}
+    bool setType(const std::string &){return false;}
     bool setRed(double value);
     bool setGreen(double value);
     bool setBlue(double value);
