@@ -53,7 +53,8 @@ void usage(){
     std::cerr<<"-oz val\tSet the offset in the z direction from the average height of the floor polygons to val."<<std::endl;
     std::cerr<<"-o val\tSet the offset for both the x and y direction from the perimeter of the floor polygons to val."<<std::endl;
     std::cerr<<"-z val\tSet the z height of the analysis points using world coordinates to val."<<std::endl;
-    std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it.  This is a mandatory option."<<std::endl;
+    std::cerr<<"-l name\tSet the layer name that will be used to find the polygons for use in creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding it."<<std::endl;
+    std::cerr<<"-i name\tSet the identifier sub-string that will be used to find the polygons for use in creating the analysis grid to name.  Multiple identifier sub-strings can be used, but each one must have a -i preceding it.";
     std::cerr<<"-r name\tSet the output file to name.  This file contains a space separated file in the following format per line:   x y z xd yd zd."<<std::endl;
     std::cerr<<"-t dist\tSet the threshold distance.  Should the polygons be too small after the offset, and the length as well as width of the polygon are less than the threshold, those polygons will be ignored.  If this value is not used, a centerline of points will be placed down the polygon."<<std::endl;
     std::cerr<<"-rz val\tSet the angle of rotation to val.  A positive value should be used when the building (or space) is rotated ccw.  Setting the rotation allows the points to be aligned with the space.";
@@ -78,6 +79,7 @@ int main (int argc, char *argv[])
     std::string viewLocation;
     std::string vType;
     std::vector<std::string> layerNames;
+    std::vector<std::string> identifiers;
     bool useZOffset=false;
     bool useOffset=false;
     bool useThreshold=false;
@@ -123,6 +125,9 @@ int main (int argc, char *argv[])
         }else if(std::strcmp(argv[i],"-l")==0){
             i++;
             layerNames.push_back(argv[i]);
+        }else if (std::strcmp(argv[i],"-i")==0){
+            i++;
+            identifiers.push_back(argv[i]);
         }else if(std::strcmp(argv[i],"-vp")==0){
             i++;
             viewLocation=argv[i];
@@ -172,7 +177,19 @@ int main (int argc, char *argv[])
 
     //Instantiate GridMaker Object
     stadic::GridMaker grid(fileName);
-    grid.setLayerNames(layerNames);
+    bool geometryNamed=false;
+    if (layerNames.size()>0){
+        grid.setLayerNames(layerNames);
+        geometryNamed=true;
+    }
+    if (identifiers.size()>0){
+        grid.setIdentifiers(identifiers);
+        geometryNamed=true;
+    }
+    if (geometryNamed==false){
+        STADIC_LOG(stadic::Severity::Fatal,"Geometry must be specified with either the -l or -i options.");
+        return EXIT_FAILURE;
+    }
     grid.setSpaceX(sx);
     grid.setSpaceY(sy);
     if (useOffset){
