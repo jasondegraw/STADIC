@@ -196,15 +196,16 @@ int main (int argc, char *argv[])
             rotation=atof(argv[i]);
         }else{
             std::string temp=argv[i];
-            STADIC_WARNING("The argument "+temp+" is an unkown argument.\n\tTry running with no arguments to get usage.");
+            STADIC_ERROR("Invalid option \""+temp+"\".  Run with no arguments to get usage.");
+            return EXIT_FAILURE;
         }
     }
     if (sx==0 ||sy==0){
-        STADIC_ERROR(std::string("The x and y spacing are needed to complete the calculation.\n\tSpecify with \"-sx\" and \"-sy\"."));
+        STADIC_ERROR("The x and y spacing are needed to complete the calculation.  Specify with \"-sx\" and \"-sy\".");
         return EXIT_FAILURE;
     }
     if (fileName.empty()){
-        STADIC_ERROR(std::string("The rad file name must be specified.\n\tSpecify with \"-f\"."));
+        STADIC_ERROR("The rad file name must be specified.  Specify with \"-f\".");
         return EXIT_FAILURE;
     }
 

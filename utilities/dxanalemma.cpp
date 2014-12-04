@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
             rotation=atof(argv[i]);
         }else{
             std::string temp=argv[i];
-            STADIC_WARNING("The argument "+temp+" is an unkown argument.");
+            STADIC_WARNING("The argument "+temp+" is an unknown argument.");
         }
     }
     if (geoFile.empty()){
