@@ -37,7 +37,7 @@
  * OF SUCH DAMAGE.
  ****************************************************************/
 
-#include "stadiccontrol.h"
+#include "spacecontrol.h"
 #include "gtest/gtest.h"
 #include <iostream>
 

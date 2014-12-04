@@ -37,8 +37,8 @@
  * OF SUCH DAMAGE.
  ****************************************************************/
 
-#ifndef STADICCONTROL_H
-#define STADICCONTROL_H
+#ifndef SPACECONTROL_H
+#define SPACECONTROL_H
 
 #include <string>
 #include <vector>

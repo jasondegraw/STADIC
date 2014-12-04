@@ -40,7 +40,7 @@
 #ifndef DAYLIGHT_H
 #define DAYLIGHT_H
 
-#include "stadiccontrol.h"
+#include "spacecontrol.h"
 #include <vector>
 #include <string>
 #include "radfiledata.h"
