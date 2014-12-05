@@ -25,9 +25,9 @@ get yourself assigned to it. Then:
 branch a name like "issue-68", where 68 is the issue number. If your "u", "e", and "-" keys are defective,
 then "iss68" is OK.
 
-    git checkout develop
-    git branch issue-68
-    git checkout issue-68
+        $> git checkout develop
+        $> git branch issue-68
+        $> git checkout issue-68
     
 2. Write code.
 3. Create a pull request.
