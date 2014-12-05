@@ -1,4 +1,5 @@
-build*
+build/*
+build-*
 *.user
 *.user.2.7pre1
 gitCommands.txt

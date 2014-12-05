@@ -5,6 +5,7 @@ project(lib)
 set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
 
 set(SRCS spacecontrol.cpp
+         buildingcontrol.cpp
          windowgroup.cpp
          shadecontrol.cpp
          controlzone.cpp
@@ -27,6 +28,7 @@ set(SRCS spacecontrol.cpp
 		 
 set(HDRS stadicapi.h
          spacecontrol.h
+         buildingcontrol.h
          windowgroup.h
          shadecontrol.h
          controlzone.h
