@@ -41,6 +41,7 @@
 #define DAYLIGHT_H
 
 #include "spacecontrol.h"
+#include "buildingcontrol.h"
 #include <vector>
 #include <string>
 #include "radfiledata.h"
@@ -51,7 +52,7 @@ namespace stadic {
 class STADIC_API Daylight
 {
 public:
-    explicit Daylight(Control *model);                         //Constructor that takes a Control object as an argument
+    explicit Daylight(BuildingControl *model);                         //Constructor that takes a Control object as an argument
     bool simDaylight();                                                             //Function to simulate the daylight
 
 private:
@@ -72,7 +73,7 @@ private:
     bool sumIlluminanceFiles(Control *model);                                       //Function to sum the illuminance files for each window group setting
 
     std::vector<int> m_SimCase;                                                     //Vector holding the simulation case for each window group
-    Control *m_Model;                                                               //Control object
+    BuildingControl *m_Model;                                                               //Control object
     std::vector<RadFileData* > m_RadFiles;                                          //Vector of RadFileData objects
 
 };

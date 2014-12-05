@@ -576,16 +576,12 @@ double Control::UDIMax(){
 //PARSER
 //******************
 
-bool Control::parseJson(const std::string &file)
+bool Control::parseJson(const JsonObject &json)
 {
-    boost::optional<JsonObject> jsonOpt = readJsonDocument(file);
-
-    if(!jsonOpt){
-        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\".");
+    if (json.empty()){
+        STADIC_LOG(Severity::Error, "The space does not contain data.");
         return false;
     }
-
-    JsonObject json = jsonOpt.get();
 
     //get_value_or(/*default*/);
     boost::optional<std::string> sVal;

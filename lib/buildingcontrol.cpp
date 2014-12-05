@@ -52,43 +52,8 @@ BuildingControl::BuildingControl()
 
 //Setters
 //******************
-//Folder Information
+//General Information
 //******************
-void BuildingControl::setProjectName(std::string name){
-    m_ProjectName=name;
-}
-void BuildingControl::setProjectFolder(std::string folder){
-    m_ProjectFolder=folder;
-}
-void BuildingControl::setTmpFolder(std::string folder){
-    m_TmpFolder=folder;
-}
-void BuildingControl::setGeoFolder(std::string folder){
-    m_GeoFolder=folder;
-}
-void BuildingControl::setIESFolder(std::string folder){
-    m_IESFolder=folder;
-}
-void BuildingControl::setResultsFolder(std::string folder){
-    m_ResultsFolder=folder;
-}
-void BuildingControl::setDataFolder(std::string folder){
-    m_DataFolder=folder;
-}
-
-//******************
-//Site Information
-//******************
-bool BuildingControl::setGroundReflect(double value){
-    if (value>1 || value<0){
-        STADIC_WARNING("The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied.");
-        //std::cerr<<"WARNING: The ground reflectance must be between 0 and  1.\n\tA default value of 0.2 will be applied."<<std::endl;
-        m_GroundReflect=0.2;
-    }else{
-        m_GroundReflect=value;
-    }
-    return true;
-}
 void BuildingControl::setWeaDataFile(std::string file){
     m_WeaDataFile=file;
 }
@@ -102,15 +67,6 @@ bool BuildingControl::setFirstDay(int value){
     return true;
 }
 
-//******************
-//Geometry Information
-//******************
-void BuildingControl::setMatFile(std::string file){
-    m_MatFile=file;
-}
-void BuildingControl::setGeoFile(std::string file){
-    m_GeoFile=file;
-}
 bool BuildingControl::setBuildingRotation(double value){
     if (value>360 || value<-360){
         STADIC_ERROR("The building rotation must be between -360 and 360.");
@@ -119,9 +75,6 @@ bool BuildingControl::setBuildingRotation(double value){
         m_BuildingRotation=value;
     }
     return true;
-}
-void BuildingControl::setPTSFile(std::string file){
-    m_PTSFile=file;
 }
 bool BuildingControl::setImportUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
@@ -148,9 +101,6 @@ bool BuildingControl::setDisplayUnits(std::string units){
         return false;
     }
     return true;
-}
-void BuildingControl::setOccSchedule(std::string file){
-    m_OccSchedule=file;
 }
 bool BuildingControl::setTargetIlluminance(double value){
     if (value<0){
@@ -301,147 +251,21 @@ bool BuildingControl::setDP(double value){
     return true;
 }
 
-
-//******************
-//Metrics
-//******************
-bool BuildingControl::setDA(bool run, double illum){
-    m_DA=run;
-    if (illum>0){
-        m_DAIllum=illum;
-    }else{
-        STADIC_ERROR("The DA illuminance must be greater than 0.");
-        return false;
-    }
-    return true;
-}
-bool BuildingControl::setcDA(bool run, double illum){
-    m_cDA=run;
-    if (illum>0){
-        m_cDAIllum=illum;
-    }else{
-        STADIC_ERROR("The cDA illuminance must be greater than 0.");
-        return false;
-    }
-    return true;
-}
-bool BuildingControl::setsDA(bool run, double illum, double DAFrac, double startTime, double endTime){
-    m_sDA=run;
-    if (illum>0){
-        m_sDAIllum=illum;
-    }else{
-        STADIC_ERROR("The sDA illuminance must be greater than 0.");
-        return false;
-    }
-    if (DAFrac>0 && DAFrac<1){
-        m_sDAFrac=DAFrac;
-    }else{
-        STADIC_ERROR("The sDA fraction must be between 0 and 1.");
-        return false;
-    }
-    if (startTime>0 && startTime<endTime){
-        m_sDAStart=startTime;
-    }else{
-        STADIC_ERROR("The sDA start time has to be greater than 0 and less than the end time.");
-        return false;
-    }
-    if (endTime<24 && endTime>startTime){
-        m_sDAEnd=endTime;
-    }else{
-        STADIC_ERROR("The sDA end time has to be greater than the start time and less than 24.");
-        return false;
-    }
-    return true;
-}
-bool BuildingControl::setOccsDA(bool run, double illum, double DAFrac){
-    m_OccsDA=run;
-    if (illum>0){
-        m_OccsDAIllum=illum;
-    }else{
-        STADIC_ERROR("The occupancy schedule based sDA illuminance must be greater than 0.");
-        return false;
-    }
-    if (DAFrac>0 && DAFrac<1){
-        m_OccsDAFrac=DAFrac;
-    }else{
-        STADIC_ERROR("The occupancy schedule based sDA fraction must be between 0 and 1.");
-        return false;
-    }
-    return true;
-}
-void BuildingControl::setDF(bool run){
-    m_DF=run;
-}
-bool BuildingControl::setUDI(bool run, double minIllum, double maxIllum){
-    m_UDI=run;
-    if (minIllum>=0 && minIllum<maxIllum){
-        m_UDIMin=minIllum;
-    }else{
-        STADIC_ERROR("The UDI minimum illuminance must be between 0 and the maximum illuminance.");
-        return false;
-    }
-    m_UDIMax=maxIllum;
-    return true;
-}
-
-
-
 //Getters
 //******************
-//Folder Information
+//General Information
 //******************
-std::string BuildingControl::projectName(){
-    return m_ProjectName;
-}
-std::string BuildingControl::projectFolder(){
-    return m_ProjectFolder;
-}
-std::string BuildingControl::tmpFolder(){
-    return m_TmpFolder;
-}
-std::string BuildingControl::geoFolder(){
-    return m_GeoFolder;
-}
-std::string BuildingControl::iesFolder(){
-    return m_IESFolder;
-}
-std::string BuildingControl::resultsFolder(){
-    return m_ResultsFolder;
-}
-std::string BuildingControl::dataFolder(){
-    return m_DataFolder;
-}
-
-//******************
-//Site Information
-//******************
-double BuildingControl::groundReflect(){
-    return m_GroundReflect;
-}
 std::string BuildingControl::weaDataFile(){
     return m_WeaDataFile;
 }
 int BuildingControl::firstDay(){
     return m_FirstDay;
 }
-
-//******************
-//Geometry Information
-//******************
-std::string BuildingControl::matFile(){
-    return m_MatFile;
-}
-std::string BuildingControl::geoFile(){
-    return m_GeoFile;
-}
 double BuildingControl::buildingRotation(){
     return m_BuildingRotation;
 }
-std::string BuildingControl::ptsFile(){
-    return m_PTSFile;
-}
-std::vector<WindowGroup> BuildingControl::windowGroups(){
-    return m_WindowGroups;
+std::vector<Control> BuildingControl::spaces(){
+    return m_Spaces;
 }
 std::string BuildingControl::importUnits(){
     return m_ImportUnits;
@@ -452,16 +276,9 @@ std::string BuildingControl::illumUnits(){
 std::string BuildingControl::displayUnits(){
     return m_DisplayUnits;
 }
-std::string BuildingControl::occSchedule(){
-    return m_OccSchedule;
-}
 double BuildingControl::targetIlluminance(){
     return m_TargetIlluminance;
 }
-
-//******************
-//Simulation Settings
-//******************
 int BuildingControl::sunDivisions(){
     return m_SunDivisions;
 }
@@ -513,66 +330,6 @@ double BuildingControl::dp(){
 }
 
 //******************
-//Lighting BuildingControl
-//******************
-std::vector<ControlZone> BuildingControl::controlZones(){
-    return m_ControlZones;
-}
-
-//******************
-//Metrics
-//******************
-bool BuildingControl::runDA(){
-    return m_DA;
-}
-double BuildingControl::DAIllum(){
-    return m_DAIllum;
-}
-bool BuildingControl::runsDA(){
-    return m_sDA;
-}
-double BuildingControl::sDAIllum(){
-    return m_sDAIllum;
-}
-double BuildingControl::sDAFrac(){
-    return m_sDAFrac;
-}
-double BuildingControl::sDAStart(){
-    return m_sDAStart;
-}
-double BuildingControl::sDAEnd(){
-    return m_sDAEnd;
-}
-bool BuildingControl::runOccsDA(){
-    return m_OccsDA;
-}
-double BuildingControl::occsDAIllum(){
-    return m_OccsDAIllum;
-}
-double BuildingControl::occsDAFrac(){
-    return m_OccsDAFrac;
-}
-bool BuildingControl::runcDA(){
-    return m_cDA;
-}
-double BuildingControl::cDAIllum(){
-    return m_cDAIllum;
-}
-bool BuildingControl::runDF(){
-    return m_DF;
-}
-bool BuildingControl::runUDI(){
-    return m_UDI;
-}
-double BuildingControl::UDIMin(){
-    return m_UDIMin;
-}
-double BuildingControl::UDIMax(){
-    return m_UDIMax;
-}
-
-
-//******************
 //PARSER
 //******************
 
@@ -593,7 +350,7 @@ bool BuildingControl::parseJson(const std::string &file)
     boost::optional<int> iVal;
     boost::optional<bool> bVal;
     boost::optional<JsonObject> treeVal;
-
+    /*
     //******************
     //Folder Information
     //******************
@@ -1113,6 +870,7 @@ bool BuildingControl::parseJson(const std::string &file)
         }
     }
     treeVal.reset();
+    */
     return true;
 }
 

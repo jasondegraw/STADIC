@@ -42,8 +42,7 @@
 
 #include <string>
 #include <vector>
-#include "windowgroup.h"
-#include "controlzone.h"
+#include "spacecontrol.h"
 #include <boost/optional.hpp>
 #include "logging.h"
 
@@ -58,41 +57,17 @@ public:
     bool parseJson(const std::string &file);
 
     //Setters
-    //******************
-    //Folder Information
-    //******************
-    void setProjectName(std::string name);
-    void setProjectFolder(std::string folder);
-    void setTmpFolder(std::string folder);
-    void setGeoFolder(std::string folder);
-    void setIESFolder(std::string folder);
-    void setResultsFolder(std::string folder);
-    void setDataFolder(std::string folder);
 
     //******************
-    //Site Information
+    //General Information
     //******************
-    bool setGroundReflect(double value);
+    bool setBuildingRotation(double value);
     void setWeaDataFile(std::string file);
     bool setFirstDay(int value);
-
-
-    //******************
-    //Geometry Information
-    //******************
-    void setMatFile(std::string file);
-    void setGeoFile(std::string file);
-    bool setBuildingRotation(double value);
-    void setPTSFile(std::string file);
     bool setImportUnits(std::string units);
     void setIllumUnits(std::string units);
     bool setDisplayUnits(std::string units);
-    void setOccSchedule(std::string file);
     bool setTargetIlluminance(double value);
-
-    //******************
-    //Simulation Settings
-    //******************
     bool setSunDivisions(int value);
     bool setSkyDivisions(int value);
     void setDaylightSavingsTime(bool value);
@@ -111,58 +86,22 @@ public:
     bool setDR(int value);
     bool setDP(double value);
 
-    //******************
-    //Metrics
-    //******************
-    bool setDA(bool run, double illum);
-    bool setcDA(bool run, double illum);
-    bool setsDA(bool run, double illum, double DAFrac, double startTime, double endTime);
-    bool setOccsDA(bool run, double illum, double DAFrac);
-    void setDF(bool run);
-    bool setUDI(bool run, double minIllum, double maxIllum);
-
-
     //Getters
     //******************
-    //Folder Information
+    //Spaces
     //******************
-    std::string projectName();
-    std::string projectFolder();
-    std::string tmpFolder();
-    std::string geoFolder();
-    std::string iesFolder();
-    std::string resultsFolder();
-    std::string dataFolder();
+    std::vector<Control> spaces();
 
     //******************
-    //Site Information
+    //General
     //******************
-    double groundReflect();
     std::string weaDataFile();
     int firstDay();
-
-    //******************
-    //Geometry Information
-    //******************
-    std::string matFile();
-    std::string geoFile();
     double buildingRotation();
-    std::string ptsFile();
-    std::vector<WindowGroup> windowGroups();
     std::string importUnits();
     std::string illumUnits();
     std::string displayUnits();
-    std::string occSchedule();
     double targetIlluminance();
-
-    //******************
-    //Lighting Control
-    //******************
-    std::vector<ControlZone> controlZones();
-
-    //******************
-    //Simulation Settings
-    //******************
     int sunDivisions();
     int skyDivisions();
     bool daylightSavingsTime();
@@ -180,64 +119,25 @@ public:
     int dr();
     double dp();
 
-    //******************
-    //Metrics
-    //******************
-    bool runDA();
-    double DAIllum();
-    bool runsDA();
-    double sDAIllum();
-    double sDAFrac();
-    double sDAStart();
-    double sDAEnd();
-    bool runOccsDA();
-    double occsDAIllum();
-    double occsDAFrac();
-    bool runcDA();
-    double cDAIllum();
-    bool runDF();
-    bool runUDI();
-    double UDIMin();
-    double UDIMax();
 
 private:
 
+    //******************
+    //Spaces
+    //******************
+    std::vector<Control> m_Spaces;
 
     //******************
-    //Folder Information
+    //General Information
     //******************
-    std::string m_ProjectName;                          //  Variable holding the project name
-    std::string m_ProjectFolder;                        //  Variable holding the project folder
-    std::string m_TmpFolder;                            //  Variable holding the tmp folder
-    std::string m_GeoFolder;                            //  Variable holding the geometry folder
-    std::string m_IESFolder;                            //  Variable holding the luminaire folder
-    std::string m_ResultsFolder;                        //  Variable holding the results folder
-    std::string m_DataFolder;                           //  Variable holding the data folder
-
-    //******************
-    //Site Information
-    //******************
-    double m_GroundReflect;                             //  Variable holding the ground reflectance
-    std::string m_WeaDataFile;                          //  Variable holding the weather data file
-    int m_FirstDay;                                     //  Variable holding the start day of the year
-
-    //******************
-    //Geometry Information
-    //******************
-    std::string m_MatFile;                              //  Variable holding the main material file
-    std::string m_GeoFile;                              //  Variable holding the main geometry file
-    double m_BuildingRotation;                          //  Variable holding the building rotation which is assumed to be positive=counter-clockwise
-    std::string m_PTSFile;                              //  Variable holding the analysis grid file
+    std::string m_WeaDataFile;
+    int m_FirstDay;
+    double m_BuildingRotation;
     std::string m_ImportUnits;                          //  Variable holding the geometry file import units
     std::string m_IllumUnits;                           //  Variable holding the illuminance units
     std::string m_DisplayUnits;                         //  Variable holding the distance units for display
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
-    std::vector<WindowGroup> m_WindowGroups;
-
-    //******************
-    //Simulation Settings
-    //******************
     int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
     int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
     bool m_DaylightSavingsTime;                         //  Variable holding whether daylight savings time is enabled
@@ -259,27 +159,6 @@ private:
     //Lighting Control
     //******************
     std::vector<ControlZone> m_ControlZones;
-
-    //******************
-    //Metrics
-    //******************
-    bool m_DA;                                          //  Variable holding whether the DA analysis should be completed
-    double m_DAIllum;                                   //  Variable holding the illuminance for the DA analysis
-    bool m_sDA;                                         //  Variable holding whether the sDA analysis should be completed
-    double m_sDAIllum;                                  //  Variable holding the illuminance for the sDA analysis
-    double m_sDAFrac;                                   //  Variable holding the DA fraction for the sDA analysis
-    double m_sDAStart;                                  //  Variable holding the start time for the sDA analysis
-    double m_sDAEnd;                                    //  Variable holding the end time for the sDA analysis
-    bool m_OccsDA;                                      //  Variable holding whether the occupancy schedule based sDA should be completed
-    double m_OccsDAIllum;                               //  Variable holding the illuminance for the occupancy schedule based sDA analysis
-    double m_OccsDAFrac;                                //  Variable holding the DA fraction for the occupancy schedule based sDA analysis
-    bool m_cDA;                                         //  Variable holding whether the cDA analysis should be completed
-    double m_cDAIllum;                                  //  Variable holding the illuminance for the cDA analysis
-    bool m_DF;                                          //  Variable holding whether the DF analysis should be completed
-    bool m_UDI;                                         //  Variable holding whether the UDI analysis shoud be completed
-    double m_UDIMin;                                    //  Variable holding the minimum illuminance for UDI
-    double m_UDIMax;                                    //  Variable holding the maximum illuminance for UDI
-    
 };
 
 }

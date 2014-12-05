@@ -55,7 +55,7 @@ class STADIC_API Control
 {
 public:
     Control();
-    bool parseJson(const std::string &file);
+    bool parseJson(const JsonObject &json);
 
     //Setters
     //******************
