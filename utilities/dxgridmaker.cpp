@@ -126,72 +126,72 @@ int main (int argc, char *argv[])
     z=0;
     rotation=0;
     for (int i=1;i<argc;i++){
-        if (std::strcmp(argv[i],"-f")==0){
+        if (std::string("-f")==argv[i]){
             i++;
             fileName.push_back(argv[i]);
-        }else if (std::strcmp(argv[i],"-sx")==0){
+        }else if (std::string("-sx")==argv[i]){
             i++;
             sx=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-sy")==0){
+        }else if (std::string("-sy")==argv[i]){
             i++;
             sy=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-ox")==0){
+        }else if (std::string("-ox")==argv[i]){
             i++;
             ox=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-oy")==0){
+        }else if (std::string("-oy")==argv[i]){
             i++;
             oy=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-oz")==0){
+        }else if (std::string("-oz")==argv[i]){
             i++;
             useZOffset=true;
             oz=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-o")==0){
+        }else if (std::string("-o")==argv[i]){
             i++;
             useOffset=true;
             offset=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-z")==0){
+        }else if (std::string("-z")==argv[i]){
             i++;
             z=atof(argv[i]);
-        }else if (std::strcmp(argv[i],"-r")==0){
+        }else if (std::string("-r")==argv[i]){
             i++;
             resultFile=argv[i];
-        }else if(std::strcmp(argv[i],"-l")==0){
+        }else if(std::string("-l")==argv[i]){
             i++;
             layerNames.push_back(argv[i]);
-        }else if (std::strcmp(argv[i],"-i")==0){
+        }else if (std::string("-i")==argv[i]){
             i++;
             identifiers.push_back(argv[i]);
-        }else if(std::strcmp(argv[i],"-vp")==0){
+        }else if(std::string("-vp")==argv[i]){
             i++;
             viewLocation=argv[i];
             vType="p";
-        }else if(std::strcmp(argv[i],"-vse")==0){
+        }else if(std::string("-vse")==argv[i]){
             i++;
             viewLocation=argv[i];
             vType="se";
-        }else if(std::strcmp(argv[i],"-vne")==0){
+        }else if(std::string("-vne")==argv[i]){
             i++;
             viewLocation=argv[i];
             vType="ne";
-        }else if(std::strcmp(argv[i],"-vsw")==0){
+        }else if(std::string("-vsw")==argv[i]){
             i++;
             viewLocation=argv[i];
             vType="sw";
-        }else if(std::strcmp(argv[i],"-vnw")==0){
+        }else if(std::string("-vnw")==argv[i]){
             i++;
             viewLocation=argv[i];
             vType="nw";
-        }else if(std::strcmp(argv[i],"-p")==0){
+        }else if(std::string("-p")==argv[i]){
             i++;
             polyFile=argv[i];
-        }else if(std::strcmp(argv[i],"-csv")==0){
+        }else if(std::string("-csv")==argv[i]){
             i++;
             csvFile=argv[i];
-        }else if(std::strcmp(argv[i],"-t")==0){
+        }else if(std::string("-t")==argv[i]){
             i++;
             threshold=atof(argv[i]);
             useThreshold=true;
-        }else if(std::strcmp(argv[i],"-rz")==0){
+        }else if(std::string("-rz")==argv[i]){
             i++;
             rotation=atof(argv[i]);
         }else{

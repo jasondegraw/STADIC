@@ -62,27 +62,27 @@ int main (int argc, char *argv[])
     double reflectance=1;                   //  Variable holding the reflectance
 
     for (int i=1;i<argc;i++){
-        if (std::strcmp(argv[i],"-f")==0){
+        if (std::string("-f")==argv[i]){
             i++;
             radFiles.push_back(argv[i]);
-        }else if (std::strcmp(argv[i],"-u")==0){
+        }else if (std::string("-u")==argv[i]){
             i++;
-            if (std::strcmp(argv[i],"in")==0){
+            if (std::string("in")==argv[i]){
                 unit=0;
-            }else if (std::strcmp(argv[i],"ft")==0){
+            }else if (std::string("ft")==argv[i]){
                 unit=1;
-            }else if (std::strcmp(argv[i],"mm")==0){
+            }else if (std::string("mm")==argv[i]){
                 unit=2;
-            }else if (std::strcmp(argv[i],"m")==0){
+            }else if (std::string("m")==argv[i]){
                 unit=3;
             }else{
                 usage();
                 EXIT_FAILURE;
             }
-        }else if(std::strcmp(argv[i],"-l")==0){
+        }else if(std::string("-l")==argv[i]){
             i++;
             floorLayers.push_back(argv[i]);
-        }else if(std::strcmp(argv[i],"-r")==0){
+        }else if(std::string("-r")==argv[i]){
             i++;
             reflectance=atof(argv[i]);
         }else{
