@@ -23,11 +23,14 @@ get yourself assigned to it. Then:
 
 1. Create a new branch from develop. Make sure that the branch is of develop and not of master and give the
 branch a name like "issue-68", where 68 is the issue number. If your "u", "e", and "-" keys are defective,
-then "iss68" is OK.
+then "iss68" is OK. It is also OK to add the name of the feature or a description to the branch name (e.g. 
+"issue-68-fix-that-thing")
 
         $> git checkout develop
         $> git branch issue-68
         $> git checkout issue-68
     
 2. Write code.
-3. Create a pull request.
+3. Create a pull request. Once your code has been reviewed and merged, delete the branch.
+
+
