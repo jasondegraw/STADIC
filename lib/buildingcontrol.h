@@ -94,29 +94,17 @@ public:
     //******************
     //General
     //******************
-    std::string weaDataFile();
-    int firstDay();
-    double buildingRotation();
-    std::string importUnits();
-    std::string illumUnits();
-    std::string displayUnits();
-    double targetIlluminance();
-    int sunDivisions();
-    int skyDivisions();
-    bool daylightSavingsTime();
-    int ab();
-    int ad();
-    int as();
-    int ar();
-    double aa();
-    int lr();
-    double st();
-    double sj();
-    double lw();
-    double dj();
-    double ds();
-    int dr();
-    double dp();
+    boost::optional<std::string> weaDataFile();
+    boost::optional<int> firstDay();
+    boost::optional<double> buildingRotation();
+    boost::optional<std::string> importUnits();
+    boost::optional<std::string> illumUnits();
+    boost::optional<std::string> displayUnits();
+    boost::optional<double> targetIlluminance();
+    boost::optional<int> sunDivisions();
+    boost::optional<int> skyDivisions();
+    boost::optional<bool> daylightSavingsTime();
+    boost::optional<std::string> getRadParam(std::string parameterSet, std::string parameterName);
 
 
 private:
@@ -129,30 +117,16 @@ private:
     //******************
     //General Information
     //******************
-    std::string m_WeaDataFile;
-    int m_FirstDay;
-    double m_BuildingRotation;
-    std::string m_ImportUnits;                          //  Variable holding the geometry file import units
-    std::string m_IllumUnits;                           //  Variable holding the illuminance units
-    std::string m_DisplayUnits;                         //  Variable holding the distance units for display
-    std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
-    double m_TargetIlluminance;                         //  Variable holding the target illuminance
-    int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
-    int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
-    bool m_DaylightSavingsTime;                         //  Variable holding whether daylight savings time is enabled
-    int m_AB;                                           //  Variable holding the number of ambient bounces
-    int m_AD;                                           //  Variable holding the number of ambient divisions
-    int m_AS;                                           //  Variable holding the number of ambient super-samples
-    int m_AR;                                           //  Variable holding the ambient resolutions
-    double m_AA;                                        //  Variable holding the ambient accuracy
-    int m_LR;                                           //  Variable holding the maximum number of reflections
-    double m_ST;                                        //  Variable holding the specular sampling threshold
-    double m_SJ;                                        //  Variable holding the specular sampling jitter
-    double m_LW;                                        //  Variable holding the minimum weight fraction to continue tracing a ray
-    double m_DJ;                                        //  Variable holding the direct jitter fraction
-    double m_DS;                                        //  Variable holding the direct sampling ratio
-    int m_DR;                                           //  Variable holding the number of relays for secondary sources
-    double m_DP;                                        //  Variable holding the secondary source presampling density
+    boost::optional<std::string> m_WeaDataFile;
+    boost::optional<int> m_FirstDay;
+    boost::optional<double> m_BuildingRotation;
+    boost::optional<std::string> m_ImportUnits;                          //  Variable holding the geometry file import units
+    boost::optional<std::string> m_IllumUnits;                           //  Variable holding the illuminance units
+    boost::optional<std::string> m_DisplayUnits;                         //  Variable holding the distance units for display
+    boost::optional<double> m_TargetIlluminance;                         //  Variable holding the target illuminance
+    boost::optional<int> m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
+    boost::optional<int> m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
+    boost::optional<bool> m_DaylightSavingsTime;                         //  Variable holding whether daylight savings time is enabled
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
 };
 

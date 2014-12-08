@@ -62,6 +62,15 @@ boost::optional<JsonObject> readJsonDocument(const std::string &filename)
 
     return boost::optional<JsonObject>(root);
 }
+boost::optional<double> STADIC_API getDouble(const JsonObject &json, const std::string &key){
+    JsonObject value = json[key];
+        if(value.isNull()) {
+        return boost::none;
+    } else if(value.isDouble()) {
+        return boost::optional<double>(value.asDouble());
+    }
+    return boost::none;
+}
 
 boost::optional<double> getDouble(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
@@ -75,6 +84,15 @@ boost::optional<double> getDouble(const JsonObject &json, const std::string &key
         } else {
             STADIC_LOG(severity, errorBad);
         }
+    }
+    return boost::none;
+}
+boost::optional<int> STADIC_API getInt(const JsonObject &json, const std::string &key){
+    JsonObject value = json[key];
+    if(value.isNull()) {
+        return boost::none;
+    } else if(value.isInt()) {
+        return boost::optional<int>(value.asInt());
     }
     return boost::none;
 }
@@ -118,6 +136,15 @@ boost::optional<std::string> getString(const JsonObject &json, const std::string
         } else {
             STADIC_LOG(severity, errorBad);
         }
+    }
+    return boost::none;
+}
+boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key){
+    JsonObject value=json[key];
+    if (value.isNull()){
+        return boost::none;
+    }else if(value.isBool()){
+        return boost::optional<bool>(value.asBool());
     }
     return boost::none;
 }

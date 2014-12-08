@@ -146,41 +146,43 @@ void BuildingControl::setDaylightSavingsTime(bool value)
 //******************
 //General Information
 //******************
-std::string BuildingControl::weaDataFile(){
+boost::optional<std::string> BuildingControl::weaDataFile(){
     return m_WeaDataFile;
 }
-int BuildingControl::firstDay(){
+boost::optional<int> BuildingControl::firstDay(){
     return m_FirstDay;
 }
-double BuildingControl::buildingRotation(){
+boost::optional<double> BuildingControl::buildingRotation(){
     return m_BuildingRotation;
 }
 std::vector<Control> BuildingControl::spaces(){
     return m_Spaces;
 }
-std::string BuildingControl::importUnits(){
+boost::optional<std::string> BuildingControl::importUnits(){
     return m_ImportUnits;
 }
-std::string BuildingControl::illumUnits(){
+boost::optional<std::string> BuildingControl::illumUnits(){
     return m_IllumUnits;
 }
-std::string BuildingControl::displayUnits(){
+boost::optional<std::string> BuildingControl::displayUnits(){
     return m_DisplayUnits;
 }
-double BuildingControl::targetIlluminance(){
+boost::optional<double> BuildingControl::targetIlluminance(){
     return m_TargetIlluminance;
 }
-int BuildingControl::sunDivisions(){
+boost::optional<int> BuildingControl::sunDivisions(){
     return m_SunDivisions;
 }
-int BuildingControl::skyDivisions(){
+boost::optional<int> BuildingControl::skyDivisions(){
     return m_SkyDivisions;
 }
 
-bool BuildingControl::daylightSavingsTime(){
+boost::optional<bool> BuildingControl::daylightSavingsTime(){
     return m_DaylightSavingsTime;
 }
-
+boost::optional<std::string> BuildingControl::getRadParam(std::string parameterSet, std::string parameterName){
+    return m_RadParams[parameterSet][parameterName];
+}
 
 //******************
 //PARSER
@@ -206,41 +208,43 @@ bool BuildingControl::parseJson(const std::string &file)
 
     treeVal=getObject(json, "general", "The key \"general\" does not appear in the STADIC Control File.", Severity::Fatal);
     //Import Units
-    sVal=getString(treeVal.get(), "import_units", "The key \"import_units\" does not appear in the STADIC Control File.", "The key \"import_units\" does not contain a string.", Severity::Warning);
-    if (!setImportUnits(sVal.get())){
-        return false;
+    sVal=getString(treeVal.get(), "import_units");
+    if (sVal){
+        setImportUnits(sVal.get());
+        sVal.reset();
     }
-    sVal.reset();
     //Display Units
-    sVal=getString(treeVal.get(), "display_units", "The key \"display_units\" does not appear in the STADIC Control File.", "The key \"display_units\" does not contain a string.", Severity::Warning);
-    if (!setDisplayUnits(sVal.get())){
-        return false;
+    sVal=getString(treeVal.get(), "display_units");
+    if (sVal){
+        setDisplayUnits(sVal.get());
+        sVal.reset();
     }
-    sVal.reset();
     //Illuminance Units
-    sVal=getString(treeVal.get(), "illum_units", "The key \"illum_units\" does not appear in the STADIC Control File.", "The key \"illum_units\" does not contain a string.", Severity::Warning);
-    setIllumUnits(sVal.get());
-    sVal.reset();
+    sVal=getString(treeVal.get(), "illum_units");
+    if (sVal){
+        setIllumUnits(sVal.get());
+        sVal.reset();
+    }
     //Radiance Parameters
     boost::optional<JsonObject> radTree;
-    radTree=getObject(treeVal.get(), "radiance_parameters", "The key \"radiance_parameters\" does not appear in the STADIC Control File.", Severity::Warning);
-    if (!radTree){
-        return false;
-    }
-    for (std::string setName : radTree.get().getMemberNames()){
-        boost::optional<JsonObject> tempTree;
-        tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
-        std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
-        m_RadParams.insert(tempPair);
-        for (std::string paramName : tempTree.get().getMemberNames()){
-            sVal=getString(tempTree.get(), paramName, "The key \""+paramName+ "\" does not appear in the STADIC Control File.", "The key \""+paramName+"\" does not appear in the STADIC Control File.", Severity::Fatal);
-            std::pair<std::string, std::string> parameters (paramName, sVal.get());
-            m_RadParams[setName].insert(parameters);
+    radTree=getObject(treeVal.get(), "radiance_parameters");
+    if (radTree){
+        for (std::string setName : radTree.get().getMemberNames()){
+            boost::optional<JsonObject> tempTree;
+            tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
+            std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
+            m_RadParams.insert(tempPair);
+            for (std::string paramName : tempTree.get().getMemberNames()){
+                sVal=getString(tempTree.get(), paramName, "The key \""+paramName+ "\" does not appear in the STADIC Control File.", "The key \""+paramName+"\" does not appear in the STADIC Control File.", Severity::Fatal);
+                std::pair<std::string, std::string> parameters (paramName, sVal.get());
+                m_RadParams[setName].insert(parameters);
+            }
         }
     }
     //Daylight Savings Time
-    bVal=getBool(treeVal.get(), "daylight_savings_time", false, "The key \"daylight_savings_time\" does not appear in the STADIC Control File.", Severity::Warning);
+    bVal=getBool(treeVal.get(), "daylight_savings_time");
     if (!bVal){
+        STADIC_LOG(Severity::Info, "Daylight Savings Time will not be enabled for this simulation.");
         setDaylightSavingsTime(false);
     }else{
         setDaylightSavingsTime(bVal.get());
@@ -267,8 +271,27 @@ bool BuildingControl::parseJson(const std::string &file)
         }
         dVal.reset();
     }
-
-    treeVal=getObject(json, "spaces", "The key \"spaces\" does not appear in the STADIC Control File.", Severity::Fatal);
+    //TargetIlluminance
+    dVal=getDouble(treeVal.get(), "target_illuminance");
+    if (dVal){
+        if (setTargetIlluminance(dVal.get())){
+            dVal.reset();
+        }
+    }
+    //Sky Divisions
+    iVal=getInt(treeVal.get(), "sky_divisions");
+    if (iVal){
+        if (setSkyDivisions(iVal.get())){
+            iVal.reset();
+        }
+    }
+    //Sun Divisions
+    iVal=getInt(treeVal.get(), "sun_divisions");
+    if (iVal){
+        if (setSunDivisions(iVal.get())){
+            iVal.reset();
+        }
+    }
 
     //******************
     //Loop over Spaces
