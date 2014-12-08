@@ -53,24 +53,6 @@ std::vector<std::string> split(std::string line, char delimiter)
         stringList.push_back(string);
     }
     return stringList;
-    /*
-    std::vector<std::string> stringList;
-    std::string remain;
-    if (line.find(delimiter)!=line.npos){
-        stringList.push_back(trim(line.substr(0,line.find(delimiter))));
-        remain=line.substr(line.find(delimiter)+1);
-    }else{
-        stringList.push_back(trim(line));
-    }
-
-    if (line.find(delimiter)!=line.npos){
-        std::vector<std::string> stringList2;
-        stringList2=split(remain,delimiter);
-        stringList.insert(stringList.end(),stringList2.begin(), stringList2.end());
-    }else{
-        return stringList;
-    }
-    */
 }
 
 std::vector<std::string> trimmedSplit(std::string line, char delimiter)
