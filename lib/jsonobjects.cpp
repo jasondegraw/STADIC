@@ -95,6 +95,17 @@ boost::optional<int> getInt(const JsonObject &json, const std::string &key, cons
     return boost::none;
 }
 
+boost::optional<std::string> getString(const JsonObject &json, const std::string &key)
+{
+  JsonObject value = json[key];
+  if(value.isNull()) {
+    return boost::none;
+  } else if(value.isString()) {
+      return boost::optional<std::string>(value.asString());
+  }
+  return boost::none;
+}
+
 boost::optional<std::string> getString(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity)
 {
