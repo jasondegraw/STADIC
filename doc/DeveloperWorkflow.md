@@ -18,13 +18,15 @@ repo.
 Add a New Feature or Fix a Bug
 ------------------------------
 
-Each new feature or bug fix should be associated with a GitHub issue. If there isn't an issue, submit one and
-get yourself assigned to it. Then:
+Each new feature or bug fix should be associated with a GitHub issue or milestone. If there isn't an issue and the
+proposed change is small, submit one and get yourself assigned to it. For larger changes, a milestone may be
+appropriate (discuss this with the developers). Then:
 
 1. Create a new branch from develop. Make sure that the branch is of develop and not of master and give the
 branch a name like "issue-68", where 68 is the issue number. If your "u", "e", and "-" keys are defective,
 then "iss68" is OK. It is also OK to add the name of the feature or a description to the branch name (e.g. 
-"issue-68-fix-that-thing")
+"issue-68-fix-that-thing"). For milestones, name the the branch after the feature being developed (e.g. 
+"milestone-add-that-feature"). The git commands to use are:
 
         $> git checkout develop
         $> git branch issue-68
