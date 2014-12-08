@@ -45,6 +45,7 @@
 #include "spacecontrol.h"
 #include <boost/optional.hpp>
 #include "logging.h"
+#include <unordered_map>
 
 #include "stadicapi.h"
 
@@ -62,29 +63,26 @@ public:
     //General Information
     //******************
     bool setBuildingRotation(double value);
+    void resetBuildingRotation();
     void setWeaDataFile(std::string file);
+    void resetWeaDataFile();
     bool setFirstDay(int value);
+    void resetFirstDay();
     bool setImportUnits(std::string units);
+    void resetImportUnits();
     void setIllumUnits(std::string units);
+    void resetIllumUnits();
     bool setDisplayUnits(std::string units);
+    void resetDisplayUnits();
     bool setTargetIlluminance(double value);
+    void resetTargetIlluminance();
     bool setSunDivisions(int value);
+    void resetSunDivisions();
     bool setSkyDivisions(int value);
+    void resetSkyDivisions();
     void setDaylightSavingsTime(bool value);
-    bool setDefaultRadianceParameters();
-    bool setAB(int value);
-    bool setAD(int value);
-    bool setAS(int value);
-    bool setAR(int value);
-    bool setAA(double value);
-    bool setLR(int value);
-    bool setST(double value);
-    bool setSJ(double value);
-    bool setLW(double value);
-    bool setDJ(double value);
-    bool setDS(double value);
-    bool setDR(int value);
-    bool setDP(double value);
+    void resetDaylightSavingsTime();
+    bool setRadianceParameters(std::string radSet, std::string radParam, std::string radVal);
 
     //Getters
     //******************
@@ -154,6 +152,7 @@ private:
     double m_DS;                                        //  Variable holding the direct sampling ratio
     int m_DR;                                           //  Variable holding the number of relays for secondary sources
     double m_DP;                                        //  Variable holding the secondary source presampling density
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
 
     //******************
     //Lighting Control
