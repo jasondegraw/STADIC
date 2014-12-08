@@ -576,7 +576,7 @@ double Control::UDIMax(){
 //PARSER
 //******************
 
-bool Control::parseJson(const JsonObject &json)
+bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl)
 {
     if (json.empty()){
         STADIC_LOG(Severity::Error, "The space does not contain data.");

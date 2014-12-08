@@ -46,6 +46,7 @@
 #include "controlzone.h"
 #include <boost/optional.hpp>
 #include "logging.h"
+#include "buildingcontrol.h"
 
 #include "stadicapi.h"
 
@@ -55,7 +56,7 @@ class STADIC_API Control
 {
 public:
     Control();
-    bool parseJson(const JsonObject &json);
+    bool parseJson(const JsonObject &json, BuildingControl *buildingControl);
 
     //Setters
     //******************

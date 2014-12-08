@@ -42,7 +42,6 @@
 
 #include <string>
 #include <vector>
-#include "spacecontrol.h"
 #include <boost/optional.hpp>
 #include "logging.h"
 #include <unordered_map>
@@ -50,6 +49,8 @@
 #include "stadicapi.h"
 
 namespace stadic {
+
+class Control;
 
 class STADIC_API BuildingControl
 {
@@ -153,11 +154,6 @@ private:
     int m_DR;                                           //  Variable holding the number of relays for secondary sources
     double m_DP;                                        //  Variable holding the secondary source presampling density
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
-
-    //******************
-    //Lighting Control
-    //******************
-    std::vector<ControlZone> m_ControlZones;
 };
 
 }
