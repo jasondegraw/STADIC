@@ -33,6 +33,23 @@ then "iss68" is OK. It is also OK to add the name of the feature or a descriptio
         $> git checkout issue-68
     
 2. Write code.
-3. Create a pull request. Once your code has been reviewed and merged, delete the branch.
 
+3. Create a pull request to merge this branch with develop. Once your code has been reviewed and merged, delete
+the branch.
 
+Releases
+--------
+
+The release procedure uses GitHub milestones. 
+
+1. Create a milestone associated with a release. The milestone should be named after the release (e.g. "Version 1.0.0").
+
+2. Create branch of develop named after the release (e.g. "release-1.0.0"):
+
+        $> git checkout develop
+        $> git branch release-1.0.0
+        $> git checkout release-1.0.0
+
+3. Write code.
+
+4. Create a pull request to merge the release branch with develop and master.
