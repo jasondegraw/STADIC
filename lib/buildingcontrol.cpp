@@ -58,6 +58,10 @@ BuildingControl::BuildingControl()
 void BuildingControl::setWeaDataFile(std::string file){
     m_WeaDataFile=file;
 }
+void BuildingControl::resetWeaDataFile(){
+    m_WeaDataFile.reset();
+}
+
 bool BuildingControl::setFirstDay(int value){
     if (value>7 || value<1){
         STADIC_WARNING("The first day must be an integer between 1 and 7.\n\tA default value of 1 will be applied.");
@@ -66,6 +70,9 @@ bool BuildingControl::setFirstDay(int value){
         m_FirstDay=value;
     }
     return true;
+}
+void BuildingControl::resetFirstDay(){
+    m_FirstDay.reset();
 }
 
 bool BuildingControl::setBuildingRotation(double value){
@@ -77,6 +84,10 @@ bool BuildingControl::setBuildingRotation(double value){
     }
     return true;
 }
+void BuildingControl::resetBuildingRotation(){
+    m_BuildingRotation.reset();
+}
+
 bool BuildingControl::setImportUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_ImportUnits=units;
@@ -86,6 +97,10 @@ bool BuildingControl::setImportUnits(std::string units){
     }
     return true;
 }
+void BuildingControl::resetImportUnits(){
+    m_ImportUnits.reset();
+}
+
 void BuildingControl::setIllumUnits(std::string units){
     if (units=="lux" || units=="fc"){
         m_IllumUnits=units;
@@ -94,6 +109,10 @@ void BuildingControl::setIllumUnits(std::string units){
         m_IllumUnits="lux";
     }
 }
+void BuildingControl::resetIllumUnits(){
+    m_IllumUnits.reset();
+}
+
 bool BuildingControl::setDisplayUnits(std::string units){
     if (units=="ft" || units=="in" || units=="mm" || units=="m"){
         m_DisplayUnits=units;
@@ -103,6 +122,10 @@ bool BuildingControl::setDisplayUnits(std::string units){
     }
     return true;
 }
+void BuildingControl::resetDisplayUnits(){
+    m_DisplayUnits.reset();
+}
+
 bool BuildingControl::setTargetIlluminance(double value){
     if (value<0){
         STADIC_ERROR("The target illuminance must be greater than 0.");
@@ -111,6 +134,9 @@ bool BuildingControl::setTargetIlluminance(double value){
         m_TargetIlluminance=value;
     }
     return true;
+}
+void BuildingControl::resetTargetIlluminance(){
+    m_TargetIlluminance.reset();
 }
 
 //******************
@@ -125,6 +151,9 @@ bool BuildingControl::setSunDivisions(int value){
     }
     return true;
 }
+void BuildingControl::resetSunDivisions(){
+    m_SunDivisions.reset();
+}
 
 bool BuildingControl::setSkyDivisions(int value)
 {
@@ -136,10 +165,16 @@ bool BuildingControl::setSkyDivisions(int value)
     }
     return true;
 }
+void BuildingControl::resetSkyDivisions(){
+    m_SkyDivisions.reset();
+}
 
 void BuildingControl::setDaylightSavingsTime(bool value)
 {
     m_DaylightSavingsTime=value;
+}
+void BuildingControl::resetDaylightSavingsTime(){
+    m_DaylightSavingsTime.reset();
 }
 
 //Getters
