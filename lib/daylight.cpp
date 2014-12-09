@@ -253,7 +253,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 
     std::string vmx=mainFileName+"_3PH.vmx";
     rcontrib.setStandardOutputFile(vmx);
-    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
     rcontrib.start();
     if (!rcontrib.wait()){
@@ -393,7 +393,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     Process rcontrib4(rcontribProgram,arguments);
     std::string dirVMX=mainFileName+"_3Dir.vmx";
     rcontrib4.setStandardOutputFile(dirVMX);
-    rcontrib4.setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib4.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
     rcontrib4.start();
     if (!rcontrib4.wait()){
@@ -481,7 +481,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     std::string dirDSMX=mainFileName+"_5PH.dsmx";
     Process rcontrib5(rcontribProgram,arguments);
     rcontrib5.setStandardOutputFile(dirDSMX);
-    rcontrib5.setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib5.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
     rcontrib5.start();
     if (!rcontrib5.wait()){
@@ -666,7 +666,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         skyDC=model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
     }
     rcontrib.setStandardOutputFile(skyDC);
-    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
     rcontrib.start();
     if (!rcontrib.wait()){
@@ -775,7 +775,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
     Process rcontrib2(rcontribProgram,arguments);
     rcontrib2.setStandardOutputFile(sunDC);
-    rcontrib2.setStandardInputFile(model->dataFolder()+model->ptsFile());
+    rcontrib2.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
     rcontrib2.start();
     if (!rcontrib2.wait()){
@@ -1494,7 +1494,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
                     Process rcontrib(rcontribProgram,arguments);
                     std::string dirDSMX=mainFileName+"_5PH.dsmx";
                     rcontrib.setStandardOutputFile(dirDSMX);
-                    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile());
+                    rcontrib.setStandardInputFile(model->dataFolder()+model->ptsFile()[0]);
 
                     rcontrib.start();
                     if (!rcontrib.wait()){

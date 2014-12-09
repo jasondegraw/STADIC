@@ -99,9 +99,33 @@ void Control::setMatFile(std::string file){
 void Control::setGeoFile(std::string file){
     m_GeoFile=file;
 }
-void Control::setPTSFile(std::string file){
-    m_PTSFile=file;
+void Control::setPTSFile(std::vector<std::string> files){
+    m_PTSFile=files;
 }
+void Control::setXSpacing(std::string value){
+    m_XSpacing=value;
+}
+
+void Control::setYSpacing(std::string value){
+    m_YSpacing=value;
+}
+
+void Control::setOffset(std::string value){
+    m_Offset=value;
+}
+
+void Control::setZOffset(std::string value){
+    m_ZOffset=value;
+}
+
+void Control::setIdentifiers(std::vector<std::string> identifiers){
+    m_Identifiers=identifiers;
+}
+
+void Control::setModifiers(std::vector<std::string> modifiers){
+    m_Modifiers=modifiers;
+}
+
 void Control::setOccSchedule(std::string file){
     m_OccSchedule=file;
 }
@@ -265,9 +289,33 @@ std::string Control::matFile(){
 std::string Control::geoFile(){
     return m_GeoFile;
 }
-std::string Control::ptsFile(){
+std::vector<std::string> Control::ptsFile(){
     return m_PTSFile;
 }
+boost::optional<std::string> Control::xSpacing(){
+    return m_XSpacing;
+}
+
+boost::optional<std::string> Control::ySpacing(){
+    return m_YSpacing;
+}
+
+boost::optional<std::string> Control::offset(){
+    return m_Offset;
+}
+
+boost::optional<std::string> Control::zOffset(){
+    return m_ZOffset;
+}
+
+boost::optional<std::vector<std::string>> Control::identifiers(){
+    return m_Identifiers;
+}
+
+boost::optional<std::vector<std::string>> Control::modifiers(){
+    return m_Modifiers;
+}
+
 std::vector<WindowGroup> Control::windowGroups(){
     return m_WindowGroups;
 }
@@ -427,7 +475,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     //******************
     //Site Information
     //******************
-    dVal=getDouble(json, "ground_reflectance", "The key \"ground_reflectance\" does not appear in the STADIC Control File.", "The \"ground_reflectance\" is not a double.", Severity::Warning);
+    dVal=getDouble(json, "ground_reflectance");
     if (!dVal){
         STADIC_LOG(Severity::Info, "A default value of 0.2 will be applied for the ground reflectance.");
         setGroundReflect(0.2);
@@ -453,15 +501,61 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         return false;
     }else{
         setGeoFile(sVal.get());
-    }
-
-    sVal=getString(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", "The \"analysis_points\" is not a string.", Severity::Error);
-    if (!sVal){
-        return false;
-    }else{
-        setPTSFile(sVal.get());
         sVal.reset();
     }
+
+    //Analysis Points
+    treeVal=getObject(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", Severity::Fatal);
+    //files
+    boost::optional<JsonObject> list;
+    list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Fatal);
+    std::vector<std::string> tempVec;
+    for (std::string name : list.get().getMemberNames()){
+        tempVec.push_back(name);
+    }
+    setPTSFile(tempVec);
+    list.reset();
+    //x-spacing
+    sVal=getString(treeVal.get(), "x_spacing");
+    if (sVal){
+        setXSpacing(sVal.get());
+        sVal.reset();
+    }
+    //y-spacing
+    sVal=getString(treeVal.get(), "y_spacing");
+    if (sVal){
+        setYSpacing(sVal.get());
+        sVal.reset();
+    }
+    //offset
+    sVal=getString(treeVal.get(), "offset");
+    if (sVal){
+        setOffset(sVal.get());
+        sVal.reset();
+    }
+    //z-offset
+    sVal=getString(treeVal.get(), "z_offset");
+    if (sVal){
+        setZOffset(sVal.get());
+        sVal.reset();
+    }
+    //identifier
+    list=getArray(treeVal.get(),"identifier");
+    tempVec.clear();
+    for (std::string name : list.get().getMemberNames()){
+        tempVec.push_back(name);
+    }
+    setIdentifiers(tempVec);
+    list.reset();
+    //modifier
+    list=getArray(treeVal.get(),"modifier");
+    tempVec.clear();
+    for (std::string name : list.get().getMemberNames()){
+        tempVec.push_back(name);
+    }
+    setModifiers(tempVec);
+    list.reset();
+
 
     treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
     if (!treeVal){

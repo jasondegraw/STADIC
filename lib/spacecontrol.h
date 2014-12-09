@@ -82,7 +82,13 @@ public:
     void setMatFile(std::string file);
     void setGeoFile(std::string file);
     bool setBuildingRotation(double value);
-    void setPTSFile(std::string file);
+    void setPTSFile(std::vector<std::string> files);
+    void setXSpacing(std::string value);
+    void setYSpacing(std::string value);
+    void setOffset(std::string value);
+    void setZOffset(std::string value);
+    void setIdentifiers(std::vector<std::string> identifiers);
+    void setModifiers(std::vector<std::string> modifiers);
     void setOccSchedule(std::string file);
     bool setTargetIlluminance(double value);
 
@@ -126,7 +132,13 @@ public:
     //******************
     std::string matFile();
     std::string geoFile();
-    std::string ptsFile();
+    std::vector<std::string> ptsFile();
+    boost::optional<std::string> xSpacing();
+    boost::optional<std::string> ySpacing();
+    boost::optional<std::string> offset();
+    boost::optional<std::string> zOffset();
+    boost::optional<std::vector<std::string>> identifiers();
+    boost::optional<std::vector<std::string>> modifiers();
     std::vector<WindowGroup> windowGroups();
     std::string occSchedule();
     double targetIlluminance();
@@ -186,7 +198,14 @@ private:
     //******************
     std::string m_MatFile;                              //  Variable holding the main material file
     std::string m_GeoFile;                              //  Variable holding the main geometry file
-    std::string m_PTSFile;                              //  Variable holding the analysis grid file
+    std::vector<std::string> m_PTSFile;                              //  Variable holding the analysis grid file
+    boost::optional<std::string> m_XSpacing;
+    boost::optional<std::string> m_YSpacing;
+    boost::optional<std::string> m_Offset;
+    boost::optional<std::string> m_ZOffset;
+    boost::optional<std::vector<std::string>> m_Identifiers;
+    boost::optional<std::vector<std::string>> m_Modifiers;
+
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
     std::vector<WindowGroup> m_WindowGroups;
