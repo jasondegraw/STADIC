@@ -216,7 +216,15 @@ boost::optional<bool> BuildingControl::daylightSavingsTime(){
     return m_DaylightSavingsTime;
 }
 boost::optional<std::string> BuildingControl::getRadParam(std::string parameterSet, std::string parameterName){
-    return m_RadParams[parameterSet][parameterName];
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>>::const_iterator got=m_RadParams.find(parameterSet);
+    if (got==m_RadParams.end()){
+        return boost::none;
+    }
+    std::unordered_map<std::string, std::string>::const_iterator got2=m_RadParams[parameterSet].find(parameterName);
+    if (got2==m_RadParams[parameterSet].end()){
+        return boost::none;
+    }
+    return boost::optional<std::string>(m_RadParams[parameterSet][parameterName]);
 }
 
 //******************

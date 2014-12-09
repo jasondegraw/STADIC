@@ -89,18 +89,6 @@ bool Control::setGroundReflect(double value){
     }
     return true;
 }
-void Control::setWeaDataFile(std::string file){
-    m_WeaDataFile=file;
-}
-bool Control::setFirstDay(int value){
-    if (value>7 || value<1){
-        STADIC_WARNING("The first day must be an integer between 1 and 7.\n\tA default value of 1 will be applied.");
-        m_FirstDay=1;
-    }else{
-        m_FirstDay=value;
-    }
-    return true;
-}
 
 //******************
 //Geometry Information
@@ -111,43 +99,8 @@ void Control::setMatFile(std::string file){
 void Control::setGeoFile(std::string file){
     m_GeoFile=file;
 }
-bool Control::setBuildingRotation(double value){
-    if (value>360 || value<-360){
-        STADIC_ERROR("The building rotation must be between -360 and 360.");
-        return false;
-    }else{
-        m_BuildingRotation=value;
-    }
-    return true;
-}
 void Control::setPTSFile(std::string file){
     m_PTSFile=file;
-}
-bool Control::setImportUnits(std::string units){
-    if (units=="ft" || units=="in" || units=="mm" || units=="m"){
-        m_ImportUnits=units;
-    }else{
-        STADIC_ERROR("The import units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\"");
-        return false;
-    }
-    return true;
-}
-void Control::setIllumUnits(std::string units){
-    if (units=="lux" || units=="fc"){
-        m_IllumUnits=units;
-    }else{
-        STADIC_WARNING("The illuminance units must be either \"lux\" or \"fc\".  The default illuminance units will be set to lux.");
-        m_IllumUnits="lux";
-    }
-}
-bool Control::setDisplayUnits(std::string units){
-    if (units=="ft" || units=="in" || units=="mm" || units=="m"){
-        m_DisplayUnits=units;
-    }else{
-        STADIC_ERROR("The display units must be one of the following:\n\t\"ft\", \"in\", \"mm\", \"m\"");
-        return false;
-    }
-    return true;
 }
 void Control::setOccSchedule(std::string file){
     m_OccSchedule=file;
@@ -185,122 +138,6 @@ bool Control::setSkyDivisions(int value)
     }
     return true;
 }
-
-void Control::setDaylightSavingsTime(bool value)
-{
-    m_DaylightSavingsTime=value;
-}
-
-bool Control::setDefaultRadianceParameters()
-{
-    std::cerr<<"\t\tab=4"<<std::endl;
-    if (!setAB(4)){
-        return false;
-    }
-    std::cerr<<"\t\tad=300"<<std::endl;
-    if (!setAD(300)){
-        return false;
-    }
-    std::cerr<<"\t\tas=20"<<std::endl;
-    if (!setAS(20)){
-        return false;
-    }
-    std::cerr<<"\t\tar=150"<<std::endl;
-    if (!setAR(150)){
-        return false;
-    }
-    std::cerr<<"\t\taa=0.1"<<std::endl;
-    if (!setAA(0.1)){
-        return false;
-    }
-    std::cerr<<"\t\tlr=6"<<std::endl;
-    if (!setLR(6)){
-        return false;
-    }
-    std::cerr<<"\t\tst=0.15"<<std::endl;
-    if (!setST(0.15)){
-        return false;
-    }
-    std::cerr<<"\t\tsj=1.0"<<std::endl;
-    if (!setSJ(1.0)){
-        return false;
-    }
-    std::cerr<<"\t\tlw=0.004"<<std::endl;
-    if (!setLW(0.004)){
-        return false;
-    }
-    std::cerr<<"\t\tdj=0.0000"<<std::endl;
-    if (!setDJ(0.0000)){
-        return false;
-    }
-    std::cerr<<"\t\tds=0.200"<<std::endl;
-    if (!setDS(0.200)){
-        return false;
-    }
-    std::cerr<<"\t\tdr=2"<<std::endl;
-    if (!setDR(2)){
-        return false;
-    }
-    std::cerr<<"\t\tdp=512"<<std::endl;
-    if (!setDP(512)){
-        return false;
-    }
-    return true;
-}
-
-bool Control::setAB(int value){
-    m_AB=value;
-    return true;
-}
-bool Control::setAD(int value){
-    m_AD=value;
-    return true;
-}
-bool Control::setAS(int value){
-    m_AS=value;
-    return true;
-}
-bool Control::setAR(int value){
-    m_AR=value;
-    return true;
-}
-bool Control::setAA(double value){
-    m_AA=value;
-    return true;
-}
-bool Control::setLR(int value){
-    m_LR=value;
-    return true;
-}
-bool Control::setST(double value){
-    m_ST=value;
-    return true;
-}
-bool Control::setSJ(double value){
-    m_SJ=value;
-    return true;
-}
-bool Control::setLW(double value){
-    m_LW=value;
-    return true;
-}
-bool Control::setDJ(double value){
-    m_DJ=value;
-    return true;
-}
-bool Control::setDS(double value){
-    m_DS=value;
-    return true;
-}
-bool Control::setDR(int value){
-    m_DR=value;
-    return true;
-}
-bool Control::setDP(double value){
-    m_DP=value;
-    return true;
-}
-
 
 //******************
 //Metrics
@@ -418,12 +255,6 @@ std::string Control::dataFolder(){
 double Control::groundReflect(){
     return m_GroundReflect;
 }
-std::string Control::weaDataFile(){
-    return m_WeaDataFile;
-}
-int Control::firstDay(){
-    return m_FirstDay;
-}
 
 //******************
 //Geometry Information
@@ -434,23 +265,11 @@ std::string Control::matFile(){
 std::string Control::geoFile(){
     return m_GeoFile;
 }
-double Control::buildingRotation(){
-    return m_BuildingRotation;
-}
 std::string Control::ptsFile(){
     return m_PTSFile;
 }
 std::vector<WindowGroup> Control::windowGroups(){
     return m_WindowGroups;
-}
-std::string Control::importUnits(){
-    return m_ImportUnits;
-}
-std::string Control::illumUnits(){
-    return m_IllumUnits;
-}
-std::string Control::displayUnits(){
-    return m_DisplayUnits;
 }
 std::string Control::occSchedule(){
     return m_OccSchedule;
@@ -469,48 +288,6 @@ int Control::skyDivisions(){
     return m_SkyDivisions;
 }
 
-bool Control::daylightSavingsTime(){
-    return m_DaylightSavingsTime;
-}
-int Control::ab(){
-    return m_AB;
-}
-int Control::ad(){
-    return m_AD;
-}
-int Control::as(){
-    return m_AS;
-}
-int Control::ar(){
-    return m_AR;
-}
-double Control::aa(){
-    return m_AA;
-}
-int Control::lr(){
-    return m_LR;
-}
-double Control::st(){
-    return m_ST;
-}
-double Control::sj(){
-    return m_SJ;
-}
-double Control::lw(){
-    return m_LW;
-}
-double Control::dj(){
-    return m_DJ;
-}
-double Control::ds(){
-    return m_DS;
-}
-int Control::dr(){
-    return m_DR;
-}
-double Control::dp(){
-    return m_DP;
-}
 
 //******************
 //Lighting Control
@@ -659,23 +436,6 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         dVal.reset();
     }
 
-    sVal=getString(json, "wea_data_file", "The key \"wea_data_file\" does not appear in the STADIC Control File.", "The \"wea_data_file\" is not a string.", Severity::Error);
-    if (!sVal){
-        return false;
-    }else{
-        setWeaDataFile(sVal.get());
-        sVal.reset();
-    }
-
-    iVal=getInt(json, "first_day", "The key \"first_day\" does not appear in the STADIC Control File.", "The \"first_day\" is not an integer.", Severity::Warning);
-    if (!iVal){
-        STADIC_LOG(Severity::Info, "The default first day will be set to 1 (Sunday).");
-        setFirstDay(1);
-    }else{
-        setFirstDay(iVal.get());
-        iVal.reset();
-    }
-
 
     //******************
     //Geometry Information
@@ -693,15 +453,6 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         return false;
     }else{
         setGeoFile(sVal.get());
-    }
-
-    dVal=getDouble(json, "building_rotation", "The key \"building_rotation\" does not appear in the STADIC Control File.", "The \"building_rotation\" is not a double.", Severity::Warning);
-    if (!dVal){
-        STADIC_LOG(Severity::Info, "The default building rotation will be set to 0");
-        setBuildingRotation(0);
-    }else{
-        setBuildingRotation(dVal.get());
-        dVal.reset();
     }
 
     sVal=getString(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", "The \"analysis_points\" is not a string.", Severity::Error);
@@ -725,35 +476,6 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
             }
         }
         treeVal.reset();
-    }
-
-    sVal=getString(json, "import_units", "The key \"import_units\" does not appear in the STADIC Control File.", "The \"import_units\" is not a string.", Severity::Error);
-    if (!sVal){
-        return false;
-    }else{
-        if (!setImportUnits(sVal.get())){
-            return false;
-        }
-        sVal.reset();
-    }
-
-    sVal=getString(json, "illum_units", "The key \"illum_units\" does not appear in the STADIC Control File.", "The \"illum_units\" is not a string.", Severity::Warning);
-    if (!sVal){
-        STADIC_LOG(Severity::Info, "The default illuminance units will be set to lux.");
-        setIllumUnits("lux");
-    }else{
-        setIllumUnits(sVal.get());
-        sVal.reset();
-    }
-
-    sVal=getString(json, "display_units", "The key \"display_units\" does not appear in the STADIC Control File.", "The \"display_units\" is not a string.", Severity::Error);
-    if (!sVal){
-        return false;
-    }else{
-        if (!setDisplayUnits(sVal.get())){
-            return false;
-        }
-        sVal.reset();
     }
 
     sVal=getString(json, "occupancy_schedule", "The key \"occupancy_schedule\" does not appear in the STADIC Control File.", "The \"occupancy_schedule\" is not a string.", Severity::Error);
@@ -801,181 +523,6 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         }
         iVal.reset();
     }
-
-    bVal=getBool(json, "daylight_savings_time", "The key \"daylight_savings_time\" does not appear in the STADIC Control File.", "The \"daylight_savings_time\" is not a boolean.", Severity::Warning);
-    if (!bVal){
-        STADIC_LOG(Severity::Info, "Daylight Savings Time will be enabled.");
-        setDaylightSavingsTime(true);
-    }else{
-        setDaylightSavingsTime(bVal.get());
-        bVal.reset();
-    }
-
-    treeVal=getObject(json, "radiance_parameters", "The key \"radiance_parameters\" does not appear in the STADIC Control File.", Severity::Info);
-    if (!treeVal){
-        STADIC_LOG(Severity::Info, "The default radiance parameters will be set.");
-        if (!setDefaultRadianceParameters()){
-            return false;
-        }
-    }else{
-        iVal=getInt(treeVal.get(), "ab", "The parameter \"ab\" was not found under radiance_parameters.", "The parameter \"ab\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 4 will be applied for \"ab\".");
-            setAB(4);
-        }else{
-            if (!setAB(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 4 will be applied for \"ab\".");
-                setAB(4);
-            }
-            iVal.reset();
-        }
-
-        iVal=getInt(treeVal.get(), "ad", "The parameter \"ad\" was not found under radiance_parameters.", "The parameter \"ad\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 300 will be applied for \"ad\".");
-            setAD(300);
-        }else{
-            if (!setAD(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 300 will be applied for \"ad\".");
-                setAD(300);
-            }
-            iVal.reset();
-        }
-
-        iVal=getInt(treeVal.get(), "as", "The parameter \"as\" was not found under radiance_parameters.", "The parameter \"as\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 20 will be applied for \"as\".");
-            setAS(20);
-        }else{
-            if (!setAS(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 20 will be applied for \"as\".");
-                setAS(20);
-            }
-            iVal.reset();
-        }
-
-        iVal=getInt(treeVal.get(), "ar", "The parameter \"ar\" was not found under radiance_parameters.",  "The parameter \"ar\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 150 will be applied for \"ar\".");
-            setAR(150);
-        }else{
-            if (!setAR(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 150 will be applied for \"ar\".");
-                setAR(150);
-            }
-            iVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "aa", "The parameter \"aa\" was not found under radiance_parameters.", "The parameter \"aa\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 0.1 will be applied for \"aa\".");
-            setAA(0.1);
-        }else{
-            if (!setAA(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 0.1 will be applied for \"aa\".");
-                setAA(0.1);
-            }
-            dVal.reset();
-        }
-        iVal=getInt(treeVal.get(), "lr", "The parameter \"lr\" was not found under radiance_parameters.", "The parameter \"lr\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 6 will be applied for \"lr\".");
-            setLR(6);
-        }else{
-            if (!setLR(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 6 will be applied for \"lr\".");
-                setLR(6);
-            }
-            iVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "st", "The parameter \"st\" was not found under radiance_parameters.", "The parameter \"st\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 0.15 will be applied for \"st\".");
-            setST(0.15);
-        }else{
-            if (!setST(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 0.15 will be applied for \"st\".");
-                setST(0.15);
-            }
-            dVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "sj", "The parameter \"sj\" was not found under radiance_parameters.", "The parameter \"sj\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 1.0 will be applied for \"sj\".");
-            setSJ(1.0);
-        }else{
-            if (!setSJ(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 1.0 will be applied for \"sj\".");
-                setSJ(1.0);
-            }
-            dVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "lw", "The parameter \"lw\" was not found under radiance_parameters.", "The parameter \"lw\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 0.004 will be applied for \"lw\".");
-            setLW(0.004);
-        }else{
-            if (!setLW(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 0.004 will be applied for \"lw\".");
-                setLW(0.004);
-            }
-            dVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "dj", "The parameter \"dj\" was not found under radiance_parameters.", "The parameter \"dj\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 0.0 will be applied for \"dj\".");
-            setDJ(0.0);
-        }else{
-            if (!setDJ(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 0.0 will be applied for \"dj\".");
-                setDJ(0.0);
-            }
-            dVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "ds", "The parameter \"ds\" was not found under radiance_parameters.", "The parameter \"ds\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 0.200 will be applied for \"ds\".");
-            setDS(0.200);
-        }else{
-            if (!setDS(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 0.200 will be applied for \"ds\".");
-                setDS(0.200);
-            }
-            dVal.reset();
-        }
-
-        dVal=getDouble(treeVal.get(), "dr", "The parameter \"dr\" was not found under radiance_parameters.", "The parameter \"dr\" is not a number.", Severity::Warning);
-        if (!dVal){
-            STADIC_LOG(Severity::Info, "A default value of 2 will be applied for \"dr\".");
-            setDR(2);
-        }else{
-            if (!setDR(dVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 2 will be applied for \"dr\".");
-                setDR(2);
-            }
-            dVal.reset();
-        }
-
-        iVal=getInt(treeVal.get(), "dp", "The parameter \"dp\" was not found under radiance_parameters.", "The parameter \"dp\" is not a number.", Severity::Warning);
-        if (!iVal){
-            STADIC_LOG(Severity::Info, "A default value of 512 will be applied for \"dp\".");
-            setDP(512);
-        }else{
-            if (!setDP(iVal.get())){
-                STADIC_LOG(Severity::Info, "A default value of 512 will be applied for \"dp\".");
-                setDP(512);
-            }
-            iVal.reset();
-        }
-    }
-    treeVal.reset();
-
-
 
     //******************
     //Lighting Control

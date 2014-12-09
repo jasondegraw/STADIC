@@ -309,15 +309,15 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     //gendaymtx
     arguments.clear();
     arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
-    if (model->buildingRotation()!=0){
+    if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
         arguments.push_back("-r");
-        arguments.push_back(std::to_string((-1)*model->buildingRotation()));
+        arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
     }
     arguments.push_back("-c");
     arguments.push_back("1");
     arguments.push_back("1");
     arguments.push_back("1");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     std::string gendaymtxProgram="gendaymtx";
     Process gendaymtx(gendaymtxProgram,arguments);
     std::string smx=mainFileName+"_3PH.smx";
@@ -406,12 +406,12 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     //gendaymtx
     arguments.clear();
     arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
-    if (model->buildingRotation()!=0){
+    if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
         arguments.push_back("-r");
-        arguments.push_back(std::to_string((-1)*model->buildingRotation()));
+        arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
     }
     arguments.push_back("-d");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     Process gendaymtx2(gendaymtxProgram,arguments);
     std::string dirSMX=mainFileName+"_3DIR.smx";
     gendaymtx2.setStandardOutputFile(dirSMX);
@@ -426,13 +426,13 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
     //gendaymtx
     arguments.clear();
     arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
-    if (model->buildingRotation()!=0){
+    if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
         arguments.push_back("-r");
-        arguments.push_back(std::to_string((-1)*model->buildingRotation()));
+        arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
     }
     arguments.push_back("-5");
     arguments.push_back("-d");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     Process gendaymtx3(gendaymtxProgram,arguments);
     std::string dir5PHsmx=mainFileName+"_5PH.smx";
     gendaymtx3.setStandardOutputFile(dir5PHsmx);
@@ -792,7 +792,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("-5");
     arguments.push_back("-d");
     arguments.push_back("-h");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     std::string gendaymtxProgram="gendaymtx";
     Process gendaymtx(gendaymtxProgram,arguments);
 
@@ -820,7 +820,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("1");
     arguments.push_back("1");
     arguments.push_back("-h");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     Process gendaymtx2(gendaymtxProgram,arguments);
 
     std::string skySMX;
@@ -844,7 +844,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back(std::to_string( model->skyDivisions()));
     arguments.push_back("d");
     arguments.push_back("-h");
-    arguments.push_back(model->weaDataFile());
+    arguments.push_back(m_Model->weaDataFile().get());
     Process gendaymtx3(gendaymtxProgram,arguments);
 
     std::string sunPatchSMX;
@@ -1870,7 +1870,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
         DaylightIlluminanceData baseIll;
         if(isFile(tempFileName)){
-            if (!baseIll.parse(tempFileName,model->weaDataFile())){
+            if (!baseIll.parse(tempFileName,m_Model->weaDataFile().get())){
                 return false;
             }
             if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
@@ -1887,7 +1887,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         }else{
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
             if(isFile(tempFileName)){
-                if (!baseIll.parse(tempFileName, model->weaDataFile())){
+                if (!baseIll.parse(tempFileName, m_Model->weaDataFile().get())){
                     return false;
                 }
             }else{
@@ -1909,7 +1909,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
             FinalIllFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
             if(isFile(tempFileName)){
-                if (!settingIll.parse(tempFileName,model->weaDataFile())){
+                if (!settingIll.parse(tempFileName,m_Model->weaDataFile().get())){
                     return false;
                 }
                 if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=0){
@@ -1922,7 +1922,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }else{
                 tempFileName=model->projectFolder()+model->tmpFolder()+model->projectName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
                 if(isFile(tempFileName)){
-                    if (!settingIll.parse(tempFileName,model->weaDataFile())){
+                    if (!settingIll.parse(tempFileName,m_Model->weaDataFile().get())){
                         return false;
                     }
                     if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=1){

@@ -74,8 +74,6 @@ public:
     //Site Information
     //******************
     bool setGroundReflect(double value);
-    void setWeaDataFile(std::string file);
-    bool setFirstDay(int value);
 
 
     //******************
@@ -85,9 +83,6 @@ public:
     void setGeoFile(std::string file);
     bool setBuildingRotation(double value);
     void setPTSFile(std::string file);
-    bool setImportUnits(std::string units);
-    void setIllumUnits(std::string units);
-    bool setDisplayUnits(std::string units);
     void setOccSchedule(std::string file);
     bool setTargetIlluminance(double value);
 
@@ -96,21 +91,7 @@ public:
     //******************
     bool setSunDivisions(int value);
     bool setSkyDivisions(int value);
-    void setDaylightSavingsTime(bool value);
-    bool setDefaultRadianceParameters();
-    bool setAB(int value);
-    bool setAD(int value);
-    bool setAS(int value);
-    bool setAR(int value);
-    bool setAA(double value);
-    bool setLR(int value);
-    bool setST(double value);
-    bool setSJ(double value);
-    bool setLW(double value);
-    bool setDJ(double value);
-    bool setDS(double value);
-    bool setDR(int value);
-    bool setDP(double value);
+
 
     //******************
     //Metrics
@@ -139,20 +120,14 @@ public:
     //Site Information
     //******************
     double groundReflect();
-    std::string weaDataFile();
-    int firstDay();
 
     //******************
     //Geometry Information
     //******************
     std::string matFile();
     std::string geoFile();
-    double buildingRotation();
     std::string ptsFile();
     std::vector<WindowGroup> windowGroups();
-    std::string importUnits();
-    std::string illumUnits();
-    std::string displayUnits();
     std::string occSchedule();
     double targetIlluminance();
 
@@ -166,20 +141,6 @@ public:
     //******************
     int sunDivisions();
     int skyDivisions();
-    bool daylightSavingsTime();
-    int ab();
-    int ad();
-    int as();
-    int ar();
-    double aa();
-    int lr();
-    double st();
-    double sj();
-    double lw();
-    double dj();
-    double ds();
-    int dr();
-    double dp();
 
     //******************
     //Metrics
@@ -219,19 +180,13 @@ private:
     //Site Information
     //******************
     double m_GroundReflect;                             //  Variable holding the ground reflectance
-    std::string m_WeaDataFile;                          //  Variable holding the weather data file
-    int m_FirstDay;                                     //  Variable holding the start day of the year
 
     //******************
     //Geometry Information
     //******************
     std::string m_MatFile;                              //  Variable holding the main material file
     std::string m_GeoFile;                              //  Variable holding the main geometry file
-    double m_BuildingRotation;                          //  Variable holding the building rotation which is assumed to be positive=counter-clockwise
     std::string m_PTSFile;                              //  Variable holding the analysis grid file
-    std::string m_ImportUnits;                          //  Variable holding the geometry file import units
-    std::string m_IllumUnits;                           //  Variable holding the illuminance units
-    std::string m_DisplayUnits;                         //  Variable holding the distance units for display
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
     std::vector<WindowGroup> m_WindowGroups;
@@ -241,20 +196,6 @@ private:
     //******************
     int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
     int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
-    bool m_DaylightSavingsTime;                         //  Variable holding whether daylight savings time is enabled
-    int m_AB;                                           //  Variable holding the number of ambient bounces
-    int m_AD;                                           //  Variable holding the number of ambient divisions
-    int m_AS;                                           //  Variable holding the number of ambient super-samples
-    int m_AR;                                           //  Variable holding the ambient resolutions
-    double m_AA;                                        //  Variable holding the ambient accuracy
-    int m_LR;                                           //  Variable holding the maximum number of reflections
-    double m_ST;                                        //  Variable holding the specular sampling threshold
-    double m_SJ;                                        //  Variable holding the specular sampling jitter
-    double m_LW;                                        //  Variable holding the minimum weight fraction to continue tracing a ray
-    double m_DJ;                                        //  Variable holding the direct jitter fraction
-    double m_DS;                                        //  Variable holding the direct sampling ratio
-    int m_DR;                                           //  Variable holding the number of relays for secondary sources
-    double m_DP;                                        //  Variable holding the secondary source presampling density
 
     //******************
     //Lighting Control
