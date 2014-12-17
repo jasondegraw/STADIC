@@ -93,4 +93,5 @@ as a Radiance primitive, but the values are wrong for a plastic. However, this i
     5 0.5 0.5 0.5 0.05    # Don't do this!
 
 This is not the kind of incorrect input that will test whether the code correctly recognizes a plastic type,
-but is more likely testing how the code handles malformed input. Don't test that here - it is tested elsewhere.
+but is more likely testing how the code handles malformed primitive input. Don't test that here - it is tested
+elsewhere.
