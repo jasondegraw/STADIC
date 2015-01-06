@@ -55,6 +55,6 @@ built. Otherwise, only the programs will be built.
 Acknowledgements
 ----------------
 
-The development of this software is supported by the Consortium for Building Energy 
-Innovation (CBEI) sponsored  by the U.S. Department of Energy under Award Number
-DE-EE0004261.
+The development of this software is partially supported by the Consortium for
+Building Energy Innovation (CBEI) sponsored  by the U.S. Department of Energy
+under Award Number DE-EE0004261.
