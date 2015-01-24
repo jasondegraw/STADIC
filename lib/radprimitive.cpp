@@ -37,7 +37,7 @@
 
 namespace stadic {
 
-VoidPrimitive voidPrimitive;
+std::shared_ptr<VoidPrimitive> VoidPrimitive::s_voidPtr;
 
 std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
                                                           "cylinder", "tube", "ring", "instance", "mesh", "light",
@@ -360,6 +360,24 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         }
     }
     return rad;
+}
+
+bool RadPrimitive::buildModifierConnections(shared_vector<RadPrimitive> &primitives)
+{
+    bool consistent = true;
+    for(unsigned i = 0; i < primitives.size(); i++) {
+        auto current = primitives[i];
+        if(!current->m_modifier) { // Skip any that are already done, might want to add option to override previous info
+            if(current->m_modifierString.empty()) {
+                consistent = false;
+            } else {
+                if(current->m_modifierString == "void") {
+                    current->m_modifier = VoidPrimitive::getShared();
+                }
+            }
+        }
+    }
+    return consistent;
 }
 
 RadPrimitive::Type RadPrimitive::typeFromString(const std::string &string)

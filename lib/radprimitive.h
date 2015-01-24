@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +41,7 @@
 #include "stadicapi.h"
 #include "functions.h"
 #include "logging.h"
+#include "sharedvector.h"
 
 namespace stadic {
 
@@ -92,6 +94,7 @@ public:
 
     std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
+	static bool buildModifierConnections(shared_vector<RadPrimitive> &primitives);
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
@@ -132,6 +135,7 @@ private:
     static Type typeFromString(const std::string &string);
 
     std::string m_Modifier;                                             //Variable holding the modifier
+    std::string m_modifierString;
 	std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
     std::string m_Name;                                                 //Variable holding the name
@@ -165,8 +169,16 @@ protected:
 class STADIC_API VoidPrimitive : public RadPrimitive
 {
 public:
-	VoidPrimitive()
-	{}
+    VoidPrimitive()
+    {}
+
+	static std::shared_ptr<VoidPrimitive> getShared()
+	{
+        if(!s_voidPtr) {
+            s_voidPtr = std::make_shared<VoidPrimitive>();
+        }
+        return s_voidPtr;
+    }
 
 	bool isVoid() const
 	{
@@ -186,9 +198,10 @@ protected:
 	{
 		return false;
 	}
-};
 
-extern VoidPrimitive voidPrimitive;
+private:
+    static std::shared_ptr<VoidPrimitive> s_voidPtr;
+};
 
 }
 

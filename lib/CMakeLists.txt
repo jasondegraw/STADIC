@@ -26,6 +26,7 @@ set(SRCS stadiccontrol.cpp
          jsonobjects.cpp)
 		 
 set(HDRS stadicapi.h
+         sharedvector.h
          stadiccontrol.h
          windowgroup.h
          shadecontrol.h
