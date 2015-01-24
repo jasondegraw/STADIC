@@ -77,10 +77,10 @@ public:
     virtual bool setArg3(const std::string &arg, int position);                //Function to set an argument on line three given the position of the argument
 
     //Getters
-    std::string modifier() const;                                       //Function that returns the modifier as a string
+    std::string modifierName() const;  //!< Returns the modifier name associated with the primitive
     Type type() const;                                                  //Function that returns the type as a type
     std::string typeString() const;                                     //Function that returns the type as a string
-    std::string name() const;                                           //Function that returns the name as a string
+    virtual std::string name() const;  //!< Returns the identifier of the primitive
     std::vector<std::string> arg1() const;                              //Function that returns the first line of arguments as a vector
     std::vector<std::string> arg2() const;                              //Function that returns the second line of arguments as a vector
     std::vector<std::string> arg3() const;                              //Function that returns the third line of arguments as a vector
@@ -94,7 +94,9 @@ public:
 
     std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
+    static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
 	static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
+    static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);
     static std::shared_ptr<RadPrimitive> sharedVoid();
 
 protected:
@@ -108,6 +110,7 @@ protected:
     bool checkDoubleValue(const std::string &value, const std::string &variable, double current) const;
     double argToDouble(int number, int position, const std::string &variable) const;
     double argToDouble(int number, int position, const std::string &variable, double defaultValue) const;
+    virtual bool setModifierName(const std::string &name);  //!< Set the modifier name if possible
     virtual bool validateArg1(const std::string &value, int position) const 
     {
         STADIC_LOG(Severity::Warning, "A " + typeString() + " primitive has no first argument in position "
@@ -134,10 +137,12 @@ protected:
 private:
     static std::shared_ptr<RadPrimitive> s_void;
     static std::array<std::string,51> s_typeStrings;
+
     static Type typeFromString(const std::string &string);
+    std::shared_ptr<RadPrimitive> findModifier(const std::string &name, const shared_vector<RadPrimitive> &knownPrimitives);
 
     std::string m_Modifier;                                             //Variable holding the modifier
-    std::string m_modifierString;
+    std::string m_modifierName;
 	std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
     std::string m_Name;                                                 //Variable holding the name

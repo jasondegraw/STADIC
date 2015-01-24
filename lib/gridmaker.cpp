@@ -270,7 +270,7 @@ bool GridMaker::parseRad(){
             bool properName=false;
             if (m_LayerNames.size()>0){
                 for (int j=0;j<m_LayerNames.size();j++){
-                    if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+                    if (m_RadFile.geometry().at(i)->modifierName()==m_LayerNames.at(j)){
                         properName=true;
                     }
                 }
@@ -590,7 +590,7 @@ bool GridMaker::writeRadPoly(std::string file){
     m_MinZRad=1000;
     for (int i=0;i<m_RadFile.geometry().size();i++){
         for (int j=0;j<m_LayerNames.size();j++){
-            if (m_RadFile.geometry().at(i)->modifier()==m_LayerNames.at(j)){
+            if (m_RadFile.geometry().at(i)->modifierName()==m_LayerNames.at(j)){
                 oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
                 oFile<<"0\t0\t"<<m_RadFile.geometry().at(i)->arg3().size()<<std::endl;
                 int coordinate=0;

@@ -113,6 +113,15 @@ void RadPrimitive::setModifier(const std::string &modifier)
     m_Modifier=modifier;
 }
 
+bool RadPrimitive::setModifierName(const std::string &name)
+{
+    if(!m_modifier) {
+        m_modifierName = name;
+        return true;
+    }
+    return false;
+}
+
 bool RadPrimitive::setType(const std::string &type)
 {
     m_TypeString=type;
@@ -196,8 +205,11 @@ bool RadPrimitive::setArg3(const std::string &arg, int position)
 }
 
 //Getters
-std::string RadPrimitive::modifier() const {
-    return m_Modifier;
+std::string RadPrimitive::modifierName() const {
+    if(!m_modifierName.empty()) {
+        return m_modifierName;
+    }
+    return m_modifier->name();
 }
 RadPrimitive::Type RadPrimitive::type() const{
     return typeFromString(m_TypeString);
@@ -236,7 +248,7 @@ static std::string nextNonComment(std::stringstream &data)
 std::string RadPrimitive::toRad() const
 {
     std::stringstream stream;
-    stream << modifier() << " " << typeString() << " " << name() << std::endl;
+    stream << modifierName() << " " << typeString() << " " << name() << std::endl;
     if(m_Arg1.size()>0) {
         stream << m_Arg1.size();
         for(const std::string &value : m_Arg1) {
@@ -308,7 +320,7 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         rad->setType(list[1]);
         break;
     }
-    rad->setModifier(list[0]);
+    rad->setModifierName(list[0]);
     rad->setName(list[2]);
 
     int nargs;
@@ -362,43 +374,188 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     return rad;
 }
 
+std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives)
+{
+    RadPrimitive *rad;
+
+    std::string string = nextNonComment(data);
+    if(string.empty()){
+        return nullptr;
+    }
+    std::vector<std::string> list = trimmedSplit(string, ' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
+    if(list.size() != 3) {
+        return nullptr;
+    }
+
+    switch(typeFromString(list[1])) {
+    case Polygon:
+        rad = new PolygonGeometry();
+        break;
+        //case Ring:
+        //    rad = new RingGeometry();
+        //    break;
+    case Plastic:
+        rad = new PlasticMaterial();
+        break;
+    case Metal:
+        rad = new MetalMaterial();
+        break;
+    case Trans:
+        rad = new TransMaterial();
+        break;
+    case Glass:
+        rad = new GlassMaterial();
+        break;
+    case BSDF:
+        rad = new BSDFMaterial();
+        break;
+    default:
+        STADIC_LOG(Severity::Warning, "Unknown primitive \"" + list[1] + "\" in input.");
+        rad = new UnknownPrimitive();
+        rad->setType(list[1]);
+        break;
+    }
+    rad->setModifierName(list[0]);
+    rad->setName(list[2]);
+
+    int nargs;
+    data >> string;   // Reads number of arguments from first line
+    nargs = toInteger(string);
+    if(nargs>0){
+        std::vector<std::string> args;
+        for(int i = 0; i<nargs; i++){
+            data >> string;
+            args.push_back(string);
+        }
+        if(!rad->setArg1(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in first argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
+    }
+
+    data >> string;   // Reads number of arguments from second line
+    nargs = toInteger(string);
+    if(nargs>0){
+        std::vector<std::string> args;
+        for(int i = 0; i<nargs; i++){
+            data >> string;
+            args.push_back(string);
+        }
+        if(!rad->setArg2(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in second argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
+    }
+
+    data >> string;   // Reads number of arguments from third line
+    nargs = toInteger(string);
+    if(nargs>0){
+        std::vector<std::string> args;
+        for(int i = 0; i<nargs; i++){
+            data >> string;
+            args.push_back(string);
+        }
+        if(!rad->setArg3(args)) {
+            delete rad;
+            STADIC_LOG(Severity::Error, "Incorrect input in third argument line for " + list[1] + " primitive, identifier "
+                + list[2]);
+            return nullptr;
+        }
+    }
+    return std::shared_ptr<RadPrimitive>(rad);
+}
+
 bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
 {
     bool consistent = true;
     // The first primitive has to have a void modifier
     if(primitives.size() > 0) {
-        if(primitives[0]->m_modifierString == "void") {
+        if(primitives[0]->m_modifierName == "void") {
             primitives[0]->m_modifier = RadPrimitive::sharedVoid();
-            primitives[0]->m_modifierString.clear();
+            primitives[0]->m_modifierName.clear();
         } else {
             STADIC_LOG(Severity::Warning, "Primitive \'" + primitives[0]->name()
-                + "\' is first primitive in primitives vector, but has non-void modifier \'" + primitives[0]->m_modifierString + "\'");
+                + "\' is first primitive in primitives vector, but has non-void modifier \'" + primitives[0]->m_modifierName + "\'");
             consistent = false;
         }
     }
     for(unsigned i = 1; i < primitives.size(); i++) {
         auto current = primitives[i];
         if(!current->m_modifier) { // Skip any that are already done, might want to add option to override previous info
-            if(current->m_modifierString.empty()) {
+            if(current->m_modifierName.empty()) {
                 consistent = false;
             } else {
-                if(current->m_modifierString == "void") {
+                if(current->m_modifierName == "void") {
                     current->m_modifier = RadPrimitive::sharedVoid();
-                    current->m_modifierString.clear();
+                    current->m_modifierName.clear();
                 } else {
                     for(unsigned j = i-1; j >= 0; j--) {
-                        if(primitives[j]->name() == current->m_modifierString) { // Found the modifier
+                        if(primitives[j]->name() == current->m_modifierName) { // Found the modifier
                             current->m_modifier = primitives[j];
-                            current->m_modifierString.clear();
+                            current->m_modifierName.clear();
                             break;
                         }
                     }
                     if(!current->m_modifier) { // Failed to find a modifier
-                        STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifierString + "\' for primitive \'"
+                        STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifierName + "\' for primitive \'"
                             + current->name() + "\'");
                         consistent = false;
                     }
                 }
+            }
+        }
+    }
+    return consistent;
+}
+
+bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
+{
+    bool consistent = true;
+    // The first primitive has to have a void modifier
+    if(primitives.size() > 0) {
+        if(primitives[0]->m_modifierName == "void") {
+            primitives[0]->m_modifier = RadPrimitive::sharedVoid();
+            primitives[0]->m_modifierName.clear();
+        } else {
+            STADIC_LOG(Severity::Warning, "Primitive \'" + primitives[0]->name()
+                + "\' is first primitive in primitives vector, but has non-void modifier \'" + primitives[0]->m_modifierName + "\'");
+            consistent = false;
+        }
+    }
+    for(unsigned i = 1; i < primitives.size(); i++) {
+        auto current = primitives[i];
+        if(!current->m_modifier) {
+            if(current->m_modifierName.empty()) {
+                consistent = false;
+            } else {
+                if(current->m_modifierName == "void") {
+                    current->m_modifier = RadPrimitive::sharedVoid();
+                    current->m_modifierName.clear();
+                } else {
+                    for(unsigned j = i - 1; j >= 0; j--) {
+                        if(primitives[j]->name() == current->m_modifierName) { // Found the modifier
+                            current->m_modifier = primitives[j];
+                            current->m_modifierName.clear();
+                            break;
+                        }
+                    }
+                    if(!current->m_modifier) { // Failed to find a modifier
+                        STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifierName + "\' for primitive \'"
+                            + current->name() + "\'");
+                        consistent = false;
+                    }
+                }
+            }
+        } else { // Check that the modifier is in this list
+            auto iter = std::find(primitives.begin(), primitives.end(), current->m_modifier);
+            if(iter != primitives.end()) {
+                STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifier->name() + "\' for primitive \'"
+                    + current->name() + "\'");
+                consistent = false;
             }
         }
     }
@@ -658,6 +815,19 @@ double RadPrimitive::argToDouble(int number, int position, const std::string &va
             + toString(position) + ") in " + typeString() + " primitive.");
     }
     return value;
+}
+
+std::shared_ptr<RadPrimitive> RadPrimitive::findModifier(const std::string &name, const shared_vector<RadPrimitive> &knownPrimitives)
+{
+    if(name == "void") {
+        return sharedVoid();
+    }
+    for(auto iter = knownPrimitives.end(); iter >= knownPrimitives.begin(); iter--) {
+        if((*iter)->name() == name) {
+            return (*iter);
+        }
+    }
+    return std::shared_ptr<RadPrimitive>();
 }
 
 }

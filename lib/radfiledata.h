@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,12 +56,14 @@ public:
     std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
 
     bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
+    bool addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
 
     //Getters
     shared_vector<RadPrimitive> geometry() const;                       //Function to get just the geometry primitives as a vector
     shared_vector<RadPrimitive> materials() const;                      //Function to get just the material primitives as a vector
     shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
 
+    bool isConsistent();
 
     template<class T> shared_vector<T> getPrimitives();
     // Splitting is officially broken
@@ -70,14 +73,16 @@ public:
     std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
 
 private:
-    shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING
+    shared_vector<RadPrimitive> m_primitives; //Vector to hold EVERYTHING
+    bool m_checked;
+    bool m_consistent;
 
 };
 
 template<class T> shared_vector<T> RadFileData::getPrimitives()
 {
     shared_vector<T> primitives;
-    for(auto primitive : m_Primitives) {
+    for(auto primitive : m_primitives) {
         auto cast = std::dynamic_pointer_cast<T>(primitive);
         if(cast) {
             primitives.push_back(cast);

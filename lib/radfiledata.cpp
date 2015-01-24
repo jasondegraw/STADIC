@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +45,7 @@ RadFileData::RadFileData()
 {
 }
 
-RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_Primitives(primitives)
+RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_primitives(primitives), m_checked(false), m_consistent(false)
 {
 }
 
@@ -75,7 +76,7 @@ bool RadFileData::addRad(std::string file)
     if(primitives.size() == 0) {
         return false;
     }
-    m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());
+    m_primitives.insert(m_primitives.end(),primitives.begin(),primitives.end());
     return true;
 }
 
@@ -106,7 +107,7 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
 std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::split(const std::vector<std::string> &vector)
 {
 	shared_vector<RadPrimitive> in, out;
-    for(std::shared_ptr<RadPrimitive> primitive : m_Primitives) {
+    for(std::shared_ptr<RadPrimitive> primitive : m_primitives) {
         if(primitive->isMaterial()) {
             if(std::find(vector.begin(),vector.end(),primitive->name()) != vector.end()) {
                 in.push_back(primitive);
@@ -114,7 +115,7 @@ std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileDat
                 out.push_back(primitive);
             }
         } else if(primitive->isGeometry()) {
-            if(std::find(vector.begin(),vector.end(),primitive->modifier()) != vector.end()) {
+            if(std::find(vector.begin(),vector.end(),primitive->modifierName()) != vector.end()) {
                 in.push_back(primitive);
             } else {
                 out.push_back(primitive);
@@ -182,9 +183,9 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 
 bool RadFileData::blackOutLayer(std::string layer)
 {
-    for(int i=0;i<m_Primitives.size();i++) {
-        if(m_Primitives[i]->modifier()==layer) {
-            m_Primitives[i]->setModifier("black");
+    for(int i=0;i<m_primitives.size();i++) {
+        if(m_primitives[i]->modifierName()==layer) {
+            m_primitives[i]->setModifier("black");
         }
     }
     return true;
@@ -222,9 +223,9 @@ bool RadFileData::writeRadFile(std::string file)
         }
     }
 
-    if(count != m_Primitives.size()) {
+    if(count != m_primitives.size()) {
         STADIC_LOG(Severity::Warning, "Only materials and geometry were written to " + file + ", "
-            + toString(m_Primitives.size() - count) + " primitives were not written out");
+            + toString(m_primitives.size() - count) + " primitives were not written out");
     }
 
     oFile << "## End of Radiance geometry file \"" + file + "\"" << std::endl;
@@ -234,13 +235,13 @@ bool RadFileData::writeRadFile(std::string file)
 
 std::vector<double> RadFileData::surfaceNormal(std::string layer){
     std::vector<double> normalVector;
-    for(int i=0;i<m_Primitives.size();i++) {
-        if(m_Primitives[i]->modifier()==layer && m_Primitives[i]->typeString()=="Polygon") {
+    for(int i=0;i<m_primitives.size();i++) {
+        if(m_primitives[i]->modifierName()==layer && m_primitives[i]->typeString()=="Polygon") {
             std::vector<std::vector<double>> normalPoints;
-            for (int j=0;j<m_Primitives[i]->arg3().size();j++){
+            for (int j=0;j<m_primitives[i]->arg3().size();j++){
                 std::vector<double> temp;
                 for (int p=0;p<3;p++){
-                    temp.push_back(atof(m_Primitives[i]->arg3()[j].c_str()));
+                    temp.push_back(atof(m_primitives[i]->arg3()[j].c_str()));
                     j++;
                 }
                 normalPoints.push_back(temp);
@@ -263,7 +264,13 @@ std::vector<double> RadFileData::surfaceNormal(std::string layer){
 
 bool RadFileData::addPrimitive(RadPrimitive *primitive)
 {
-    m_Primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
+    m_primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
+    return true;
+}
+
+bool RadFileData::addPrimitive(std::shared_ptr<RadPrimitive> primitive)
+{
+    m_primitives.push_back(primitive);
     return true;
 }
 
@@ -271,7 +278,7 @@ bool RadFileData::addPrimitive(RadPrimitive *primitive)
 shared_vector<RadPrimitive> RadFileData::geometry() const
 {
     shared_vector<RadPrimitive> primitives;
-    for(auto primitive : m_Primitives) {
+    for(auto primitive : m_primitives) {
         if(primitive->isGeometry()) {
             primitives.push_back(primitive);
         }
@@ -282,7 +289,7 @@ shared_vector<RadPrimitive> RadFileData::geometry() const
 shared_vector<RadPrimitive> RadFileData::materials() const
 {
     shared_vector<RadPrimitive> primitives;
-    for(auto primitive : m_Primitives) {
+    for(auto primitive : m_primitives) {
         if(primitive->isMaterial()) {
             primitives.push_back(primitive);
         }
@@ -292,7 +299,12 @@ shared_vector<RadPrimitive> RadFileData::materials() const
 
 shared_vector<RadPrimitive> RadFileData::primitives() const
 {
-    return m_Primitives;
+    return m_primitives;
+}
+
+bool RadFileData::isConsistent()
+{
+    return RadPrimitive::checkModifierTree(m_primitives);
 }
 
 }

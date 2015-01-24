@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +50,7 @@ TEST(RadFileTests, ParseRadFile)
   ASSERT_EQ(6, radData.materials().size());
 
   //Testing First Polygon for contents
-  EXPECT_EQ("l_floor", radData.geometry().at(0)->modifier());
+  EXPECT_EQ("l_floor", radData.geometry().at(0)->modifierName());
   EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(0)->type());
   EXPECT_EQ("l_floor.0.1", radData.geometry().at(0)->name());
   EXPECT_EQ(0, radData.geometry().at(0)->arg1().size());
@@ -61,7 +62,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(240, stadic::toDouble(radData.geometry().at(0)->arg3().at(10)));
 
   //Testing Last Polygon for contents
-  EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifier());
+  EXPECT_EQ("l_ceiling", radData.geometry().at(radData.geometry().size()-1)->modifierName());
   EXPECT_EQ(stadic::RadPrimitive::Polygon, radData.geometry().at(radData.geometry().size()-1)->type());
   EXPECT_EQ("l_ceiling.39.1", radData.geometry().at(radData.geometry().size()-1)->name());
   EXPECT_EQ(0, radData.geometry().at(radData.geometry().size()-1)->arg1().size());
@@ -73,7 +74,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, stadic::toDouble(radData.geometry().at(radData.geometry().size()-1)->arg3().at(10)));
 
   //Testing first material for contents
-  EXPECT_EQ("void", radData.materials().at(0)->modifier());
+  EXPECT_EQ("void", radData.materials().at(0)->modifierName());
   EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(0)->type());
   EXPECT_EQ("l_wall", radData.materials().at(0)->name());
   EXPECT_EQ(0, radData.materials().at(0)->arg1().size());
@@ -86,7 +87,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0, stadic::toDouble(radData.materials().at(0)->arg3().at(4)));
 
   //Testing second material for contents
-  EXPECT_EQ("void", radData.materials().at(1)->modifier());
+  EXPECT_EQ("void", radData.materials().at(1)->modifierName());
   EXPECT_EQ(stadic::RadPrimitive::Glass, radData.materials().at(1)->type());
   EXPECT_EQ("l_window", radData.materials().at(1)->name());
   EXPECT_EQ(0, radData.materials().at(1)->arg1().size());
@@ -97,7 +98,7 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(.65, stadic::toDouble(radData.materials().at(1)->arg3().at(2)));
 
   //Testing last material for contents
-  EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifier());
+  EXPECT_EQ("void", radData.materials().at(radData.materials().size()-1)->modifierName());
   EXPECT_EQ(stadic::RadPrimitive::Plastic, radData.materials().at(radData.materials().size()-1)->type());
   EXPECT_EQ("l_ceiling", radData.materials().at(radData.materials().size()-1)->name());
   EXPECT_EQ(0, radData.materials().at(radData.materials().size()-1)->arg1().size());
@@ -203,7 +204,7 @@ TEST(RadFileTests, PlasticTest)
     ASSERT_EQ(6, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::PlasticMaterial>(radData.primitives()[0]);
     ASSERT_FALSE(!primitive);
-    EXPECT_EQ("void", primitive->modifier());
+    EXPECT_EQ("void", primitive->modifierName());
     EXPECT_EQ("l_wall", primitive->name());
     EXPECT_EQ(0.5, primitive->red());
     EXPECT_EQ(0.5, primitive->green());
@@ -222,7 +223,7 @@ TEST(RadFileTests, MetalTest)
     ASSERT_EQ(6, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::MetalMaterial>(radData.primitives()[1]);
     ASSERT_FALSE(!primitive);
-    EXPECT_EQ("void", primitive->modifier());
+    EXPECT_EQ("void", primitive->modifierName());
     EXPECT_EQ("l_metal", primitive->name());
     EXPECT_EQ(0.75, primitive->red());
     EXPECT_EQ(0.75, primitive->green());
@@ -241,7 +242,7 @@ TEST(RadFileTests, GlassTest)
     ASSERT_EQ(6, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::GlassMaterial>(radData.primitives()[2]);
     ASSERT_FALSE(!primitive);
-    EXPECT_EQ("void", primitive->modifier());
+    EXPECT_EQ("void", primitive->modifierName());
     EXPECT_EQ("l_window", primitive->name());
     EXPECT_EQ(0.65, primitive->redTrans());
     EXPECT_EQ(0.65, primitive->greenTrans());
@@ -258,7 +259,7 @@ TEST(RadFileTests, TransTest)
     ASSERT_EQ(6, radData.primitives().size());
     auto primitive = std::dynamic_pointer_cast<stadic::TransMaterial>(radData.primitives()[3]);
     ASSERT_FALSE(!primitive);
-    EXPECT_EQ("void", primitive->modifier());
+    EXPECT_EQ("void", primitive->modifierName());
     EXPECT_EQ("l_trans", primitive->name());
     EXPECT_EQ(0.75, primitive->red());
     EXPECT_EQ(0.75, primitive->green());
@@ -280,10 +281,23 @@ TEST(RadFileTests, PolygonTest)
     auto primitive = std::dynamic_pointer_cast<stadic::PolygonGeometry>(radData.primitives()[4]);
     ASSERT_FALSE(!primitive);
     ASSERT_EQ(12, primitive->arg3().size());
-    EXPECT_EQ("l_wall", primitive->modifier());
+    EXPECT_EQ("l_wall", primitive->modifierName());
     EXPECT_EQ("l_wall.2.1", primitive->name());
 
     EXPECT_FALSE(badData.addRad("badpolygongeometry.rad"));
     EXPECT_EQ(0, badData.primitives().size());
 }
 
+TEST(RadFileTests, ParseConsistentRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("complicated.rad"));
+    ASSERT_TRUE(radData.isConsistent());
+}
+
+TEST(RadFileTests, ParseInconsistentRadFile)
+{
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("simple.rad"));
+    ASSERT_TRUE(radData.isConsistent());
+}
