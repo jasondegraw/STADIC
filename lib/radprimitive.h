@@ -36,7 +36,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-
+#include <memory>
 #include "stadicapi.h"
 #include "functions.h"
 #include "logging.h"
@@ -58,6 +58,10 @@ public:
 
     bool isGeometry() const;                                            //Boolean that determines whether the primitive is of a geometry type
     bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type
+	virtual bool isVoid() const
+	{
+		return false;
+	}
 
     //Setters
     void setModifier(const std::string &modifier);                             //Function to set the modifier
@@ -128,6 +132,7 @@ private:
     static Type typeFromString(const std::string &string);
 
     std::string m_Modifier;                                             //Variable holding the modifier
+	std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
     std::string m_Name;                                                 //Variable holding the name
     std::vector<std::string> m_Arg1;                                    //Vector holding arguments on line 1
@@ -156,6 +161,34 @@ protected:
         return true;
     }
 };
+
+class STADIC_API VoidPrimitive : public RadPrimitive
+{
+public:
+	VoidPrimitive()
+	{}
+
+	bool isVoid() const
+	{
+		return true;
+	}
+
+protected:
+	virtual bool validateArg1(const std::string &, int) const
+	{
+		return false;
+	}
+	virtual bool validateArg2(const std::string &, int) const
+	{
+		return false;
+	}
+	virtual bool validateArg3(const std::string &, int) const
+	{
+		return false;
+	}
+};
+
+extern VoidPrimitive voidPrimitive;
 
 }
 

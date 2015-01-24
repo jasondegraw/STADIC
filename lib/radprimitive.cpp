@@ -37,6 +37,8 @@
 
 namespace stadic {
 
+VoidPrimitive voidPrimitive;
+
 std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
                                                           "cylinder", "tube", "ring", "instance", "mesh", "light",
                                                           "illum", "glow", "spotlight", "mirror", "prism1", "prism2",
