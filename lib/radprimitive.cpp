@@ -386,8 +386,17 @@ bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
                     current->m_modifier = RadPrimitive::sharedVoid();
                     current->m_modifierString.clear();
                 } else {
-                    for(unsigned j = i; j >= 0; j--) {
-
+                    for(unsigned j = i-1; j >= 0; j--) {
+                        if(primitives[j]->name() == current->m_modifierString) { // Found the modifier
+                            current->m_modifier = primitives[j];
+                            current->m_modifierString.clear();
+                            break;
+                        }
+                    }
+                    if(!current->m_modifier) { // Failed to find a modifier
+                        STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifierString + "\' for primitive \'"
+                            + current->name() + "\'");
+                        consistent = false;
                     }
                 }
             }
