@@ -37,7 +37,7 @@
 
 namespace stadic {
 
-std::shared_ptr<VoidPrimitive> VoidPrimitive::s_voidPtr;
+std::shared_ptr<RadPrimitive> RadPrimitive::s_void;
 
 std::array<std::string,51> RadPrimitive::s_typeStrings = {"source", "sphere", "bubble", "polygon", "cone", "cup",
                                                           "cylinder", "tube", "ring", "instance", "mesh", "light",
@@ -362,22 +362,46 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
     return rad;
 }
 
-bool RadPrimitive::buildModifierConnections(shared_vector<RadPrimitive> &primitives)
+bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
 {
     bool consistent = true;
-    for(unsigned i = 0; i < primitives.size(); i++) {
+    // The first primitive has to have a void modifier
+    if(primitives.size() > 0) {
+        if(primitives[0]->m_modifierString == "void") {
+            primitives[0]->m_modifier = RadPrimitive::sharedVoid();
+            primitives[0]->m_modifierString.clear();
+        } else {
+            STADIC_LOG(Severity::Warning, "Primitive \'" + primitives[0]->name()
+                + "\' is first primitive in primitives vector, but has non-void modifier \'" + primitives[0]->m_modifierString + "\'");
+            consistent = false;
+        }
+    }
+    for(unsigned i = 1; i < primitives.size(); i++) {
         auto current = primitives[i];
         if(!current->m_modifier) { // Skip any that are already done, might want to add option to override previous info
             if(current->m_modifierString.empty()) {
                 consistent = false;
             } else {
                 if(current->m_modifierString == "void") {
-                    current->m_modifier = VoidPrimitive::getShared();
+                    current->m_modifier = RadPrimitive::sharedVoid();
+                    current->m_modifierString.clear();
+                } else {
+                    for(unsigned j = i; j >= 0; j--) {
+
+                    }
                 }
             }
         }
     }
     return consistent;
+}
+
+std::shared_ptr<RadPrimitive> RadPrimitive::sharedVoid()
+{
+    if(!s_void) {
+        s_void = std::make_shared<VoidPrimitive>();
+    }
+    return s_void;
 }
 
 RadPrimitive::Type RadPrimitive::typeFromString(const std::string &string)

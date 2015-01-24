@@ -94,7 +94,8 @@ public:
 
     std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
-	static bool buildModifierConnections(shared_vector<RadPrimitive> &primitives);
+	static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
+    static std::shared_ptr<RadPrimitive> sharedVoid();
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
@@ -131,6 +132,7 @@ protected:
     virtual bool extendArg3() const { return false; }
     
 private:
+    static std::shared_ptr<RadPrimitive> s_void;
     static std::array<std::string,51> s_typeStrings;
     static Type typeFromString(const std::string &string);
 
@@ -172,14 +174,6 @@ public:
     VoidPrimitive()
     {}
 
-	static std::shared_ptr<VoidPrimitive> getShared()
-	{
-        if(!s_voidPtr) {
-            s_voidPtr = std::make_shared<VoidPrimitive>();
-        }
-        return s_voidPtr;
-    }
-
 	bool isVoid() const
 	{
 		return true;
@@ -199,8 +193,6 @@ protected:
 		return false;
 	}
 
-private:
-    static std::shared_ptr<VoidPrimitive> s_voidPtr;
 };
 
 }
