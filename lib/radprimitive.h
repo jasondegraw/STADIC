@@ -32,7 +32,6 @@
 #ifndef RADPRIMITIVE_H
 #define RADPRIMITIVE_H
 
-
 #include <array>
 #include <vector>
 #include <string>
@@ -42,6 +41,7 @@
 #include "functions.h"
 #include "logging.h"
 #include "sharedvector.h"
+#include <boost/optional.hpp>
 
 namespace stadic {
 
@@ -67,6 +67,7 @@ public:
 
     //Setters
     void setModifier(const std::string &modifier);                             //Function to set the modifier
+    void setModifierOverride(const std::string &name);  //!< Set the name of the modifier to use, overriding the modifier pointer
     virtual bool setType(const std::string &type);                             //Function to set the type
     void setName(const std::string &name);                                     //Function to set the name
     virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
@@ -78,6 +79,7 @@ public:
 
     //Getters
     std::string modifierName() const;  //!< Returns the modifier name associated with the primitive
+    boost::optional<std::string>  modifierOverride() const; //!< Returns the modifier name that will be used, if empty then the modifier pointer is used
     Type type() const;                                                  //Function that returns the type as a type
     std::string typeString() const;                                     //Function that returns the type as a string
     virtual std::string name() const;  //!< Returns the identifier of the primitive
@@ -142,7 +144,7 @@ private:
     std::shared_ptr<RadPrimitive> findModifier(const std::string &name, const shared_vector<RadPrimitive> &knownPrimitives);
 
     std::string m_Modifier;                                             //Variable holding the modifier
-    std::string m_modifierName;
+    boost::optional<std::string> m_modifierName;
 	std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
     std::string m_Name;                                                 //Variable holding the name
