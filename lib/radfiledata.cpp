@@ -45,7 +45,7 @@ RadFileData::RadFileData()
 {
 }
 
-RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_primitives(primitives), m_checked(false), m_consistent(false)
+RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_primitives(primitives)
 {
 }
 
@@ -305,6 +305,11 @@ shared_vector<RadPrimitive> RadFileData::primitives() const
 bool RadFileData::isConsistent()
 {
     return RadPrimitive::checkModifierTree(m_primitives);
+}
+
+bool RadFileData::buildModifierTree()
+{
+    return RadPrimitive::buildModifierTree(m_primitives);
 }
 
 }

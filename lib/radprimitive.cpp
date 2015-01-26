@@ -206,7 +206,7 @@ bool RadPrimitive::setArg3(const std::string &arg, int position)
 
 //Getters
 std::string RadPrimitive::modifierName() const {
-    if(!m_modifierName) {
+    if(m_modifierName) {
         return m_modifierName.get();
     } else if(m_modifier) {
         return m_modifier->name();
@@ -329,7 +329,6 @@ RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
         break;
     }
     rad->setModifierName(list[0]);
-    std::cout << " ********** " << rad->m_modifierName.get() << std::endl;
     rad->setName(list[2]);
 
     int nargs;

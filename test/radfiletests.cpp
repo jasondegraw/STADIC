@@ -292,12 +292,14 @@ TEST(RadFileTests, ParseConsistentRadFile)
 {
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("complicated.rad"));
-    ASSERT_TRUE(radData.isConsistent());
+    ASSERT_FALSE(radData.isConsistent());
+    ASSERT_TRUE(radData.buildModifierTree());
 }
 
 TEST(RadFileTests, ParseInconsistentRadFile)
 {
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("simple.rad"));
-    ASSERT_TRUE(radData.isConsistent());
+    ASSERT_FALSE(radData.isConsistent());
+    ASSERT_FALSE(radData.buildModifierTree());
 }

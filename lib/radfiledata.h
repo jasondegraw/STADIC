@@ -64,6 +64,7 @@ public:
     shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
 
     bool isConsistent();
+    bool buildModifierTree();
 
     template<class T> shared_vector<T> getPrimitives();
     // Splitting is officially broken
@@ -74,8 +75,6 @@ public:
 
 private:
     shared_vector<RadPrimitive> m_primitives; //Vector to hold EVERYTHING
-    bool m_checked;
-    bool m_consistent;
 
 };
 
