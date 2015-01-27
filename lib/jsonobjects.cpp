@@ -248,5 +248,11 @@ boost::optional<std::string> asString(const JsonObject &json, const std::string 
     }
     return boost::none;
 }
-
+boost::optional<bool> asBool(const JsonObject &json, const std::string &errorBad, Severity severity)
+{
+    if (json.isBool()) {
+        return boost::optional<bool>(json.asBool());
+    }
+    return boost::none;
+}
 }

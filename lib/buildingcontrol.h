@@ -105,7 +105,7 @@ public:
     boost::optional<int> skyDivisions();
     boost::optional<bool> daylightSavingsTime();
     boost::optional<std::string> getRadParam(std::string parameterSet, std::string parameterName);
-
+    boost::optional<std::unordered_map<std::string, std::unordered_map<std::string, std::string>>> getAllRadParams();
 
 private:
 

@@ -39,7 +39,7 @@
 
 #include "daylight.h"
 #include "logging.h"
-
+#include "buildingcontrol.h"
 #include <iostream>
 
 void usage()

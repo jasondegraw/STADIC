@@ -54,26 +54,23 @@ Control::Control()
 //******************
 //Folder Information
 //******************
-void Control::setProjectName(std::string name){
-    m_ProjectName=name;
+void Control::setSpaceName(std::string name){
+    m_SpaceName=name;
 }
-void Control::setProjectFolder(std::string folder){
-    m_ProjectFolder=folder;
+void Control::setSpaceDirectory(std::string directory){
+    m_SpaceDirectory=directory;
 }
-void Control::setTmpFolder(std::string folder){
-    m_TmpFolder=folder;
+void Control::setGeoDirectory(std::string directory){
+    m_GeoDirectory=directory;
 }
-void Control::setGeoFolder(std::string folder){
-    m_GeoFolder=folder;
+void Control::setIESDirectory(std::string directory){
+    m_IESDirectory=directory;
 }
-void Control::setIESFolder(std::string folder){
-    m_IESFolder=folder;
+void Control::setResultsDirectory(std::string directory){
+    m_ResultsDirectory=directory;
 }
-void Control::setResultsFolder(std::string folder){
-    m_ResultsFolder=folder;
-}
-void Control::setDataFolder(std::string folder){
-    m_DataFolder=folder;
+void Control::setInputDirectory(std::string directory){
+    m_InputDirectory=directory;
 }
 
 //******************
@@ -129,6 +126,10 @@ void Control::setModifiers(std::vector<std::string> modifiers){
 void Control::setOccSchedule(std::string file){
     m_OccSchedule=file;
 }
+void Control::setLightSchedule(std::string file){
+    m_LightSchedule=file;
+}
+
 bool Control::setTargetIlluminance(double value){
     if (value<0){
         STADIC_ERROR("The target illuminance must be greater than 0.");
@@ -162,6 +163,7 @@ bool Control::setSkyDivisions(int value)
     }
     return true;
 }
+
 
 //******************
 //Metrics
@@ -251,26 +253,26 @@ bool Control::setUDI(bool run, double minIllum, double maxIllum){
 //******************
 //Folder Information
 //******************
-std::string Control::projectName(){
-    return m_ProjectName;
+std::string Control::spaceName(){
+    return m_SpaceName;
 }
-std::string Control::projectFolder(){
-    return m_ProjectFolder;
+std::string Control::spaceDirectory(){
+    return m_SpaceDirectory;
 }
-std::string Control::tmpFolder(){
-    return m_TmpFolder;
+std::string Control::geoDirectory(){
+    return m_GeoDirectory;
 }
-std::string Control::geoFolder(){
-    return m_GeoFolder;
+std::string Control::iesDirectory(){
+    return m_IESDirectory;
 }
-std::string Control::iesFolder(){
-    return m_IESFolder;
+std::string Control::resultsDirectory(){
+    return m_ResultsDirectory;
 }
-std::string Control::resultsFolder(){
-    return m_ResultsFolder;
+std::string Control::inputDirectory(){
+    return m_InputDirectory;
 }
-std::string Control::dataFolder(){
-    return m_DataFolder;
+std::string Control::intermediateDataDirectory(){
+    return m_ResultsDirectory +"intermediateData\\";
 }
 
 //******************
@@ -322,6 +324,10 @@ std::vector<WindowGroup> Control::windowGroups(){
 std::string Control::occSchedule(){
     return m_OccSchedule;
 }
+std::string Control::lightSchedule(){
+    return m_LightSchedule;
+}
+
 double Control::targetIlluminance(){
     return m_TargetIlluminance;
 }
@@ -335,6 +341,27 @@ int Control::sunDivisions(){
 int Control::skyDivisions(){
     return m_SkyDivisions;
 }
+boost::optional<std::string> Control::getRadParam(std::string parameterSet, std::string parameterName){
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>>::const_iterator got=m_RadParams.find(parameterSet);
+    if (got==m_RadParams.end()){
+        return boost::none;
+    }
+    std::unordered_map<std::string, std::string>::const_iterator got2=m_RadParams[parameterSet].find(parameterName);
+    if (got2==m_RadParams[parameterSet].end()){
+        return boost::none;
+    }
+    return boost::optional<std::string>(m_RadParams[parameterSet][parameterName]);
+}
+
+boost::optional<std::unordered_map<std::string, std::string>> Control::getParamSet(std::string setName){
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>>::const_iterator got=m_RadParams.find(setName);
+    if (got==m_RadParams.end()){
+        return boost::none;
+    }
+
+    return boost::optional<std::unordered_map<std::string, std::string>>(m_RadParams[setName]);
+}
+
 
 
 //******************
@@ -397,6 +424,9 @@ double Control::UDIMax(){
 }
 
 
+
+
+
 //******************
 //PARSER
 //******************
@@ -418,57 +448,49 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     //******************
     //Folder Information
     //******************
-    sVal=getString(json, "project_name", "The key \"project_name\" does not appear in the STADIC Control File.", "The key \"project_name\" does not contain a string.", Severity::Error);
+    sVal=getString(json, "space_name", "The key \"space_name\" does not appear in the STADIC Control File.", "The key \"space_name\" does not contain a string.", Severity::Error);
     if(!sVal){
         return false;
     }else{
-        setProjectName(sVal.get());
+        setSpaceName(sVal.get());
         sVal.reset();
     }
 
-    sVal=getString(json, "project_folder", "The key \"project_folder\" does not appear in the STADIC Control File.", "The key \"project_folder\" does not contain a string.", Severity::Error);
+    sVal=getString(json, "space_directory", "The key \"space_directory\" does not appear in the STADIC Control File.", "The key \"space_directory\" does not contain a string.", Severity::Error);
     if(!sVal){
         return false;
     }else{
-        setProjectFolder(sVal.get());
+        setSpaceDirectory(sVal.get());
         sVal.reset();
     }
 
-    sVal=getString(json, "tmp_folder", "The key \"tmp_folder\" does not appear in the STADIC Control File.", "The \"tmp_folder\" is not a string.", Severity::Error);
+    sVal=getString(json, "geometry_directory", "The key \"geometry_directory\" does not appear in the STADIC Control File.", "The \"geometry_directory\" is not a string.", Severity::Error);
     if (!sVal){
         return false;
     }else{
-        setTmpFolder(sVal.get());
+        setGeoDirectory(sVal.get());
         sVal.reset();
     }
 
-    sVal=getString(json, "geometry_folder", "The key \"geometry_folder\" does not appear in the STADIC Control File.", "The \"geometry_folder\" is not a string.", Severity::Error);
-    if (!sVal){
-        return false;
-    }else{
-        setGeoFolder(sVal.get());
-        sVal.reset();
-    }
-
-    sVal=getString(json, "ies_folder", "The key \"ies_folder\" does not appear in the STADIC Control File.", "The \"ies_folder\" is not a string.", Severity::Warning);
+    sVal=getString(json, "ies_directory", "The key \"ies_directory\" does not appear in the STADIC Control File.", "The \"ies_directory\" is not a string.", Severity::Warning);
     if (sVal){
-        setIESFolder(sVal.get());
+        setIESDirectory(sVal.get());
         sVal.reset();
     }
 
-    sVal=getString(json, "results_folder", "The key \"results_folder\" does not appear in the STADIC Control File.", "The \"results_folder\" is not a string.", Severity::Error);
+    sVal=getString(json, "results_directory", "The key \"results_directory\" does not appear in the STADIC Control File.", "The \"results_directory\" is not a string.", Severity::Error);
     if (!sVal){
         return false;
     }else{
-        setResultsFolder(sVal.get());
+        setResultsDirectory(sVal.get());
         sVal.reset();
     }
 
-    sVal=getString(json, "data_folder", "The key \"data_folder\" does not appear in the STADIC Control File.", "The \"data_folder\" is not a string.", Severity::Error);
+    sVal=getString(json, "input_directory", "The key \"input_directory\" does not appear in the STADIC Control File.", "The \"input_directory\" is not a string.", Severity::Error);
     if (!sVal){
         return false;
     }else{
-        setDataFolder(sVal.get());
+        setInputDirectory(sVal.get());
         sVal.reset();
     }
 
@@ -557,7 +579,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     list.reset();
 
 
-    treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control File.", Severity::Error);
+    treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control Space.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
@@ -580,8 +602,19 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         sVal.reset();
     }
 
-    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear in the STADIC Control File.", "The \"target_illuminance\" is not a double.", Severity::Error);
+    sVal=getString(json, "lighting_schedule","The key \"lighting_schedule\" does not appear in the STADIC Control Space.", "The \"lighting_schedule\" is not a string.", Severity::Error);
+    if (!sVal){
+        return false;
+    }else{
+        setLightSchedule(sVal.get());
+        sVal.reset();
+    }
+
+    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear within the STADIC Control Space.  The \"general\" value will be attempted.", "The \"target_illuminance\" is not a double.  The \"general\" value will be attempted.", Severity::Error);
     if (!dVal){
+        if (buildingControl->targetIlluminance()){
+            setTargetIlluminance(buildingControl->targetIlluminance().get());
+        }
         return false;
     }else{
         if (!setTargetIlluminance(dVal.get())){
@@ -594,10 +627,14 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     //******************
     //Simulation Settings
     //******************
-    iVal=getInt(json, "sun_divisions", "The key \"sun_divisions\" does not appear in the STADIC Control File.", "The \"sun_divisions\" is not an integer.", Severity::Warning);
+    iVal=getInt(json, "sun_divisions", "The key \"sun_divisions\" does not appear in the STADIC Control Space.  The \"general\" value will be attempted.", "The \"sun_divisions\" is not an integer.  The \"general\" value will be attempted.", Severity::Warning);
     if (!iVal){
-        STADIC_LOG(Severity::Info, "Sun Divisions will be set to 3.");
-        setSunDivisions(3);
+        if (buildingControl->sunDivisions()){
+            setSunDivisions(buildingControl->sunDivisions().get());
+        }else{
+            STADIC_LOG(Severity::Info, "Sun Divisions will be set to 3.");
+            setSunDivisions(3);
+        }
     }else{
         if (!setSunDivisions(iVal.get())){
             STADIC_LOG(Severity::Info, "Sun Divisions will be set to 3.");
@@ -606,10 +643,14 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         iVal.reset();
     }
 
-    iVal=getInt(json, "sky_divisions", "The key \"sky_divisions\" does not appear in the STADIC Control File.", "The \"sky_divisions\" is not an integer.", Severity::Warning);
+    iVal=getInt(json, "sky_divisions", "The key \"sky_divisions\" does not appear in the STADIC Control Space.  The \"general\" value will be attempted.", "The \"sky_divisions\" is not an integer.  The \"general\" value will be attempted.", Severity::Warning);
     if (!iVal){
-        STADIC_LOG(Severity::Info, "Sky Divisions will be set to 3.");
-        setSkyDivisions(3);
+        if (buildingControl->skyDivisions()){
+            setSkyDivisions(buildingControl->skyDivisions().get());
+        }else{
+            STADIC_LOG(Severity::Info, "Sky Divisions will be set to 3.");
+            setSkyDivisions(3);
+        }
     }else{
         if (!setSkyDivisions(iVal.get())){
             STADIC_LOG(Severity::Info, "Sky Divisions will be set to 3.");
@@ -617,6 +658,33 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         }
         iVal.reset();
     }
+    //Radiance Parameters
+    boost::optional<JsonObject> radTree;
+    radTree=getObject(treeVal.get(), "radiance_parameters");
+    if (radTree){
+        for (std::string setName : radTree.get().getMemberNames()){
+            boost::optional<JsonObject> tempTree;
+            tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
+            std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
+            m_RadParams.insert(tempPair);
+            for (std::string paramName : tempTree.get().getMemberNames()){
+                sVal=getString(tempTree.get(), paramName, "The key \""+paramName+ "\" does not appear in the STADIC Control File.", "The key \""+paramName+"\" does not appear in the STADIC Control File.", Severity::Fatal);
+                std::pair<std::string, std::string> parameters (paramName, sVal.get());
+                m_RadParams[setName].insert(parameters);
+            }
+        }
+    }else{
+         for ( auto i = buildingControl->getAllRadParams().get().begin(); i != buildingControl->getAllRadParams().get().end(); ++i ){
+            std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (i->first, std::unordered_map<std::string, std::string> ());
+            m_RadParams.insert(tempPair);
+            for (auto j=i->second.begin();j!= i->second.end();++j){
+                std::pair<std::string, std::string> parameters (j->first, j->second);
+                m_RadParams[i->first].insert(parameters);
+            }
+        }
+    }
+    verifyParameters();
+
 
     //******************
     //Lighting Control
@@ -642,30 +710,40 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     treeVal=getObject(json, "sDA", "The key \"sDA\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double illum, frac, startTime, endTime;
+        bool calculate;
+        bVal=getBool(treeVal.get(), "calculate", false, "The key \"calculate\" is not a boolean.", Severity::Info);
+        if (!bVal){
+            calculate=false;
+        }else{
+            calculate=bVal.get();
+            bVal.reset();
+        }
         dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" is missing under sDA.", "The key \"illuminance\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 300 will be used for sDA illuminance.");
             illum=300;
         }else{
             illum=dVal.get();
+            dVal.reset();
         }
-        dVal.reset();
+
         dVal=getDouble(treeVal.get(), "DA_fraction", "The key \"DA_fraction\" is missing under sDA.", "The key \"DA_fraction\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 0.50 will be used for sDA fraction.");
             frac=0.50;
         }else{
             frac=dVal.get();
+            dVal.reset();
         }
-        dVal.reset();
+
         dVal=getDouble(treeVal.get(), "start_time", "The key \"start_time\" is missing under sDA.", "The key \"start_time\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 8 will be used for sDA start time.");
             startTime=8;
         }else{
             startTime=dVal.get();
+            dVal.reset();
         }
-        dVal.reset();
         dVal=getDouble(treeVal.get(), "end_time", "The key \"end_time\" is missing under sDA.", "The key \"end_time\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 17 will be used for sDA end time.");
@@ -673,52 +751,90 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         }else{
             endTime=dVal.get();
         }
-        if (!setsDA(true, illum, frac, startTime, endTime)){
+        if (!setsDA(calculate, illum, frac, startTime, endTime)){
             return false;
         }
+        treeVal.reset();
     }
-    treeVal.reset();
+
 
     treeVal=getObject(json, "occupied_sDA", "The key \"occupied_sDA\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double illum, frac;
+        bool calculate;
+        bVal=getBool(treeVal.get(), "calculate", false, "The key \"calculate\" is not a boolean.", Severity::Info);
+        if (!bVal){
+            calculate=false;
+        }else{
+            calculate=bVal.get();
+            bVal.reset();
+        }
         dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" is missing under occupied_sDA.", "The key \"illuminance\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 300 will be used for occupied_sDA illuminance.");
             illum=300;
         }else{
             illum=dVal.get();
+            dVal.reset();
         }
-        dVal.reset();
+
         dVal=getDouble(treeVal.get(), "DA_fraction", "The key \"DA_fraction\" is missing under occupied_sDA.", "The key \"DA_fraction\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 0.50 will be used for occupied_sDA fraction.");
             frac=0.50;
         }else{
             frac=dVal.get();
+            dVal.reset();
         }
-        dVal.reset();
-        if (!setOccsDA(true, illum, frac)){
+        if (!setOccsDA(calculate, illum, frac)){
             return false;
         }
+        treeVal.reset();
     }
-    treeVal.reset();
 
-    dVal=getDouble(json, "DA", "The key \"DA\" does not appear in the STADIC Control File.", "The key \"DA\" is not a double.", Severity::Info);
-    if (dVal){
-        if (!setDA(true, dVal.get())){
+    treeVal=getObject(json, "DA");
+    if (treeVal){
+        double illuminance;
+        bool calculate;
+        bVal=getBool(treeVal.get(), "calculate", false, "The key \"calculate\" is not a boolean.", Severity::Info);
+        if (!bVal){
+            calculate=false;
+        }else{
+            calculate=bVal.get();
+            bVal.reset();
+        }
+        dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" does not appear in the STADIC Control File.", "The key \"illuminance\" is not a double.", Severity::Error);
+        if (dVal){
+            illuminance=dVal.get();
+            dVal.reset();
+        }
+        if (!setDA(calculate, illuminance)){
             return false;
         }
+        treeVal.reset();
     }
-    dVal.reset();
 
-    dVal=getDouble(json, "cDA", "The key \"cDA\" does not appear in the STADIC Control File.", "The key \"cDA\" is not a double.", Severity::Info);
-    if (dVal){
-        if (!setcDA(true, dVal.get())){
+    treeVal=getObject(json, "cDA");
+    if (treeVal){
+        double illuminance;
+        bool calculate;
+        bVal=getBool(treeVal.get(), "calculate", false, "The key \"calculate\" is not a boolean.", Severity::Info);
+        if (!bVal){
+            calculate=false;
+        }else{
+            calculate=bVal.get();
+            bVal.reset();
+        }
+        dVal=getDouble(treeVal.get(), "illuminance", "The key \"illuminance\" does not appear in the STADIC Control File.", "The key \"illuminance\" is not a double.", Severity::Info);
+        if (dVal){
+            illuminance=dVal.get();
+            dVal.reset();
+        }
+        if (!setcDA(calculate, illuminance)){
             return false;
         }
+        treeVal.reset();
     }
-    dVal.reset();
 
     bVal=getBool(json, "DF", "The key \"DF\" does not appear in the STADIC Control File.", "The key \"DF\" is not a boolean.", Severity::Info);
     if (bVal){
@@ -729,6 +845,14 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     treeVal=getObject(json, "UDI", "The key \"UDI\" does not appear in the STADIC Control File.", Severity::Info);
     if (treeVal){
         double minimum, maximum;
+        bool calculate;
+        bVal=getBool(treeVal.get(), "calculate", false, "The key \"calculate\" is not a boolean.", Severity::Info);
+        if (!bVal){
+            calculate=false;
+        }else{
+            calculate=bVal.get();
+            bVal.reset();
+        }
         dVal=getDouble(treeVal.get(), "minimum", "The key \"minimum\" is missing under UDI.", "The key \"minimum\" does not contain a number.", Severity::Warning);
         if (!dVal){
             STADIC_LOG(Severity::Info, "An assumed value of 100 will be used for UDI minimum.");
@@ -745,13 +869,121 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
             maximum=dVal.get();
         }
         dVal.reset();
-        if (!setUDI(true, minimum, maximum)){
+        if (!setUDI(calculate, minimum, maximum)){
                 return false;
         }
+        treeVal.reset();
     }
-    treeVal.reset();
     return true;
 }
 
+bool Control::verifyParameters(){
+    bool allOk=true;
+    //ab
+    if (!checkParameter("dmx", "ab", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "ab", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "ab", "int")){
+        allOk=false;
+    }
+    //ad
+    if (!checkParameter("dmx", "ad", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "ad", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "ad", "int")){
+        allOk=false;
+    }
+    //as
+    if (!checkParameter("dmx", "as", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "as", "int")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "as", "int")){
+        allOk=false;
+    }
+    //dt
+    if (!checkParameter("dmx", "dt", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "dt", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "dt", "double")){
+        allOk=false;
+    }
+    //dc
+    if (!checkParameter("dmx", "dc", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "dc", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "dc", "double")){
+        allOk=false;
+    }
+    //dj
+    if (!checkParameter("dmx", "dj", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "dj", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "dj", "double")){
+        allOk=false;
+    }
+    //dp
+    if (!checkParameter("dmx", "dp", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "dp", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "dp", "double")){
+        allOk=false;
+    }
+    //lw
+    if (!checkParameter("dmx", "lw", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("vmx", "lw", "double")){
+        allOk=false;
+    }
+    if (!checkParameter("default", "lw", "double")){
+        allOk=false;
+    }
+
+}
+bool Control::checkParameter(std::string setName, std::string parameter, std::string varType){
+    boost::optional<std::string> check;
+    bool *ok;
+    check=getRadParam(setName, parameter);
+    if (check){
+        if (varType=="int"){
+            toInteger(check.get(), ok);
+            if (!ok){
+                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
+            }
+        }else if (varType=="double"){
+            toDouble(check.get(), ok);
+            if (!ok){
+                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The variable type for the verification of the parameters is not a known type.  This can be either \"int\" or \"double\".");
+        }
+
+        check.reset();
+    }else{
+        STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
+    }
+}
 
 }

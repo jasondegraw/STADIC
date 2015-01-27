@@ -62,13 +62,12 @@ public:
     //******************
     //Folder Information
     //******************
-    void setProjectName(std::string name);
-    void setProjectFolder(std::string folder);
-    void setTmpFolder(std::string folder);
-    void setGeoFolder(std::string folder);
-    void setIESFolder(std::string folder);
-    void setResultsFolder(std::string folder);
-    void setDataFolder(std::string folder);
+    void setSpaceName(std::string name);
+    void setSpaceDirectory(std::string directory);
+    void setGeoDirectory(std::string directory);
+    void setIESDirectory(std::string directory);
+    void setResultsDirectory(std::string directory);
+    void setInputDirectory(std::string directory);
 
     //******************
     //Site Information
@@ -90,6 +89,7 @@ public:
     void setIdentifiers(std::vector<std::string> identifiers);
     void setModifiers(std::vector<std::string> modifiers);
     void setOccSchedule(std::string file);
+    void setLightSchedule(std::string file);
     bool setTargetIlluminance(double value);
 
     //******************
@@ -114,13 +114,13 @@ public:
     //******************
     //Folder Information
     //******************
-    std::string projectName();
-    std::string projectFolder();
-    std::string tmpFolder();
-    std::string geoFolder();
-    std::string iesFolder();
-    std::string resultsFolder();
-    std::string dataFolder();
+    std::string spaceName();
+    std::string spaceDirectory();
+    std::string geoDirectory();
+    std::string iesDirectory();
+    std::string resultsDirectory();
+    std::string inputDirectory();
+    std::string intermediateDataDirectory();
 
     //******************
     //Site Information
@@ -141,6 +141,7 @@ public:
     boost::optional<std::vector<std::string>> modifiers();
     std::vector<WindowGroup> windowGroups();
     std::string occSchedule();
+    std::string lightSchedule();
     double targetIlluminance();
 
     //******************
@@ -153,6 +154,8 @@ public:
     //******************
     int sunDivisions();
     int skyDivisions();
+    boost::optional<std::string> getRadParam(std::string parameterSet, std::string parameterName);
+    boost::optional<std::unordered_map<std::string, std::string>> getParamSet(std::string setName);
 
     //******************
     //Metrics
@@ -175,18 +178,18 @@ public:
     double UDIMax();
 
 private:
-
+    bool verifyParameters();
+    bool checkParameter(std::string setName, std::string parameter, std::string varType);
 
     //******************
     //Folder Information
     //******************
-    std::string m_ProjectName;                          //  Variable holding the project name
-    std::string m_ProjectFolder;                        //  Variable holding the project folder
-    std::string m_TmpFolder;                            //  Variable holding the tmp folder
-    std::string m_GeoFolder;                            //  Variable holding the geometry folder
-    std::string m_IESFolder;                            //  Variable holding the luminaire folder
-    std::string m_ResultsFolder;                        //  Variable holding the results folder
-    std::string m_DataFolder;                           //  Variable holding the data folder
+    std::string m_SpaceName;                          //  Variable holding the project name
+    std::string m_SpaceDirectory;                     //  Variable holding the project folder
+    std::string m_GeoDirectory;                       //  Variable holding the geometry folder
+    std::string m_IESDirectory;                       //  Variable holding the luminaire folder
+    std::string m_ResultsDirectory;                   //  Variable holding the results folder
+    std::string m_InputDirectory;                     //  Variable holding the data folder
 
     //******************
     //Site Information
@@ -207,6 +210,7 @@ private:
     boost::optional<std::vector<std::string>> m_Modifiers;
 
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
+    std::string m_LightSchedule;
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
     std::vector<WindowGroup> m_WindowGroups;
 
@@ -215,6 +219,7 @@ private:
     //******************
     int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
     int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
 
     //******************
     //Lighting Control

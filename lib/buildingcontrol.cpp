@@ -226,6 +226,9 @@ boost::optional<std::string> BuildingControl::getRadParam(std::string parameterS
     }
     return boost::optional<std::string>(m_RadParams[parameterSet][parameterName]);
 }
+boost::optional<std::unordered_map<std::string, std::unordered_map<std::string, std::string>>> BuildingControl::getAllRadParams(){
+    return m_RadParams;
+}
 
 //******************
 //PARSER

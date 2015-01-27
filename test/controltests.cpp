@@ -37,12 +37,14 @@
  * OF SUCH DAMAGE.
  ****************************************************************/
 
-#include "spacecontrol.h"
+#include "buildingcontrol.h"
 #include "gtest/gtest.h"
 #include <iostream>
 
 TEST(ControlTests, PTreeReadJson)
 {
+    stadic::BuildingControl controlFile;
+    //ASSERT_TRUE(controlFile.parseJson("control.json"));
     /*
   stadic::Control controlFile;
   ASSERT_TRUE(controlFile.parseJson("control.json"));

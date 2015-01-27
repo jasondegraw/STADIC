@@ -62,6 +62,9 @@ void WindowGroup::setBSDF(bool isBSDF){
 void WindowGroup::setBaseGeometry(const std::string &file){
     m_BaseGeometry=file;
 }
+void WindowGroup::setBaseCalculate(bool runBase){
+    m_RunBase=runBase;
+}
 
 //  Getters
 std::string WindowGroup::name() const
@@ -87,6 +90,10 @@ std::vector<std::string> WindowGroup::glazingLayers() const
 std::vector<std::string> WindowGroup::shadeSettingGeometry() const
 {
     return m_ShadeSettingGeometry;
+}
+std::vector<bool> WindowGroup::runSetting() const
+{
+    return m_RunSetting;
 }
 std::vector<std::vector<std::string> > WindowGroup::bsdfSettingLayers() const
 {
@@ -124,30 +131,39 @@ bool WindowGroup::parseJson(const JsonObject &json){
         setBaseGeometry(sVal.get());
     }
 
+    bVal=getBool(json, "calculate_base", "The key \"calculate_base\" within window group " + name() + " is not a bool.  This will not be calculated.", "The key \"calculate_base\" within window group " + name() + " is not a bool.  This will not be calculated.", Severity::Info);
+    if (bVal){
+        setBaseCalculate(bVal.get());
+        bVal.reset();
+    }else{
+        setBaseCalculate(false);
+    }
     if (isBSDF()){
-        treeVal=getArray(json, "bsdf_base_layers");
+        treeVal=getArray(json, "bsdf_base_materials");
         if(!treeVal) {
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the base case.");
         } else {
             for(auto &v : treeVal.get()){
-                sVal = asString(v, "There was a problem reading the bsdf_base_layers key for window group "+name()+".", Severity::Fatal);
+                sVal = asString(v, "There was a problem reading the bsdf_base_materials key for window group "+name()+".", Severity::Fatal);
                 if (sVal){
                     m_BSDFBaseLayers.push_back(sVal.get());
                 }
             }
         }
+        treeVal.reset();
     }
 
-    treeVal=getArray(json, "glazing_layers", "The key \"glazing_layers\" within window group " + name() + " is missing.\n\tThese layers must be defined for the program to run.", Severity::Error);
+    treeVal=getArray(json, "glazing_materials", "The key \"glazing_materials\" within window group " + name() + " is missing.\n\tThese materials must be defined for the program to run.", Severity::Error);
     if(!treeVal) {
         return false;
     } else {
         for(auto &v : treeVal.get()){
-            sVal = asString(v, "There was a problem reading the glazing_layers key for window group "+name()+".", Severity::Fatal);
+            sVal = asString(v, "There was a problem reading the glazing_materials key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_GlazingLayers.push_back(sVal.get());
             }
         }
+        treeVal.reset();
     }
 
     treeVal=getArray(json, "shade_settings", "The key \"shade_settings\" within window group " + name() + " is missing.", Severity::Warning);
@@ -158,8 +174,24 @@ bool WindowGroup::parseJson(const JsonObject &json){
             sVal = asString(v, "There was a problem reading the shade_settings key for window group "+name()+".", Severity::Fatal);
             if (sVal){
                 m_ShadeSettingGeometry.push_back(sVal.get());
+                sVal.reset();
             }
         }
+        treeVal.reset();
+    }
+
+    treeVal=getArray(json, "calculate_setting", "The key \"calculate_setting\" within window group "+ name() + " is missing.", Severity::Warning);
+    if (!treeVal){
+        STADIC_LOG(Severity::Info, "It is assumed there are no shade settings for window group "+name()+".");
+    }else{
+        for (auto &v : treeVal.get()){
+            bVal=asBool(v, "There was a problem reading the calculate settings for window group "+name()+".", Severity::Warning);
+            if (bVal){
+                m_RunSetting.push_back(bVal.get());
+                bVal.get();
+            }
+        }
+        treeVal.reset();
     }
 
     if (shadeSettingGeometry().size()>0){
@@ -174,14 +206,14 @@ bool WindowGroup::parseJson(const JsonObject &json){
     }
 
     if (isBSDF() && shadeSettingGeometry().size()>0){
-        treeVal=getArray(json, "bsdf_setting_layers");
+        treeVal=getArray(json, "bsdf_setting_materials");
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
         }else{
             for(auto &v : treeVal.get()){
                 std::vector<std::string> tempVector;
                 for (auto &v2 : v){
-                    sVal = asString(v2, "There was a problem reading the bsdf_setting_layers key for window group "+name()+".", Severity::Fatal);
+                    sVal = asString(v2, "There was a problem reading the bsdf_setting_materials key for window group "+name()+".", Severity::Fatal);
                     if (sVal){
                         tempVector.push_back(sVal.get());
                     }
