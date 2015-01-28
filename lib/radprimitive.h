@@ -67,7 +67,7 @@ public:
 
     //Setters
     void setModifier(const std::string &modifier);                             //Function to set the modifier
-    void setModifierOverride(const std::string &name);  //!< Set the name of the modifier to use, overriding the modifier pointer
+    bool setModifierOverride(const std::string &name);  //!< Set the name of the modifier to use, overriding the modifier pointer
     virtual bool setType(const std::string &type);                             //Function to set the type
     void setName(const std::string &name);                                     //Function to set the name
     virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
