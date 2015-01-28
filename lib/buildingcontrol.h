@@ -45,6 +45,7 @@
 #include <boost/optional.hpp>
 #include "logging.h"
 #include <unordered_map>
+#include <memory>
 
 #include "stadicapi.h"
 
@@ -89,7 +90,7 @@ public:
     //******************
     //Spaces
     //******************
-    std::vector<Control> spaces();
+    std::vector<std::shared_ptr<Control>> spaces();
 
     //******************
     //General
@@ -112,7 +113,7 @@ private:
     //******************
     //Spaces
     //******************
-    std::vector<Control> m_Spaces;
+    std::vector<std::shared_ptr<Control>> m_Spaces;
 
     //******************
     //General Information

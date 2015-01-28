@@ -190,7 +190,7 @@ boost::optional<int> BuildingControl::firstDay(){
 boost::optional<double> BuildingControl::buildingRotation(){
     return m_BuildingRotation;
 }
-std::vector<Control> BuildingControl::spaces(){
+std::vector<std::shared_ptr<Control>> BuildingControl::spaces(){
     return m_Spaces;
 }
 boost::optional<std::string> BuildingControl::importUnits(){
@@ -347,8 +347,8 @@ bool BuildingControl::parseJson(const std::string &file)
         return false;
     }else{
         for(auto &v : treeVal.get()){
-            Control spaceControl;
-            if (spaceControl.parseJson(v, this)){
+            std::shared_ptr<Control> spaceControl;
+            if (spaceControl.get()->parseJson(v, this)){
                 m_Spaces.push_back(spaceControl);
             }else{
                 return false;

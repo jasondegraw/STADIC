@@ -53,13 +53,13 @@ Daylight::Daylight(BuildingControl *model) :
 
 bool Daylight::simDaylight()
 {
-    std::vector<Control> spaces=m_Model->spaces();
+    std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
     for (int i=0;i<spaces.size();i++){
-        if (!uniqueGlazingMaterials(&spaces[i])){
+        if (!uniqueGlazingMaterials(spaces[i].get())){
             return false;
         }
 
-        if (!testSimCase(&spaces[i])){
+        if (!testSimCase(spaces[i].get())){
             return false;
         }
 
@@ -69,53 +69,53 @@ bool Daylight::simDaylight()
                 BSDFs=true;
             }
         }
-        if (!writeSky(&spaces[i])){
+        if (!writeSky(spaces[i].get())){
             return false;
         }
-        if (!createBaseRadFiles(&spaces[i])){
+        if (!createBaseRadFiles(spaces[i].get())){
             return false;
         }
         //Configure the simulation for each window group
-        for (int j=0;j<spaces[i].windowGroups().size();j++){
+        for (int j=0;j<spaces[i].get()->windowGroups().size();j++){
             switch (m_SimCase[j]){
                 case 1:
-                    if (!simCase1(j,&spaces[i])){
+                    if (!simCase1(j,spaces[i].get())){
                         return false;
                     }
                     break;
                 case 2:
-                    if (!simCase2(j, &spaces[i])){
+                    if (!simCase2(j, spaces[i].get())){
                         return false;
                     }
                     break;
                 case 3:
                     //Simulation case 3 will be for window groups that contain BSDFs even in the base case, but the glazing layers are not BSDFs
-                    if(!simCase3(j,&spaces[i])){
+                    if(!simCase3(j,spaces[i].get())){
                         return false;
                     }
                     break;
                 case 4:
                     //Simulation case 4 will be for window groups that have shade materials in addition to the glazing layer
-                    if (!simCase4(j,&spaces[i])){
+                    if (!simCase4(j,spaces[i].get())){
                         return false;
                     }
                     break;
                 case 5:
                     //Simulation case 5 will be for window groups that have added geometry, but it is a proxy geometry
-                    if (!simCase5(j,&spaces[i])){
+                    if (!simCase5(j,spaces[i].get())){
                         return false;
                     }
                     break;
                 case 6:
                     //Simulation case 6 will be for window groups that only have the glazing layer as a BSDF
-                    if (!simCase6(j,&spaces[i])){
+                    if (!simCase6(j,spaces[i].get())){
                         return false;
                     }
                     break;
 
             }
         }
-        if(!sumIlluminanceFiles(&spaces[i])){
+        if(!sumIlluminanceFiles(spaces[i].get())){
             return false;
         }
     }
