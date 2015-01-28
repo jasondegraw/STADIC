@@ -41,10 +41,11 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
-TEST(ControlTests, PTreeReadJson)
+TEST(ControlTests, JsonCppReadJson)
 {
     stadic::BuildingControl controlFile;
-    //ASSERT_TRUE(controlFile.parseJson("control.json"));
+    controlFile.parseJson("control.json");
+    ASSERT_TRUE(controlFile.parseJson("control.json"));
     /*
   stadic::Control controlFile;
   ASSERT_TRUE(controlFile.parseJson("control.json"));

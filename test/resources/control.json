@@ -1,37 +1,35 @@
 {
-	"spaces": [
-		{
-			"space_name": "prj1",
-			"space_directory": "c:/example/",
-			"geometry_directory": "rad/",
-			"ies_directory": "ies/",
-			"results_directory": "res/",
-			"input_directory": "data/",
-			"occupancy_schedule": "sched.csv",
-			"lighting_schedule": "sched.csv",
-		    	"ground_reflectance": 1.1,
-	
-			"material_file": "main_mat.rad",
-			"geometry_file": "main_geo.rad",
-			"analysis_points": {
-				"files": ["calc_grid.pts"],
-				"x_spacing": 24,
-				"y_spacing": 24,
-				"offset": 24,
-				"z_offset": 30,
-				"modifier": ["l_floor"]
-			}
-			"window_groups": [
-				{
-					"name": "WG1",
-					"base_geometry": "wg1base.rad",
-					"calculate_base": true,
-					"glazing_materials": ["l_glazing", "l_glazing2"],
-					"shade_control":{
-						"method": "automated_profile_angle",
-						"elevation_azimuth": 30,
-						"angle_settings": [30, 60]
-					},
+  "spaces": [{
+    "space_name": "prj1",
+    "space_directory": "c:/example/",
+    "geometry_directory": "rad/",
+    "ies_directory": "ies/",
+    "results_directory": "res/",
+    "input_directory": "data/",
+    "occupancy_schedule": "sched.csv",
+    "lighting_schedule": "sched.csv",
+    "ground_reflectance": 1.1,
+    "material_file": "main_mat.rad",
+    "geometry_file": "main_geo.rad",
+    "analysis_points": {
+      "files": ["calc_grid.pts"],
+      "x_spacing": 24,
+      "y_spacing": 24,
+      "offset": 24,
+      "z_offset": 30,
+      "modifier": ["l_floor"]
+    },
+    "window_groups": [
+      {
+        "name": "WG1",
+        "base_geometry": "wg1base.rad",
+        "calculate_base": true,
+        "glazing_materials": ["l_glazing", "l_glazing2"],
+        "shade_control":{
+          "method": "automated_profile_angle",
+          "elevation_azimuth": 30,
+          "angle_settings": [30, 60]
+        },
 					"shade_settings":["wg1set1.rad", "wg1set2.rad"],
 					"calculate_setting": [true, false]
 				},
@@ -39,7 +37,7 @@
 					"name": "WG2",
 					"BSDF": true,
 					"base_geometry": "wg2base.rad",
-					"calculate_base": false;
+					"calculate_base": false,
 					"glazing_materails": ["l_window"],
 					"bsdf_base_materials": ["l_window"],
 					"shade_control":{
@@ -297,6 +295,5 @@
 		"target_illuminance": 300,
 		"sky_divisions": 3,
 		"sun_divisions": 4
-	}	
+	}
 }
-	
