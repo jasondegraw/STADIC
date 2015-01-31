@@ -294,6 +294,7 @@ TEST(RadFileTests, ParseConsistentRadFile)
     ASSERT_TRUE(radData.addRad("complicated.rad"));
     ASSERT_FALSE(radData.isConsistent());
     ASSERT_TRUE(radData.buildModifierTree());
+    ASSERT_TRUE(radData.isConsistent());
 }
 
 TEST(RadFileTests, ParseInconsistentRadFile)
@@ -302,4 +303,5 @@ TEST(RadFileTests, ParseInconsistentRadFile)
     ASSERT_TRUE(radData.addRad("simple.rad"));
     ASSERT_FALSE(radData.isConsistent());
     ASSERT_FALSE(radData.buildModifierTree());
+    ASSERT_FALSE(radData.isConsistent());
 }

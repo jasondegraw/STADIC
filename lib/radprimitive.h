@@ -60,10 +60,10 @@ public:
 
     bool isGeometry() const;                                            //Boolean that determines whether the primitive is of a geometry type
     bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type
-	virtual bool isVoid() const
-	{
-		return false;
-	}
+    virtual bool isVoid() const
+    {
+        return false;
+    }
 
     //Setters
     void setModifier(const std::string &modifier);                             //Function to set the modifier
@@ -97,7 +97,7 @@ public:
     std::string toRad() const;
     static RadPrimitive *fromRad(std::stringstream &data);
     static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
-	static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
+    static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
     static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);
     static std::shared_ptr<RadPrimitive> sharedVoid();
 
@@ -145,7 +145,7 @@ private:
 
     std::string m_Modifier;                                             //Variable holding the modifier
     boost::optional<std::string> m_modifierName;
-	std::shared_ptr<RadPrimitive> m_modifier;
+    std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
     std::string m_Name;                                                 //Variable holding the name
     std::vector<std::string> m_Arg1;                                    //Vector holding arguments on line 1
@@ -165,10 +165,12 @@ protected:
     {
         return true;
     }
+
     virtual bool validateArg2(const std::string &, int) const
     {
         return true;
     }
+
     virtual bool validateArg3(const std::string &, int) const
     {
         return true;
@@ -178,27 +180,31 @@ protected:
 class STADIC_API VoidPrimitive : public RadPrimitive
 {
 public:
-    VoidPrimitive()
-    {}
+    VoidPrimitive() 
+    {
+        setName("void");
+    }
 
-	bool isVoid() const
-	{
-		return true;
-	}
+    bool isVoid() const
+    {
+        return true;
+    }
 
 protected:
-	virtual bool validateArg1(const std::string &, int) const
-	{
-		return false;
-	}
-	virtual bool validateArg2(const std::string &, int) const
-	{
-		return false;
-	}
-	virtual bool validateArg3(const std::string &, int) const
-	{
-		return false;
-	}
+    virtual bool validateArg1(const std::string &, int) const
+    {
+        return false;
+    }
+
+    virtual bool validateArg2(const std::string &, int) const
+    {
+        return false;
+    }
+
+    virtual bool validateArg3(const std::string &, int) const
+    {
+        return false;
+    }
 
 };
 
