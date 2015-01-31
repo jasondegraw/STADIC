@@ -125,7 +125,7 @@ std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileDat
         }
     }
     // In this new version, the caller is responsible for checking that the vectors actually contain something
-	return std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
+    return std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
 }
 
 /*
@@ -181,7 +181,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 }
 */
 
-bool RadFileData::blackOutLayer(std::string layer)
+bool RadFileData::overrideLayer(const std::string &layer, const std::string &name)
 {
     for(int i=0;i<m_primitives.size();i++) {
         if(m_primitives[i]->modifierName()==layer) {
