@@ -44,8 +44,9 @@
 TEST(ControlTests, JsonCppReadJson)
 {
     stadic::BuildingControl controlFile;
-    controlFile.parseJson("control.json");
-    ASSERT_TRUE(controlFile.parseJson("control.json"));
+    ASSERT_TRUE(controlFile.parseJson("simplejson.txt"));
+
+    //ASSERT_TRUE(controlFile.parseJson("control.json"));
     /*
   stadic::Control controlFile;
   ASSERT_TRUE(controlFile.parseJson("control.json"));

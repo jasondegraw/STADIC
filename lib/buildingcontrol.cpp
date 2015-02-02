@@ -239,7 +239,7 @@ bool BuildingControl::parseJson(const std::string &file)
     boost::optional<JsonObject> jsonOpt = readJsonDocument(file);
 
     if(!jsonOpt){
-        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\".");
+        STADIC_LOG(Severity::Fatal, "Failed to read json input file \"" + file + "\" .");
         return false;
     }
 
@@ -280,12 +280,22 @@ bool BuildingControl::parseJson(const std::string &file)
             tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
             std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
             m_RadParams.insert(tempPair);
+            //Added to make radiance_parameters work with jsonCPP
+            for (Json::Value::iterator it =tempTree.get().begin(); it != tempTree.get().end(); it++){
+                Json::Value key =it.key();
+                Json::Value value = (*it);
+                std::pair<std::string, std::string> parameters (key.asString(), value.asString());
+                m_RadParams[setName].insert(parameters);
+            }
+            /* //Removed to make radiance_parameters work with jsonCPP
             for (std::string paramName : tempTree.get().getMemberNames()){
                 sVal=getString(tempTree.get(), paramName, "The key \""+paramName+ "\" does not appear in the STADIC Control File.", "The key \""+paramName+"\" does not appear in the STADIC Control File.", Severity::Fatal);
                 std::pair<std::string, std::string> parameters (paramName, sVal.get());
                 m_RadParams[setName].insert(parameters);
             }
+            */
         }
+
     }
     //Daylight Savings Time
     bVal=getBool(treeVal.get(), "daylight_savings_time");
@@ -342,7 +352,7 @@ bool BuildingControl::parseJson(const std::string &file)
     //******************
     //Loop over Spaces
     //******************
-    treeVal=getArray(json, "spaces", "The key \"window_groups\" does not appear in the STADIC BuildingControl File.", Severity::Error);
+    treeVal=getArray(json, "spaces", "The key \"spaces\" does not appear in the STADIC BuildingControl File.", Severity::Error);
     if (!treeVal){
         return false;
     }else{
