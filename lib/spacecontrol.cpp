@@ -437,7 +437,8 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         STADIC_LOG(Severity::Error, "The space does not contain data.");
         return false;
     }
-
+    std::cout<<"Passed a json value that is not empty."<<std::endl;
+    std::cout<<"It contains "<<json.size()<<" entries."<<std::endl;
     //get_value_or(/*default*/);
     boost::optional<std::string> sVal;
     boost::optional<double> dVal;
@@ -450,11 +451,14 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     //******************
     sVal=getString(json, "space_name", "The key \"space_name\" does not appear in the STADIC Control File.", "The key \"space_name\" does not contain a string.", Severity::Error);
     if(!sVal){
+        //std::cout<<"Failed to read the Space Name"<<std::endl;
         return false;
     }else{
+        //std::cout<<"Read the Space Name : "<<m_SpaceName<<std::endl;
         setSpaceName(sVal.get());
         sVal.reset();
     }
+
 
     sVal=getString(json, "space_directory", "The key \"space_directory\" does not appear in the STADIC Control File.", "The key \"space_directory\" does not contain a string.", Severity::Error);
     if(!sVal){
@@ -463,6 +467,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         setSpaceDirectory(sVal.get());
         sVal.reset();
     }
+    std::cout<<"Read the Space Directory : "<<m_SpaceDirectory<<std::endl;
 
     sVal=getString(json, "geometry_directory", "The key \"geometry_directory\" does not appear in the STADIC Control File.", "The \"geometry_directory\" is not a string.", Severity::Error);
     if (!sVal){

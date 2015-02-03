@@ -354,7 +354,7 @@ bool BuildingControl::parseJson(const std::string &file)
     //******************
     treeVal=getArray(json, "spaces", "The key \"spaces\" does not appear in the STADIC BuildingControl File.", Severity::Error);
     if (!treeVal){
-        return false;
+        //return false;
     }else{
         for(auto &v : treeVal.get()){
             std::shared_ptr<Control> spaceControl;

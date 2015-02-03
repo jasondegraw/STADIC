@@ -46,6 +46,30 @@ TEST(ControlTests, JsonCppReadJson)
     stadic::BuildingControl controlFile;
     ASSERT_TRUE(controlFile.parseJson("simplejson.txt"));
 
+    EXPECT_EQ("in", controlFile.importUnits().get());
+    EXPECT_EQ("lux", controlFile.illumUnits().get());
+    EXPECT_EQ("ft", controlFile.displayUnits().get());
+    EXPECT_TRUE(controlFile.daylightSavingsTime().get());
+    EXPECT_EQ("USA_PA_Lancaster.AP.725116_TMY3.epw", controlFile.weaDataFile().get());
+    EXPECT_EQ(1,controlFile.firstDay().get());
+    EXPECT_EQ(0,controlFile.buildingRotation().get());
+    EXPECT_EQ(300, controlFile.targetIlluminance().get());
+    EXPECT_EQ(3, controlFile.skyDivisions().get());
+    EXPECT_EQ(4, controlFile.sunDivisions().get());
+    EXPECT_EQ("2", controlFile.getRadParam("dmx", "ab").get());
+    EXPECT_EQ("1024", controlFile.getRadParam("dmx", "ad").get());
+    EXPECT_EQ("256", controlFile.getRadParam("dmx", "as").get());
+    EXPECT_EQ("150", controlFile.getRadParam("dmx", "ar").get());
+    EXPECT_EQ("0.1", controlFile.getRadParam("dmx", "aa").get());
+    EXPECT_EQ("6", controlFile.getRadParam("dmx", "lr").get());
+    EXPECT_EQ("0.15", controlFile.getRadParam("dmx", "st").get());
+    EXPECT_EQ("1", controlFile.getRadParam("dmx", "sj").get());
+    EXPECT_EQ("0.004", controlFile.getRadParam("dmx", "lw").get());
+    EXPECT_EQ("0", controlFile.getRadParam("dmx", "dj").get());
+    EXPECT_EQ("0.2", controlFile.getRadParam("dmx", "ds").get());
+    EXPECT_EQ("2", controlFile.getRadParam("dmx", "dr").get());
+    EXPECT_EQ("1", controlFile.getRadParam("dmx", "dp").get());
+    EXPECT_EQ("1", controlFile.getRadParam("dmx", "dc").get());
     //ASSERT_TRUE(controlFile.parseJson("control.json"));
     /*
   stadic::Control controlFile;
