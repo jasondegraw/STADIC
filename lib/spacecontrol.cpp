@@ -964,7 +964,7 @@ bool Control::verifyParameters(){
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
     }
-
+    return false; // Add return for VS
 }
 bool Control::checkParameter(std::string setName, std::string parameter, std::string varType){
     boost::optional<std::string> check;
@@ -989,6 +989,7 @@ bool Control::checkParameter(std::string setName, std::string parameter, std::st
     }else{
         STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
     }
+    return false; // Add return for VS
 }
 
 }
