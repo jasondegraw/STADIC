@@ -191,6 +191,11 @@ bool RadFileData::overrideLayer(const std::string &layer, const std::string &nam
     return true;
 }
 
+bool RadFileData::blackOutLayer(const std::string &layer)
+{
+    return overrideLayer(layer,"black");
+}
+
 bool RadFileData::writeRadFile(std::string file)
 {
     std::ofstream oFile;

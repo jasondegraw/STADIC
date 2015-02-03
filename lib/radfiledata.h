@@ -51,7 +51,8 @@ public:
 
     bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
     //bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
-    bool overrideLayer(const std::string &layer, const std::string &name = "black"); //Function to black out a layer
+    bool overrideLayer(const std::string &layer, const std::string &name); //Function to override a layer
+    bool blackOutLayer(const std::string &layer);                              //Function to black out a layer
     bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
     std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
 
