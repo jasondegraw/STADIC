@@ -357,8 +357,9 @@ bool BuildingControl::parseJson(const std::string &file)
         //return false;
     }else{
         for(auto &v : treeVal.get()){
-            std::shared_ptr<Control> spaceControl;
-            if (spaceControl.get()->parseJson(v, this)){
+            // This is not a pretty way to do this, but it shouldn't lead to leaks
+            std::shared_ptr<Control> spaceControl(new Control);
+            if (spaceControl->parseJson(v, this)){
                 m_Spaces.push_back(spaceControl);
             }else{
                 return false;
