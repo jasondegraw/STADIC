@@ -445,6 +445,15 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     boost::optional<int> iVal;
     boost::optional<bool> bVal;
     boost::optional<JsonObject> treeVal;
+    for (Json::Value::iterator it=json.begin(); it!=json.end();it++){
+        Json::Value key= it.key();
+        std::cout<<"Key is: "<<key.asString()<<std::endl;
+        if (key.asString()=="space_name"){
+            Json::Value value=(*it);
+            std::cout<<"Value is: "<<value.asString()<<std::endl;
+        }
+    }
+
 
     //******************
     //Folder Information
@@ -454,9 +463,10 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         //std::cout<<"Failed to read the Space Name"<<std::endl;
         return false;
     }else{
-        //std::cout<<"Read the Space Name : "<<m_SpaceName<<std::endl;
+        std::cout<<"Space Name is "<<sVal.get()<<std::endl;
         setSpaceName(sVal.get());
         sVal.reset();
+        //std::cout<<"Read the Space Name : "<<m_SpaceName<<std::endl;
     }
 
 
