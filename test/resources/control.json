@@ -67,7 +67,7 @@
 	"spaces" : [
 		{
 			"space_name" : "prj1",
-			"space_directory" : "c:/example",
+			"space_directory" : "c:/example/",
 			"geometry_directory" : "rad/",
 			"ies_directory" : "ies/",
 			"results_directory" : "res/",
@@ -125,7 +125,7 @@
 					},
 					"shade_settings" : ["wg2set1.rad", "wg2set2.rad"],
 					"calculate_setting" : [true,true],
-					"bsdf_setting_layers" : [
+					"bsdf_setting_materials" : [
 						["l_window"],
 						["l_window"]
 					]

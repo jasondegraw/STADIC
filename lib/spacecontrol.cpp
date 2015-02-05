@@ -86,6 +86,10 @@ bool Control::setGroundReflect(double value){
     }
     return true;
 }
+void Control::setWeaFile(std::string fileName){
+    m_WeaFile=fileName;
+}
+
 
 //******************
 //Geometry Information
@@ -95,6 +99,9 @@ void Control::setMatFile(std::string file){
 }
 void Control::setGeoFile(std::string file){
     m_GeoFile=file;
+}
+void Control::setBuildingRotation(double value){
+    m_BuildingRotation=value;
 }
 void Control::setPTSFile(std::vector<std::string> files){
     m_PTSFile=files;
@@ -163,7 +170,25 @@ bool Control::setSkyDivisions(int value)
     }
     return true;
 }
+void Control::setFirstDay(boost::optional<int> value){
+    m_FirstDay=value;
+}
 
+void Control::setImportUnits(std::string units){
+    m_ImportUnits=units;
+}
+
+void Control::setIllumUnits(std::string units){
+    m_IllumUnits=units;
+}
+
+void Control::setDisplayUnits(std::string units){
+    m_displayUnits=units;
+}
+
+void Control::setDaylightSavingsTime(bool DST){
+    m_DaylightSavingsTime=DST;
+}
 
 //******************
 //Metrics
@@ -281,6 +306,9 @@ std::string Control::intermediateDataDirectory(){
 double Control::groundReflect(){
     return m_GroundReflect;
 }
+std::string Control::weaFile(){
+    return m_WeaFile;
+}
 
 //******************
 //Geometry Information
@@ -290,6 +318,9 @@ std::string Control::matFile(){
 }
 std::string Control::geoFile(){
     return m_GeoFile;
+}
+double Control::buildingRotation(){
+    return m_BuildingRotation;
 }
 std::vector<std::string> Control::ptsFile(){
     return m_PTSFile;
@@ -360,6 +391,25 @@ boost::optional<std::unordered_map<std::string, std::string>> Control::getParamS
     }
 
     return boost::optional<std::unordered_map<std::string, std::string>>(m_RadParams[setName]);
+}
+boost::optional<int> Control::firstDay(){
+    return m_FirstDay;
+}
+
+std::string Control::importUnits(){
+    return m_ImportUnits;
+}
+
+std::string Control::illumUnits(){
+    return m_IllumUnits;
+}
+
+std::string Control::displayUnits(){
+    return m_displayUnits;
+}
+
+bool Control::daylightSavingsTime(){
+    return m_DaylightSavingsTime;
 }
 
 
@@ -445,6 +495,19 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     boost::optional<bool> bVal;
     boost::optional<JsonObject> treeVal;
 
+    setWeaFile(buildingControl->weaDataFile().get());
+    if (buildingControl->buildingRotation()){
+        setBuildingRotation(buildingControl->buildingRotation().get());
+    }
+    setFirstDay(buildingControl->firstDay());
+    setImportUnits(buildingControl->importUnits().get());
+    setIllumUnits(buildingControl->illumUnits().get());
+    setDisplayUnits(buildingControl->displayUnits().get());
+    if (buildingControl->daylightSavingsTime()){
+        setDaylightSavingsTime(buildingControl->daylightSavingsTime().get());
+    }else{
+        setDaylightSavingsTime(false);
+    }
 
     //******************
     //Folder Information
@@ -714,10 +777,8 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         }
         */
     }
-    std::cout<<"Read Parameters"<<std::endl;
     //Fails to verify parameters.
     verifyParameters();
-    std::cout<<"Verified Parameters"<<std::endl;
 
     //******************
     //Lighting Control

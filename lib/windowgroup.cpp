@@ -209,14 +209,11 @@ bool WindowGroup::parseJson(const JsonObject &json){
         treeVal=getArray(json, "bsdf_setting_materials");
         if (!treeVal){
             STADIC_LOG(Severity::Info, "It is assumed that window group "+name()+" does not contain BSDFs in the setting layers.");
-        }else{
-            for(auto &v : treeVal.get()){
+        }else{            
+            for(int index1=0;index1<treeVal.get().size();index1++){
                 std::vector<std::string> tempVector;
-                for (auto &v2 : v){
-                    sVal = asString(v2, "There was a problem reading the bsdf_setting_materials key for window group "+name()+".", Severity::Fatal);
-                    if (sVal){
-                        tempVector.push_back(sVal.get());
-                    }
+                for (int index2=0;index2<treeVal.get()[index1].size();index2++){
+                    tempVector.push_back(treeVal.get()[index1][index2].asString());
                 }
                 m_BSDFSettingLayers.push_back(tempVector);
             }
