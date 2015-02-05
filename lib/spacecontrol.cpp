@@ -437,22 +437,13 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         STADIC_LOG(Severity::Error, "The space does not contain data.");
         return false;
     }
-    std::cout<<"Passed a json value that is not empty."<<std::endl;
-    std::cout<<"It contains "<<json.size()<<" entries."<<std::endl;
+
     //get_value_or(/*default*/);
     boost::optional<std::string> sVal;
     boost::optional<double> dVal;
     boost::optional<int> iVal;
     boost::optional<bool> bVal;
     boost::optional<JsonObject> treeVal;
-    for (Json::Value::iterator it=json.begin(); it!=json.end();it++){
-        Json::Value key= it.key();
-        std::cout<<"Key is: "<<key.asString()<<std::endl;
-        if (key.asString()=="space_name"){
-            Json::Value value=(*it);
-            std::cout<<"Value is: "<<value.asString()<<std::endl;
-        }
-    }
 
 
     //******************
@@ -460,13 +451,10 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     //******************
     sVal=getString(json, "space_name", "The key \"space_name\" does not appear in the STADIC Control File.", "The key \"space_name\" does not contain a string.", Severity::Error);
     if(!sVal){
-        //std::cout<<"Failed to read the Space Name"<<std::endl;
         return false;
     }else{
-        std::cout<<"Space Name is "<<sVal.get()<<std::endl;
         setSpaceName(sVal.get());
         sVal.reset();
-        //std::cout<<"Read the Space Name : "<<m_SpaceName<<std::endl;
     }
 
 
@@ -477,7 +465,6 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         setSpaceDirectory(sVal.get());
         sVal.reset();
     }
-    std::cout<<"Read the Space Directory : "<<m_SpaceDirectory<<std::endl;
 
     sVal=getString(json, "geometry_directory", "The key \"geometry_directory\" does not appear in the STADIC Control File.", "The \"geometry_directory\" is not a string.", Severity::Error);
     if (!sVal){
@@ -547,8 +534,11 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     boost::optional<JsonObject> list;
     list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Fatal);
     std::vector<std::string> tempVec;
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list.get().size()<1){
+        STADIC_LOG(Severity::Fatal, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
+    }
+    for (int index=0;index<list.get().size();index++){
+        tempVec.push_back(list.get()[index].asString());
     }
     setPTSFile(tempVec);
     list.reset();
@@ -578,21 +568,25 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     }
     //identifier
     list=getArray(treeVal.get(),"identifier");
-    tempVec.clear();
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list){
+        tempVec.clear();
+        for (int index=0;index<list.get().size();index++){
+            tempVec.push_back(list.get()[index].asString());
+        }
+        setIdentifiers(tempVec);
     }
-    setIdentifiers(tempVec);
     list.reset();
     //modifier
     list=getArray(treeVal.get(),"modifier");
-    tempVec.clear();
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list){
+        tempVec.clear();
+        for (int index=0;index<list.get().size();index++){
+            tempVec.push_back(list.get()[index].asString());
+        }
+        setModifiers(tempVec);
     }
-    setModifiers(tempVec);
     list.reset();
-
+    //Code works through this point.
 
     treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control Space.", Severity::Error);
     if (!treeVal){
@@ -625,12 +619,15 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         sVal.reset();
     }
 
-    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear within the STADIC Control Space.  The \"general\" value will be attempted.", "The \"target_illuminance\" is not a double.  The \"general\" value will be attempted.", Severity::Error);
+    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear within the STADIC Control Space.  The \"general\" value will be attempted.", "The \"target_illuminance\" is not a double.  The \"general\" value will be attempted.", Severity::Warning);
     if (!dVal){
         if (buildingControl->targetIlluminance()){
             setTargetIlluminance(buildingControl->targetIlluminance().get());
+            STADIC_LOG(Severity::Info, "The General target illuminance value of " +toString(buildingControl->targetIlluminance().get()) +" will be applied to the space named \"" +m_SpaceName+"\"");
+        }else{
+            STADIC_LOG(Severity::Fatal, "General does not contain a target illuminance.  Please add this to the control file before proceeding.");
+            return false;
         }
-        return false;
     }else{
         if (!setTargetIlluminance(dVal.get())){
             return false;
@@ -675,8 +672,22 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     }
     //Radiance Parameters
     boost::optional<JsonObject> radTree;
-    radTree=getObject(treeVal.get(), "radiance_parameters");
+    radTree=getObject(json, "radiance_parameters");
     if (radTree){
+        for (std::string setName : radTree.get().getMemberNames()){
+            boost::optional<JsonObject> tempTree;
+            tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
+            std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
+            m_RadParams.insert(tempPair);
+            //Added to make radiance_parameters work with jsonCPP
+            for (Json::Value::iterator it =tempTree.get().begin(); it != tempTree.get().end(); it++){
+                Json::Value key =it.key();
+                Json::Value value = (*it);
+                std::pair<std::string, std::string> parameters (key.asString(), value.asString());
+                m_RadParams[setName].insert(parameters);
+            }
+        }
+        /* //Old parameter parsing code
         for (std::string setName : radTree.get().getMemberNames()){
             boost::optional<JsonObject> tempTree;
             tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
@@ -688,7 +699,11 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
                 m_RadParams[setName].insert(parameters);
             }
         }
+        */
     }else{
+         //This gets all of the radiance parameters.
+         m_RadParams=buildingControl->getAllRadParams().get();
+         /*
          for ( auto i = buildingControl->getAllRadParams().get().begin(); i != buildingControl->getAllRadParams().get().end(); ++i ){
             std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (i->first, std::unordered_map<std::string, std::string> ());
             m_RadParams.insert(tempPair);
@@ -697,9 +712,12 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
                 m_RadParams[i->first].insert(parameters);
             }
         }
+        */
     }
+    std::cout<<"Read Parameters"<<std::endl;
+    //Fails to verify parameters.
     verifyParameters();
-
+    std::cout<<"Verified Parameters"<<std::endl;
 
     //******************
     //Lighting Control
