@@ -45,7 +45,7 @@ TEST(ControlTests, JsonCppReadJson)
 {
     stadic::BuildingControl controlFile;
     ASSERT_TRUE(controlFile.parseJson("simplejson.txt"));
-
+    //General Arguments
     EXPECT_EQ("in", controlFile.importUnits().get());
     EXPECT_EQ("lux", controlFile.illumUnits().get());
     EXPECT_EQ("ft", controlFile.displayUnits().get());
@@ -56,6 +56,7 @@ TEST(ControlTests, JsonCppReadJson)
     EXPECT_EQ(300, controlFile.targetIlluminance().get());
     EXPECT_EQ(3, controlFile.skyDivisions().get());
     EXPECT_EQ(4, controlFile.sunDivisions().get());
+    //DMX Parameters
     EXPECT_EQ("2", controlFile.getRadParam("dmx", "ab").get());
     EXPECT_EQ("1024", controlFile.getRadParam("dmx", "ad").get());
     EXPECT_EQ("256", controlFile.getRadParam("dmx", "as").get());
@@ -70,6 +71,43 @@ TEST(ControlTests, JsonCppReadJson)
     EXPECT_EQ("2", controlFile.getRadParam("dmx", "dr").get());
     EXPECT_EQ("1", controlFile.getRadParam("dmx", "dp").get());
     EXPECT_EQ("1", controlFile.getRadParam("dmx", "dc").get());
+    EXPECT_EQ("0.5", controlFile.getRadParam("dmx", "dt").get());
+    //VMX Parameters
+    EXPECT_EQ("12", controlFile.getRadParam("vmx", "ab").get());
+    EXPECT_EQ("50000", controlFile.getRadParam("vmx", "ad").get());
+    EXPECT_EQ("256", controlFile.getRadParam("vmx", "as").get());
+    EXPECT_EQ("150", controlFile.getRadParam("vmx", "ar").get());
+    EXPECT_EQ("0.1", controlFile.getRadParam("vmx", "aa").get());
+    EXPECT_EQ("6", controlFile.getRadParam("vmx", "lr").get());
+    EXPECT_EQ("0.15", controlFile.getRadParam("vmx", "st").get());
+    EXPECT_EQ("1", controlFile.getRadParam("vmx", "sj").get());
+    EXPECT_EQ("0.000152", controlFile.getRadParam("vmx", "lw").get());
+    EXPECT_EQ("1", controlFile.getRadParam("vmx", "dj").get());
+    EXPECT_EQ("0.2", controlFile.getRadParam("vmx", "ds").get());
+    EXPECT_EQ("2", controlFile.getRadParam("vmx", "dr").get());
+    EXPECT_EQ("1", controlFile.getRadParam("vmx", "dp").get());
+    EXPECT_EQ("1", controlFile.getRadParam("vmx", "dc").get());
+    EXPECT_EQ("0.5", controlFile.getRadParam("vmx", "dt").get());
+    //Default Parameters
+    EXPECT_EQ("5", controlFile.getRadParam("default", "ab").get());
+    EXPECT_EQ("10000", controlFile.getRadParam("default", "ad").get());
+    EXPECT_EQ("256", controlFile.getRadParam("default", "as").get());
+    EXPECT_EQ("150", controlFile.getRadParam("default", "ar").get());
+    EXPECT_EQ("0.1", controlFile.getRadParam("default", "aa").get());
+    EXPECT_EQ("6", controlFile.getRadParam("default", "lr").get());
+    EXPECT_EQ("0.15", controlFile.getRadParam("default", "st").get());
+    EXPECT_EQ("1", controlFile.getRadParam("default", "sj").get());
+    EXPECT_EQ("0.004", controlFile.getRadParam("default", "lw").get());
+    EXPECT_EQ("1", controlFile.getRadParam("default", "dj").get());
+    EXPECT_EQ("0.2", controlFile.getRadParam("default", "ds").get());
+    EXPECT_EQ("2", controlFile.getRadParam("default", "dr").get());
+    EXPECT_EQ("1", controlFile.getRadParam("default", "dp").get());
+    EXPECT_EQ("1", controlFile.getRadParam("default", "dc").get());
+    EXPECT_EQ("0.5", controlFile.getRadParam("default", "dt").get());
+    EXPECT_EQ(1, controlFile.spaces().size());
+    EXPECT_EQ("prj1", controlFile.spaces()[0]->get().spaceName());
+
+
     //ASSERT_TRUE(controlFile.parseJson("control.json"));
     /*
   stadic::Control controlFile;
