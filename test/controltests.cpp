@@ -44,7 +44,7 @@
 TEST(ControlTests, JsonCppReadJson)
 {
     stadic::BuildingControl controlFile;
-    ASSERT_TRUE(controlFile.parseJson("simplejson.txt"));
+    ASSERT_TRUE(controlFile.parseJson("control.json"));
     //General Arguments
     EXPECT_EQ("in", controlFile.importUnits().get());
     EXPECT_EQ("lux", controlFile.illumUnits().get());
