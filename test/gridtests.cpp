@@ -426,6 +426,7 @@ TEST(GridTests, Diamond)
     iFile.close();
     EXPECT_EQ(36, counter);
 }
+
 TEST(GridTests, DiamondIdentifier)
 {
     std::vector<std::string> files;

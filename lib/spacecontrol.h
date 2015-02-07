@@ -28,8 +28,8 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef STADICCONTROL_H
-#define STADICCONTROL_H
+#ifndef SPACECONTROL_H
+#define SPACECONTROL_H
 
 #include <string>
 #include <vector>
@@ -37,6 +37,7 @@
 #include "controlzone.h"
 #include <boost/optional.hpp>
 #include "logging.h"
+#include "buildingcontrol.h"
 
 #include "stadicapi.h"
 
@@ -46,26 +47,23 @@ class STADIC_API Control
 {
 public:
     Control();
-    bool parseJson(const std::string &file);
+    bool parseJson(const JsonObject &json, BuildingControl *buildingControl);
 
     //Setters
     //******************
     //Folder Information
     //******************
-    void setProjectName(std::string name);
-    void setProjectFolder(std::string folder);
-    void setTmpFolder(std::string folder);
-    void setGeoFolder(std::string folder);
-    void setIESFolder(std::string folder);
-    void setResultsFolder(std::string folder);
-    void setDataFolder(std::string folder);
+    void setSpaceName(std::string name);
+    void setSpaceDirectory(std::string directory);
+    void setGeoDirectory(std::string directory);
+    void setIESDirectory(std::string directory);
+    void setResultsDirectory(std::string directory);
+    void setInputDirectory(std::string directory);
 
     //******************
     //Site Information
     //******************
     bool setGroundReflect(double value);
-    void setWeaDataFile(std::string file);
-    bool setFirstDay(int value);
 
 
     //******************
@@ -74,11 +72,15 @@ public:
     void setMatFile(std::string file);
     void setGeoFile(std::string file);
     bool setBuildingRotation(double value);
-    void setPTSFile(std::string file);
-    bool setImportUnits(std::string units);
-    void setIllumUnits(std::string units);
-    bool setDisplayUnits(std::string units);
+    void setPTSFile(std::vector<std::string> files);
+    void setXSpacing(std::string value);
+    void setYSpacing(std::string value);
+    void setOffset(std::string value);
+    void setZOffset(std::string value);
+    void setIdentifiers(std::vector<std::string> identifiers);
+    void setModifiers(std::vector<std::string> modifiers);
     void setOccSchedule(std::string file);
+    void setLightSchedule(std::string file);
     bool setTargetIlluminance(double value);
 
     //******************
@@ -86,21 +88,7 @@ public:
     //******************
     bool setSunDivisions(int value);
     bool setSkyDivisions(int value);
-    void setDaylightSavingsTime(bool value);
-    bool setDefaultRadianceParameters();
-    bool setAB(int value);
-    bool setAD(int value);
-    bool setAS(int value);
-    bool setAR(int value);
-    bool setAA(double value);
-    bool setLR(int value);
-    bool setST(double value);
-    bool setSJ(double value);
-    bool setLW(double value);
-    bool setDJ(double value);
-    bool setDS(double value);
-    bool setDR(int value);
-    bool setDP(double value);
+
 
     //******************
     //Metrics
@@ -117,33 +105,34 @@ public:
     //******************
     //Folder Information
     //******************
-    std::string projectName();
-    std::string projectFolder();
-    std::string tmpFolder();
-    std::string geoFolder();
-    std::string iesFolder();
-    std::string resultsFolder();
-    std::string dataFolder();
+    std::string spaceName();
+    std::string spaceDirectory();
+    std::string geoDirectory();
+    std::string iesDirectory();
+    std::string resultsDirectory();
+    std::string inputDirectory();
+    std::string intermediateDataDirectory();
 
     //******************
     //Site Information
     //******************
     double groundReflect();
-    std::string weaDataFile();
-    int firstDay();
 
     //******************
     //Geometry Information
     //******************
     std::string matFile();
     std::string geoFile();
-    double buildingRotation();
-    std::string ptsFile();
+    std::vector<std::string> ptsFile();
+    boost::optional<std::string> xSpacing();
+    boost::optional<std::string> ySpacing();
+    boost::optional<std::string> offset();
+    boost::optional<std::string> zOffset();
+    boost::optional<std::vector<std::string>> identifiers();
+    boost::optional<std::vector<std::string>> modifiers();
     std::vector<WindowGroup> windowGroups();
-    std::string importUnits();
-    std::string illumUnits();
-    std::string displayUnits();
     std::string occSchedule();
+    std::string lightSchedule();
     double targetIlluminance();
 
     //******************
@@ -156,20 +145,8 @@ public:
     //******************
     int sunDivisions();
     int skyDivisions();
-    bool daylightSavingsTime();
-    int ab();
-    int ad();
-    int as();
-    int ar();
-    double aa();
-    int lr();
-    double st();
-    double sj();
-    double lw();
-    double dj();
-    double ds();
-    int dr();
-    double dp();
+    boost::optional<std::string> getRadParam(std::string parameterSet, std::string parameterName);
+    boost::optional<std::unordered_map<std::string, std::string>> getParamSet(std::string setName);
 
     //******************
     //Metrics
@@ -192,37 +169,39 @@ public:
     double UDIMax();
 
 private:
-
+    bool verifyParameters();
+    bool checkParameter(std::string setName, std::string parameter, std::string varType);
 
     //******************
     //Folder Information
     //******************
-    std::string m_ProjectName;                          //  Variable holding the project name
-    std::string m_ProjectFolder;                        //  Variable holding the project folder
-    std::string m_TmpFolder;                            //  Variable holding the tmp folder
-    std::string m_GeoFolder;                            //  Variable holding the geometry folder
-    std::string m_IESFolder;                            //  Variable holding the luminaire folder
-    std::string m_ResultsFolder;                        //  Variable holding the results folder
-    std::string m_DataFolder;                           //  Variable holding the data folder
+    std::string m_SpaceName;                          //  Variable holding the project name
+    std::string m_SpaceDirectory;                     //  Variable holding the project folder
+    std::string m_GeoDirectory;                       //  Variable holding the geometry folder
+    std::string m_IESDirectory;                       //  Variable holding the luminaire folder
+    std::string m_ResultsDirectory;                   //  Variable holding the results folder
+    std::string m_InputDirectory;                     //  Variable holding the data folder
 
     //******************
     //Site Information
     //******************
     double m_GroundReflect;                             //  Variable holding the ground reflectance
-    std::string m_WeaDataFile;                          //  Variable holding the weather data file
-    int m_FirstDay;                                     //  Variable holding the start day of the year
 
     //******************
     //Geometry Information
     //******************
     std::string m_MatFile;                              //  Variable holding the main material file
     std::string m_GeoFile;                              //  Variable holding the main geometry file
-    double m_BuildingRotation;                          //  Variable holding the building rotation which is assumed to be positive=counter-clockwise
-    std::string m_PTSFile;                              //  Variable holding the analysis grid file
-    std::string m_ImportUnits;                          //  Variable holding the geometry file import units
-    std::string m_IllumUnits;                           //  Variable holding the illuminance units
-    std::string m_DisplayUnits;                         //  Variable holding the distance units for display
+    std::vector<std::string> m_PTSFile;                              //  Variable holding the analysis grid file
+    boost::optional<std::string> m_XSpacing;
+    boost::optional<std::string> m_YSpacing;
+    boost::optional<std::string> m_Offset;
+    boost::optional<std::string> m_ZOffset;
+    boost::optional<std::vector<std::string>> m_Identifiers;
+    boost::optional<std::vector<std::string>> m_Modifiers;
+
     std::string m_OccSchedule;                          //  Variable holding the occupancy schedule file
+    std::string m_LightSchedule;
     double m_TargetIlluminance;                         //  Variable holding the target illuminance
     std::vector<WindowGroup> m_WindowGroups;
 
@@ -231,20 +210,7 @@ private:
     //******************
     int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
     int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
-    bool m_DaylightSavingsTime;                         //  Variable holding whether daylight savings time is enabled
-    int m_AB;                                           //  Variable holding the number of ambient bounces
-    int m_AD;                                           //  Variable holding the number of ambient divisions
-    int m_AS;                                           //  Variable holding the number of ambient super-samples
-    int m_AR;                                           //  Variable holding the ambient resolutions
-    double m_AA;                                        //  Variable holding the ambient accuracy
-    int m_LR;                                           //  Variable holding the maximum number of reflections
-    double m_ST;                                        //  Variable holding the specular sampling threshold
-    double m_SJ;                                        //  Variable holding the specular sampling jitter
-    double m_LW;                                        //  Variable holding the minimum weight fraction to continue tracing a ray
-    double m_DJ;                                        //  Variable holding the direct jitter fraction
-    double m_DS;                                        //  Variable holding the direct sampling ratio
-    int m_DR;                                           //  Variable holding the number of relays for secondary sources
-    double m_DP;                                        //  Variable holding the secondary source presampling density
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
 
     //******************
     //Lighting Control

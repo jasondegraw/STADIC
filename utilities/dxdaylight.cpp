@@ -30,7 +30,7 @@
 
 #include "daylight.h"
 #include "logging.h"
-
+#include "buildingcontrol.h"
 #include <iostream>
 
 void usage()
@@ -46,7 +46,8 @@ int main (int argc, char *argv[]){
         return EXIT_FAILURE;
     }
     std::string fileName=argv[1];
-    stadic::Control model;
+    stadic::BuildingControl model;
+    //stadic::Control model;
     if (!model.parseJson(fileName)){
         return EXIT_FAILURE;
     }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,11 @@ typedef Json::Value JsonObject;
 
 boost::optional<JsonObject> readJsonDocument(const std::string &filename);
 
+boost::optional<double> STADIC_API getDouble(const JsonObject &json, const std::string &key);
 boost::optional<double> STADIC_API getDouble(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, const std::string &errorBad, Severity severity);
 
+boost::optional<int> STADIC_API getInt(const JsonObject &json, const std::string &key);
 boost::optional<int> STADIC_API getInt(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity);
 
@@ -53,6 +55,7 @@ boost::optional<std::string> STADIC_API getString(const JsonObject &json, const 
 boost::optional<std::string> STADIC_API getString(const JsonObject &json, const std::string &key,
     const std::string &errorMissing, const std::string &errorBad, Severity severity);
 
+boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key);
 boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key, const std::string &errorMissing,
     const std::string &errorBad, Severity severity);
 boost::optional<bool> STADIC_API getBool(const JsonObject &json, const std::string &key, bool defaultValue, 
@@ -69,7 +72,7 @@ boost::optional<JsonObject> STADIC_API getArray(const JsonObject &json, const st
 boost::optional<double> STADIC_API asDouble(const JsonObject &json, const std::string &errorBad, Severity severity);
 boost::optional<int> STADIC_API asInt(const JsonObject &json, const std::string &errorBad, Severity severity);
 boost::optional<std::string> STADIC_API asString(const JsonObject &json, const std::string &errorBad, Severity severity);
-
+boost::optional<bool> STADIC_API asBool(const JsonObject &json, const std::string &errorBad, Severity severity);
 }
 
 #endif
