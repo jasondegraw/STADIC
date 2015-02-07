@@ -1,243 +1,299 @@
 {
-	"project_name": "prj1",
-	"project_folder": "c:/example/",
-	"tmp_folder": "tmp/",
-	"geometry_folder": "rad/",
-	"ies_folder": "ies/",
-	"results_folder": "res/",
-	"data_folder": "data/",
-	
+  "spaces": [{
+    "space_name": "prj1",
+    "space_directory": "c:/example/",
+    "geometry_directory": "rad/",
+    "ies_directory": "ies/",
+    "results_directory": "res/",
+    "input_directory": "data/",
+    "occupancy_schedule": "sched.csv",
+    "lighting_schedule": "sched.csv",
     "ground_reflectance": 1.1,
-	"wea_data_file": "c:/weaData/state_college.wea",
-	"first_day": 1,
-	
-	"material_file": "main_mat.rad",
-	"geometry_file": "main_geo.rad",
-	"building_rotation": 0,
-	"analysis_points": "calc_grid.pts",
-	"window_groups": [
-		{
-			"name": "WG1",
-			"base_geometry": "wg1base.rad",
-			"glazing_layers": ["l_glazing", "l_glazing2"],
-			"shade_control":{
-				"method": "automated_profile_angle",
-				"elevation_azimuth": 30,
-				"angle_settings": [30, 60]
-			},
-			"shade_settings":["wg1set1.rad", "wg1set2.rad"]
-		},
-		{
-			"name": "WG2",
-			"BSDF": true,
-			"base_geometry": "wg2base.rad",
-			"glazing_layers": ["l_window"],
-			"bsdf_base_layers": ["l_window"],
-			"shade_control":{
-				"method": "automated_signal",
-				"sensor": {
-                    "sensor_type": "sensitivity_file",
-                    "sensor_file": "cos.sen",
-					"location": {
-						"x": 4,
-						"y": 0,
-						"z": 5,
-						"xd": 0,
-						"yd": -1,
-						"zd": 0,
-						"spin_ccw": 0
-					}
+    "material_file": "main_mat.rad",
+    "geometry_file": "main_geo.rad",
+    "analysis_points": {
+      "files": ["calc_grid.pts"],
+      "x_spacing": 24,
+      "y_spacing": 24,
+      "offset": 24,
+      "z_offset": 30,
+      "modifier": ["l_floor"]
+    },
+    "window_groups": [
+      {
+        "name": "WG1",
+        "base_geometry": "wg1base.rad",
+        "calculate_base": true,
+        "glazing_materials": ["l_glazing", "l_glazing2"],
+        "shade_control":{
+          "method": "automated_profile_angle",
+          "elevation_azimuth": 30,
+          "angle_settings": [30, 60]
+        },
+					"shade_settings":["wg1set1.rad", "wg1set2.rad"],
+					"calculate_setting": [true, false]
 				},
-				"signal_settings": [13000, 10000, 8000]
+				{
+					"name": "WG2",
+					"BSDF": true,
+					"base_geometry": "wg2base.rad",
+					"calculate_base": false,
+					"glazing_materails": ["l_window"],
+					"bsdf_base_materials": ["l_window"],
+					"shade_control":{
+						"method": "automated_signal",
+						"sensor": {
+		                    		"sensor_type": "sensitivity_file",
+		                    		"sensor_file": "cos.sen",
+							"location": {
+								"x": 4,
+								"y": 0,
+								"z": 5,
+								"xd": 0,
+								"yd": -1,
+								"zd": 0,
+								"spin_ccw": 0
+							}
+						},
+						"signal_settings": [13000, 10000]
+					},
+					"shade_settings":["wg2set1.rad", "wg2set2.rad"],
+					"calculate_setting": [true, true],
+					"bsdf_setting_layers":[
+						["l_window"],
+						["l_window"]
+					]
+				}
+			],
+			
+			"control_zones": [
+				{
+					"name": "zone1",
+		            	"optimum_control": "dim_to_min",
+					"sensor": {
+		                "sensor_type": "sensitivity_file",
+		                "sensor_file": "cos.sen",
+						"location": {
+							"x": 14,
+							"y": 8,
+							"z": 10,
+							"xd": 0,
+							"yd": 0,
+							"zd": -1,
+							"spin_ccw": 0
+			                }
+					},
+					"cp_method": "auto",
+					"quantity": 3,
+					"target_percentage": 0.1,
+					"excluded_points": "exclude.pts",
+					"open_dimming": {
+		                "maximum_bf_signal": 3000,
+		                "minimum_bf_signal": 100,
+						"off_signal": 300
+		            },
+		            "luminaire_information": {
+		                "ies_file": "pendant.ies",
+		                "LLF": 0.9,
+		                "lamp_lumens": 2700
+		            },
+		            "ballast_driver_information": {
+		                "ballast_type": "linear_dimming",
+		                "bf_max": 1.0,
+		                "bf_min": 0.01,
+		                "watts_max": 28,
+		                "watts_min": 10
+		            },
+		            "luminaire_layout":[
+		                {
+		                    "x": 4,
+		                    "y": 4,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 10,
+		                    "y": 4,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 16,
+		                    "y": 4,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 22,
+		                    "y": 4,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 28,
+		                    "y": 4,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                }
+		            ]
+				},
+				{
+					"name": "zone2",
+		            "optimum_control": "on",
+		            "luminaire_information": {
+		                "ies_file": "downlight.ies",
+		                "LLF": 0.85,
+		                "lamp_lumens": 2900
+		            },
+		            "ballast_driver_information": {
+		                "ballast_type": "non_dimming",
+		                "ballast_factor": 1.0,
+		                "watts": 32
+		            },
+		            "luminaire_layout":[
+		                {
+		                    "x": 4,
+		                    "y": 10,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 10,
+		                    "y": 10,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 16,
+		                    "y": 10,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 22,
+		                    "y": 10,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                },
+		                {
+		                    "x": 28,
+		                    "y": 10,
+		                    "z": 10,
+		                    "rotation": 0,
+		                    "tilt": 0,
+		                    "spin_ccw": 0
+		                }
+		            ]
+				}
+			],
+		    "sDA": {
+				"calculate": true,
+				"illuminance": 300,
+				"DA_fraction": 0.5,
+				"start_time": 8,
+				"end_time": 17
 			},
-			"shade_settings":["wg2set1.rad", "wg2set2.rad"],
-			"bsdf_setting_layers":[
-				["l_window"],
-				["l_window"]
-			]
+			"occupied_sDA": {
+				"calculate": true,
+				"illuminance": 300,
+				"DA_fraction": 0.5
+			},
+			"DA": {
+				"calculate": true,
+				"illuminance": 300
+			},
+			"cDA": {
+				"calculate": true,
+				"illuminance": 300
+			},
+			"DF": true,
+			"UDI": {
+				"calculate": true,
+				"minimum": 100,
+				"maximum": 250
+			}
 		}
 	],
-	
-	"import_units": "in",
-	"illum_units": "lux",
-	"display_units": "ft",
-	
-	"occupancy_schedule": "sched.csv",
-	"target_illuminance": 500,
-	
-	"control_zones": [
-		{
-			"name": "zone1",
-            "optimum_control": "dim_to_min",
-			"sensor": {
-                "sensor_type": "sensitivity_file",
-                "sensor_file": "cos.sen",
-				"location": {
-					"x": 14,
-					"y": 8,
-					"z": 10,
-					"xd": 0,
-					"yd": 0,
-					"zd": -1,
-					"spin_ccw": 0
-                }
-			},
-			"cp_method": "auto",
-			"quantity": 3,
-			"target_percentage": 0.1,
-			"excluded_points": "exclude.pts",
-			"open_dimming": {
-                "maximum_bf_signal": 3000,
-                "minimum_bf_signal": 100,
-				"off_signal": 300
-            },
-            "luminaire_information": {
-                "ies_file": "pendant.ies",
-                "LLF": 0.9,
-                "lamp_lumens": 2700
-            },
-            "ballast_driver_information": {
-                "ballast_type": "linear_dimming",
-                "bf_max": 1.0,
-                "bf_min": 0.01,
-                "watts_max": 28,
-                "watts_min": 10
-            },
-            "luminaire_layout":[
-                {
-                    "x": 4,
-                    "y": 4,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 10,
-                    "y": 4,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 16,
-                    "y": 4,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 22,
-                    "y": 4,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 28,
-                    "y": 4,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                }
-            ]
-		},
-		{
-			"name": "zone2",
-            "optimum_control": "on",
-            "luminaire_information": {
-                "ies_file": "downlight.ies",
-                "LLF": 0.85,
-                "lamp_lumens": 2900
-            },
-            "ballast_driver_information": {
-                "ballast_type": "non_dimming",
-                "ballast_factor": 1.0,
-                "watts": 32
-            },
-            "luminaire_layout":[
-                {
-                    "x": 4,
-                    "y": 10,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 10,
-                    "y": 10,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 16,
-                    "y": 10,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 22,
-                    "y": 10,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                },
-                {
-                    "x": 28,
-                    "y": 10,
-                    "z": 10,
-                    "rotation": 0,
-                    "tilt": 0,
-                    "spin_ccw": 0
-                }
-            ]
-		}
-	],
-	"sky_divisions": 3,
-	"sun_divisions": 4,
-	"radiance_parameters": {
-		"ab": 4,
-		"ad": 300,
-		"as": 20,
-		"ar": 150,
-		"aa": 0.1,
-		"lr": 6,
-		"st": 0.1500,
-		"sj": 1.0000,
-		"lw": 0.004000,
-		"dj": 0.0000,
-		"ds": 0.200,
-		"dr": 2,
-		"dp": 512
-	},
-	
-	"daylight_savings_time": true,
-    "sDA": {
-		"illuminance": 300,
-		"DA_fraction": 0.5,
-		"start_time": 8,
-		"end_time": 17
-	},
-	"occupied_sDA": {
-		"illuminance": 300,
-		"DA_fraction": 0.5
-		
-	},
-	"DA": 300,
-	"cDA": 300,
-	"DF": true,
-	"UDI": {
-		"minimum": 100,
-		"maximum": 250
+	"general": {
+		"import_units": "in",
+		"illum_units": "lux",
+		"display_units": "ft",
+		"radiance_parameters": [
+			{
+				"dmx": {
+					"ab": 2,
+					"ad": 1024,
+					"as": 256,
+					"ar": 150,
+					"aa": 0.1,
+					"lr": 6,
+					"st": 0.1500,
+					"sj": 1.0000,
+					"lw": 0.004000,
+					"dj": 0.0000,
+					"ds": 0.200,
+					"dr": 2,
+					"dp": 1.0,
+					"dc": 1.0
+				},
+				"vmx": {
+					"ab": 12,
+					"ad": 50000,
+					"as": 256,
+					"ar": 150,
+					"aa": 0.1,
+					"lr": 6,
+					"st": 0.1500,
+					"sj": 1.0000,
+					"lw": 0.0000152,
+					"dj": 1.0000,
+					"ds": 0.200,
+					"dr": 2,
+					"dp": 1.0,
+					"dc": 1.0
+				},
+				"default": {
+					"ab": 5,
+					"ad": 10000,
+					"as": 256,
+					"ar": 150,
+					"aa": 0.1,
+					"lr": 6,
+					"st": 0.1500,
+					"sj": 1.0000,
+					"lw": 0.0000152,
+					"dj": 1.0000,
+					"ds": 0.200,
+					"dr": 2,
+					"dp": 1.0,
+					"dc": 1.0
+				}
+			}
+		],
+		"daylight_savings_time": true,
+		"epw_file": "USA_PA_Lancaster.AP.725116_TMY3.epw",
+		"first_day": 1,
+		"building_rotation": 0,
+		"target_illuminance": 300,
+		"sky_divisions": 3,
+		"sun_divisions": 4
 	}
 }
