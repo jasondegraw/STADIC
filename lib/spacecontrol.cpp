@@ -959,20 +959,21 @@ bool Control::verifyParameters(){
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
     }
-
+    return allOk; // Just guessing here...
 }
+
 bool Control::checkParameter(std::string setName, std::string parameter, std::string varType){
     boost::optional<std::string> check;
-    bool *ok;
+    bool ok;
     check=getRadParam(setName, parameter);
     if (check){
         if (varType=="int"){
-            toInteger(check.get(), ok);
+            toInteger(check.get(), &ok);
             if (!ok){
                 STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
             }
         }else if (varType=="double"){
-            toDouble(check.get(), ok);
+            toDouble(check.get(), &ok);
             if (!ok){
                 STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
             }
@@ -984,6 +985,7 @@ bool Control::checkParameter(std::string setName, std::string parameter, std::st
     }else{
         STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
     }
+    return false; // This is probably not what is intended
 }
 
 }
