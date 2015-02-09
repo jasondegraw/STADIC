@@ -1051,8 +1051,9 @@ bool Control::verifyParameters(){
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
     }
-    return false; // Add return for VS
+    return allOk; // Just guessing here... but VS requires a return
 }
+
 bool Control::checkParameter(std::string setName, std::string parameter, std::string varType){
     boost::optional<std::string> check;
     bool ok;
