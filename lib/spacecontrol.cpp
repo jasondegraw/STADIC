@@ -971,81 +971,90 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
 
 bool Control::verifyParameters(){
     bool allOk=true;
+    bool bsdfSets=false;
+    for (int i=0;i<m_WindowGroups.size();i++){
+        std::cout<<"within first window group."<<std::endl;
+        if (m_WindowGroups[i].isBSDF()){
+            bsdfSets=true;
+            std::cout<<"there are bsdfs"<<std::endl;
+        }
+    }
+    std::cout<<"the bool is "<<bsdfSets<<std::endl;
     //ab
-    if (!checkParameter("dmx", "ab", "int")){
+    if (!checkParameter("dmx", "ab", "int") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "ab", "int")){
+    if (!checkParameter("vmx", "ab", "int") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "ab", "int")){
         allOk=false;
     }
     //ad
-    if (!checkParameter("dmx", "ad", "int")){
+    if (!checkParameter("dmx", "ad", "int") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "ad", "int")){
+    if (!checkParameter("vmx", "ad", "int") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "ad", "int")){
         allOk=false;
     }
     //as
-    if (!checkParameter("dmx", "as", "int")){
+    if (!checkParameter("dmx", "as", "int") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "as", "int")){
+    if (!checkParameter("vmx", "as", "int") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "as", "int")){
         allOk=false;
     }
     //dt
-    if (!checkParameter("dmx", "dt", "double")){
+    if (!checkParameter("dmx", "dt", "double") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "dt", "double")){
+    if (!checkParameter("vmx", "dt", "double") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "dt", "double")){
         allOk=false;
     }
     //dc
-    if (!checkParameter("dmx", "dc", "double")){
+    if (!checkParameter("dmx", "dc", "double") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "dc", "double")){
+    if (!checkParameter("vmx", "dc", "double") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "dc", "double")){
         allOk=false;
     }
     //dj
-    if (!checkParameter("dmx", "dj", "double")){
+    if (!checkParameter("dmx", "dj", "double") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "dj", "double")){
+    if (!checkParameter("vmx", "dj", "double") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "dj", "double")){
         allOk=false;
     }
     //dp
-    if (!checkParameter("dmx", "dp", "double")){
+    if (!checkParameter("dmx", "dp", "double") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "dp", "double")){
+    if (!checkParameter("vmx", "dp", "double") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "dp", "double")){
         allOk=false;
     }
     //lw
-    if (!checkParameter("dmx", "lw", "double")){
+    if (!checkParameter("dmx", "lw", "double") && bsdfSets){
         allOk=false;
     }
-    if (!checkParameter("vmx", "lw", "double")){
+    if (!checkParameter("vmx", "lw", "double") && bsdfSets){
         allOk=false;
     }
     if (!checkParameter("default", "lw", "double")){

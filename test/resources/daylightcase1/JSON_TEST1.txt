@@ -1,98 +1,95 @@
 {
-"spaces": [
+"spaces" : [
 	{
-		"project_name": "test1",
-		"project_directory": "c:/json_tests/",
-		"geometry_directory": "rad/",
-		"results_directory": "res/",
-		"input_directory": "data/",
-		
-	    	"ground_reflectance": 0.2,
-
-		"lighting_schedule": "8to6.csv",
-		"material_file": "mat1.rad",
-		"geometry_file": "geom1.rad",
-		"analysis_points": {
-       		"file": ["grid.pts"],
-			"x_spacing": 2,
-			"y_spacing": 2,
-			"offset":	1,
-			"z_offset": 2.5,
-			"modifier": ["l_floor"]
+		"space_name" : "test1",
+		"space_directory" : "c:/json_tests/",
+		"geometry_directory" : "rad/",
+		"results_directory" : "res/",
+		"input_directory" : "data/",
+	    	"ground_reflectance" : 0.2,
+		"lighting_schedule" : "8to6.csv",
+		"occupancy_schedule" : "8to6.csv",
+		"material_file" : "mat1.rad",
+		"geometry_file" : "geom1.rad",
+		"analysis_points" : {
+       		"files" : ["grid.pts"],
+			"x_spacing" : 2,
+			"y_spacing" : 2,
+			"offset" :	1,
+			"z_offset" : 2.5,
+			"modifier" : ["l_floor"]
        	},
-		"window_groups": [
+		"window_groups" : [
 			{
-				"name": "WG1",
-				"base_geometry": "wg1base.rad",
-				"calculate_base": true,
-				"glazing_layers": ["l_glazing"],
-				"shade_control":{
-					"method": "automated_profile_angle",
-					"elevation_azimuth": 45,
-					"angle_settings": [30]
+				"name" : "WG1",
+				"base_geometry" : "wg1base.rad",
+				"calculate_base" : true,
+				"glazing_materials" : ["l_glazing"],
+				"shade_control" :{
+					"method" : "automated_profile_angle",
+					"elevation_azimuth" : 45,
+					"angle_settings" : [30]
 				},
-				"shade_settings":["shade.rad"],
-				"calculate_setting": [true]
-			},
-			
+				"shade_settings" :["shade.rad"],
+				"calculate_setting" : [true]
+			}
 		],
-		"sDA": {
-			"calculate": true,
-       		"illuminance": 300,
-			"DA_fraction": 0.5,
-			"start_time": 8,
-			"end_time": 17
+		"sDA" : {
+			"calculate" : true,
+       		"illuminance" : 300,
+			"DA_fraction" : 0.5,
+			"start_time" : 8,
+			"end_time" : 17
 		},
-		"occupied_sDA": {
-			"calculate": true,
-			"illuminance": 300,
-			"DA_fraction": 0.5
+		"occupied_sDA" : {
+			"calculate" : true,
+			"illuminance" : 300,
+			"DA_fraction" : 0.5
 			
 		},
-		"DA": {
-			"calculate": true,
-			"illuminance": 300
+		"DA" : {
+			"calculate" : true,
+			"illuminance" : 300
 		},
-		"cDA": {
-			"calculate": true,
-			"illuminance": 300
+		"cDA" : {
+			"calculate" : true,
+			"illuminance" : 300
 		},
-		"DF": true,
-		"UDI": {
-			"calculate": true,
-			"minimum": 100,
-			"maximum": 250
+		"DF" : true,
+		"UDI" : {
+			"calculate" : true,
+			"minimum" : 100,
+			"maximum" : 250
 		}
-	},
+	}
 ],
 "general" : {
-	"import_units": "ft",
-	"illum_units": "lux",
-	"display_units": "ft",
-	"epw_file": "c:/data/state_college.epw",
-	"first_day": 1,
-	"building_rotation": 0,
-	"target_illuminance": 500,		
-	"sky_divisions": 4,
-	"sun_divisions": 4,
-	"radiance_parameter": [
-		"default":{
-			"ab": 5,
-			"ad": 300,
-			"as": 20,
-			"ar": 150,
-			"aa": 0.1,
-			"lr": 6,
-			"st": 0.1500,
-			"sj": 1.0000,
-			"lw": 0.004000,
-			"dj": 0.0000,
-			"ds": 0.200,
-			"dr": 2,
-			"dp": 512
-		},
-	],
-	"daylight_savings_time": true,
-    	
+	"import_units" : "ft",
+	"illum_units" : "lux",
+	"display_units" : "ft",
+	"epw_file" : "c:/data/state_college.epw",
+	"first_day" : 1,
+	"building_rotation" : 0,
+	"target_illuminance" : 500,		
+	"sky_divisions" : 4,
+	"sun_divisions" : 4,
+	"radiance_parameters" : {
+		"default" : {
+			"ab" : 5,
+			"ad" : 300,
+			"as" : 20,
+			"ar" : 150,
+			"aa" : 0.1,
+			"lr" : 6,
+			"st" : 0.1500,
+			"sj" : 1.0000,
+			"lw" : 0.004000,
+			"dj" : 0.0000,
+			"ds" : 0.200,
+			"dr" : 2,
+			"dp" : 512
+		}
+	},
+	"daylight_savings_time" : true
 }
 }	
