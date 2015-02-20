@@ -41,8 +41,20 @@
 #include "stadicapi.h"
 
 namespace stadic {
-
 class Control;
+}
+
+#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
+template class __declspec(dllexport) std::vector<stadic::Control>;
+template class __declspec(dllexport) boost::optional<std::string> ;
+//template class __declspec(dllexport) std::vector<double>;
+//template class __declspec(dllexport) std::string;
+//template class __declspec(dllexport) std::basic_string < char, std::char_traits<char>, std::allocator<char> >;
+//template class __declspec(dllexport) boost::optional_detail::aligned_storage<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>;
+//template class __declspec(dllexport) std::vector<std::string>;
+#endif
+
+namespace stadic {
 
 class STADIC_API BuildingControl
 {
