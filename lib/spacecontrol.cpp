@@ -591,7 +591,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     if (list.get().size()<1){
         STADIC_LOG(Severity::Fatal, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
     }
-    for (int index=0;index<list.get().size();index++){
+    for (unsigned index=0;index<list.get().size();index++){
         tempVec.push_back(list.get()[index].asString());
     }
     setPTSFile(tempVec);
@@ -624,7 +624,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     list=getArray(treeVal.get(),"identifier");
     if (list){
         tempVec.clear();
-        for (int index=0;index<list.get().size();index++){
+        for (unsigned index=0;index<list.get().size();index++){
             tempVec.push_back(list.get()[index].asString());
         }
         setIdentifiers(tempVec);
@@ -634,7 +634,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     list=getArray(treeVal.get(),"modifier");
     if (list){
         tempVec.clear();
-        for (int index=0;index<list.get().size();index++){
+        for (unsigned index=0;index<list.get().size();index++){
             tempVec.push_back(list.get()[index].asString());
         }
         setModifiers(tempVec);

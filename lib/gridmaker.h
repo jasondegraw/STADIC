@@ -41,6 +41,11 @@
 #include <boost/geometry/core/cs.hpp>
 #include "stadicapi.h"
 
+#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
+template class __declspec(dllexport) std::vector<double>;
+template class __declspec(dllexport) std::vector < std::vector<std::vector<double> > >;
+#endif
+
 namespace stadic {
 
 class STADIC_API GridMaker

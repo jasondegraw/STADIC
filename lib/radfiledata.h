@@ -38,6 +38,10 @@
 
 #include "stadicapi.h"
 
+#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
+template class __declspec(dllexport) std::vector < std::shared_ptr<stadic::RadPrimitive>, std::allocator<std::shared_ptr<stadic::RadPrimitive>> >;
+#endif
+
 // This is a C++11 thing - if we can't use this then we're looking
 // at a define or some other horrifying construct
 template<typename T>
