@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -216,7 +216,7 @@ std::vector<std::string> RadPrimitive::arg3() const{
     return m_Arg3;
 }
 
-static std::string nextNonComment(std::stringstream &data)
+static std::string nextNonComment(std::istream &data)
 {
     std::string string;
     while(!data.eof()) {
@@ -265,7 +265,7 @@ std::string RadPrimitive::toRad() const
     return stream.str();
 }
 
-RadPrimitive* RadPrimitive::fromRad(std::stringstream &data)
+RadPrimitive* RadPrimitive::fromRad(std::istream &data)
 {
     RadPrimitive *rad;
 
