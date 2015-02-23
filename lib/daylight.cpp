@@ -46,10 +46,11 @@ bool Daylight::simDaylight()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
     for (int i=0;i<spaces.size();i++){
+
         if (!uniqueGlazingMaterials(spaces[i].get())){
             return false;
         }
-
+        //If the next line causes a crash in the program, it is most likely in setSimCase having to do with the second test.
         if (!testSimCase(spaces[i].get())){
             return false;
         }
@@ -1745,12 +1746,16 @@ bool Daylight::testSimCase(Control *model){
 }
 
 bool Daylight::setSimCase(int setting, int simCase){
+    if (m_SimCase.size()==0){
+        m_SimCase.resize(1);
+    }
     if (setting>(m_SimCase.size()-1)){
-        m_SimCase.reserve(setting+1);
+        m_SimCase.resize(setting+1);
     }else if (setting<0){
         STADIC_ERROR("The setting of the simulation case failed.");
         return false;
     }
+    int j=m_SimCase.size()-1;
     m_SimCase.at(setting)=simCase;
     return true;
 }
@@ -1760,7 +1765,7 @@ bool Daylight::writeSky(Control *model){
     std::string tmpFile=model->spaceDirectory()+model->intermediateDataDirectory()+"sky_white1.rad";
     oFile.open(tmpFile);
     if (!oFile.is_open()){
-        STADIC_ERROR("The opning of the file "+tmpFile +" has failed.");
+        STADIC_ERROR("The opening of the file "+tmpFile +" has failed.");
         return false;
     }
 

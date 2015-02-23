@@ -95,8 +95,8 @@ add_executable(daylighttest daylighttest.cpp)
 add_test(daylighttest daylighttest.cpp)
 target_link_libraries(daylighttest stadic_core gtest gtest_main)
 add_custom_command(TARGET daylighttest POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
-                    ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/JSON_TEST1.txt $<TARGET_FILE_DIR:daylighttest>)
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/ $<TARGET_FILE_DIR:daylighttest>/daylightcase1/)
 
 
 set(RESOURCES resources/simple.rad

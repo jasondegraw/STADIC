@@ -2,7 +2,7 @@
 "spaces" : [
 	{
 		"space_name" : "test1",
-		"space_directory" : "c:/json_tests/",
+		"space_directory" : "daylightcase1/",
 		"geometry_directory" : "rad/",
 		"results_directory" : "res/",
 		"input_directory" : "data/",

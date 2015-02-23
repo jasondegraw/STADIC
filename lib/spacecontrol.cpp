@@ -297,7 +297,7 @@ std::string Control::inputDirectory(){
     return m_InputDirectory;
 }
 std::string Control::intermediateDataDirectory(){
-    return m_ResultsDirectory +"intermediateData\\";
+    return m_ResultsDirectory +"intermediateData/";
 }
 
 //******************
@@ -973,89 +973,102 @@ bool Control::verifyParameters(){
     bool allOk=true;
     bool bsdfSets=false;
     for (int i=0;i<m_WindowGroups.size();i++){
-        std::cout<<"within first window group."<<std::endl;
         if (m_WindowGroups[i].isBSDF()){
             bsdfSets=true;
-            std::cout<<"there are bsdfs"<<std::endl;
         }
     }
-    std::cout<<"the bool is "<<bsdfSets<<std::endl;
     //ab
-    if (!checkParameter("dmx", "ab", "int") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "ab", "int") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "ab", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "ab", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "ab", "int")){
         allOk=false;
     }
     //ad
-    if (!checkParameter("dmx", "ad", "int") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "ad", "int") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "ad", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "ad", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "ad", "int")){
         allOk=false;
     }
     //as
-    if (!checkParameter("dmx", "as", "int") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "as", "int") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "as", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "as", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "as", "int")){
         allOk=false;
     }
     //dt
-    if (!checkParameter("dmx", "dt", "double") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dt", "double") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dt", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dt", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dt", "double")){
         allOk=false;
     }
     //dc
-    if (!checkParameter("dmx", "dc", "double") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dc", "double") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dc", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dc", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dc", "double")){
         allOk=false;
     }
     //dj
-    if (!checkParameter("dmx", "dj", "double") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dj", "double") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dj", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dj", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dj", "double")){
         allOk=false;
     }
     //dp
-    if (!checkParameter("dmx", "dp", "double") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dp", "double") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dp", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dp", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dp", "double")){
         allOk=false;
     }
     //lw
-    if (!checkParameter("dmx", "lw", "double") && bsdfSets){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "lw", "double") && bsdfSets){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "lw", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "lw", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
@@ -1071,20 +1084,18 @@ bool Control::checkParameter(std::string setName, std::string parameter, std::st
         if (varType=="int"){
             toInteger(check.get(), &ok);
             if (!ok){
-                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
+                STADIC_LOG(Severity::Fatal, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
             }
         }else if (varType=="double"){
             toDouble(check.get(), &ok);
             if (!ok){
-                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
+                STADIC_LOG(Severity::Fatal, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The variable type for the verification of the parameters is not a known type.  This can be either \"int\" or \"double\".");
         }
 
         check.reset();
-    }else{
-        STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
     }
     return false; // Add return for VS
 }

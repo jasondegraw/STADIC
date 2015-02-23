@@ -37,8 +37,9 @@
 TEST(DaylightTests, Case1)
 {
     stadic::BuildingControl model;
-    //ASSERT_TRUE(model.parseJson("daylightcase1/JSON_TEST1.txt"));
-    ASSERT_TRUE(model.parseJson("JSON_TEST1.txt"));
+    ASSERT_TRUE(model.parseJson("daylightcase1/JSON_TEST1.txt"));
+    //ASSERT_TRUE(model.parseJson("JSON_TEST1.txt"));
     stadic::Daylight sim(&model);
+    ASSERT_TRUE(sim.simDaylight());
 
 }
