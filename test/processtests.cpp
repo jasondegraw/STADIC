@@ -79,8 +79,12 @@ TEST(ProcessTests, ProcessProgramArgs)
 #ifdef _WIN32
     SYSTEMTIME time;
     GetLocalTime(&time);
-    std::string datestring = days[time.wDayOfWeek] + " " + stadic::toString(time.wMonth) + "/"
-      + stadic::toString(time.wDay) + "/" + stadic::toString(time.wYear);
+    std::stringstream stream;
+    stream << days[time.wDayOfWeek] << " ";
+    stream << std::setw(2) << std::setfill('0') << time.wMonth;
+    stream << "/";
+    stream << std::setw(2) << std::setfill('0') << time.wDay;
+    std::string datestring = stream.str() + "/" + stadic::toString(time.wYear);
     std::vector<std::string> args;
     args.push_back("/c");
     args.push_back("date");
