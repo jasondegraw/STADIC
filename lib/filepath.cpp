@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +31,7 @@
 
 #include "filepath.h"
 #include "logging.h"
+#include "functions.h"
 #include <sstream>
 #include <iostream>
 #ifdef _MSC_VER
@@ -37,6 +39,17 @@
 #else
 #include <sys/stat.h>
 #include <string.h>
+#endif
+
+// Will need to fix later
+#include <direct.h>
+
+#ifdef _WIN32
+#define PATHSEPARATOR '\\'
+#define MKDIR _mkdir
+#else
+#define PATHSEPARATOR '/'
+#define MKDIR mkdir
 #endif
 
 namespace stadic{
@@ -83,6 +96,59 @@ bool exists(const std::string &path)
         return true;
     }
     return isFile(path);
+}
+
+PathName::PathName(const std::string &path) : m_isFile(false)
+{
+    if(path.size() > 0) {
+        m_parts = split(path, '/');
+        if(m_parts.size() > 0) {
+            if(*(path.end() - 1) != '/'){
+                m_isFile = true;
+                m_filename = *(m_parts.end() - 1);
+                m_parts.pop_back();
+            }
+        }
+    }
+}
+
+bool PathName::create() const
+{
+    if(m_parts.size() > 0){
+        std::string current = m_parts[0];
+        MKDIR(current.c_str());
+        for(unsigned i = 1; i<m_parts.size(); ++i){
+            current += PATHSEPARATOR + m_parts[i];
+            MKDIR(current.c_str());
+        }
+        if(m_isFile) {
+            std::string name = toString();
+            FILE* fp = fopen(name.c_str(), "w");
+            fclose(fp);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool PathName::isFile() const
+{
+    return m_isFile;
+}
+
+std::string PathName::toString() const
+{
+    std::string result;
+    if(m_parts.size() > 0) {
+        result = m_parts[0] + PATHSEPARATOR;
+        for(unsigned i = 1; i<m_parts.size(); ++i) {
+            result += m_parts[i] + PATHSEPARATOR;
+        }
+    }
+    if(m_isFile) {
+        result += m_filename;
+    }
+    return result;
 }
 
 }
