@@ -51,6 +51,7 @@ bool Daylight::simDaylight()
             return false;
         }
         //If the next line causes a crash in the program, it is most likely in setSimCase having to do with the second test.
+        // This comment is all well and good... but the program should never crash
         if (!testSimCase(spaces[i].get())){
             return false;
         }
@@ -959,8 +960,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 }
 
 bool Daylight::simCase1(int blindGroupNum, Control *model){
+    // Passing an integer blind group number is very, very dangerous
     //Simulation Case 1 will be for window groups that do not contain BSDFs
     //First simulate the base condition
+    // This is not making a copy *and* it is a memory leak.
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());    //This used to be (m_RadFiles[i],this), but the program failed to build
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
