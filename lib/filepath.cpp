@@ -151,4 +151,10 @@ std::string PathName::toString() const
     return result;
 }
 
+bool PathName::exists() const
+{
+    std::string file = toString();
+    return stadic::exists(file);
+}
+
 }

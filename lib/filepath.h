@@ -46,7 +46,7 @@ bool STADIC_API isDir(const std::string &dir);
 bool STADIC_API isFile(const std::string &file);
 bool STADIC_API exists(const std::string &path);
 
-class PathName
+class STADIC_API PathName
 {
 public:
     PathName(const std::string &path);
