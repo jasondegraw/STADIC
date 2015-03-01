@@ -119,7 +119,9 @@ bool PathName::create() const
         MKDIR(current.c_str());
         for(unsigned i = 1; i<m_parts.size(); ++i){
             current += PATHSEPARATOR + m_parts[i];
-            MKDIR(current.c_str());
+            if(!stadic::exists(current)) {
+                MKDIR(current.c_str());
+            }
         }
         if(m_isFile) {
             std::string name = toString();

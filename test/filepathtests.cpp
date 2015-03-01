@@ -36,10 +36,10 @@
 
 
 #ifdef _MSC_VER
-#include <windows.h>            //Added for Sleep(ms)
+//#include <windows.h>            //Added for Sleep(ms)
 #define UNLINK _unlink
 #else
-#include <unistd.h>             //Added for sleep(s)
+//#include <unistd.h>             //Added for sleep(s)
 #define UNLINK unlink
 #endif
 
@@ -83,4 +83,10 @@ TEST(FilePathTests, File)
     EXPECT_TRUE(stadic::isFile(testString));
     EXPECT_FALSE(stadic::isDir(testString));
     UNLINK(testString.c_str());
+}
+
+TEST(FilePathTests, PathNameDir)
+{
+    std::string pathstring("this/is/a/subdir");
+    stadic::PathName path(pathstring);
 }
