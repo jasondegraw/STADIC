@@ -129,6 +129,13 @@ TEST(RadfileTests, Empty)
     ASSERT_EQ(0, radData.primitives().size());
 }
 
+TEST(RadfileTests, SingleLine)
+{
+    stadic::RadFileData radData;
+    ASSERT_FALSE(radData.addRad("materialsingleline.rad"));
+    ASSERT_EQ(6, radData.primitives().size());
+}
+
 bool isGlass(stadic::RadPrimitive* primitive)
 {
     return primitive->type() == stadic::RadPrimitive::Glass;
