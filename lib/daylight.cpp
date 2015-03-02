@@ -984,6 +984,7 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
+            // Memory leak
             RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             wgRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
             std::string wgSetFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_std.rad";
@@ -1007,6 +1008,7 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
 bool Daylight::simCase2(int blindGroupNum, Control *model){
     //Simulation case 2 will be for window groups that contain BSDFs, but not in the base case
     //First simulate the base condition
+    // Memory leak
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());    //This used to be (m_RadFiles[i],this), but the program failed to build
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
@@ -1028,10 +1030,12 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
+            // Memory leak
             RadFileData *settingRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             settingRad->addRad(model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
             if (model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size()>0){
                 //Create a file of the glazing layers with all BSDFs blacked out and simulate it
+                // Memory leak
                 RadFileData *settingStdRad=new RadFileData(settingRad->primitives());
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
@@ -1080,6 +1084,7 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                     }
                 }
             }else{
+                // Memory leak
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
                 wgRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
                 std::string wgSetFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+".rad";
@@ -1107,11 +1112,13 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
     //	Simulation case 3 will be for window groups that contain BSDFs even in the base case, but the glazing layers are not BSDFs
     //First simulate the base condition
     //Standard radiance run with all bsdfs blacked out
+    // Memory leak
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
 
+    // Memory leak
     RadFileData *baseStdRad=new RadFileData(baseRad->primitives());
     for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfBaseLayers().size();j++){
         if (!baseStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
@@ -1168,10 +1175,12 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
+            // Memory leak
             RadFileData *settingRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             settingRad->addRad(model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
             if (model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size()>0){
                 //Create a file of the glazing layers with all BSDFs blacked out and simulate it
+                // Memory leak
                 RadFileData *settingStdRad=new RadFileData(settingRad->primitives());
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
                     if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
@@ -1220,6 +1229,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                     }
                 }
             }else{
+                // Memory leak
                 RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
                 wgRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
                 std::string wgSetFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+".rad";
@@ -1245,6 +1255,7 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
 
 bool Daylight::simCase4(int blindGroupNum, Control *model){
     //	Simulation case 4 will be for window groups that have shade materials in addition to the glazing layer which is a BSDF
+    // Memory leak
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
@@ -1288,6 +1299,7 @@ bool Daylight::simCase4(int blindGroupNum, Control *model){
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
+            // Memory leak
             RadFileData *settingRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             settingRad->addRad(model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
             if (model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size()>0){
@@ -1338,6 +1350,7 @@ bool Daylight::simCase5(int blindGroupNum, Control *model){
 
 bool Daylight::simCase6(int blindGroupNum, Control *model){
     //	Simulation case 6 will be for window groups that only have the glazing layer as a BSDF
+    // Memory leak
     RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
@@ -1380,6 +1393,7 @@ bool Daylight::simCase6(int blindGroupNum, Control *model){
     //For the settings only run the last part of the calculation
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
         for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
+            // Memory leak
             RadFileData *settingRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             settingRad->addRad(model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
             if (model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size()>0){
@@ -1793,6 +1807,8 @@ bool Daylight::createBaseRadFiles(Control *model){
     //Add the main material file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->matFile());
     RadPrimitive *black = new PlasticMaterial();
+    black->setModifier("void");
+    black->setName("black");
     radModel.addPrimitive(black);
     //Add the main geometry file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
@@ -1804,7 +1820,8 @@ bool Daylight::createBaseRadFiles(Control *model){
     //tempFile=model.spaceDirectory()+model.intermediateDataDirectory()+model.spaceName()+"_Main.rad";
     //radModel.writeRadFile(tempFile);
     for (int i=0;i<model->windowGroups().size();i++){
-        RadFileData *wgRadModel = new RadFileData(radModel.primitives()); // Careful! Stack allocation!
+        // Memory leak
+        RadFileData *wgRadModel = new RadFileData(radModel.primitives()); // Careful! Stack allocation! What? This is heap allocation
         //wgRadModel.addRad(tempFile);
         for (int j=0;j<model->windowGroups().size();j++){
             if (i!=j){
