@@ -817,7 +817,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
-    //gendaymtx fun sun in patches
+    //gendaymtx for sun in patches
     arguments.clear();
     arguments.push_back("-m");
     arguments.push_back(std::to_string( model->skyDivisions()));

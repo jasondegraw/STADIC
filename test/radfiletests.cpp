@@ -294,3 +294,9 @@ TEST(RadFileTests, PolygonTest)
     EXPECT_EQ(0, badData.primitives().size());
 }
 
+TEST(RadFileTests, SingleLineTest){
+
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("daylightcase1/rad/mat1.rad"));
+
+}
