@@ -29,20 +29,33 @@
  *****************************************************************************/
 
 #include "radparser.h"
-
+#include <iostream>
 
 namespace stadic {
 
-RadParser::RadParser(std::istream &stream) : m_stream(stream)
+RadParser::RadParser(std::istream &stream) : m_stream(stream), m_linenumber(0)
 {
 }
 
 boost::optional<std::string> RadParser::next()
 {
+    std::string string;
     // Try to get something from the internal string stream
-
-    // Try to refill the internal string stream
-
+    if(!m_strsteam.eof()) {
+        m_strsteam >> string;
+        return boost::optional<std::string>(string);
+    } else {
+        // Try to refill the internal string stream
+        do {
+            if(m_stream.get().eof()) {
+                return boost::none;
+            }
+            std::getline(m_stream.get(), string);
+            m_linenumber++;
+        } while(string.empty());
+        // Need to do more work on the string, decomment etc.
+        m_strsteam << string;
+    }
     return boost::none;
 }
 

@@ -32,6 +32,7 @@
 #define RADPARSER_H
 
 #include <istream>
+#include <string>
 #include <sstream>
 #include <functional>
 #include <boost/optional.hpp>
@@ -49,6 +50,7 @@ public:
 private:
     std::reference_wrapper<std::istream> m_stream;
     std::stringstream m_strsteam;
+    unsigned m_linenumber;
 };
 
 }
