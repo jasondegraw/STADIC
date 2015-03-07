@@ -87,6 +87,19 @@ TEST(FilePathTests, File)
 
 TEST(FilePathTests, PathNameDir)
 {
-    std::string pathstring("this/is/a/subdir");
+    std::string pathstring("this/is/a/subdir/");
     stadic::PathName path(pathstring);
+    ASSERT_TRUE(path.create());
+    std::string filestring("this/is/a/file");
+    stadic::PathName file(filestring);
+    ASSERT_TRUE(file.create());
+#ifdef _WIN32
+    std::string checkpath("this\\is\\a\\subdir");
+    std::string checkfile("this\\is\\a\\file");
+#else
+    std::string checkpath("this/is/a/subdir");
+    std::string checkfile("this/is/a/file");
+#endif
+    ASSERT_TRUE(stadic::exists(checkpath));
+    ASSERT_TRUE(stadic::exists(checkfile));
 }
