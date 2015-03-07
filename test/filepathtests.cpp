@@ -36,10 +36,8 @@
 
 
 #ifdef _MSC_VER
-//#include <windows.h>            //Added for Sleep(ms)
 #define UNLINK _unlink
 #else
-//#include <unistd.h>             //Added for sleep(s)
 #define UNLINK unlink
 #endif
 
@@ -101,5 +99,7 @@ TEST(FilePathTests, PathNameDir)
     std::string checkfile("this/is/a/file");
 #endif
     ASSERT_TRUE(stadic::exists(checkpath));
+    ASSERT_TRUE(stadic::isDir(checkpath));
     ASSERT_TRUE(stadic::exists(checkfile));
+    ASSERT_TRUE(stadic::isFile(checkfile));
 }
