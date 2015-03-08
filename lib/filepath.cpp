@@ -41,13 +41,7 @@
 #include <string.h>
 #endif
 
-#ifdef _MSC_VER
-#define UNLINK _unlink
-#else
-#define UNLINK unlink
-#endif
-
-// Will need to fix later
+// May need to fix later for POSIX
 #include <direct.h>
 
 #ifdef _WIN32
@@ -157,8 +151,10 @@ bool PathName::remove() const
         if(!DeleteFile(result.c_str())) {
             return false;
         }
-#else
-        ADD POSIX VERSION HERE
+#else // POSIX
+        if(!unlink(result.c_str())) {
+            return false;
+        }
 #endif
     }
     //for(auto string : paths) {
@@ -170,8 +166,10 @@ bool PathName::remove() const
         if(!RemoveDirectory(iter->c_str())) {
             return false;
         }
-#else
-        ADD POSIX VERSION HERE
+#else  // POSIX
+        if(!rmdir(iter->c_str())) {
+            return false;
+        }
 #endif
         if(stadic::exists(*iter)) {
             return false;
