@@ -51,6 +51,7 @@ class STADIC_API PathName
 public:
     PathName(const std::string &path);
     bool create() const;
+    bool remove() const;
     bool exists() const;
     bool isFile() const;
     std::string toString() const;

@@ -41,6 +41,12 @@
 #include <string.h>
 #endif
 
+#ifdef _MSC_VER
+#define UNLINK _unlink
+#else
+#define UNLINK unlink
+#endif
+
 // Will need to fix later
 #include <direct.h>
 
@@ -131,6 +137,47 @@ bool PathName::create() const
         return true;
     }
     return false;
+}
+
+bool PathName::remove() const
+{
+    std::vector<std::string> paths;
+    std::string result;
+    if(m_parts.size() > 0) {
+        result = m_parts[0] + PATHSEPARATOR;
+        paths.push_back(result);
+        for(unsigned i = 1; i<m_parts.size(); ++i) {
+            result += m_parts[i] + PATHSEPARATOR;
+            paths.push_back(result);
+        }
+    }
+    if(m_isFile) {
+        result += m_filename;
+#ifdef _WIN32
+        if(!DeleteFile(result.c_str())) {
+            return false;
+        }
+#else
+        ADD POSIX VERSION HERE
+#endif
+    }
+    //for(auto string : paths) {
+    //    std::cout << string << std::endl;
+    //}
+    for(auto iter = paths.rbegin(); iter != paths.rend(); iter++) {
+        //std::cout << *iter << std::endl;
+#ifdef _WIN32
+        if(!RemoveDirectory(iter->c_str())) {
+            return false;
+        }
+#else
+        ADD POSIX VERSION HERE
+#endif
+        if(stadic::exists(*iter)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool PathName::isFile() const

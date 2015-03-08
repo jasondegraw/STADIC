@@ -83,7 +83,7 @@ TEST(FilePathTests, File)
     UNLINK(testString.c_str());
 }
 
-TEST(FilePathTests, PathNameDir)
+TEST(FilePathTests, PathName)
 {
     std::string pathstring("this/is/a/subdir/");
     stadic::PathName path(pathstring);
@@ -102,4 +102,7 @@ TEST(FilePathTests, PathNameDir)
     ASSERT_TRUE(stadic::isDir(checkpath));
     ASSERT_TRUE(stadic::exists(checkfile));
     ASSERT_TRUE(stadic::isFile(checkfile));
+
+    EXPECT_FALSE(path.remove());
+    ASSERT_TRUE(file.remove());
 }
