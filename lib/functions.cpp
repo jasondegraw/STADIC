@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -167,6 +168,19 @@ std::string wrapAtN(const std::string &text, unsigned N, unsigned indent, bool h
         }
     }
     return stream.str();
+}
+
+std::pair<std::string, std::string> stringPartition(const std::string &string, char delimiter)
+{
+    std::pair<std::string, std::string> pair;
+    std::size_t found = string.find(delimiter);
+    if(found >= string.length()) {
+        pair.first = string;
+        return pair;
+    }
+    pair.first = std::string(string.begin(), string.begin() + found);
+    pair.second = std::string(string.begin()+found+1, string.end());
+    return pair;
 }
 
 }

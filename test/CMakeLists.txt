@@ -73,6 +73,10 @@ add_executable(functiontests functiontests.cpp)
 add_test(functiontests functiontests)
 target_link_libraries(functiontests stadic_core gtest gtest_main)
 
+add_executable(radparsertests radparsertests.cpp)
+add_test(radparsertests radparsertests)
+target_link_libraries(radparsertests stadic_core gtest gtest_main)
+
 add_executable(filepathtests filepathtests.cpp)
 add_test(filepathtests filepathtests)
 target_link_libraries(filepathtests stadic_core gtest gtest_main)

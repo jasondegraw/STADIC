@@ -46,10 +46,14 @@ class STADIC_API RadParser
 public:
     RadParser(std::istream &stream);
     boost::optional<std::string> next();
+    unsigned linenumber() const {
+        return m_linenumber;
+    }
 
 private:
-    std::reference_wrapper<std::istream> m_stream;
-    std::stringstream m_strsteam;
+    bool fillStream();
+    std::reference_wrapper<std::istream> m_file;
+    std::stringstream m_stream;
     unsigned m_linenumber;
 };
 

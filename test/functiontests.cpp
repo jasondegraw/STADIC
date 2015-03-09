@@ -107,3 +107,20 @@ TEST(FunctionTests, ToString)
   double value = 20.5;
   EXPECT_EQ(string, stadic::toString(value));
 }
+
+TEST(FunctionTests, Partition)
+{
+    std::string string = "abcdefghijklm";
+    auto parts = stadic::stringPartition(string, 'j');
+    EXPECT_EQ("abcdefghi", parts.first);
+    EXPECT_EQ("klm", parts.second);
+    parts = stadic::stringPartition(string, 'n');
+    EXPECT_EQ("abcdefghijklm", parts.first);
+    EXPECT_TRUE(parts.second.empty());
+    parts = stadic::stringPartition(string, 'm');
+    EXPECT_EQ("abcdefghijkl", parts.first);
+    EXPECT_TRUE(parts.second.empty());
+    parts = stadic::stringPartition(string, 'a');
+    EXPECT_EQ("bcdefghijklm", parts.second);
+    EXPECT_TRUE(parts.first.empty());
+}

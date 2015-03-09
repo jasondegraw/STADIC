@@ -29,34 +29,52 @@
  *****************************************************************************/
 
 #include "radparser.h"
+#include "functions.h"
 #include <iostream>
 
 namespace stadic {
 
-RadParser::RadParser(std::istream &stream) : m_stream(stream), m_linenumber(0)
+RadParser::RadParser(std::istream &stream) : m_file(stream), m_linenumber(0)
 {
+    // Fill the internal stream
+    fillStream();
+}
+
+bool RadParser::fillStream()
+{
+    std::string string;
+    do {
+        if(m_file.get().eof()) {
+            //std::cout << "Out of stream to read" << std::endl;
+            return false;
+        }
+        std::getline(m_file.get(), string);
+        m_linenumber++;
+        //std::cout << "fillStream line " << m_linenumber << ": " << string << std::endl;
+        auto parts = stringPartition(string, '#');
+        string = trim(parts.first);
+    } while(string.empty());
+    m_stream = std::stringstream(string);
+    return true;
 }
 
 boost::optional<std::string> RadParser::next()
 {
     std::string string;
-    // Try to get something from the internal string stream
-    if(!m_strsteam.eof()) {
-        m_strsteam >> string;
-        return boost::optional<std::string>(string);
-    } else {
-        // Try to refill the internal string stream
-        do {
-            if(m_stream.get().eof()) {
-                return boost::none;
-            }
-            std::getline(m_stream.get(), string);
-            m_linenumber++;
-        } while(string.empty());
-        // Need to do more work on the string, decomment etc.
-        m_strsteam << string;
+    // Try to fill the internal string stream if needed
+    if(m_stream.eof()) {
+        //std::cout << "stream at EOF" << std::endl;
+        if(!fillStream()) {
+            return boost::none;
+        }
     }
-    return boost::none;
+    //std::cout << "Have data in stream..." << std::endl;
+    // Try to get something from the internal string stream
+    m_stream >> string;
+    if(string.empty()) {
+        return boost::none;
+    }
+    return boost::optional<std::string>(string);
 }
 
 }

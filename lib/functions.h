@@ -50,6 +50,7 @@ template <typename T> std::string toString(T value)  //Function that takes a dou
 }
 std::string STADIC_API wrapAtN(const std::string &text, unsigned N = 72, unsigned indent = 0,
     bool hangingIndent = false);
+std::pair<std::string, std::string> STADIC_API stringPartition(const std::string &string, char delimiter);
 
 }
 #endif // FUNCTIONS_H
