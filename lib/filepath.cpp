@@ -147,12 +147,12 @@ bool PathName::remove() const
     }
     if(m_isFile) {
         result += m_filename;
-#ifdef _WIN32
+#ifdef _MSC_VER
         if(!DeleteFile(result.c_str())) {
             return false;
         }
 #else // POSIX
-        if(!unlink(result.c_str())) {
+        if(unlink(result.c_str()) != 0) {
             return false;
         }
 #endif
@@ -162,18 +162,19 @@ bool PathName::remove() const
     //}
     for(auto iter = paths.rbegin(); iter != paths.rend(); iter++) {
         //std::cout << *iter << std::endl;
-#ifdef _WIN32
+#ifdef _MSC_VER
         if(!RemoveDirectory(iter->c_str())) {
             return false;
         }
 #else  // POSIX
-        if(!rmdir(iter->c_str())) {
+        if(rmdir(iter->c_str()) != 0) {
             return false;
         }
 #endif
-        if(stadic::exists(*iter)) {
-            return false;
-        }
+        // Is this really necessary?
+        //if(stadic::exists(*iter)) {
+        //    return false;
+        //}
     }
     return true;
 }
