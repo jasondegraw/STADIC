@@ -77,4 +77,12 @@ boost::optional<std::string> RadParser::next()
     return boost::optional<std::string>(string);
 }
 
+bool RadParser::endOfInput()
+{
+    if(m_stream.eof()) {
+        return fillStream();
+    }
+    return false;
+}
+
 }

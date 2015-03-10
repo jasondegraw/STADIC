@@ -40,6 +40,7 @@
 #include "stadicapi.h"
 #include "functions.h"
 #include "logging.h"
+#include "radparser.h"
 
 namespace stadic {
 
@@ -88,6 +89,7 @@ public:
 
     std::string toRad() const;
     static RadPrimitive *fromRad(std::istream &data);
+    static RadPrimitive *fromRad(RadParser &data);
 
 protected:
     void initArg(int number, std::vector<std::string> arg);

@@ -30,6 +30,7 @@
 
 #include "radfiledata.h"
 #include "functions.h"
+#include "radparser.h"
 #include "logging.h"
 #include <fstream>
 #include <sstream>
@@ -57,10 +58,12 @@ bool RadFileData::addRad(std::string file)
         STADIC_ERROR("The opening of the rad file '"+file+"' failed.");
         return false;
     }
+    RadParser parser(data);
     shared_vector<RadPrimitive> primitives;
-    while (!data.eof()) {
+    while(!parser.endOfInput()) {
+//    while (!data.eof()) {
         try {
-            RadPrimitive *primitive = RadPrimitive::fromRad(data);
+            RadPrimitive *primitive = RadPrimitive::fromRad(parser);
             if(primitive == nullptr) {
                 break;
             }

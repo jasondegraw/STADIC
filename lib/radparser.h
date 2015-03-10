@@ -49,6 +49,8 @@ public:
     unsigned linenumber() const {
         return m_linenumber;
     }
+    bool endOfInput();
+
 
 private:
     bool fillStream();
