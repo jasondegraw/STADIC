@@ -58,6 +58,24 @@ bool RadParser::fillStream()
     return true;
 }
 
+bool RadParser::fillQueue()
+{
+    std::string string;
+    do {
+        if(m_file.get().eof()) {
+            //std::cout << "Out of stream to read" << std::endl;
+            return false;
+        }
+        std::getline(m_file.get(), string);
+        m_linenumber++;
+        //std::cout << "fillStream line " << m_linenumber << ": " << string << std::endl;
+        auto parts = stringPartition(string, '#');
+        string = trim(parts.first);
+    } while(string.empty());
+    // Put in queue here
+    return true;
+}
+
 boost::optional<std::string> RadParser::next()
 {
     std::string string;

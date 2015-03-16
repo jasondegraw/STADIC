@@ -35,6 +35,7 @@
 #include <string>
 #include <sstream>
 #include <functional>
+#include <queue>
 #include <boost/optional.hpp>
 
 #include "stadicapi.h"
@@ -54,8 +55,10 @@ public:
 
 private:
     bool fillStream();
+    bool fillQueue();
     std::reference_wrapper<std::istream> m_file;
     std::stringstream m_stream;
+    std::queue<std::string> m_queue;
     unsigned m_linenumber;
 };
 
