@@ -32,6 +32,7 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <vector>
+#include <queue>
 
 TEST(FunctionTests, Split)
 {
@@ -123,4 +124,10 @@ TEST(FunctionTests, Partition)
     parts = stadic::stringPartition(string, 'a');
     EXPECT_EQ("bcdefghijklm", parts.second);
     EXPECT_TRUE(parts.first.empty());
+}
+
+TEST(FunctionTests, Tokenize)
+{
+    std::vector<std::string> queue;
+    stadic::tokenize(queue, "This is a string to tokenize");
 }

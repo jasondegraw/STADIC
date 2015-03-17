@@ -51,6 +51,16 @@ template <typename T> std::string toString(T value)  //Function that takes a dou
 std::string STADIC_API wrapAtN(const std::string &text, unsigned N = 72, unsigned indent = 0,
     bool hangingIndent = false);
 std::pair<std::string, std::string> STADIC_API stringPartition(const std::string &string, char delimiter);
-
+template<class T> void tokenize(T &container, const std::string &string)
+{
+    std::stringstream stream(string);
+    std::string token;
+    while(!stream.eof()) {
+        stream >> token;
+        if(!token.empty()) {
+            container.push_back(token);
+        }
+    }
+}
 }
 #endif // FUNCTIONS_H
