@@ -35,8 +35,6 @@
 #include <string>
 #include "stadicapi.h"
 
-
-
 namespace stadic{
 
 class STADIC_API LeakCheck
