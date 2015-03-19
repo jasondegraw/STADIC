@@ -58,7 +58,7 @@ std::vector<RayTrace*> RayTrace::children() const
 
 void RayTrace::read(const std::string &filename)
 {
-
+    // Read a file with this as the root
 }
 
 }
