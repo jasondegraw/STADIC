@@ -32,6 +32,7 @@
 #define FUNCTIONS_H
 #include <string>
 #include <vector>
+#include <queue>
 #include <sstream>
 #include "stadicapi.h"
 #include "logging.h"
@@ -62,5 +63,6 @@ template<class T> void tokenize(T &container, const std::string &string)
         }
     }
 }
+void STADIC_API tokenize(std::queue<std::string> &container, const std::string &string);
 }
 #endif // FUNCTIONS_H

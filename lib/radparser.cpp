@@ -72,7 +72,7 @@ bool RadParser::fillQueue()
         auto parts = stringPartition(string, '#');
         string = trim(parts.first);
     } while(string.empty());
-    // Put in queue here
+    tokenize(m_queue, string);
     return true;
 }
 

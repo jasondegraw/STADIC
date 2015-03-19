@@ -183,4 +183,16 @@ std::pair<std::string, std::string> stringPartition(const std::string &string, c
     return pair;
 }
 
+void tokenize(std::queue<std::string> &container, const std::string &string)
+{
+    std::stringstream stream(string);
+    std::string token;
+    while(!stream.eof()) {
+        stream >> token;
+        if(!token.empty()) {
+            container.push(token);
+        }
+    }
+}
+
 }

@@ -128,6 +128,18 @@ TEST(FunctionTests, Partition)
 
 TEST(FunctionTests, Tokenize)
 {
-    std::vector<std::string> queue;
+    std::queue<std::string> queue;
     stadic::tokenize(queue, "This is a string to tokenize");
+    ASSERT_EQ(6, queue.size());
+    EXPECT_EQ("This", queue.front());
+    queue.pop();
+    EXPECT_EQ("is", queue.front());
+    queue.pop();
+    EXPECT_EQ("a", queue.front());
+    queue.pop();
+    EXPECT_EQ("string", queue.front());
+    queue.pop();
+    EXPECT_EQ("to", queue.front());
+    queue.pop();
+    EXPECT_EQ("tokenize", queue.front());
 }

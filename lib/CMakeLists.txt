@@ -4,28 +4,28 @@ project(lib)
 
 set(DEP_SRCS ../dependencies/jsoncpp/jsoncpp.cpp)
 
-set(SRCS spacecontrol.cpp
+set(SRCS analemma.cpp
          buildingcontrol.cpp
-         windowgroup.cpp
-         shadecontrol.cpp
          controlzone.cpp
-         logging.cpp
+         dayill.cpp
+         daylight.cpp
+         elecill.cpp
+         functions.cpp
+         filepath.cpp
+         geometryprimitives.cpp
          gridmaker.cpp
+         jsonobjects.cpp
+         leakcheck.cpp
+         logging.cpp
+         materialprimitives.cpp
          radfiledata.cpp
          radparser.cpp
          radprimitive.cpp
-         geometryprimitives.cpp
-         weatherdata.cpp
-         dayill.cpp
-         elecill.cpp
-         daylight.cpp
-         materialprimitives.cpp
-         leakcheck.cpp
-         functions.cpp
-         filepath.cpp
-         analemma.cpp
+         spacecontrol.cpp
+         shadecontrol.cpp
          stadicprocess.cpp
-         jsonobjects.cpp)
+         weatherdata.cpp
+         windowgroup.cpp)
 
 set(HDRS stadicapi.h
          spacecontrol.h
