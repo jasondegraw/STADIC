@@ -13,6 +13,7 @@ set(SRCS spacecontrol.cpp
          gridmaker.cpp
          radfiledata.cpp
          radprimitive.cpp
+         raytrace.cpp
          geometryprimitives.cpp
          weatherdata.cpp
          dayill.cpp
@@ -25,7 +26,7 @@ set(SRCS spacecontrol.cpp
          analemma.cpp
          stadicprocess.cpp
          jsonobjects.cpp)
-		 
+
 set(HDRS stadicapi.h
          spacecontrol.h
          buildingcontrol.h
@@ -36,6 +37,7 @@ set(HDRS stadicapi.h
          gridmaker.h
          radfiledata.h
          radprimitive.h
+         raytrace.h
          geometryprimitives.h
          weatherdata.h
          dayill.h
