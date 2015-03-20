@@ -52,6 +52,7 @@ std::string readFileToString(const std::string &filename)
     string.erase(std::remove_if(string.begin(), string.end(), ::iscntrl), string.end());
     stream.close();
     return stadic::trim(string);
+    _unlink("");
 }
 
 TEST(ProcessTests, ProcessBadProgram)

@@ -41,8 +41,10 @@
 #include "stadicapi.h"
 
 namespace stadic {
-
 class Control;
+}
+
+namespace stadic {
 
 class STADIC_API BuildingControl
 {

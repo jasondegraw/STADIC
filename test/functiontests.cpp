@@ -45,6 +45,24 @@ TEST(FunctionTests, Split)
   EXPECT_EQ("only",testList[2]);
   EXPECT_EQ("a",testList[3]);
   EXPECT_EQ("test",testList[4]);
+
+  testList = stadic::split("", ',');
+  EXPECT_EQ(0, testList.size());
+
+  testList = stadic::split(",", ',');
+  EXPECT_EQ(0, testList.size());
+
+  testList = stadic::split(",begins,with,delimiter", ',');
+  ASSERT_EQ(3, testList.size());
+  EXPECT_EQ("begins", testList[0]);
+  EXPECT_EQ("with", testList[1]);
+  EXPECT_EQ("delimiter", testList[2]);
+
+  testList = stadic::split("ends,with,delimiter,", ',');
+  ASSERT_EQ(3, testList.size());
+  EXPECT_EQ("ends", testList[0]);
+  EXPECT_EQ("with", testList[1]);
+  EXPECT_EQ("delimiter", testList[2]);
 }
 
 TEST(FunctionTests, SplitTrim)
