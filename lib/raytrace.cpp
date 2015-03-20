@@ -31,18 +31,22 @@
 #include "raytrace.h"
 #include "functions.h"
 #include <iostream>
+#include <fstream>
 
 namespace stadic {
-
-//RayTrace::RayTrace()
-//{
-//}
 
 RayTrace::RayTrace(RayTrace *parent, std::shared_ptr<RadPrimitive> &primitive) : m_parent(parent),
     m_primitive(primitive)
 {
     if(m_parent) {
         m_parent->m_children.push_back(this);
+    }
+}
+
+RayTrace::~RayTrace()
+{
+    for(auto child : m_children) {
+        delete child;
     }
 }
 
@@ -56,9 +60,44 @@ std::vector<RayTrace*> RayTrace::children() const
     return m_children;
 }
 
-void RayTrace::read(const std::string &filename)
+bool RayTrace::read(const std::string &filename, shared_vector<RadPrimitive> &geometry)
 {
+    // Clear any previous content
+    m_primitive.reset();
+    for(auto child : m_children) {
+        delete child;
+    }
+    m_raysTerminate = true;
     // Read a file with this as the root
+    std::ifstream input(filename);
+    std::string line;
+    // Read the header
+    do {
+        std::getline(input, line);
+    } while(!line.empty());
+    if(input.eof()){
+        return false;
+    }
+    // Read the name of the root
+    std::getline(input, line);
+    line = trim(line);
+    if(line.empty()) {
+        return false;
+    }
+    // Find the primitive
+    for(auto primitive : geometry) {
+        if(primitive->name() == line) {
+            m_primitive = primitive;
+        }
+    }
+    // Probably easiest to do this recursively with a function that reads the children of the current top-level
+
+    return true;
+}
+
+bool RayTrace::raysTerminate()
+{
+    return m_raysTerminate;
 }
 
 }

@@ -47,16 +47,18 @@ namespace stadic {
 class STADIC_API RayTrace
 {
 public:
-    //RayTrace();
     RayTrace(RayTrace *parent, std::shared_ptr<RadPrimitive> &primitive);
+    ~RayTrace();
     std::shared_ptr<RadPrimitive> primitive() const;
     std::vector<RayTrace*> children() const;
 
-    void read(const std::string &filename);
+    bool read(const std::string &filename, shared_vector<RadPrimitive> &geometry);
+    bool raysTerminate();
 
 private:
     RayTrace *m_parent;
     std::shared_ptr<RadPrimitive> m_primitive;
+    bool m_raysTerminate;
     std::vector<RayTrace*> m_children; // Maybe should use a smart pointer here?
 
 };
