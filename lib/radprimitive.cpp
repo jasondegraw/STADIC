@@ -488,55 +488,75 @@ std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(std::stringstream &data, con
 
 bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
 {
-    bool consistent = true;
     // The first primitive has to have a void modifier
     if(primitives.size() > 0) {
         auto current = primitives[0];
         if(current->m_modifierName) {
-            if(current->m_modifierName.get() != "void") { // Non-void
+            if(current->m_modifierName.get() != "void") {
                 STADIC_LOG(Severity::Warning, "Primitive \'" + current->name()
                     + "\' is first primitive in primitives vector, but has non-void modifier \'" + current->m_modifierName.get() + "\'");
-                consistent = false;
-            } else {
-                current->m_modifier = RadPrimitive::sharedVoid();
-                current->m_modifierName = boost::none;
+                return false;
+            }
+        } else if(current->m_modifier) {
+            if(current->m_modifier->m_Name != "void") {
+                STADIC_LOG(Severity::Warning, "Primitive \'" + current->name()
+                    + "\' is first primitive in primitives vector, but has non-void modifier \'" + current->m_modifier->m_Name + "\'");
+                return false;
             }
         } else {
             if(!current->m_modifier) {
                 STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
-                consistent = false;
+                return false;
             }
         }
+        current->m_modifier = RadPrimitive::sharedVoid();
+        current->m_modifierName = boost::none;
     }
     for(unsigned i = 1; i < primitives.size(); i++) {
         auto current = primitives[i];
-        if(!current->m_modifier) {
-            // Loop and look for the primitive
-        } else if(current->m_modifierName) {
-            // Loop and look for the name
+        auto name = current->m_modifierName;
+        if(!name) {
+            if(!current->m_modifier) {
+                STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
+                return false;
+            }
+            // Loop and find the modifier
+            for(unsigned j = i - 1; j >= 0; j++) {
+                if(current->m_modifier == primitives[j]) {
+                    break;
+                }
+                if(j == i){
+                    STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifier->name() + "\' for primitive \'"
+                        + current->name() + "\'");
+                    return false;
+                }
+            }
+        } else {
+            if(name.get() == "void") {
+                current->m_modifier = RadPrimitive::sharedVoid();
+                current->m_modifierName = boost::none;
+                continue;
+            }
+            // Loop and find the modifier by name
             for(unsigned j = i - 1; j >= 0; j--) {
-                if(primitives[j]->name() == current->m_modifierName.get()) { // Found the modifier
+                if(name.get() == primitives[j]->name()) {
                     current->m_modifier = primitives[j];
                     current->m_modifierName = boost::none;
                     break;
                 }
+                if(j == i){
+                    STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + name.get() + "\' for primitive \'"
+                        + current->name() + "\'");
+                    return false;
+                }
             }
-            if(!current->m_modifier) { // Failed to find a modifier
-                STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifierName.get() + "\' for primitive \'"
-                    + current->name() + "\'");
-                consistent = false;
-            }
-        } else {
-            STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
-            consistent = false;
         }
     }
-    return consistent;
+    return true;
 }
 
 bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
 {
-    bool consistent = true;
     // The first primitive has to have a void modifier
     if(primitives.size() > 0) {
         auto current = primitives[0];
@@ -561,7 +581,8 @@ bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
     }
     for(unsigned i = 1; i < primitives.size(); i++) {
         auto current = primitives[i];
-        auto name = current->modifierOverride();
+        auto name = current->m_modifierName;
+        //std::cout << i << " " << current->name() << std::endl;
         if(!name) {
             if(!current->m_modifier) {
                 STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
@@ -575,12 +596,16 @@ bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
                 if(j == i){
                     STADIC_LOG(Severity::Warning, "Failed to find modifier \'" + current->m_modifier->name() + "\' for primitive \'"
                         + current->name() + "\'");
-                    consistent = false;
+                    return false;
                 }
             }
         } else {
+            if(name.get() == "void") {
+                continue;
+            }
             // Loop and find the modifier by name
-            for(unsigned j = i - 1; j >= 0; j++) {
+            for(unsigned j = i - 1; j >= 0; j--) {
+                //std::cout << "\t" << j << " " << primitives[j]->name() << std::endl;
                 if(name.get() == primitives[j]->name()) {
                     break;
                 }
@@ -591,27 +616,8 @@ bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
                 }
             }
         }
-        if(current->m_modifierName) {
-            if(current->m_modifierName.get() != "void") {
-                STADIC_LOG(Severity::Warning, "Primitive \'" + current->name()
-                    + "\' is first primitive in primitives vector, but has non-void modifier \'" + current->m_modifierName.get() + "\'");
-                return false;
-            }
-        } else if(current->m_modifier) {
-            if(current->m_modifier->m_Name != "void") {
-                STADIC_LOG(Severity::Warning, "Primitive \'" + current->name()
-                    + "\' is first primitive in primitives vector, but has non-void modifier \'" + current->m_modifier->m_Name + "\'");
-                return false;
-            }
-        } else {
-            if(!current->m_modifier) {
-                STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
-                return false;
-            }
-        }
     }
     return true;
-        
 }
 
 std::shared_ptr<RadPrimitive> RadPrimitive::sharedVoid()

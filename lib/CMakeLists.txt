@@ -25,7 +25,7 @@ set(SRCS spacecontrol.cpp
          analemma.cpp
          stadicprocess.cpp
          jsonobjects.cpp)
-		 
+
 set(HDRS stadicapi.h
          sharedvector.h
          spacecontrol.h

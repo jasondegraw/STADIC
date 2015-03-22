@@ -181,21 +181,6 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 }
 */
 
-bool RadFileData::overrideLayer(const std::string &layer, const std::string &name)
-{
-    for(int i=0;i<m_primitives.size();i++) {
-        if(m_primitives[i]->modifierName()==layer) {
-            m_primitives[i]->setModifier("black");
-        }
-    }
-    return true;
-}
-
-bool RadFileData::blackOutLayer(const std::string &layer)
-{
-    return overrideLayer(layer,"black");
-}
-
 bool RadFileData::writeRadFile(std::string file)
 {
     std::ofstream oFile;
