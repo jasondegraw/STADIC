@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,8 @@
 
 
 #ifdef _MSC_VER
-#include <windows.h>            //Added for Sleep(ms)
 #define UNLINK _unlink
 #else
-#include <unistd.h>             //Added for sleep(s)
 #define UNLINK unlink
 #endif
 
@@ -83,4 +81,28 @@ TEST(FilePathTests, File)
     EXPECT_TRUE(stadic::isFile(testString));
     EXPECT_FALSE(stadic::isDir(testString));
     UNLINK(testString.c_str());
+}
+
+TEST(FilePathTests, PathName)
+{
+    std::string pathstring("this/is/a/subdir/");
+    stadic::PathName path(pathstring);
+    ASSERT_TRUE(path.create());
+    std::string filestring("this/is/a/file");
+    stadic::PathName file(filestring);
+    ASSERT_TRUE(file.create());
+#ifdef _WIN32
+    std::string checkpath("this\\is\\a\\subdir");
+    std::string checkfile("this\\is\\a\\file");
+#else
+    std::string checkpath("this/is/a/subdir");
+    std::string checkfile("this/is/a/file");
+#endif
+    ASSERT_TRUE(stadic::exists(checkpath));
+    ASSERT_TRUE(stadic::isDir(checkpath));
+    ASSERT_TRUE(stadic::exists(checkfile));
+    ASSERT_TRUE(stadic::isFile(checkfile));
+
+    EXPECT_FALSE(path.remove());
+    ASSERT_TRUE(file.remove());
 }

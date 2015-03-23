@@ -1,5 +1,6 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +31,7 @@
 
 #include "filepath.h"
 #include "logging.h"
+#include "functions.h"
 #include <sstream>
 #include <iostream>
 #ifdef _MSC_VER
@@ -37,6 +39,17 @@
 #else
 #include <sys/stat.h>
 #include <string.h>
+#endif
+
+// May need to fix later for POSIX
+#include <direct.h>
+
+#ifdef _WIN32
+#define PATHSEPARATOR '\\'
+#define MKDIR _mkdir
+#else
+#define PATHSEPARATOR '/'
+#define MKDIR mkdir
 #endif
 
 namespace stadic{
@@ -83,6 +96,113 @@ bool exists(const std::string &path)
         return true;
     }
     return isFile(path);
+}
+
+PathName::PathName(const std::string &path) : m_isFile(false)
+{
+    if(path.size() > 0) {
+        m_parts = split(path, '/');
+        if(m_parts.size() > 0) {
+            if(*(path.end() - 1) != '/'){
+                m_isFile = true;
+                m_filename = *(m_parts.end() - 1);
+                m_parts.pop_back();
+            }
+        }
+    }
+}
+
+bool PathName::create() const
+{
+    if(m_parts.size() > 0){
+        std::string current = m_parts[0];
+        MKDIR(current.c_str());
+        for(unsigned i = 1; i<m_parts.size(); ++i){
+            current += PATHSEPARATOR + m_parts[i];
+            if(!stadic::exists(current)) {
+                MKDIR(current.c_str());
+            }
+        }
+        if(m_isFile) {
+            std::string name = toString();
+            FILE* fp = fopen(name.c_str(), "w");
+            fclose(fp);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool PathName::remove() const
+{
+    std::vector<std::string> paths;
+    std::string result;
+    if(m_parts.size() > 0) {
+        result = m_parts[0] + PATHSEPARATOR;
+        paths.push_back(result);
+        for(unsigned i = 1; i<m_parts.size(); ++i) {
+            result += m_parts[i] + PATHSEPARATOR;
+            paths.push_back(result);
+        }
+    }
+    if(m_isFile) {
+        result += m_filename;
+#ifdef _MSC_VER
+        if(!DeleteFile(result.c_str())) {
+            return false;
+        }
+#else // POSIX
+        if(unlink(result.c_str()) != 0) {
+            return false;
+        }
+#endif
+    }
+    //for(auto string : paths) {
+    //    std::cout << string << std::endl;
+    //}
+    for(auto iter = paths.rbegin(); iter != paths.rend(); iter++) {
+        //std::cout << *iter << std::endl;
+#ifdef _MSC_VER
+        if(!RemoveDirectory(iter->c_str())) {
+            return false;
+        }
+#else  // POSIX
+        if(rmdir(iter->c_str()) != 0) {
+            return false;
+        }
+#endif
+        // Is this really necessary?
+        //if(stadic::exists(*iter)) {
+        //    return false;
+        //}
+    }
+    return true;
+}
+
+bool PathName::isFile() const
+{
+    return m_isFile;
+}
+
+std::string PathName::toString() const
+{
+    std::string result;
+    if(m_parts.size() > 0) {
+        result = m_parts[0] + PATHSEPARATOR;
+        for(unsigned i = 1; i<m_parts.size(); ++i) {
+            result += m_parts[i] + PATHSEPARATOR;
+        }
+    }
+    if(m_isFile) {
+        result += m_filename;
+    }
+    return result;
+}
+
+bool PathName::exists() const
+{
+    std::string file = toString();
+    return stadic::exists(file);
 }
 
 }

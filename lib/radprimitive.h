@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
@@ -95,7 +95,7 @@ public:
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
     std::string toRad() const;
-    static RadPrimitive *fromRad(std::stringstream &data);
+    static RadPrimitive *fromRad(std::istream &data);
     static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
     static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
     static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);

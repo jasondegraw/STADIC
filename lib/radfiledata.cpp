@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
@@ -52,14 +52,12 @@ RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_prim
 //Setters
 bool RadFileData::addRad(std::string file)
 {
-    std::ifstream iFile;
-    iFile.open(file);
-    if (!iFile.is_open()){
+    std::ifstream data;
+    data.open(file);
+    if (!data.is_open()){
         STADIC_ERROR("The opening of the rad file '"+file+"' failed.");
         return false;
     }
-    std::stringstream data;
-    data<<iFile.rdbuf();
     shared_vector<RadPrimitive> primitives;
     while (!data.eof()) {
         try {
@@ -69,10 +67,11 @@ bool RadFileData::addRad(std::string file)
             }
             primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
         } catch(const std::runtime_error &) {
+            data.close();
             return false;
         }
     }
-    iFile.close();
+    data.close();
     if(primitives.size() == 0) {
         return false;
     }

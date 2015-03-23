@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,14 +64,14 @@ public:
     //Site Information
     //******************
     bool setGroundReflect(double value);
-
+    void setWeaFile(std::string fileName);
 
     //******************
     //Geometry Information
     //******************
     void setMatFile(std::string file);
     void setGeoFile(std::string file);
-    bool setBuildingRotation(double value);
+    void setBuildingRotation(double value);
     void setPTSFile(std::vector<std::string> files);
     void setXSpacing(std::string value);
     void setYSpacing(std::string value);
@@ -88,7 +88,11 @@ public:
     //******************
     bool setSunDivisions(int value);
     bool setSkyDivisions(int value);
-
+    void setFirstDay(boost::optional<int> value);
+    void setImportUnits(std::string units);
+    void setIllumUnits(std::string units);
+    void setDisplayUnits(std::string units);
+    void setDaylightSavingsTime(bool DST);
 
     //******************
     //Metrics
@@ -117,12 +121,14 @@ public:
     //Site Information
     //******************
     double groundReflect();
+    std::string weaFile();
 
     //******************
     //Geometry Information
     //******************
     std::string matFile();
     std::string geoFile();
+    double buildingRotation();
     std::vector<std::string> ptsFile();
     boost::optional<std::string> xSpacing();
     boost::optional<std::string> ySpacing();
@@ -147,6 +153,12 @@ public:
     int skyDivisions();
     boost::optional<std::string> getRadParam(std::string parameterSet, std::string parameterName);
     boost::optional<std::unordered_map<std::string, std::string>> getParamSet(std::string setName);
+    boost::optional<int> firstDay();
+    std::string importUnits();
+    std::string illumUnits();
+    std::string displayUnits();
+    bool daylightSavingsTime();
+
 
     //******************
     //Metrics
@@ -186,12 +198,14 @@ private:
     //Site Information
     //******************
     double m_GroundReflect;                             //  Variable holding the ground reflectance
+    std::string m_WeaFile;                              //  Variable holding the weather file name
 
     //******************
     //Geometry Information
     //******************
     std::string m_MatFile;                              //  Variable holding the main material file
     std::string m_GeoFile;                              //  Variable holding the main geometry file
+    double m_BuildingRotation;
     std::vector<std::string> m_PTSFile;                              //  Variable holding the analysis grid file
     boost::optional<std::string> m_XSpacing;
     boost::optional<std::string> m_YSpacing;
@@ -211,6 +225,11 @@ private:
     int m_SunDivisions;                                 //  Variable holding the integer for the number of sun divisions
     int m_SkyDivisions;                                 //  Variable holding the integer for the number of sky divisions
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_RadParams;
+    boost::optional<int> m_FirstDay;
+    std::string m_ImportUnits;
+    std::string m_IllumUnits;
+    std::string m_displayUnits;
+    bool m_DaylightSavingsTime;
 
     //******************
     //Lighting Control

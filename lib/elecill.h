@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,6 @@
 
 #include "stadicapi.h"
 
-#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
-template class __declspec(dllexport) std::basic_string < char, std::char_traits<char>, std::allocator<char> >;
-#endif
-
 namespace stadic {
 
 class STADIC_API SpatialIlluminance
@@ -61,10 +57,6 @@ private:
     std::string m_y;                                    //Variable holding the y location of the illuminance point
     std::string m_z;                                    //Variable holding the z location of the illuminance point
 };
-
-#ifdef _MSC_VER // Suppress warning C4251: http://support.microsoft.com/kb/168958/en-us
-template class __declspec(dllexport) std::vector<SpatialIlluminance>;
-#endif
 
 class STADIC_API ElectricIlluminanceData
 {

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +40,10 @@
 #endif
 #else
 #define STADIC_API
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(disable: 4251)
 #endif
 
 #endif // STADICAPI_H

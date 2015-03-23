@@ -1,41 +1,32 @@
-/****************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+/******************************************************************************
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms,
- * with or without modification, are permitted for
- * personal and commercial purposes provided that the
- * following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission of the
+ *    respective copyright holder or contributor.
  *
- * 1. Redistribution of source code must retain the
- *    above copyright notice, this list of conditions
- *    and the following disclaimer.
- *
- * 2. Redistribution in binary form must reproduce the
- *    above copyright notice, this list of conditions
- *    and the following disclaimer.
- *
- * 3. Neither the name of The Pennsylvania State University
- *    nor the names of its contributors may be used to
- *    endorse or promote products derived from this software
- *    without the specific prior written permission of The
- *    Pennsylvania State University.
- *
- * THIS SOFTWARE IS PROVIDED BY THE PENNSYLVANIA STATE UNIVERSITY
- * "AS IS" AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING,
- * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT OF
- * INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN NO EVENT
- * SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
- * OF SUCH DAMAGE.
- ****************************************************************/
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+ * AND NONINFRINGEMENT OF INTELLECTUAL PROPERTY ARE EXPRESSLY DISCLAIMED. IN
+ * NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *****************************************************************************/
 
 #include "spacecontrol.h"
 #include "windowgroup.h"
@@ -86,6 +77,10 @@ bool Control::setGroundReflect(double value){
     }
     return true;
 }
+void Control::setWeaFile(std::string fileName){
+    m_WeaFile=fileName;
+}
+
 
 //******************
 //Geometry Information
@@ -95,6 +90,9 @@ void Control::setMatFile(std::string file){
 }
 void Control::setGeoFile(std::string file){
     m_GeoFile=file;
+}
+void Control::setBuildingRotation(double value){
+    m_BuildingRotation=value;
 }
 void Control::setPTSFile(std::vector<std::string> files){
     m_PTSFile=files;
@@ -163,7 +161,25 @@ bool Control::setSkyDivisions(int value)
     }
     return true;
 }
+void Control::setFirstDay(boost::optional<int> value){
+    m_FirstDay=value;
+}
 
+void Control::setImportUnits(std::string units){
+    m_ImportUnits=units;
+}
+
+void Control::setIllumUnits(std::string units){
+    m_IllumUnits=units;
+}
+
+void Control::setDisplayUnits(std::string units){
+    m_displayUnits=units;
+}
+
+void Control::setDaylightSavingsTime(bool DST){
+    m_DaylightSavingsTime=DST;
+}
 
 //******************
 //Metrics
@@ -281,6 +297,9 @@ std::string Control::intermediateDataDirectory(){
 double Control::groundReflect(){
     return m_GroundReflect;
 }
+std::string Control::weaFile(){
+    return m_WeaFile;
+}
 
 //******************
 //Geometry Information
@@ -290,6 +309,9 @@ std::string Control::matFile(){
 }
 std::string Control::geoFile(){
     return m_GeoFile;
+}
+double Control::buildingRotation(){
+    return m_BuildingRotation;
 }
 std::vector<std::string> Control::ptsFile(){
     return m_PTSFile;
@@ -360,6 +382,25 @@ boost::optional<std::unordered_map<std::string, std::string>> Control::getParamS
     }
 
     return boost::optional<std::unordered_map<std::string, std::string>>(m_RadParams[setName]);
+}
+boost::optional<int> Control::firstDay(){
+    return m_FirstDay;
+}
+
+std::string Control::importUnits(){
+    return m_ImportUnits;
+}
+
+std::string Control::illumUnits(){
+    return m_IllumUnits;
+}
+
+std::string Control::displayUnits(){
+    return m_displayUnits;
+}
+
+bool Control::daylightSavingsTime(){
+    return m_DaylightSavingsTime;
 }
 
 
@@ -445,6 +486,20 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     boost::optional<bool> bVal;
     boost::optional<JsonObject> treeVal;
 
+    setWeaFile(buildingControl->weaDataFile().get());
+    if (buildingControl->buildingRotation()){
+        setBuildingRotation(buildingControl->buildingRotation().get());
+    }
+    setFirstDay(buildingControl->firstDay());
+    setImportUnits(buildingControl->importUnits().get());
+    setIllumUnits(buildingControl->illumUnits().get());
+    setDisplayUnits(buildingControl->displayUnits().get());
+    if (buildingControl->daylightSavingsTime()){
+        setDaylightSavingsTime(buildingControl->daylightSavingsTime().get());
+    }else{
+        setDaylightSavingsTime(false);
+    }
+
     //******************
     //Folder Information
     //******************
@@ -455,6 +510,7 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         setSpaceName(sVal.get());
         sVal.reset();
     }
+
 
     sVal=getString(json, "space_directory", "The key \"space_directory\" does not appear in the STADIC Control File.", "The key \"space_directory\" does not contain a string.", Severity::Error);
     if(!sVal){
@@ -532,8 +588,11 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     boost::optional<JsonObject> list;
     list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Fatal);
     std::vector<std::string> tempVec;
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list.get().size()<1){
+        STADIC_LOG(Severity::Fatal, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
+    }
+    for (unsigned index=0;index<list.get().size();index++){
+        tempVec.push_back(list.get()[index].asString());
     }
     setPTSFile(tempVec);
     list.reset();
@@ -563,21 +622,25 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     }
     //identifier
     list=getArray(treeVal.get(),"identifier");
-    tempVec.clear();
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list){
+        tempVec.clear();
+        for (unsigned index=0;index<list.get().size();index++){
+            tempVec.push_back(list.get()[index].asString());
+        }
+        setIdentifiers(tempVec);
     }
-    setIdentifiers(tempVec);
     list.reset();
     //modifier
     list=getArray(treeVal.get(),"modifier");
-    tempVec.clear();
-    for (std::string name : list.get().getMemberNames()){
-        tempVec.push_back(name);
+    if (list){
+        tempVec.clear();
+        for (unsigned index=0;index<list.get().size();index++){
+            tempVec.push_back(list.get()[index].asString());
+        }
+        setModifiers(tempVec);
     }
-    setModifiers(tempVec);
     list.reset();
-
+    //Code works through this point.
 
     treeVal=getArray(json, "window_groups", "The key \"window_groups\" does not appear in the STADIC Control Space.", Severity::Error);
     if (!treeVal){
@@ -610,12 +673,15 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         sVal.reset();
     }
 
-    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear within the STADIC Control Space.  The \"general\" value will be attempted.", "The \"target_illuminance\" is not a double.  The \"general\" value will be attempted.", Severity::Error);
+    dVal=getDouble(json, "target_illuminance", "The key \"target_illuminance\" does not appear within the STADIC Control Space.  The \"general\" value will be attempted.", "The \"target_illuminance\" is not a double.  The \"general\" value will be attempted.", Severity::Warning);
     if (!dVal){
         if (buildingControl->targetIlluminance()){
             setTargetIlluminance(buildingControl->targetIlluminance().get());
+            STADIC_LOG(Severity::Info, "The General target illuminance value of " +toString(buildingControl->targetIlluminance().get()) +" will be applied to the space named \"" +m_SpaceName+"\"");
+        }else{
+            STADIC_LOG(Severity::Fatal, "General does not contain a target illuminance.  Please add this to the control file before proceeding.");
+            return false;
         }
-        return false;
     }else{
         if (!setTargetIlluminance(dVal.get())){
             return false;
@@ -660,8 +726,22 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     }
     //Radiance Parameters
     boost::optional<JsonObject> radTree;
-    radTree=getObject(treeVal.get(), "radiance_parameters");
+    radTree=getObject(json, "radiance_parameters");
     if (radTree){
+        for (std::string setName : radTree.get().getMemberNames()){
+            boost::optional<JsonObject> tempTree;
+            tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
+            std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (setName, std::unordered_map<std::string, std::string> ());
+            m_RadParams.insert(tempPair);
+            //Added to make radiance_parameters work with jsonCPP
+            for (Json::Value::iterator it =tempTree.get().begin(); it != tempTree.get().end(); it++){
+                Json::Value key =it.key();
+                Json::Value value = (*it);
+                std::pair<std::string, std::string> parameters (key.asString(), value.asString());
+                m_RadParams[setName].insert(parameters);
+            }
+        }
+        /* //Old parameter parsing code
         for (std::string setName : radTree.get().getMemberNames()){
             boost::optional<JsonObject> tempTree;
             tempTree=getObject(radTree.get(), setName, "The key \""+setName+ "\"does not appear in the STADIC Control File.", Severity::Fatal);
@@ -673,7 +753,11 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
                 m_RadParams[setName].insert(parameters);
             }
         }
+        */
     }else{
+         //This gets all of the radiance parameters.
+         m_RadParams=buildingControl->getAllRadParams().get();
+         /*
          for ( auto i = buildingControl->getAllRadParams().get().begin(); i != buildingControl->getAllRadParams().get().end(); ++i ){
             std::pair<std::string, std::unordered_map<std::string, std::string>> tempPair=std::make_pair (i->first, std::unordered_map<std::string, std::string> ());
             m_RadParams.insert(tempPair);
@@ -682,17 +766,16 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
                 m_RadParams[i->first].insert(parameters);
             }
         }
+        */
     }
+    //Fails to verify parameters.
     verifyParameters();
-
 
     //******************
     //Lighting Control
     //******************
-    treeVal=getObject(json, "control_zones", "The key \"control_zones\" does not appear in the STADIC Control File.", Severity::Error);
-    if (!treeVal){
-        return false;
-    }else{
+    treeVal=getObject(json, "control_zones", "The key \"control_zones\" does not appear in the STADIC Control File.", Severity::Warning);
+    if (treeVal){
         for(auto &v : treeVal.get()){
             ControlZone zone;
             if (zone.parseJson(v)){
@@ -959,7 +1042,7 @@ bool Control::verifyParameters(){
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
     }
-    return allOk; // Just guessing here...
+    return allOk; // Just guessing here... but VS requires a return
 }
 
 bool Control::checkParameter(std::string setName, std::string parameter, std::string varType){
@@ -985,7 +1068,7 @@ bool Control::checkParameter(std::string setName, std::string parameter, std::st
     }else{
         STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
     }
-    return false; // This is probably not what is intended
+    return false; // Add return for VS
 }
 
 }

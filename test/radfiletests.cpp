@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014, The Pennsylvania State University
+ * Copyright (c) 2014-2015, The Pennsylvania State University
  * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
@@ -39,7 +39,7 @@
 TEST(RadFileTests, ParseRadFile)
 {
   stadic::RadFileData radData;
-  ASSERT_TRUE(radData.addRad("Simple.rad"));
+  ASSERT_TRUE(radData.addRad("simple.rad"));
   ASSERT_EQ(36, radData.primitives().size());
   ASSERT_EQ(36, radData.geometry().size());
   ASSERT_EQ(0, radData.materials().size());
@@ -123,6 +123,13 @@ TEST(RadFileTests, ParseRadFile)
   EXPECT_EQ(0,plastic[1]->roughness());
 }
 
+TEST(RadfileTests, Empty)
+{
+    stadic::RadFileData radData;
+    ASSERT_FALSE(radData.addRad("empty.rad"));
+    ASSERT_EQ(0, radData.primitives().size());
+}
+
 bool isGlass(stadic::RadPrimitive* primitive)
 {
     return primitive->type() == stadic::RadPrimitive::Glass;
@@ -190,7 +197,7 @@ TEST(RadFileTests, ParseComplicatedRadFile)
 TEST(RadFileTests, WriteSimpleRadFile)
 {
     stadic::RadFileData radData;
-    ASSERT_TRUE(radData.addRad("Simple.rad"));
+    ASSERT_TRUE(radData.addRad("simple.rad"));
     ASSERT_TRUE(radData.writeRadFile("simpletest.rad"));
     stadic::RadFileData reread;
     ASSERT_TRUE(reread.addRad("simpletest.rad"));
