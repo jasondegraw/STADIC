@@ -108,23 +108,9 @@ bool RadPrimitive::isMaterial() const
 }
 
 //Setters
-void RadPrimitive::setModifier(const std::string &modifier)
-{
-    m_Modifier=modifier;
-}
-
 bool RadPrimitive::setModifierName(const std::string &name)
 {
     if(!m_modifier) {
-        m_modifierName = name;
-        return true;
-    }
-    return false;
-}
-
-bool RadPrimitive::setModifierOverride(const std::string &name)
-{
-    if(!name.empty()) {
         m_modifierName = name;
         return true;
     }
@@ -587,9 +573,12 @@ bool RadPrimitive::checkModifierTree(shared_vector<RadPrimitive> &primitives)
             if(!current->m_modifier) {
                 STADIC_LOG(Severity::Warning, "Primitive \'" + current->name() + "\' has no modifier");
                 return false;
+            } else if(current->m_modifier->name() == "void") {
+                continue;
             }
             // Loop and find the modifier
-            for(unsigned j = i - 1; j >= 0; j++) {
+            for(unsigned j = i - 1; j >= 0; j--) {
+                //std::cout << current->m_modifier->name() << " " << primitives[j]->name() << std::endl;
                 if(current->m_modifier == primitives[j]) {
                     break;
                 }

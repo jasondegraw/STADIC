@@ -66,8 +66,6 @@ public:
     }
 
     //Setters
-    void setModifier(const std::string &modifier);                             //Function to set the modifier
-    bool setModifierOverride(const std::string &name);  //!< Set the name of the modifier to use, overriding the modifier pointer
     virtual bool setType(const std::string &type);                             //Function to set the type
     void setName(const std::string &name);                                     //Function to set the name
     virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
@@ -143,7 +141,6 @@ private:
     static Type typeFromString(const std::string &string);
     std::shared_ptr<RadPrimitive> findModifier(const std::string &name, const shared_vector<RadPrimitive> &knownPrimitives);
 
-    std::string m_Modifier;                                             //Variable holding the modifier
     boost::optional<std::string> m_modifierName;
     std::shared_ptr<RadPrimitive> m_modifier;
     std::string m_TypeString;                                           //Variable holding the type
