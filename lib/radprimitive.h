@@ -58,32 +58,32 @@ public:
     virtual ~RadPrimitive()
     {}
 
-    bool isGeometry() const;                                            //Boolean that determines whether the primitive is of a geometry type
-    bool isMaterial() const;                                            //Boolean that determines whether the primitive is of a material type
-    virtual bool isVoid() const
+    bool isGeometry() const;  //!< Returns true if the primitive is of a geometry type
+    bool isMaterial() const;  //!< Returns true if the primitive is of a material type
+    virtual bool isVoid() const  //!< Returns true if the primitive is a void primitive
     {
         return false;
     }
 
     //Setters
-    virtual bool setType(const std::string &type);                             //Function to set the type
-    void setName(const std::string &name);                                     //Function to set the name
-    virtual bool setArg1(std::vector<std::string> vals);                //Function to set the argumens on line one from a vector of strings
-    virtual bool setArg1(const std::string &arg, int position);                //Function to set an argument on line one given the position of the argument
-    virtual bool setArg2(std::vector<std::string> vals);                //Function to set the arguments on line two from a vector of strings
-    virtual bool setArg2(const std::string &arg, int position);                //Function to set an argument on line two given the position of the argument
-    virtual bool setArg3(std::vector<std::string> vals);                //Function to set the arguments on line three from a vector of strings
-    virtual bool setArg3(const std::string &arg, int position);                //Function to set an argument on line three given the position of the argument
+    virtual bool setType(const std::string &type);  //!< Set the primitive type, returns true on success. This function is overloaded by most subclasses
+    void setName(const std::string &name);  //!< Set the name of the primitive
+    virtual bool setArg1(std::vector<std::string> vals);  //!< Set the arguments on line one from a vector of strings, returns true on success
+    virtual bool setArg1(const std::string &arg, int position);  //!< Set an argument on line one given the position of the argument, returns true on success
+    virtual bool setArg2(std::vector<std::string> vals);  //!< Set the arguments on line two from a vector of strings, returns true on success
+    virtual bool setArg2(const std::string &arg, int position);  //!< Set an argument on line two given the position of the argument, returns true on success
+    virtual bool setArg3(std::vector<std::string> vals);  //!< Set the arguments on line three from a vector of strings, returns true on success
+    virtual bool setArg3(const std::string &arg, int position);  //!< Set an argument on line three given the position of the argument, returns true on success
 
     //Getters
     std::string modifierName() const;  //!< Returns the modifier name associated with the primitive
     boost::optional<std::string>  modifierOverride() const; //!< Returns the modifier name that will be used, if empty then the modifier pointer is used
-    Type type() const;                                                  //Function that returns the type as a type
-    std::string typeString() const;                                     //Function that returns the type as a string
+    Type type() const;  //!< Returns the primitive type as an enumeration
+    std::string typeString() const;  //!< Returns the type as a string
     virtual std::string name() const;  //!< Returns the identifier of the primitive
-    std::vector<std::string> arg1() const;                              //Function that returns the first line of arguments as a vector
-    std::vector<std::string> arg2() const;                              //Function that returns the second line of arguments as a vector
-    std::vector<std::string> arg3() const;                              //Function that returns the third line of arguments as a vector
+    std::vector<std::string> arg1() const;  //!< Returns the first line of arguments as a vector
+    std::vector<std::string> arg2() const;  //!< Returns the second line of arguments as a vector
+    std::vector<std::string> arg3() const;  //! Returns the third line of arguments as a vector
 
     virtual std::string getArg1(int position) const; //!< Returns a given argument from the first line as a string, throws for out of range values
     virtual std::string getArg2(int position) const; //!< Returns a given argument from the second line as a string, throws for out of range values
@@ -92,12 +92,12 @@ public:
     virtual std::string getArg2(int position, const std::string &defaultValue) const; //!< Returns a given argument from the second line as a string or a default if the position is out of range
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
-    std::string toRad() const;
+    std::string toRad() const;  //!< Returns the primitive in Radiance's primitive file format
     static RadPrimitive *fromRad(std::istream &data);
     static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
-    static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);
-    static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);
-    static std::shared_ptr<RadPrimitive> sharedVoid();
+    static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Attempts to build connections between primitives and modifier primitives, returns true on success
+    static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Returns true if the input list of primitives represents a complete Radiance primitive input file
+    static std::shared_ptr<RadPrimitive> sharedVoid();  //!< Returns a shared pointer to a void primitive - use this to limit the number of void primitives in memory
 
 protected:
     void initArg(int number, std::vector<std::string> arg);
@@ -141,13 +141,13 @@ private:
     static Type typeFromString(const std::string &string);
     std::shared_ptr<RadPrimitive> findModifier(const std::string &name, const shared_vector<RadPrimitive> &knownPrimitives);
 
-    boost::optional<std::string> m_modifierName;
-    std::shared_ptr<RadPrimitive> m_modifier;
-    std::string m_TypeString;                                           //Variable holding the type
-    std::string m_Name;                                                 //Variable holding the name
-    std::vector<std::string> m_Arg1;                                    //Vector holding arguments on line 1
-    std::vector<std::string> m_Arg2;                                    //Vector holding arguments on line 2
-    std::vector<std::string> m_Arg3;                                    //Vector holding arguments on line 3
+    boost::optional<std::string> m_modifierName;     // Optional storage of the modifier name - should only hold the string before building the tree
+    std::shared_ptr<RadPrimitive> m_modifier;        // Shared pointer to the modifier primitive
+    std::string m_TypeString;                        // String type
+    std::string m_Name;                              // String name
+    std::vector<std::string> m_Arg1;                 // Vector holding arguments on line 1
+    std::vector<std::string> m_Arg2;                 // Vector holding arguments on line 2
+    std::vector<std::string> m_Arg3;                 // Vector holding arguments on line 3
 
 };
 
