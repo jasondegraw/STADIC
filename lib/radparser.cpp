@@ -36,26 +36,8 @@ namespace stadic {
 
 RadParser::RadParser(std::istream &stream) : m_file(stream), m_linenumber(0)
 {
-    // Fill the internal stream
-    fillStream();
-}
-
-bool RadParser::fillStream()
-{
-    std::string string;
-    do {
-        if(m_file.get().eof()) {
-            //std::cout << "Out of stream to read" << std::endl;
-            return false;
-        }
-        std::getline(m_file.get(), string);
-        m_linenumber++;
-        //std::cout << "fillStream line " << m_linenumber << ": " << string << std::endl;
-        auto parts = stringPartition(string, '#');
-        string = trim(parts.first);
-    } while(string.empty());
-    m_stream = std::stringstream(string);
-    return true;
+    // Fill the internal queue
+    fillQueue();
 }
 
 bool RadParser::fillQueue()
@@ -73,34 +55,26 @@ bool RadParser::fillQueue()
         string = trim(parts.first);
     } while(string.empty());
     tokenize(m_queue, string);
-    return true;
+    return (m_queue.size() > 0);
 }
 
 boost::optional<std::string> RadParser::next()
 {
     std::string string;
-    // Try to fill the internal string stream if needed
-    if(m_stream.eof()) {
-        //std::cout << "stream at EOF" << std::endl;
-        if(!fillStream()) {
+    // If queue is empty, try to fill it
+    if(m_queue.empty()) {
+        if(!fillQueue()) {
             return boost::none;
         }
     }
-    //std::cout << "Have data in stream..." << std::endl;
-    // Try to get something from the internal string stream
-    m_stream >> string;
-    if(string.empty()) {
-        return boost::none;
-    }
+    string = m_queue.front();
+    m_queue.pop();
     return boost::optional<std::string>(string);
 }
 
 bool RadParser::endOfInput()
 {
-    if(m_stream.eof()) {
-        return fillStream();
-    }
-    return false;
+    return (m_file.get().eof() && m_queue.size() == 0);
 }
 
 }

@@ -57,7 +57,6 @@ private:
     bool fillStream();
     bool fillQueue();
     std::reference_wrapper<std::istream> m_file;
-    std::stringstream m_stream;
     std::queue<std::string> m_queue;
     unsigned m_linenumber;
 };

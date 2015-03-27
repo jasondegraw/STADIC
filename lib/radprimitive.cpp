@@ -441,9 +441,9 @@ RadPrimitive* RadPrimitive::fromRad(RadParser &data)
             args.push_back(input.get());
         }
         if(!rad->setArg1(args)) {
-            delete rad;
             STADIC_LOG(Severity::Error, "Incorrect input in first argument set for " + type + " primitive, identifier "
                 + id);
+            delete rad;
             return nullptr;
         }
     }
@@ -497,9 +497,9 @@ RadPrimitive* RadPrimitive::fromRad(RadParser &data)
             args.push_back(input.get());
         }
         if(!rad->setArg3(args)) {
-            delete rad;
             STADIC_LOG(Severity::Error, "Incorrect input in third argument set for " + type + " primitive, identifier "
                 + id);
+            delete rad;
             return nullptr;
         }
     }
