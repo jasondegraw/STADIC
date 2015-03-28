@@ -40,6 +40,10 @@ RadParser::RadParser(std::istream &stream) : m_file(stream), m_linenumber(0)
     fillQueue();
 }
 
+unsigned RadParser::linenumber() const {
+    return m_linenumber;
+}
+
 bool RadParser::fillQueue()
 {
     std::string string;

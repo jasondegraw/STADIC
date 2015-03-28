@@ -46,15 +46,12 @@ class STADIC_API RadParser
 {
 public:
     RadParser(std::istream &stream);
-    boost::optional<std::string> next();
-    unsigned linenumber() const {
-        return m_linenumber;
-    }
-    bool endOfInput();
+    boost::optional<std::string> next();  //!< Returns a boost:optional containing the next available token from a Radiance primitive file, the optional is empty if nothing is available
+    unsigned linenumber() const;  //!< Returns the current line number in the input file
+    bool endOfInput();  //!< Returns true if no more input can be read
 
 
 private:
-    bool fillStream();
     bool fillQueue();
     std::reference_wrapper<std::istream> m_file;
     std::queue<std::string> m_queue;
