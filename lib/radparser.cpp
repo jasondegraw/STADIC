@@ -74,7 +74,10 @@ boost::optional<std::string> RadParser::next()
 
 bool RadParser::endOfInput()
 {
-    return (m_file.get().eof() && m_queue.size() == 0);
+    if(m_queue.size() == 0) {
+        return !fillQueue();
+    }
+    return false;
 }
 
 }

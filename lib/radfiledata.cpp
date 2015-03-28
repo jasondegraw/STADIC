@@ -50,7 +50,7 @@ RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_Prim
 }
 
 //Setters
-bool RadFileData::addRad(std::string file)
+bool RadFileData::addRad(const std::string &file)
 {
     std::ifstream data;
     data.open(file);
@@ -70,11 +70,13 @@ bool RadFileData::addRad(std::string file)
             primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
         } catch(const std::runtime_error &) {
             data.close();
+            STADIC_LOG(Severity::Warning, "Exception caught reading from '" + file + "'.");
             return false;
         }
     }
     data.close();
     if(primitives.size() == 0) {
+        STADIC_LOG(Severity::Warning, "No primitives were read from '" + file + "'.");
         return false;
     }
     m_Primitives.insert(m_Primitives.end(),primitives.begin(),primitives.end());

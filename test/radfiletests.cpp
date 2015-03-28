@@ -132,7 +132,7 @@ TEST(RadfileTests, Empty)
 TEST(RadfileTests, SingleLine)
 {
     stadic::RadFileData radData;
-    ASSERT_FALSE(radData.addRad("materialsingleline.rad"));
+    ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
     ASSERT_EQ(6, radData.primitives().size());
 }
 

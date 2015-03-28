@@ -51,7 +51,7 @@ public:
     explicit RadFileData();
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
-    bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
+    bool addRad(const std::string &file);                                      //Function to add rad primitives from a rad file
     //bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
     bool blackOutLayer(std::string layer);                              //Function to black out a layer
     bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
