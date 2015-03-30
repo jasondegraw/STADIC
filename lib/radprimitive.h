@@ -88,7 +88,6 @@ public:
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
     std::string toRad() const;
-    static RadPrimitive *fromRad(std::istream &data);
     static RadPrimitive *fromRad(RadParser &data);
 
 protected:
