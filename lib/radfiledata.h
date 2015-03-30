@@ -49,9 +49,9 @@ public:
     explicit RadFileData();
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
-    bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
-    bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
-    std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
+    bool addRad(const std::string &file);                                      //Function to add rad primitives from a rad file
+    bool writeRadFile(const std::string &file);                                //Function to write the rad file from the list of primitives
+    std::vector<double> surfaceNormal(const std::string &layer);               //Function that returns the surface normal as a vector of doubles
 
     bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
     bool addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives

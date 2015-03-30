@@ -42,6 +42,7 @@
 #include "logging.h"
 #include "sharedvector.h"
 #include <boost/optional.hpp>
+#include "radparser.h"
 
 namespace stadic {
 
@@ -93,6 +94,7 @@ public:
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
     std::string toRad() const;  //!< Returns the primitive in Radiance's primitive file format
+    static RadPrimitive *fromRad(RadParser &data);
     static RadPrimitive *fromRad(std::istream &data);
     static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
     static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Attempts to build connections between primitives and modifier primitives, returns true on success

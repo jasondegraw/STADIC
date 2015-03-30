@@ -31,6 +31,7 @@
 
 #include "radfiledata.h"
 #include "functions.h"
+#include "radparser.h"
 #include "logging.h"
 #include <fstream>
 #include <sstream>
@@ -50,7 +51,7 @@ RadFileData::RadFileData(const shared_vector<RadPrimitive> &primitives) : m_prim
 }
 
 //Setters
-bool RadFileData::addRad(std::string file)
+bool RadFileData::addRad(const std::string &file)
 {
     std::ifstream data;
     data.open(file);
@@ -58,21 +59,25 @@ bool RadFileData::addRad(std::string file)
         STADIC_ERROR("The opening of the rad file '"+file+"' failed.");
         return false;
     }
+    RadParser parser(data);
     shared_vector<RadPrimitive> primitives;
-    while (!data.eof()) {
+    while(!parser.endOfInput()) {
+//    while (!data.eof()) {
         try {
-            RadPrimitive *primitive = RadPrimitive::fromRad(data);
+            RadPrimitive *primitive = RadPrimitive::fromRad(parser);
             if(primitive == nullptr) {
                 break;
             }
             primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
         } catch(const std::runtime_error &) {
             data.close();
+            STADIC_LOG(Severity::Warning, "Exception caught reading from '" + file + "'.");
             return false;
         }
     }
     data.close();
     if(primitives.size() == 0) {
+        STADIC_LOG(Severity::Warning, "No primitives were read from '" + file + "'.");
         return false;
     }
     m_primitives.insert(m_primitives.end(),primitives.begin(),primitives.end());
@@ -180,7 +185,7 @@ bool RadFileData::removeLayer(const QString &layer, const QString &removing, con
 }
 */
 
-bool RadFileData::writeRadFile(std::string file)
+bool RadFileData::writeRadFile(const std::string &file)
 {
     std::ofstream oFile;
     oFile.open(file);
@@ -222,7 +227,7 @@ bool RadFileData::writeRadFile(std::string file)
     return true;
 }
 
-std::vector<double> RadFileData::surfaceNormal(std::string layer){
+std::vector<double> RadFileData::surfaceNormal(const std::string &layer){
     std::vector<double> normalVector;
     for(int i=0;i<m_primitives.size();i++) {
         if(m_primitives[i]->modifierName()==layer && m_primitives[i]->typeString()=="Polygon") {

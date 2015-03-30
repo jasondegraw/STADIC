@@ -58,6 +58,9 @@ add_custom_command(TARGET radfiletests POST_BUILD
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/empty.rad $<TARGET_FILE_DIR:radfiletests>)
+add_custom_command(TARGET radfiletests POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_SOURCE_DIR}/test/resources/materialsingleline.rad $<TARGET_FILE_DIR:radfiletests>)
 
 add_executable(leaktests leaktests.cpp)
 add_test(leaktests leaktests)
@@ -69,6 +72,10 @@ add_custom_command(TARGET leaktests POST_BUILD
 add_executable(functiontests functiontests.cpp)
 add_test(functiontests functiontests)
 target_link_libraries(functiontests stadic_core gtest gtest_main)
+
+add_executable(radparsertests radparsertests.cpp)
+add_test(radparsertests radparsertests)
+target_link_libraries(radparsertests stadic_core gtest gtest_main)
 
 add_executable(filepathtests filepathtests.cpp)
 add_test(filepathtests filepathtests)

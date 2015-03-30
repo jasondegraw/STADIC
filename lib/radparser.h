@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2015, Alliance for Sustainable Energy
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,36 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
-#include <string>
-#include <vector>
-#include <queue>
-#include <sstream>
-#include "stadicapi.h"
-#include "logging.h"
-namespace stadic{
+#ifndef RADPARSER_H
+#define RADPARSER_H
 
-std::vector<std::string> STADIC_API split(std::string line, char delimiter);                    //Function that splits a string given a delimiter
-std::vector<std::string> STADIC_API trimmedSplit(std::string line, char delimiter);             //Function that trims and splits a string given a delimiter
-std::string STADIC_API trim(std::string string);                                                //Function that removes whitespace from either end of a string
-double STADIC_API toDouble(const std::string &string, bool *ok = nullptr);                      //Function that takes a string and returns a double
-int STADIC_API toInteger(const std::string &string, bool *ok = nullptr);
-template <typename T> std::string toString(T value)  //Function that takes a double and returns a string
+#include <istream>
+#include <string>
+#include <sstream>
+#include <functional>
+#include <queue>
+#include <boost/optional.hpp>
+
+#include "stadicapi.h"
+
+namespace stadic {
+
+class STADIC_API RadParser
 {
-    std::stringstream stream;
-    stream << value;
-    return stream.str();
+public:
+    RadParser(std::istream &stream);
+    boost::optional<std::string> next();  //!< Returns a boost:optional containing the next available token from a Radiance primitive file, the optional is empty if nothing is available
+    unsigned linenumber() const;  //!< Returns the current line number in the input file
+    bool endOfInput();  //!< Returns true if no more input can be read
+
+
+private:
+    bool fillQueue();
+    std::reference_wrapper<std::istream> m_file;
+    std::queue<std::string> m_queue;
+    unsigned m_linenumber;
+};
+
 }
-std::string STADIC_API wrapAtN(const std::string &text, unsigned N = 72, unsigned indent = 0,
-    bool hangingIndent = false);
-std::pair<std::string, std::string> STADIC_API stringPartition(const std::string &string, char delimiter);
-template<class T> void tokenize(T &container, const std::string &string)
-{
-    std::stringstream stream(string);
-    std::string token;
-    while(!stream.eof()) {
-        stream >> token;
-        if(!token.empty()) {
-            container.push_back(token);
-        }
-    }
-}
-void STADIC_API tokenize(std::queue<std::string> &container, const std::string &string);
-}
-#endif // FUNCTIONS_H
+
+#endif // RADPARSER_H
