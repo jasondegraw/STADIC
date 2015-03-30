@@ -78,7 +78,6 @@ public:
 
     //Getters
     std::string modifierName() const;  //!< Returns the modifier name associated with the primitive
-    boost::optional<std::string>  modifierOverride() const; //!< Returns the modifier name that will be used, if empty then the modifier pointer is used
     Type type() const;  //!< Returns the primitive type as an enumeration
     std::string typeString() const;  //!< Returns the type as a string
     virtual std::string name() const;  //!< Returns the identifier of the primitive
@@ -94,8 +93,7 @@ public:
     virtual std::string getArg3(int position, const std::string &defaultValue) const; //!< Returns a given argument from the third line as a string or a default if the position is out of range
 
     std::string toRad() const;  //!< Returns the primitive in Radiance's primitive file format
-    static RadPrimitive *fromRad(RadParser &data);
-    //static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
+    static std::shared_ptr<RadPrimitive> fromRad(RadParser &data);  //!< Reads a primitive from Radiance's primitive file format and returns a shared pointer to a RadPrimitive
     static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Attempts to build connections between primitives and modifier primitives, returns true on success
     static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Returns true if the input list of primitives represents a complete Radiance primitive input file
     static std::shared_ptr<RadPrimitive> sharedVoid();  //!< Returns a shared pointer to a void primitive - use this to limit the number of void primitives in memory

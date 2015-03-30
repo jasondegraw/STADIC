@@ -64,11 +64,11 @@ bool RadFileData::addRad(const std::string &file)
     while(!parser.endOfInput()) {
 //    while (!data.eof()) {
         try {
-            RadPrimitive *primitive = RadPrimitive::fromRad(parser);
+            std::shared_ptr<RadPrimitive> primitive = RadPrimitive::fromRad(parser);
             if(primitive == nullptr) {
                 break;
             }
-            primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
+            primitives.push_back(primitive);
         } catch(const std::runtime_error &) {
             data.close();
             STADIC_LOG(Severity::Warning, "Exception caught reading from '" + file + "'.");

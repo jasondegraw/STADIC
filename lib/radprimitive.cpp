@@ -209,11 +209,6 @@ std::string RadPrimitive::modifierName() const {
     return std::string();
 }
 
-boost::optional<std::string> RadPrimitive::modifierOverride() const
-{
-    return m_modifierName;
-}
-
 RadPrimitive::Type RadPrimitive::type() const{
     return typeFromString(m_TypeString);
 }
@@ -282,7 +277,7 @@ std::string RadPrimitive::toRad() const
     return stream.str();
 }
 
-RadPrimitive* RadPrimitive::fromRad(RadParser &data)
+std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(RadParser &data)
 {
     RadPrimitive *rad;
     boost::optional<std::string> input;
@@ -426,105 +421,8 @@ RadPrimitive* RadPrimitive::fromRad(RadParser &data)
         }
     }
     
-    return rad;
-}
-
-/*
-std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives)
-{
-    RadPrimitive *rad;
-
-    std::string string = nextNonComment(data);
-    if(string.empty()){
-        return nullptr;
-    }
-    std::vector<std::string> list = trimmedSplit(string, ' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
-    if(list.size() != 3) {
-        return nullptr;
-    }
-
-    switch(typeFromString(list[1])) {
-    case Polygon:
-        rad = new PolygonGeometry();
-        break;
-        //case Ring:
-        //    rad = new RingGeometry();
-        //    break;
-    case Plastic:
-        rad = new PlasticMaterial();
-        break;
-    case Metal:
-        rad = new MetalMaterial();
-        break;
-    case Trans:
-        rad = new TransMaterial();
-        break;
-    case Glass:
-        rad = new GlassMaterial();
-        break;
-    case BSDF:
-        rad = new BSDFMaterial();
-        break;
-    default:
-        STADIC_LOG(Severity::Warning, "Unknown primitive \"" + list[1] + "\" in input.");
-        rad = new UnknownPrimitive();
-        rad->setType(list[1]);
-        break;
-    }
-    rad->setModifierName(list[0]);
-    rad->setName(list[2]);
-
-    int nargs;
-    data >> string;   // Reads number of arguments from first line
-    nargs = toInteger(string);
-    if(nargs>0){
-        std::vector<std::string> args;
-        for(int i = 0; i<nargs; i++){
-            data >> string;
-            args.push_back(string);
-        }
-        if(!rad->setArg1(args)) {
-            delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in first argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
-            return nullptr;
-        }
-    }
-
-    data >> string;   // Reads number of arguments from second line
-    nargs = toInteger(string);
-    if(nargs>0){
-        std::vector<std::string> args;
-        for(int i = 0; i<nargs; i++){
-            data >> string;
-            args.push_back(string);
-        }
-        if(!rad->setArg2(args)) {
-            delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in second argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
-            return nullptr;
-        }
-    }
-
-    data >> string;   // Reads number of arguments from third line
-    nargs = toInteger(string);
-    if(nargs>0){
-        std::vector<std::string> args;
-        for(int i = 0; i<nargs; i++){
-            data >> string;
-            args.push_back(string);
-        }
-        if(!rad->setArg3(args)) {
-            delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in third argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
-            return nullptr;
-        }
-    }
     return std::shared_ptr<RadPrimitive>(rad);
 }
-*/
 
 bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
 {
