@@ -32,6 +32,7 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <vector>
+#include <queue>
 
 TEST(FunctionTests, Split)
 {
@@ -106,4 +107,39 @@ TEST(FunctionTests, ToString)
   std::string string = "20.5";
   double value = 20.5;
   EXPECT_EQ(string, stadic::toString(value));
+}
+
+TEST(FunctionTests, Partition)
+{
+    std::string string = "abcdefghijklm";
+    auto parts = stadic::stringPartition(string, 'j');
+    EXPECT_EQ("abcdefghi", parts.first);
+    EXPECT_EQ("klm", parts.second);
+    parts = stadic::stringPartition(string, 'n');
+    EXPECT_EQ("abcdefghijklm", parts.first);
+    EXPECT_TRUE(parts.second.empty());
+    parts = stadic::stringPartition(string, 'm');
+    EXPECT_EQ("abcdefghijkl", parts.first);
+    EXPECT_TRUE(parts.second.empty());
+    parts = stadic::stringPartition(string, 'a');
+    EXPECT_EQ("bcdefghijklm", parts.second);
+    EXPECT_TRUE(parts.first.empty());
+}
+
+TEST(FunctionTests, Tokenize)
+{
+    std::queue<std::string> queue;
+    stadic::tokenize(queue, "This is a string to tokenize");
+    ASSERT_EQ(6, queue.size());
+    EXPECT_EQ("This", queue.front());
+    queue.pop();
+    EXPECT_EQ("is", queue.front());
+    queue.pop();
+    EXPECT_EQ("a", queue.front());
+    queue.pop();
+    EXPECT_EQ("string", queue.front());
+    queue.pop();
+    EXPECT_EQ("to", queue.front());
+    queue.pop();
+    EXPECT_EQ("tokenize", queue.front());
 }

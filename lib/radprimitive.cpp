@@ -265,26 +265,40 @@ std::string RadPrimitive::toRad() const
     return stream.str();
 }
 
-RadPrimitive* RadPrimitive::fromRad(std::istream &data)
+RadPrimitive* RadPrimitive::fromRad(RadParser &data)
 {
     RadPrimitive *rad;
+    boost::optional<std::string> input;
 
-    std::string string = nextNonComment(data);
-    if (string.empty()){
+    // Currently look for "modifier type identifier"
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read a modifier from line " + std::to_string(data.linenumber()) + " of input file");
         return nullptr;
     }
-    std::vector<std::string> list = trimmedSplit(string,' ');    // string.split(QRegExp("\\s+")); // This should be "modifier type identifier"?
-    if(list.size() != 3) {
+    std::string modifier = input.get();
+
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read a primitive type from line " + std::to_string(data.linenumber()) + " of input file");
         return nullptr;
     }
+    std::string type = input.get();
 
-    switch(typeFromString(list[1])) {
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read an identifier from line " + std::to_string(data.linenumber()) + " of input file");
+        return nullptr;
+    }
+    std::string id = input.get();
+
+    switch(typeFromString(type)) {
     case Polygon:
         rad = new PolygonGeometry();
         break;
-    //case Ring:
-    //    rad = new RingGeometry();
-    //    break;
+        //case Ring:
+        //    rad = new RingGeometry();
+        //    break;
     case Plastic:
         rad = new PlasticMaterial();
         break;
@@ -301,62 +315,100 @@ RadPrimitive* RadPrimitive::fromRad(std::istream &data)
         rad = new BSDFMaterial();
         break;
     default:
-        STADIC_LOG(Severity::Warning, "Unknown primitive \"" + list[1] + "\" in input.");
+        STADIC_LOG(Severity::Warning, "Unknown primitive \"" + type + "\" in input.");
         rad = new UnknownPrimitive();
-        rad->setType(list[1]);
+        rad->setType(type);
         break;
     }
-    rad->setModifier(list[0]);
-    rad->setName(list[2]);
+    rad->setModifier(modifier);
+    rad->setName(id);
 
     int nargs;
-    data>>string;   //Reads number of arguments from first line
-    nargs = toInteger(string);
-    if (nargs>0){
+
+    // Read the first argument line
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read a first argument count from line " + std::to_string(data.linenumber()) + " of input file");
+        delete rad;
+        return nullptr;
+    }
+
+    nargs = toInteger(input.get());
+    if(nargs>0){
         std::vector<std::string> args;
-        for (int i=0;i<nargs;i++){
-            data>>string;
-            args.push_back(string);
+        for(int i = 0; i<nargs; i++){
+            input = data.next();
+            if(!input) {
+                STADIC_LOG(Severity::Warning, "Insufficient first argument data on line " + std::to_string(data.linenumber()) + " of input file");
+                delete rad;
+                return nullptr;
+            }
+            args.push_back(input.get());
         }
         if(!rad->setArg1(args)) {
+            STADIC_LOG(Severity::Error, "Incorrect input in first argument set for " + type + " primitive, identifier "
+                + id);
             delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in first argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
             return nullptr;
         }
     }
 
-    data>>string;   //Reads number of arguments from second line
-    nargs = toInteger(string);
-    if (nargs>0){
+    // Read the first argument line
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read a second argument count from line " + std::to_string(data.linenumber()) + " of input file");
+        delete rad;
+        return nullptr;
+    }
+
+    nargs = toInteger(input.get());
+    if(nargs>0){
         std::vector<std::string> args;
-        for (int i=0;i<nargs;i++){
-            data>>string;
-            args.push_back(string);
+        for(int i = 0; i<nargs; i++){
+            input = data.next();
+            if(!input) {
+                STADIC_LOG(Severity::Warning, "Insufficient second argument data on line " + std::to_string(data.linenumber()) + " of input file");
+                delete rad;
+                return nullptr;
+            }
+            args.push_back(input.get());
         }
         if(!rad->setArg2(args)) {
             delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in second argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
+            STADIC_LOG(Severity::Error, "Incorrect input in second argument set for " + type + " primitive, identifier "
+                + id);
             return nullptr;
         }
     }
 
-    data>>string;   //Reads number of arguments from third line
-    nargs = toInteger(string);
-    if (nargs>0){
+    // Read the first argument line
+    input = data.next();
+    if(!input) {
+        STADIC_LOG(Severity::Warning, "Failed to read a third argument count from line " + std::to_string(data.linenumber()) + " of input file");
+        delete rad;
+        return nullptr;
+    }
+
+    nargs = toInteger(input.get());
+    if(nargs>0){
         std::vector<std::string> args;
-        for (int i=0;i<nargs;i++){
-            data>>string;
-            args.push_back(string);
+        for(int i = 0; i<nargs; i++){
+            input = data.next();
+            if(!input) {
+                STADIC_LOG(Severity::Warning, "Insufficient third argument data on line " + std::to_string(data.linenumber()) + " of input file");
+                delete rad;
+                return nullptr;
+            }
+            args.push_back(input.get());
         }
         if(!rad->setArg3(args)) {
+            STADIC_LOG(Severity::Error, "Incorrect input in third argument set for " + type + " primitive, identifier "
+                + id);
             delete rad;
-            STADIC_LOG(Severity::Error, "Incorrect input in third argument line for " + list[1] + " primitive, identifier "
-                + list[2]);
             return nullptr;
         }
     }
+    
     return rad;
 }
 
