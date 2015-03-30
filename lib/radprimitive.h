@@ -95,8 +95,7 @@ public:
 
     std::string toRad() const;  //!< Returns the primitive in Radiance's primitive file format
     static RadPrimitive *fromRad(RadParser &data);
-    static RadPrimitive *fromRad(std::istream &data);
-    static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
+    //static std::shared_ptr<RadPrimitive> fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives);
     static bool buildModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Attempts to build connections between primitives and modifier primitives, returns true on success
     static bool checkModifierTree(shared_vector<RadPrimitive> &primitives);  //!< Returns true if the input list of primitives represents a complete Radiance primitive input file
     static std::shared_ptr<RadPrimitive> sharedVoid();  //!< Returns a shared pointer to a void primitive - use this to limit the number of void primitives in memory

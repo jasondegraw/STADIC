@@ -429,6 +429,7 @@ RadPrimitive* RadPrimitive::fromRad(RadParser &data)
     return rad;
 }
 
+/*
 std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(std::stringstream &data, const shared_vector<RadPrimitive> &knownPrimitives)
 {
     RadPrimitive *rad;
@@ -523,6 +524,7 @@ std::shared_ptr<RadPrimitive> RadPrimitive::fromRad(std::stringstream &data, con
     }
     return std::shared_ptr<RadPrimitive>(rad);
 }
+*/
 
 bool RadPrimitive::buildModifierTree(shared_vector<RadPrimitive> &primitives)
 {
