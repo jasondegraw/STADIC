@@ -217,6 +217,14 @@ bool RadFileData::writeRadFile(std::string file)
         }
     }
 
+    // Write out the aliases - I'm not sure this is actually correct
+    if(m_aliases.size()) {
+        oFile << "## Aliases" << std::endl;
+        for(auto pair : m_aliases) {
+            oFile << "void alias " << pair.first->name() << " " << pair.second->name() << std::endl;
+        }
+    }
+
     primitives=geometry();
     count += primitives.size();
     if(primitives.size() > 0) {
@@ -297,6 +305,12 @@ shared_vector<RadPrimitive> RadFileData::materials() const
 shared_vector<RadPrimitive> RadFileData::primitives() const
 {
     return m_Primitives;
+}
+
+bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier)
+{
+    m_aliases.push_back(std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>(newModifier, oldModifier));
+    return true; // At some point there will need to be rule checking
 }
 
 }
