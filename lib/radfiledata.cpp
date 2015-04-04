@@ -307,9 +307,9 @@ shared_vector<RadPrimitive> RadFileData::primitives() const
     return m_Primitives;
 }
 
-bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier)
+bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> oldModifier, std::shared_ptr<RadPrimitive> newModifier)
 {
-    m_aliases.push_back(std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>(newModifier, oldModifier));
+    m_aliases.push_back(std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>(oldModifier, newModifier));
     return true; // At some point there will need to be rule checking
 }
 
