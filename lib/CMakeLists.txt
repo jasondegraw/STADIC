@@ -28,6 +28,7 @@ set(SRCS analemma.cpp
          windowgroup.cpp)
 
 set(HDRS stadicapi.h
+         sharedvector.h
          spacecontrol.h
          buildingcontrol.h
          windowgroup.h

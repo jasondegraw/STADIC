@@ -1030,9 +1030,9 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 //Create a file of the glazing layers with all BSDFs blacked out and simulate it
                 RadFileData *settingStdRad=new RadFileData(settingRad->primitives());
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
-                    if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                        return false;
-                    }
+//                    if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
+//                        return false;
+//                    }
                 }
                 std::string wgSettingFileStd=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_std.rad";
                 files[0]=wgSettingFileStd;
@@ -1110,9 +1110,9 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
 
     RadFileData *baseStdRad=new RadFileData(baseRad->primitives());
     for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfBaseLayers().size();j++){
-        if (!baseStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
-            return false;
-        }
+//        if (!baseStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfBaseLayers()[j])){
+//            return false;
+//        }
     }
     //Create base standard octree
     std::string wgBaseFileStd=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_std.rad";
@@ -1170,9 +1170,9 @@ bool Daylight::simCase3(int blindGroupNum, Control *model){
                 //Create a file of the glazing layers with all BSDFs blacked out and simulate it
                 RadFileData *settingStdRad=new RadFileData(settingRad->primitives());
                 for (int j=0;j<model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i].size();j++){
-                    if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
-                        return false;
-                    }
+//                    if (!settingStdRad->blackOutLayer(model->windowGroups()[blindGroupNum].bsdfSettingLayers()[i][j])){
+//                        return false;
+//                    }
                 }
                 std::string wgSettingFileStd=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_std.rad";
                 files[0]=wgSettingFileStd;
@@ -1804,9 +1804,9 @@ bool Daylight::createBaseRadFiles(Control *model){
                     return false;
                 }
                 for (int k=0;k<model->windowGroups()[j].glazingLayers().size();k++){
-                    if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
-                        return false;
-                    }
+//                    if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
+//                        return false;
+//                    }
                 }
             }
         }
