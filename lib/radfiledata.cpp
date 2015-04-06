@@ -208,6 +208,14 @@ bool RadFileData::writeRadFile(const std::string &file)
         }
     }
 
+    // Write out the aliases - I'm not sure this is actually correct
+    if(m_aliases.size()) {
+        oFile << "## Aliases" << std::endl;
+        for(auto pair : m_aliases) {
+            oFile << "void alias " << pair.first->name() << " " << pair.second->name() << std::endl;
+        }
+    }
+
     primitives=geometry();
     count += primitives.size();
     if(primitives.size() > 0) {
@@ -304,6 +312,12 @@ bool RadFileData::isConsistent()
 bool RadFileData::buildModifierTree()
 {
     return RadPrimitive::buildModifierTree(m_primitives);
+}
+
+bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> oldModifier, std::shared_ptr<RadPrimitive> newModifier)
+{
+    m_aliases.push_back(std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>(oldModifier, newModifier));
+    return true; // At some point there will need to be rule checking
 }
 
 }

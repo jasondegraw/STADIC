@@ -61,6 +61,10 @@ public:
     shared_vector<RadPrimitive> materials() const;                      //Function to get just the material primitives as a vector
     shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
 
+    // Aliasing
+    bool setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier);
+
+    // Consistency
     bool isConsistent();
     bool buildModifierTree();
 
@@ -73,6 +77,7 @@ public:
 
 private:
     shared_vector<RadPrimitive> m_primitives; //Vector to hold EVERYTHING
+    std::vector < std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> m_aliases; // Stop-gap to get this done now
 
 };
 
