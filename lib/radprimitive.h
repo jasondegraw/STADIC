@@ -69,6 +69,7 @@ public:
     //Setters
     virtual bool setType(const std::string &type);  //!< Set the primitive type, returns true on success. This function is overloaded by most subclasses
     void setName(const std::string &name);  //!< Set the name of the primitive
+    void setModifier(const std::shared_ptr<RadPrimitive> &modifier);
     virtual bool setArg1(std::vector<std::string> vals);  //!< Set the arguments on line one from a vector of strings, returns true on success
     virtual bool setArg1(const std::string &arg, int position);  //!< Set an argument on line one given the position of the argument, returns true on success
     virtual bool setArg2(std::vector<std::string> vals);  //!< Set the arguments on line two from a vector of strings, returns true on success

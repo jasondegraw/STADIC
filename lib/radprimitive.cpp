@@ -128,6 +128,12 @@ void RadPrimitive::setName(const std::string &name)
     m_Name=name;
 }
 
+void RadPrimitive::setModifier(const std::shared_ptr<RadPrimitive> &modifier)
+{
+    m_modifierName = boost::none;
+    m_modifier = modifier;
+}
+
 bool RadPrimitive::setArg1(std::vector<std::string> vals)
 {
     if(validateArg1(vals)) {
