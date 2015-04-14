@@ -1,0 +1,12 @@
+void plastic l_wall 0 0 5 .5 .5 .5 0 0
+
+void glass l_window 0 0 3 .65 .65 .65
+
+void plastic l_extwall 0 0 5 .15 .15 .15 0 0
+
+void plastic l_ground 0 0 5 .18 .18 .18 0 0
+
+void plastic l_floor 0 0 5 .25 .25 .25 0 0
+
+void plastic l_ceiling 0 0 5 .8 .8 .8 0 0
+

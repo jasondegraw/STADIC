@@ -1,5 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2015, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,12 +37,9 @@
 #include <memory>
 #include <utility>
 
-#include "stadicapi.h"
+#include "sharedvector.h"
 
-// This is a C++11 thing - if we can't use this then we're looking
-// at a define or some other horrifying construct
-template<typename T>
-using shared_vector = std::vector<std::shared_ptr<T> >;
+#include "stadicapi.h"
 
 namespace stadic {
 
@@ -51,19 +49,24 @@ public:
     explicit RadFileData();
     RadFileData(const shared_vector<RadPrimitive> &primitives);
 
-    bool addRad(std::string file);                                      //Function to add rad primitives from a rad file
-    //bool removeLayer(const QString &layer, const QString &removing, const QString &rest);   //Function to remove a layer from the list to its own geometry file
-    bool blackOutLayer(std::string layer);                              //Function to black out a layer
-    bool writeRadFile(std::string file);                                //Function to write the rad file from the list of primitives
-    std::vector<double> surfaceNormal(std::string layer);               //Function that returns the surface normal as a vector of doubles
+    bool addRad(const std::string &file);                                      //Function to add rad primitives from a rad file
+    bool writeRadFile(const std::string &file);                                //Function to write the rad file from the list of primitives
+    std::vector<double> surfaceNormal(const std::string &layer);               //Function that returns the surface normal as a vector of doubles
 
     bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
+    bool addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
 
     //Getters
     shared_vector<RadPrimitive> geometry() const;                       //Function to get just the geometry primitives as a vector
     shared_vector<RadPrimitive> materials() const;                      //Function to get just the material primitives as a vector
     shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
 
+    // Aliasing
+    bool setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier);
+
+    // Consistency
+    bool isConsistent();
+    bool buildModifierTree();
 
     template<class T> shared_vector<T> getPrimitives();
     // Splitting is officially broken
@@ -73,14 +76,15 @@ public:
     std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
 
 private:
-    shared_vector<RadPrimitive> m_Primitives; //Vector to hold EVERYTHING
+    shared_vector<RadPrimitive> m_primitives; //Vector to hold EVERYTHING
+    std::vector < std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> m_aliases; // Stop-gap to get this done now
 
 };
 
 template<class T> shared_vector<T> RadFileData::getPrimitives()
 {
     shared_vector<T> primitives;
-    for(auto primitive : m_Primitives) {
+    for(auto primitive : m_primitives) {
         auto cast = std::dynamic_pointer_cast<T>(primitive);
         if(cast) {
             primitives.push_back(cast);
