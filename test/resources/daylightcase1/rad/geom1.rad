@@ -70,7 +70,7 @@ l_walls polygon l_walls.8.1
 	1.000000 0.000000 4.000000
 
 
-l_glazing polygon l_glazing.9.1
+l_glazingS polygon l_glazing.9.1
 0 0 12 	1.000000 0.000000 4.000000
 	1.000000 0.000000 9.000000
 	19.000000 0.000000 9.000000

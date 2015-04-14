@@ -652,6 +652,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
+
         return false;
     }
 
@@ -968,6 +969,13 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
     baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
     std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
     baseRad->writeRadFile(wgBaseFile);
+    //Test for primitive continuity once that is working
+    /*
+    if(!baseRad->isConsistent()){
+        STADIC_LOG(stadic::Severity::Error, "The base rad file for window group "+toString(blindGroupNum)+" is not continuous through the primitive tree.");
+        return false;
+    }
+    */
     std::vector<std::string> files;
     files.push_back(wgBaseFile);
     files.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+"sky_white1.rad");
@@ -1807,8 +1815,13 @@ bool Daylight::createBaseRadFiles(Control *model){
     //Add the main material file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->matFile());
     RadPrimitive *black = new PlasticMaterial();
-    black->setModifier("void");
+    black->setModifier(RadPrimitive::sharedVoid());
     black->setName("black");
+    std::vector<std::string> blackArgs;
+    for (int i=0;i<5;i++){
+        blackArgs.push_back("0");
+    }
+    black->setArg3(blackArgs);
     radModel.addPrimitive(black);
     //Add the main geometry file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
