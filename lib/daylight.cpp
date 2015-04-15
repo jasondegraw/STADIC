@@ -614,9 +614,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     std::vector<std::string> arguments;
     arguments.push_back("-I+");
     if (model->getParamSet("default")){
-        for (auto param : model->getParamSet("default").get()){
-            arguments.push_back("-"+param.first);
-            arguments.push_back(param.second);
+        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+            arguments.push_back("-"+it->first);
+            arguments.push_back(it->second);
         }
     }else{
         STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
@@ -633,7 +634,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("sky_glow");
     arguments.push_back("-faa");
     std::string rcontribProgram="rcontrib";
-    Process rcontrib(rcontribProgram,arguments);
+
 
     std::string skyDC;
     if (setting==-1){
@@ -644,14 +645,21 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
         skyDC=model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
     }
+    Process rcontrib(rcontribProgram,arguments);
     rcontrib.setStandardOutputFile(skyDC);
-    rcontrib.setStandardInputFile(model->inputDirectory()+model->ptsFile()[0]);
+    if (stadic::exists(model->ptsFile()[0])){
+        rcontrib.setStandardInputFile(model->inputDirectory()+model->ptsFile()[0]);
+    }else{
+        STADIC_LOG(stadic::Severity::Error, "The points file "+model->ptsFile()[0] + " does not exist.");
+        return false;
+    }
 
+    rcontrib.setStandardErrorFile("c:/RcontribError.txt");
     rcontrib.start();
     if (!rcontrib.wait()){
         STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
-
+        STADIC_LOG(stadic::Severity::Info, "The command line entry is as follows:\n\t"+rcontrib.commandLine());
 
         return false;
     }
@@ -1814,14 +1822,9 @@ bool Daylight::createBaseRadFiles(Control *model){
     RadFileData radModel;
     //Add the main material file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->matFile());
-    RadPrimitive *black = new PlasticMaterial();
+    RadPrimitive *black = new PlasticMaterial(0,0,0,0,0);
     black->setModifier(RadPrimitive::sharedVoid());
     black->setName("black");
-    std::vector<std::string> blackArgs;
-    for (int i=0;i<5;i++){
-        blackArgs.push_back("0");
-    }
-    black->setArg3(blackArgs);
     radModel.addPrimitive(black);
     //Add the main geometry file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
