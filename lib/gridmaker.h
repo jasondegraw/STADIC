@@ -47,7 +47,7 @@ class STADIC_API GridMaker
 {
 public:
     GridMaker(std::vector<std::string> fileList);                                       //Constructor that takes a list of radiance geometry files
-
+    GridMaker(std::string file);                                                        //Constructor that takes a single radiane geometry file
     //Setters
     //Points
 

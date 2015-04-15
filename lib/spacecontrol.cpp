@@ -586,10 +586,10 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     treeVal=getObject(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", Severity::Fatal);
     //files
     boost::optional<JsonObject> list;
-    list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Fatal);
+    list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Warning);
     std::vector<std::string> tempVec;
     if (list.get().size()<1){
-        STADIC_LOG(Severity::Fatal, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
+        STADIC_LOG(Severity::Warning, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
     }
     for (unsigned index=0;index<list.get().size();index++){
         tempVec.push_back(list.get()[index].asString());
@@ -597,29 +597,57 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     setPTSFile(tempVec);
     list.reset();
     //x-spacing
+    dVal=getDouble(treeVal.get(), "x_spacing");
+    if (dVal){
+        setXSpacing(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "x_spacing");
     if (sVal){
         setXSpacing(sVal.get());
         sVal.reset();
     }
+    */
     //y-spacing
+    dVal=getDouble(treeVal.get(), "y_spacing");
+    if (dVal){
+        setYSpacing(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "y_spacing");
     if (sVal){
         setYSpacing(sVal.get());
         sVal.reset();
     }
+    */
     //offset
+    dVal=getDouble(treeVal.get(), "offset");
+    if (dVal){
+        setOffset(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "offset");
     if (sVal){
         setOffset(sVal.get());
         sVal.reset();
     }
+    */
     //z-offset
+    dVal=getDouble(treeVal.get(), "z_offset");
+    if (dVal){
+        setZOffset(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "z_offset");
     if (sVal){
         setZOffset(sVal.get());
         sVal.reset();
     }
+    */
     //identifier
     list=getArray(treeVal.get(),"identifier");
     if (list){

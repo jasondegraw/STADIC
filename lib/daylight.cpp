@@ -35,6 +35,7 @@
 #include "stadicprocess.h"
 #include <fstream>
 #include "materialprimitives.h"
+#include "gridmaker.h"
 
 namespace stadic {
 Daylight::Daylight(BuildingControl *model) :
@@ -640,18 +641,47 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if (setting==-1){
         //This is the base case
         arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
-        skyDC=model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
+        skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
     }else{
         arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
-        skyDC=model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
+        skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
     }
     Process rcontrib(rcontribProgram,arguments);
     rcontrib.setStandardOutputFile(skyDC);
+    //Test whether the points file exists.  If it doesn't, test whether the necessary arguments to create one exist.
     if (stadic::exists(model->ptsFile()[0])){
-        rcontrib.setStandardInputFile(model->inputDirectory()+model->ptsFile()[0]);
+        rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
     }else{
-        STADIC_LOG(stadic::Severity::Error, "The points file "+model->ptsFile()[0] + " does not exist.");
-        return false;
+        if (model->xSpacing()&&model->ySpacing()&& model->offset() && model->zOffset()&& (model->modifiers()||model->identifiers())){
+            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  A points file will attempt to be generated.");
+            GridMaker ptsCreator(model->spaceDirectory()+model->geoDirectory()+ model->geoFile());
+            ptsCreator.setSpaceX(toDouble(model->xSpacing().get()));
+            ptsCreator.setSpaceY(toDouble(model->ySpacing().get()));
+            ptsCreator.setOffset(toDouble(model->offset().get()));
+            ptsCreator.setOffsetZ(toDouble(model->zOffset().get()));
+            if (model->modifiers()){
+                ptsCreator.setLayerNames(model->modifiers().get());
+            }else{
+                ptsCreator.setIdentifiers(model->identifiers().get());
+            }
+            if (ptsCreator.makeGrid()){
+                if (!ptsCreator.writePTS(model->spaceDirectory()+model->inputDirectory()+model->spaceName()+"_AutoGen.pts")){
+                    STADIC_LOG(stadic::Severity::Error, "The writing of the points file has failed.");
+                    return false;
+                }
+                std::vector<std::string> ptsFiles;
+                ptsFiles.push_back(model->spaceName()+"_AutoGen.pts");
+                model->setPTSFile(ptsFiles);
+            }else{
+                STADIC_LOG(stadic::Severity::Error, "The creation of the points file has failed.");
+                return false;
+            }
+        }else{
+            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  And no arguments exist for one to be generated.");
+            return false;
+        }
+        rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        STADIC_LOG(stadic::Severity::Info, "A new points file has been successfully generated.");
     }
 
     rcontrib.setStandardErrorFile("c:/RcontribError.txt");
@@ -698,7 +728,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         std::string rcalcProgram="rcalc";
         Process rcalc(rcalcProgram,arguments2);
         cnt.setStandardOutputProcess(&rcalc);
-        rcalc.setStandardOutputFile(model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
+        rcalc.setStandardOutputFile(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
 
         cnt.start();
         rcalc.start();
