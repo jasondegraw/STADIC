@@ -36,6 +36,7 @@
 #include <fstream>
 #include "materialprimitives.h"
 #include "gridmaker.h"
+#include "weatherdata.h"
 
 namespace stadic {
 Daylight::Daylight(BuildingControl *model) :
@@ -747,11 +748,15 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     std::string sunsOct;
     if (setting==-1){
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad");
+        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
         sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_base.oct";
 
     }else{
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"set"+std::to_string(setting+1)+"_ste.rad");
+        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
         sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_std"+std::to_string(setting+1)+"std.oct";
 
@@ -763,11 +768,13 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     //rcontrib for sun
     arguments.clear();
     arguments.push_back("-I+");
-    arguments.push_back("-ab");
     if (model->getParamSet("default")){
-        for (auto param : model->getParamSet("default").get()){
-            arguments.push_back("-"+param.first);
-            arguments.push_back(param.second);
+        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+            if (it->first!="sj"){
+                arguments.push_back("-"+it->first);
+                arguments.push_back(it->second);
+            }
         }
     }else{
         STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
@@ -787,14 +794,14 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back(sunsOct);
     if (setting==-1){
         //This is the base case
-        sunDC=model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
+        sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
     }else{
         //This is for the settings
-        sunDC=model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
+        sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
     }
     Process rcontrib2(rcontribProgram,arguments);
     rcontrib2.setStandardOutputFile(sunDC);
-    rcontrib2.setStandardInputFile(model->inputDirectory()+model->ptsFile()[0]);
+    rcontrib2.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
 
     rcontrib2.start();
     if (!rcontrib2.wait()){
@@ -827,6 +834,21 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         STADIC_ERROR("The creation of the suns has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
 
+        return false;
+    }
+    //Generate Weather file if it hasn't been generated already
+    WeatherData tmpWeather;
+    if (m_Model->weaDataFile()){
+        if (!tmpWeather.parseWeather(m_Model->weaDataFile().get())){
+            STADIC_LOG(stadic::Severity::Error, "The parsing of the weather file failed.");
+            return false;
+        }
+        if (!tmpWeather.writeWea(model->spaceDirectory()+model->inputDirectory()+tmpWeather.place()+".wea")){
+            STADIC_LOG(stadic::Severity::Error, "The creation of the .wea file failed.");
+            return false;
+        }
+    }else{
+        STADIC_LOG(stadic::Severity::Error, "The weather file needed for running the simulation does not exist.");
         return false;
     }
 
