@@ -617,8 +617,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if (model->getParamSet("default")){
         std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
         for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-            arguments.push_back("-"+it->first);
-            arguments.push_back(it->second);
+            if (it->first!="sj"){
+                arguments.push_back("-"+it->first);
+                arguments.push_back(it->second);
+            }
         }
     }else{
         STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
@@ -653,7 +655,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
     }else{
         if (model->xSpacing()&&model->ySpacing()&& model->offset() && model->zOffset()&& (model->modifiers()||model->identifiers())){
-            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  A points file will attempt to be generated.");
+            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  The creation of a new points file will be attempted.");
             GridMaker ptsCreator(model->spaceDirectory()+model->geoDirectory()+ model->geoFile());
             ptsCreator.setSpaceX(toDouble(model->xSpacing().get()));
             ptsCreator.setSpaceY(toDouble(model->ySpacing().get()));
@@ -684,13 +686,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         STADIC_LOG(stadic::Severity::Info, "A new points file has been successfully generated.");
     }
 
-    rcontrib.setStandardErrorFile("c:/RcontribError.txt");
+    rcontrib.setStandardErrorFile(model->spaceDirectory()+"RcontribError.txt");
     rcontrib.start();
     if (!rcontrib.wait()){
         STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
         //I want to display the errors here if the standard error has any errors to show.
         STADIC_LOG(stadic::Severity::Info, "The command line entry is as follows:\n\t"+rcontrib.commandLine());
-
         return false;
     }
 
