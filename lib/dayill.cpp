@@ -32,6 +32,7 @@
 #include "logging.h"
 #include <fstream>
 #include "functions.h"
+#include "weatherdata.h"
 
 namespace stadic {
 
@@ -87,8 +88,6 @@ DaylightIlluminanceData::DaylightIlluminanceData()
 }
 
 
-
-
 bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
     std::ifstream iFile;
     iFile.open(fileName);
@@ -97,52 +96,35 @@ bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
         return false;
     }
 
-    std::ifstream weaInFile;
-    weaInFile.open(weaFile);
-    if (!weaInFile.is_open()){
-        STADIC_ERROR("The opening of the wea file " +weaFile+" failed.");
+    WeatherData weaData;
+    if(!weaData.parseWeather(weaFile)){
         return false;
     }
 
     std::string line;
-    std::string weaLine;
-    while (std::getline(iFile,line)){
-        int month,day;
-        double hour;
-        std::getline(weaInFile,weaLine);
-        std::vector<std::string> vals;
-        vals=split(weaLine,' ');
-        if(vals.size() < 5) {
-            STADIC_ERROR("The number of items on each line of the wea file is less than 5.");
-            return false;
+    int countHours=0;
+    bool firstPoint=true;
+    std::vector<std::vector<double>> illData;
+    while (std::getline(iFile, line)){
+        countHours++;
+        if (firstPoint){
+            std::vector<double> tmpIll;
+            tmpIll.push_back(toDouble(line));
+            illData.push_back(tmpIll);
+        }else{
+            illData[countHours-1].push_back(toDouble(line));
         }
-        month =atoi(vals[0].c_str());
-        if (month<1 || month>12){
-            STADIC_ERROR("One of the month values is not acceptable.");
-            return false;
+        if (countHours==weaData.hour().size()){
+            countHours=0;
+            firstPoint=false;
         }
-        day=atoi(vals[1].c_str());
-        if (day<1 || day>31){
-            STADIC_ERROR("One of the day values is not acceptable.");
-            return false;
-        }
-        hour=atof(vals[2].c_str());
-        if (hour<0 || hour>24){
-            STADIC_ERROR("One of the hour values is not acceptable.");
-            return false;
-        }
-        vals=split(line,' ');
-        std::vector<double> ill;
-
-        for (int i=0;i<vals.size();i++){
-            ill.push_back(atof(vals[i].c_str()));
-        }
-
-        TemporalIlluminance datapoint(month,day,hour,ill);
-        m_data.push_back(datapoint);
     }
     iFile.close();
-    weaInFile.close();
+    for (int i=0;i<weaData.hour().size();i++){
+        TemporalIlluminance datapoint(weaData.month()[i],weaData.day()[i],weaData.hour()[i],illData[i]);
+        m_data.push_back(datapoint);
+    }
+
     return true;
 }
 

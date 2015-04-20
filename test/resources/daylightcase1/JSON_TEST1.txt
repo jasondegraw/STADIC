@@ -67,7 +67,7 @@
 	"import_units" : "ft",
 	"illum_units" : "lux",
 	"display_units" : "ft",
-	"epw_file" : "c:/data/state_college.epw",
+	"epw_file" : "daylightcase1/data/state_college.epw",
 	"first_day" : 1,
 	"building_rotation" : 0,
 	"target_illuminance" : 500,		

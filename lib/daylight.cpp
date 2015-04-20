@@ -651,8 +651,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
     Process rcontrib(rcontribProgram,arguments);
     rcontrib.setStandardOutputFile(skyDC);
+
     //Test whether the points file exists.  If it doesn't, test whether the necessary arguments to create one exist.
-    if (stadic::exists(model->ptsFile()[0])){
+    if (stadic::exists(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0])){
         rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
     }else{
         if (model->xSpacing()&&model->ySpacing()&& model->offset() && model->zOffset()&& (model->modifiers()||model->identifiers())){
@@ -687,7 +688,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         STADIC_LOG(stadic::Severity::Info, "A new points file has been successfully generated.");
     }
 
-    rcontrib.setStandardErrorFile(model->spaceDirectory()+"RcontribError.txt");
     rcontrib.start();
     if (!rcontrib.wait()){
         STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
@@ -754,11 +754,11 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_base.oct";
 
     }else{
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"set"+std::to_string(setting+1)+"_ste.rad");
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.rad");
         //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
-        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_std"+std::to_string(setting+1)+"std.oct";
+        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_set"+std::to_string(setting+1)+"_std.oct";
 
     }
     if(!createOctree(octFiles,sunsOct)){
@@ -802,7 +802,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     Process rcontrib2(rcontribProgram,arguments);
     rcontrib2.setStandardOutputFile(sunDC);
     rcontrib2.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
-
     rcontrib2.start();
     if (!rcontrib2.wait()){
         STADIC_ERROR("The sun rcontrib run failed with the following errors.");
@@ -811,14 +810,40 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
+    //Generate Weather file if it hasn't been generated already.
+    if (!m_WeaFileName){
+        WeatherData tmpWeather;
+        if (m_Model->weaDataFile()){
+            if (!tmpWeather.parseWeather(m_Model->weaDataFile().get())){
+                return false;
+            }
+            std::string tmpWeaFileName;
+            tmpWeaFileName=model->spaceDirectory()+model->inputDirectory()+tmpWeather.place()+".wea";
+            std::vector<std::string> placeArgs;
+            placeArgs=trimmedSplit(tmpWeaFileName, ' ');
+            tmpWeaFileName.clear();
+            for (int i=0;i<placeArgs.size();i++){
+                tmpWeaFileName=tmpWeaFileName+placeArgs.at(i);
+            }
+            m_WeaFileName=tmpWeaFileName;
+            if (!tmpWeather.writeWea(m_WeaFileName.get())){
+                STADIC_LOG(stadic::Severity::Error, "The creation of the .wea file failed.");
+                return false;
+            }
+        }else{
+            STADIC_LOG(stadic::Severity::Error, "The weather file needed for running the simulation does not exist.");
+            return false;
+        }
+    }
+
     //gendaymtx for sun
     arguments.clear();
     arguments.push_back("-m");
     arguments.push_back(std::to_string( model->sunDivisions()));
     arguments.push_back("-5");
     arguments.push_back("-d");
-    arguments.push_back("-h");
-    arguments.push_back(m_Model->weaDataFile().get());
+    arguments.push_back("-ho");
+    arguments.push_back(m_WeaFileName.get());
     std::string gendaymtxProgram="gendaymtx";
     Process gendaymtx(gendaymtxProgram,arguments);
 
@@ -831,26 +856,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx.setStandardOutputFile(sunSMX);
     gendaymtx.start();
     if (!gendaymtx.wait()){
-        STADIC_ERROR("The creation of the suns has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
+        STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
+        return false;
+    }
 
-        return false;
-    }
-    //Generate Weather file if it hasn't been generated already
-    WeatherData tmpWeather;
-    if (m_Model->weaDataFile()){
-        if (!tmpWeather.parseWeather(m_Model->weaDataFile().get())){
-            STADIC_LOG(stadic::Severity::Error, "The parsing of the weather file failed.");
-            return false;
-        }
-        if (!tmpWeather.writeWea(model->spaceDirectory()+model->inputDirectory()+tmpWeather.place()+".wea")){
-            STADIC_LOG(stadic::Severity::Error, "The creation of the .wea file failed.");
-            return false;
-        }
-    }else{
-        STADIC_LOG(stadic::Severity::Error, "The weather file needed for running the simulation does not exist.");
-        return false;
-    }
 
     //gendaymtx for sky
     arguments.clear();
@@ -860,8 +869,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.push_back("1");
     arguments.push_back("1");
     arguments.push_back("1");
-    arguments.push_back("-h");
-    arguments.push_back(m_Model->weaDataFile().get());
+    arguments.push_back("-ho");
+    arguments.push_back(m_WeaFileName.get());
     Process gendaymtx2(gendaymtxProgram,arguments);
 
     std::string skySMX;
@@ -883,9 +892,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.clear();
     arguments.push_back("-m");
     arguments.push_back(std::to_string( model->skyDivisions()));
-    arguments.push_back("d");
-    arguments.push_back("-h");
-    arguments.push_back(m_Model->weaDataFile().get());
+    arguments.push_back("-d");
+    arguments.push_back("-ho");
+    arguments.push_back(m_WeaFileName.get());
     Process gendaymtx3(gendaymtxProgram,arguments);
 
     std::string sunPatchSMX;
@@ -897,9 +906,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     gendaymtx3.setStandardOutputFile(sunPatchSMX);
     gendaymtx3.start();
     if (!gendaymtx3.wait()){
-        STADIC_ERROR("The creation of the sun patches has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
-
+        STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
         return false;
     }
 
@@ -907,6 +914,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     arguments.clear();
     arguments.push_back("-n");
     arguments.push_back("8760");
+    //Added this line from an email that didn't exist before
+    arguments.push_back(skyDC);
     arguments.push_back(skySMX);
     std::string dctimestepProgram="dctimestep";
     Process dctimestep(dctimestepProgram,arguments);
@@ -926,7 +935,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         skyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sky_std.txt";
     }
     rcollate.setStandardOutputFile(skyCollated);
-
     dctimestep.start();
     rcollate.start();
 
@@ -938,7 +946,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
 
     //dctimestep | rcollate for the sun
-    arguments[2]=sunSMX;
+    //Added this line from an email that didn't exist before
+    arguments[2]=sunDC;
+    arguments[3]=sunSMX;
     Process dctimestep2(dctimestepProgram,arguments);
     std::string sunCollated;
     if (setting==-1){
@@ -949,7 +959,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     Process rcollate2(rcollateProgram,arguments2);
     dctimestep2.setStandardOutputProcess(&rcollate2);
     rcollate2.setStandardOutputFile(sunCollated);
-
     dctimestep2.start();
     rcollate2.start();
 
@@ -962,7 +971,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
 
     //dctimestep | rcollate for the sun patch
-    arguments[2]=sunPatchSMX;
+    //Added this line from an email that didn't exist before
+    arguments[2]=skyDC;
+    arguments[3]=sunPatchSMX;
     Process dctimestep3(dctimestepProgram,arguments);
     std::string sunPatchCollated;
     if (setting==-1){
@@ -986,14 +997,15 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     //rlam | rcalc bringing it all together
     arguments.clear();
     arguments.push_back(skyCollated);
-    arguments.push_back(sunCollated);
     arguments.push_back(sunPatchCollated);
+    arguments.push_back(sunCollated);
+
     std::string rlamProgram="rlam";
     Process rlam(rlamProgram,arguments);
 
     arguments2.clear();
     arguments2.push_back("-e");
-    arguments2.push_back("r=$1-$4+$7;g=$2-@5+8;b=$3-$6+$9");
+    arguments2.push_back("r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9");
     arguments2.push_back("-e");
     arguments2.push_back("ill=179*(.265*r+.670*g+.065*b)");
     arguments2.push_back("-e");
@@ -1010,7 +1022,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
 
     rcalc.setStandardOutputFile(finalIll);
-
     rlam.start();
     rcalc.start();
 
@@ -1933,11 +1944,12 @@ bool Daylight::createOctree(std::vector<std::string> files, std::string octreeNa
 }
 
 bool Daylight::sumIlluminanceFiles(Control *model){
+    STADIC_LOG(Severity::Info, "Writing out the illuminance files.");
     std::string FinalIllFileName;
     std::string tempFileName;
     for (int i=0;i<model->windowGroups().size();i++){
         //Base Illuminance files
-        FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+model->windowGroups()[i].name()+"_base.ill";
+        FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
         DaylightIlluminanceData baseIll;
         if(isFile(tempFileName)){
@@ -1978,15 +1990,17 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
             DaylightIlluminanceData settingIll;
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
-            FinalIllFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
+            FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
             if(isFile(tempFileName)){
                 if (!settingIll.parse(tempFileName,m_Model->weaDataFile().get())){
                     return false;
                 }
-                if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=0){
-                    for (int k=0;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
-                        tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+".ill";
-                        settingIll.addIllFile(tempFileName);
+                if (model->windowGroups()[i].bsdfSettingLayers().size()>=j+1){
+                    if (model->windowGroups()[i].bsdfSettingLayers()[j].size()>0){
+                        for (int k=0;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
+                            tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+".ill";
+                            settingIll.addIllFile(tempFileName);
+                        }
                     }
                 }
                 settingIll.writeIllFileLux(FinalIllFileName);
