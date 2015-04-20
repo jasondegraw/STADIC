@@ -59,8 +59,8 @@ bool Daylight::simDaylight()
         }
 
         bool BSDFs=false;
-        for (int i=0;i<m_SimCase.size();i++){
-            if (m_SimCase[i]>0){
+        for (int j=0;j<m_SimCase.size();j++){
+            if (m_SimCase[j]>0){
                 BSDFs=true;
             }
         }
