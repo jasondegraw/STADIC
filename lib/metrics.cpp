@@ -89,13 +89,78 @@ bool Metrics::processMetrics()
 
 bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
 {
-    for (int i=0;i<dayIll->illuminance().size();i++){
-
+    std::vector<int> pointCount;
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        pointCount.push_back(0);
     }
+    int hourCount=0;
+    for (int i=0;i<dayIll->illuminance().size();i++){
+        if(m_Occupancy[i]){
+            hourCount++;
+            if (model->illumUnits()=="lux"){
+                for (int j=0;j<dayIll->illuminance()[i].lux().size();j++){
+                    if (dayIll->illuminance()[i].lux()[j]>model->DAIllum()){
+                        pointCount[j]++;
+                    }
+                }
+            }else{
+                for (int j=0;j<dayIll->illuminance()[i].fc().size();j++){
+                    if (dayIll->illuminance()[i].fc()[j]>model->DAIllum()){
+                        pointCount[j]++;
+                    }
+                }
+            }
+        }
+    }
+
+    std::ofstream outDA;
+    std::string tmpFileName;
+    tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_DA.res";
+    outDA.open(tmpFileName);
+    if (!outDA.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the Daylight Autonomy results file "+tmpFileName +" has failed.");
+        return false;
+    }
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        outDA<<double(pointCount[i])/hourCount<<std::endl;
+    }
+    outDA.close();
     return true;
 }
 bool Metrics::calculatecDA(Control *model, DaylightIlluminanceData *dayIll)
 {
+    std::vector<double> pointCount;
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        pointCount.push_back(0);
+    }
+    int hourCount=0;
+    for (int i=0;i<dayIll->illuminance().size();i++){
+        if(m_Occupancy[i]){
+            hourCount++;
+            if (model->illumUnits()=="lux"){
+                for (int j=0;j<dayIll->illuminance()[i].lux().size();j++){
+                    pointCount[j]=pointCount[j]+dayIll->illuminance()[i].lux()[j]/model->cDAIllum();
+                }
+            }else{
+                for (int j=0;j<dayIll->illuminance()[i].fc().size();j++){
+                    pointCount[j]=pointCount[j]+dayIll->illuminance()[i].fc()[j]/model->cDAIllum();
+                }
+            }
+        }
+    }
+
+    std::ofstream outcDA;
+    std::string tmpFileName;
+    tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_cDA.res";
+    outcDA.open(tmpFileName);
+    if (!outcDA.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the Continuous Daylight Autonomy results file "+tmpFileName +" has failed.");
+        return false;
+    }
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        outcDA<<double(pointCount[i])/hourCount<<std::endl;
+    }
+    outcDA.close();
 
     return true;
 }
@@ -106,6 +171,78 @@ bool Metrics::calculateDF(Control *model, DaylightIlluminanceData *dayIll)
 }
 bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
 {
+    std::vector<double> countWithin;
+    std::vector<double> countBelow;
+    std::vector<double> countAbove;
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        countWithin.push_back(0);
+        countBelow.push_back(0);
+        countAbove.push_back(0);
+    }
+    int hourCount=0;
+    for (int i=0;i<dayIll->illuminance().size();i++){
+        if(m_Occupancy[i]){
+            hourCount++;
+            if (model->illumUnits()=="lux"){
+                for (int j=0;j<dayIll->illuminance()[i].lux().size();j++){
+                    if (dayIll->illuminance()[i].lux()[j]<model->UDIMin()){
+                        countBelow[j]++;
+                    }else if(dayIll->illuminance()[i].lux()[j]<=model->UDIMax()){
+                        countWithin[j]++;
+                    }else{
+                        countAbove[j]++;
+                    }
+                }
+            }else{
+                for (int j=0;j<dayIll->illuminance()[i].fc().size();j++){
+                    if (dayIll->illuminance()[i].fc()[j]<model->UDIMin()){
+                        countBelow[j]++;
+                    }else if(dayIll->illuminance()[i].fc()[j]<=model->UDIMax()){
+                        countWithin[j]++;
+                    }else{
+                        countAbove[j]++;
+                    }
+                }
+            }
+        }
+    }
+
+    std::ofstream outUDIbelow;
+    std::string tmpFileName;
+    tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_below_UDI.res";
+    outUDIbelow.open(tmpFileName);
+    if (!outUDIbelow.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the below UDI results file "+tmpFileName +" has failed.");
+        return false;
+    }
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        outUDIbelow<<double(countBelow[i])/hourCount<<std::endl;
+    }
+    outUDIbelow.close();
+
+    std::ofstream outUDI;
+    tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_UDI.res";
+    outUDI.open(tmpFileName);
+    if (!outUDI.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the UDI results file "+tmpFileName +" has failed.");
+        return false;
+    }
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        outUDI<<double(countWithin[i])/hourCount<<std::endl;
+    }
+    outUDI.close();
+
+    std::ofstream outUDIabove;
+    tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_above_UDI.res";
+    outUDIabove.open(tmpFileName);
+    if (!outUDIabove.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the above UDI results file "+tmpFileName +" has failed.");
+        return false;
+    }
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        outUDIabove<<double(countAbove[i])/hourCount<<std::endl;
+    }
+    outUDIabove.close();
 
     return true;
 }
