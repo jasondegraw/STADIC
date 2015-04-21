@@ -194,6 +194,9 @@ bool Control::setDA(bool run, double illum){
     }
     return true;
 }
+void Control::setCalcDA(bool run){
+    m_DA=run;
+}
 bool Control::setcDA(bool run, double illum){
     m_cDA=run;
     if (illum>0){
@@ -203,6 +206,9 @@ bool Control::setcDA(bool run, double illum){
         return false;
     }
     return true;
+}
+void Control::setCalccDA(bool run){
+    m_cDA=run;
 }
 bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, double endTime){
     m_sDA=run;
@@ -232,6 +238,9 @@ bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, do
     }
     return true;
 }
+void Control::setCalcsDA(bool run){
+    m_sDA=run;
+}
 bool Control::setOccsDA(bool run, double illum, double DAFrac){
     m_OccsDA=run;
     if (illum>0){
@@ -248,6 +257,9 @@ bool Control::setOccsDA(bool run, double illum, double DAFrac){
     }
     return true;
 }
+void Control::setCalcOccsDA(bool run){
+    m_OccsDA=run;
+}
 void Control::setDF(bool run){
     m_DF=run;
 }
@@ -262,7 +274,9 @@ bool Control::setUDI(bool run, double minIllum, double maxIllum){
     m_UDIMax=maxIllum;
     return true;
 }
-
+void Control::setCalcUDI(bool run){
+    m_UDI=run;
+}
 
 
 //Getters

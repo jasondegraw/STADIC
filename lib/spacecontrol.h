@@ -98,11 +98,16 @@ public:
     //Metrics
     //******************
     bool setDA(bool run, double illum);
+    void setCalcDA(bool run);
     bool setcDA(bool run, double illum);
+    void setCalccDA(bool run);
     bool setsDA(bool run, double illum, double DAFrac, double startTime, double endTime);
+    void setCalcsDA(bool run);
     bool setOccsDA(bool run, double illum, double DAFrac);
+    void setCalcOccsDA(bool run);
     void setDF(bool run);
     bool setUDI(bool run, double minIllum, double maxIllum);
+    void setCalcUDI(bool run);
 
 
     //Getters
