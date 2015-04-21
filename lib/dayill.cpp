@@ -271,4 +271,9 @@ int DaylightIlluminanceData::hoursGreaterThan(double value,int point)
 }
 */
 
+std::vector<TemporalIlluminance> DaylightIlluminanceData::illuminance() const
+{
+    return m_data;
+}
+
 }

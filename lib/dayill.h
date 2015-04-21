@@ -72,7 +72,7 @@ public:
     bool writeIllFileLux(std::string fileName);                                    //Function to write the illuminance file in lux
     bool writeIllFileFC(std::string fileName);                                  //Function to write the illuminance file in fc
     //Getters
-    std::vector<TemporalIlluminance> illuminance();                             //Function that returns the illuminance values in a vector
+    std::vector<TemporalIlluminance> illuminance() const;                             //Function that returns the illuminance values in a vector
 
     //int hoursGreaterThan(double value, int point);
 
