@@ -496,6 +496,141 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
 }
 bool Metrics::calculateOccsDA(Control *model, DaylightIlluminanceData *dayIll)
 {
+    //Calculate the area of the floor polygons
+    GridMaker gridSize(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
+    if (model->identifiers()){
+        gridSize.setIdentifiers(model->identifiers().get());
+    }else if (model->modifiers()){
+        gridSize.setLayerNames(model->modifiers().get());
+    }else{
+        STADIC_LOG(Severity::Warning, "The calculation of sDA for "+model->spaceName()+" cannot be completed without a list of floor geometry.");
+        return false;
+    }
+    if (!gridSize.calcArea()){
+        STADIC_LOG(Severity::Error, "The calculation of the floor area for "+model->spaceName()+" has failed.");
+        return false;
+    }
+    double area;
+    area=gridSize.area();
+    //Correct all values to be in feet.
+    if (model->importUnits()=="mm"){
+        area=area*0.00328084*0.00328084;
+    }else if (model->importUnits()=="in"){
+        area=area/144;
+    }else if (model->importUnits()=="m"){
+        area=area*3.28084*3.28084;
+    }
+    //Parse the shade option file
+    std::vector<std::vector<int>> shadeSchedule;
+    shadeSchedule.resize(dayIll->illuminance().size());
+    for (int i=0;i<shadeSchedule.size();i++){
+        for (int j=0;j<model->windowGroups().size();j++){
+            shadeSchedule[i].push_back(0);
+        }
+    }
+    std::ifstream shadeFile;
+    shadeFile.open(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shades.sch");
+    if (!shadeFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the shade schedule file "+model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shades.sch has failed.");
+        return false;
+    }
+    std::string line;
+    int lineCounter=0;
+    while (std::getline(shadeFile, line)){
+        std::vector<std::string> vals;
+        vals=trimmedSplit(line, ',');
+        for (int i=3;i<vals.size();i++){
+            shadeSchedule[lineCounter][i-3]=toInteger(vals[i]);
+        }
+        lineCounter++;
+    }
+
+
+    //Combine Illuminance files based on shade option schedule
+    std::vector<DaylightIlluminanceData> baseIlls;
+    std::vector<std::vector<DaylightIlluminanceData>> settingIlls;
+    settingIlls.resize(model->windowGroups().size());
+    for (int i=0;i<model->windowGroups().size();i++){
+        DaylightIlluminanceData illBase;
+        illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
+        baseIlls.push_back(illBase);
+        for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
+            DaylightIlluminanceData illSetting;
+            illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(j+1)+".ill");
+            settingIlls[i].push_back(illSetting);
+        }
+
+    }
+    DaylightIlluminanceData finalIlluminance;
+    std::vector<double> finalTemporalIll;
+    for (int i=0;i<shadeSchedule.size();i++){               //Loop over the entire year
+        finalTemporalIll.clear();
+        for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
+            finalTemporalIll.push_back(0);
+        }
+        for (int j=0;j<shadeSchedule[i].size();j++){        //Loop over window groups
+            if (shadeSchedule[i][j]){           //Shades Employed
+                for (int k=0;k<settingIlls[j][shadeSchedule[i][j]-1].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + settingIlls[j][shadeSchedule[i][j]-1].illuminance()[i].lux()[k];
+                }
+            }else{                              //Use base condition
+                for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
+                }
+            }
+        }
+        TemporalIlluminance dataPoint(baseIlls[0].illuminance()[i].month(), baseIlls[0].illuminance()[i].day(), baseIlls[0].illuminance()[i].hour(), finalTemporalIll);
+        finalIlluminance.addDataPoint(dataPoint);
+    }
+    //Write out sDA by point (DA with sDA shade control)
+    int countHours=0;
+    std::vector<int> sDACount;
+    sDACount.resize(finalIlluminance.illuminance()[0].lux().size());
+    if (model->illumUnits()=="lux"){
+        for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
+            if (m_Occupancy[i]>(0.1)){                                      //This threshold should probably come from the user.
+                countHours++;
+                for (int j=0;j<finalIlluminance.illuminance()[0].lux().size();j++){
+                    if (finalIlluminance.illuminance()[i].lux()[j]>model->occsDAIllum()){
+                        sDACount[j]++;
+                    }
+                }
+            }
+        }
+    }else{
+        for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
+            if (m_Occupancy[i]>(0.1)){
+                countHours++;
+                for (int j=0;j<finalIlluminance.illuminance()[0].fc().size();j++){
+                    if (finalIlluminance.illuminance()[i].fc()[j]>model->occsDAIllum()){
+                        sDACount[j]++;
+                    }
+                }
+            }
+        }
+    }
+
+    finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_occupancy_sDA.ill");
+    int finalsDA=0;
+    for (int i=0;i<sDACount.size();i++){
+        if (sDACount[i]/double(countHours)>model->occsDAFrac()){
+            finalsDA++;
+        }
+    }
+    std::ofstream sDAPoint;
+    std::string tempFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_occupancy_sDA_Points.res";
+    sDAPoint.open(tempFileName);
+    if (!sDAPoint.is_open()){
+        STADIC_LOG(Severity::Warning, "The opening of the sDA points result file "+tempFileName+" has failed.");
+        return false;
+    }
+    sDAPoint<<"area= "<<area<<std::endl;
+    sDAPoint<<"points= "<<sDACount.size()<<std::endl;
+    sDAPoint<<"occupancy_sDA= "<<finalsDA/double(sDACount.size())<<std::endl;
+    for (int i=0;i<sDACount.size();i++){
+        sDAPoint<<toString(sDACount[i]/double(countHours))<<std::endl;
+    }
+    sDAPoint.close();
 
     return true;
 }
