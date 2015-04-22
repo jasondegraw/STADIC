@@ -39,7 +39,8 @@
        		"illuminance" : 300,
 			"DA_fraction" : 0.5,
 			"start_time" : 8,
-			"end_time" : 17
+			"end_time" : 17,
+			"window_group_settings" : [1]
 		},
 		"occupied_sDA" : {
 			"calculate" : true,

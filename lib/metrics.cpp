@@ -638,7 +638,7 @@ bool Metrics::parseOccupancy(std::string file, double threshold){
     std::ifstream occFile;
     occFile.open(file);
     if (!occFile.is_open()){
-        STADIC_LOG(Severity::Error, "The opening of the occupancy file "+file+" has failed.");
+        STADIC_LOG(Severity::Error, "The opening of the occupancy csv file "+file+" has failed.");
         return false;
     }
     std::string line;
