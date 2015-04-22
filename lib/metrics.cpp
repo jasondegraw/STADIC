@@ -318,15 +318,146 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
         baseDirectIlls.push_back(illBase);
     }
 
-    //Find the combination closest to the sDAPercent without going over
+    //Find the combination closest to the sDAPercent without going over and produce shade schedule
     std::vector<std::vector<int>> shadeSchedule;
     shadeSchedule.resize(baseDirectIlls[0].illuminance().size());
     for (int i=0;i<baseDirectIlls[0].illuminance().size();i++){
-        shadeSchedule[i].resize(model->windowGroups().size());
+        for (int j=0;j<model->windowGroups().size();j++){
+            shadeSchedule[i].push_back(0);
+        }
     }
     for (int i=0;i<baseDirectIlls[0].illuminance().size();i++){         //Loop through the number of hours in the year
-
+        bool allZeros=true;
+        for (int p=0;p<model->windowGroups().size();p++){
+            if (!baseDirectIlls[p].illuminance()[i].allZeros()){
+                allZeros=false;
+            }
+        }
+        if (!allZeros){
+            std::vector<double> fracDirectSun;                              //Fraction of direct sun per window group
+            for (int j=0;j<model->windowGroups().size();j++){
+                fracDirectSun.push_back(baseDirectIlls[j].illuminance()[i].fractionAboveTarget(300));
+            }
+            int closestCombo;                                               //Variable to hold the index of the best combination
+            double tempFracTotal=0;
+            double min=1;
+            for (int j=0;j<combinations.size();j++){                        //Loop through the possible combinations
+                for (int k=0;k<fracDirectSun.size();k++){
+                    if (!combinations[j][k]){                                  //True if the shades are employed
+                        tempFracTotal=tempFracTotal+fracDirectSun[k];
+                    }
+                }
+                if (sDAPercent>tempFracTotal && (sDAPercent-tempFracTotal)<=min){
+                    closestCombo=j;
+                    min=sDAPercent-tempFracTotal;
+                }
+            }
+            for (int j=0;j<model->windowGroups().size();j++){
+                if (combinations[closestCombo][j]){
+                    shadeSchedule[i][j]=model->sDAwgSettings()[j];
+                }
+            }
+        }
     }
+
+    //Write out the sDA shade option file
+    std::ofstream sDAShades;
+    std::string tempFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_sDA_ShadeSchedule.res";
+    sDAShades.open(tempFileName);
+    if (!sDAShades.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the file "+tempFileName+" has failed.");
+        return false;
+    }
+    for (int i=0;i<shadeSchedule.size();i++){
+        sDAShades<<toString(baseDirectIlls[0].illuminance()[i].month())<<" ";
+        sDAShades<<toString(baseDirectIlls[0].illuminance()[i].day())<<" ";
+        sDAShades<<toString(baseDirectIlls[0].illuminance()[i].hour());
+        for (int j=0;j<shadeSchedule[i].size();j++){
+            sDAShades<<" "<<toString(shadeSchedule[i][j])<<std::endl;
+        }
+    }
+
+    //Combine Illuminance files based on shade option schedule
+    std::vector<DaylightIlluminanceData> baseIlls;
+    std::vector<DaylightIlluminanceData> settingIlls;
+    for (int i=0;i<model->windowGroups().size();i++){
+        DaylightIlluminanceData illBase;
+        illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
+        baseIlls.push_back(illBase);
+        DaylightIlluminanceData illSetting;
+        illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(model->sDAwgSettings()[i])+".ill");
+        settingIlls.push_back(illSetting);
+    }
+    DaylightIlluminanceData finalIlluminance;
+    std::vector<double> finalTemporalIll;
+    for (int i=0;i<shadeSchedule.size();i++){               //Loop over the entire year
+        finalTemporalIll.clear();
+        for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
+            finalTemporalIll.push_back(0);
+        }
+        for (int j=0;j<shadeSchedule[i].size();j++){        //Loop over window groups
+            if (shadeSchedule[i][j]){           //Shades Employed
+                for (int k=0;k<settingIlls[j].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + settingIlls[j].illuminance()[i].lux()[k];
+                }
+            }else{                              //Use base condition
+                for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
+                }
+            }
+        }
+        TemporalIlluminance dataPoint(baseDirectIlls[0].illuminance()[i].month(), baseDirectIlls[0].illuminance()[i].day(), baseDirectIlls[0].illuminance()[i].hour(), finalTemporalIll);
+        finalIlluminance.addDataPoint(dataPoint);
+    }
+    //Write out sDA by point (DA with sDA shade control)
+    int countHours=0;
+    std::vector<int> sDACount;
+    sDACount.resize(finalIlluminance.illuminance()[0].lux().size());
+    if (model->illumUnits()=="lux"){
+        for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
+            if (finalIlluminance.illuminance()[i].hour()>=model->sDAStart()&&finalIlluminance.illuminance()[i].hour()<=model->sDAEnd()){
+                countHours++;
+                for (int j=0;j<finalIlluminance.illuminance()[0].lux().size();j++){
+                    if (finalIlluminance.illuminance()[i].lux()[j]>model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                }
+            }
+        }
+    }else{
+        for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
+            if (finalIlluminance.illuminance()[i].hour()>=model->sDAStart()&&finalIlluminance.illuminance()[i].hour()<=model->sDAEnd()){
+                countHours++;
+                for (int j=0;j<finalIlluminance.illuminance()[0].fc().size();j++){
+                    if (finalIlluminance.illuminance()[i].fc()[j]>model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                }
+            }
+        }
+    }
+
+    finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_sDA.ill");
+    int finalsDA=0;
+    for (int i=0;i<sDACount.size();i++){
+        if (sDACount[i]/double(countHours)>model->sDAFrac()){
+            finalsDA++;
+        }
+    }
+    std::ofstream sDAPoint;
+    tempFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_sDA_Points.res";
+    sDAPoint.open(tempFileName);
+    if (!sDAPoint.is_open()){
+        STADIC_LOG(Severity::Warning, "The opening of the sDA points result file "+tempFileName+" has failed.");
+        return false;
+    }
+    sDAPoint<<"area= "<<area<<std::endl;
+    sDAPoint<<"points= "<<sDACount.size()<<std::endl;
+    sDAPoint<<"sDA= "<<finalsDA/double(sDACount.size())<<std::endl;
+    for (int i=0;i<sDACount.size();i++){
+        sDAPoint<<toString(sDACount[i]/double(countHours))<<std::endl;
+    }
+    sDAPoint.close();
 
 
     return true;

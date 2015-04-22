@@ -90,6 +90,15 @@ bool TemporalIlluminance::allZeros(){
     }
     return true;
 }
+double TemporalIlluminance::fractionAboveTarget(double target){
+    double tempFrac=0;
+    for (int i=0;i<m_Illuminance.size();i++){
+        if (m_Illuminance[i]>target){
+            tempFrac++;
+        }
+    }
+    return tempFrac/m_Illuminance.size();
+}
 
 DaylightIlluminanceData::DaylightIlluminanceData()
 {
@@ -264,6 +273,9 @@ bool DaylightIlluminanceData::writeIllFileFC(std::string fileName){
     }
     oFile.close();
     return true;
+}
+void DaylightIlluminanceData::addDataPoint(TemporalIlluminance dataPoint){
+    m_data.push_back(dataPoint);
 }
 
 /*
