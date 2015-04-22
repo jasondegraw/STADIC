@@ -317,6 +317,38 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
         illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill");
         baseDirectIlls.push_back(illBase);
     }
+    //Calculate ASE
+    std::vector<int> countASE;
+    for (int i=0;i<baseDirectIlls[0].illuminance()[0].lux().size();i++){            //Loop over points
+        countASE.push_back(0);
+        for (int j=0;j<baseDirectIlls[0].illuminance().size();j++){                 //Loop over hours in the year
+            if (baseDirectIlls[0].illuminance()[j].hour()>=model->sDAStart()&&baseDirectIlls[0].illuminance()[j].hour()<=model->sDAEnd()){
+                double tempIll=0;
+                for (int k=0;k<baseDirectIlls.size();k++){                          //Loop over window groups
+                    tempIll=tempIll+baseDirectIlls[k].illuminance()[j].lux()[i];    //Sum the direct illuminance from window groups
+                }
+                if (tempIll>1000){                                                  //Test whether it is over the threshold of 1000 lux and add 1 to the count if it is
+                    countASE[i]++;
+                }
+            }
+        }
+    }
+    int totalPoints=0;
+    for (int i=0;i<countASE.size();i++){
+        if (countASE[i]>250){
+            totalPoints++;
+        }
+    }
+    //Write out ASE
+    std::ofstream outASE;
+    outASE.open(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_ASE.res");
+    if (!outASE.is_open()){
+        STADIC_LOG(Severity::Warning, "The results file for the ASE calculation failed to open for "+model->spaceName()+".");
+    }else{
+        outASE<<"area= "<<area<<std::endl;
+        outASE<<"ASE= "<<double(totalPoints)/countASE.size()<<std::endl;
+        outASE.close();
+    }
 
     //Find the combination closest to the sDAPercent without going over and produce shade schedule
     std::vector<std::vector<int>> shadeSchedule;
