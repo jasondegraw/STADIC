@@ -810,6 +810,53 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
+    //rcontrib for direct sun (sDA & ASE)
+    arguments.clear();
+    arguments.push_back("-I+");
+    if (model->getParamSet("default")){
+        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+            if (it->first!="sj" && it->first!="ab"){
+                arguments.push_back("-"+it->first);
+                arguments.push_back(it->second);
+            }
+        }
+        arguments.push_back("-ab");
+        arguments.push_back("0");
+    }else{
+        STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+    }
+    arguments.push_back("-e");
+    arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
+    arguments.push_back("-f");
+    arguments.push_back("reinhart.cal");
+    arguments.push_back("-b");
+    arguments.push_back("rbin");
+    arguments.push_back("-bn");
+    arguments.push_back("Nrbins");
+    arguments.push_back("-m");
+    arguments.push_back("solar");
+    arguments.push_back("-faa");
+    std::string directSunDC;
+    arguments.push_back(sunsOct);
+    if (setting==-1){
+        //This is the base case
+        directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d_direct.dc";
+    }else{
+        //This is for the settings
+        directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std_direct.dc";
+    }
+    Process rcontrib3(rcontribProgram,arguments);
+    rcontrib3.setStandardOutputFile(directSunDC);
+    rcontrib3.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+    rcontrib3.start();
+    if (!rcontrib3.wait()){
+        STADIC_ERROR("The direct sun rcontrib run failed with the following errors.");
+        //I want to display the errors here if the standard error has any errors to show.
+        return false;
+    }
+
+
     //Generate Weather file if it hasn't been generated already.
     if (!m_WeaFileName){
         WeatherData tmpWeather;
@@ -969,25 +1016,48 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
+    //dctimestep | rcollate for the direct sun (sDA & ASE)
+    //Added this line from an email that didn't exist before
+    arguments[2]=directSunDC;
+    arguments[3]=sunSMX;
+    Process dctimestep3(dctimestepProgram,arguments);
+    std::string directSunCollated;
+    if (setting==-1){
+        directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun_direct.txt";
+    }else{
+        directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std_direct.txt";
+    }
+    Process rcollate3(rcollateProgram,arguments2);
+    dctimestep3.setStandardOutputProcess(&rcollate3);
+    rcollate3.setStandardOutputFile(directSunCollated);
+    dctimestep3.start();
+    rcollate3.start();
+
+    if(!rcollate3.wait()){
+        STADIC_ERROR("The running of rcollate for the direct sun has failed.");
+        //I want to display the errors here if the standard error has any errors to show.
+
+        return false;
+    }
 
     //dctimestep | rcollate for the sun patch
     //Added this line from an email that didn't exist before
     arguments[2]=skyDC;
     arguments[3]=sunPatchSMX;
-    Process dctimestep3(dctimestepProgram,arguments);
+    Process dctimestep4(dctimestepProgram,arguments);
     std::string sunPatchCollated;
     if (setting==-1){
         sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sunPatch.txt";
     }else{
         sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sunPatch_std.txt";
     }
-    Process rcollate3(rcollateProgram,arguments2);
-    dctimestep3.setStandardOutputProcess(&rcollate3);
-    rcollate3.setStandardOutputFile(sunPatchCollated);
-    dctimestep3.start();
-    rcollate3.start();
+    Process rcollate4(rcollateProgram,arguments2);
+    dctimestep4.setStandardOutputProcess(&rcollate4);
+    rcollate4.setStandardOutputFile(sunPatchCollated);
+    dctimestep4.start();
+    rcollate4.start();
 
-    if(!rcollate3.wait()){
+    if(!rcollate4.wait()){
         STADIC_ERROR("The running of rcollate for the sun patches has failed.");
         //I want to display the errors here if the standard error has any errors to show.
 
@@ -1029,6 +1099,26 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         return false;
     }
 
+    //rcalc for the direct component illuminance file by itself
+    arguments.clear();
+    arguments.push_back("-e");
+    arguments.push_back("ill=179*(.265*$1+.670*$2+.065*$3)");
+    arguments.push_back("-e");
+    arguments.push_back("$1=floor(ill+.5)");
+    Process rcalc2(rcalcProgram, arguments);
+    rcalc2.setStandardInputFile(directSunCollated);
+    std::string directIll;
+    if (setting==-1){
+        directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_direct_ill.tmp";
+    }else{
+        directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_direct_ill_std.tmp";
+    }
+    rcalc2.setStandardOutputFile(directIll);
+    rcalc2.start();
+
+    if (!rcalc2.wait()){
+        return false;
+    }
     return true;
 }
 
@@ -1944,7 +2034,6 @@ bool Daylight::createOctree(std::vector<std::string> files, std::string octreeNa
 }
 
 bool Daylight::sumIlluminanceFiles(Control *model){
-    STADIC_LOG(Severity::Info, "Writing out the illuminance files.");
     std::string FinalIllFileName;
     std::string tempFileName;
     for (int i=0;i<model->windowGroups().size();i++){
@@ -1987,6 +2076,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
             baseIll.writeIllFileLux(FinalIllFileName);
         }
+        //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
             DaylightIlluminanceData settingIll;
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
@@ -2024,6 +2114,89 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
         }
     }
+
+    //Direct illuminance file generation (for sDA and ASE)
+    std::string directFinalIllFileName;
+    std::string directTempFileName;
+    for (int i=0;i<model->windowGroups().size();i++){
+        //Base Illuminance files
+        directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill";
+        directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct_ill.tmp";
+        DaylightIlluminanceData baseIllDirect;
+        if(isFile(directTempFileName)){
+            if (!baseIllDirect.parse(directTempFileName,m_Model->weaDataFile().get())){
+                return false;
+            }
+            if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
+                for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                    directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+"_direct.ill";
+                    if(isFile(directTempFileName)){
+                        if (!baseIllDirect.addIllFile(directTempFileName)){
+                            return false;
+                        }
+                    }
+                }
+            }
+            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+        }else{
+            directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0_direct.ill";
+            if(isFile(directTempFileName)){
+                if (!baseIllDirect.parse(directTempFileName, m_Model->weaDataFile().get())){
+                    return false;
+                }
+            }else{
+                STADIC_ERROR("The illuminance file "+directTempFileName+" does not exist.");
+                return false;
+            }
+            if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
+                for (int j=1;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                    directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf"+std::to_string(j)+"_direct.ill";
+                    if (!baseIllDirect.addIllFile(directTempFileName)){
+                        return false;
+                    }
+                }
+            }
+            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+        }
+        //Shade Setting Illuminance files
+        for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
+            DaylightIlluminanceData settingIllDirect;
+            directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct_ill_std.tmp";
+            directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct.ill";
+            if(isFile(tempFileName)){
+                if (!settingIllDirect.parse(directTempFileName,m_Model->weaDataFile().get())){
+                    return false;
+                }
+                if (model->windowGroups()[i].bsdfSettingLayers().size()>=j+1){
+                    if (model->windowGroups()[i].bsdfSettingLayers()[j].size()>0){
+                        for (int k=0;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
+                            directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+"_direct.ill";
+                            settingIllDirect.addIllFile(directTempFileName);
+                        }
+                    }
+                }
+                settingIllDirect.writeIllFileLux(directFinalIllFileName);
+            }else{
+                directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0_direct.ill";
+                if(isFile(directTempFileName)){
+                    if (!settingIllDirect.parse(directTempFileName,m_Model->weaDataFile().get())){
+                        return false;
+                    }
+                    if (model->windowGroups()[i].bsdfSettingLayers()[j].size()!=1){
+                        for (int k=1;k<model->windowGroups()[i].bsdfSettingLayers()[j].size();k++){
+                            directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf"+std::to_string(k)+"_direct.ill";
+                            settingIllDirect.addIllFile(directTempFileName);
+                        }
+                    }
+                    settingIllDirect.writeIllFileLux(directFinalIllFileName);
+                }else{
+                    STADIC_ERROR("The illuminance file "+directTempFileName+" does not exist.");
+                    return false;
+                }
+            }
+        }
+    }
+
     return true;
 }
 

@@ -33,6 +33,7 @@
 #include "dayill.h"
 #include <fstream>
 #include "functions.h"
+#include "gridmaker.h"
 
 namespace stadic {
 Metrics::Metrics(BuildingControl *model) :
@@ -248,6 +249,85 @@ bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
 }
 bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
 {
+    //Calculate the area of the floor polygons
+    GridMaker gridSize(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
+    if (model->identifiers()){
+        gridSize.setIdentifiers(model->identifiers().get());
+    }else if (model->modifiers()){
+        gridSize.setLayerNames(model->modifiers().get());
+    }else{
+        STADIC_LOG(Severity::Warning, "The calculation of sDA for "+model->spaceName()+" cannot be completed without a list of floor geometry.");
+        return false;
+    }
+    if (!gridSize.calcArea()){
+        STADIC_LOG(Severity::Error, "The calculation of the floor area for "+model->spaceName()+" has failed.");
+        return false;
+    }
+    double area;
+    area=gridSize.area();
+    //Correct all values to be in feet.
+    if (model->importUnits()=="mm"){
+        area=area*0.00328084*0.00328084;
+    }else if (model->importUnits()=="in"){
+        area=area/144;
+    }else if (model->importUnits()=="m"){
+        area=area*3.28084*3.28084;
+    }
+
+    //Calculate the target sDA Percentage to stay under with direct sun.
+    double sDAPercent=0.02;
+    if (area<200){
+        sDAPercent=2.0/dayIll->illuminance()[0].lux().size();
+    }else if (area<500){
+        sDAPercent=4.0/dayIll->illuminance()[0].lux().size();
+    }else if (area<1000){
+        sDAPercent=6.0/dayIll->illuminance()[0].lux().size();
+    }
+    if (sDAPercent<0.02){
+        sDAPercent=0.2;
+    }
+
+    //Create possible shade combinations array
+    std::vector<std::vector<bool>> combinations;
+    combinations.resize(int(std::pow(2, model->windowGroups().size())));        //Resizes the main vector to the number of combinations
+    for (int i=0;i<combinations.size();i++){
+        combinations[i].resize(model->windowGroups().size());                   //Resizes the inner vectors to the number of window groups
+    }
+    for (int i=0;i<model->windowGroups().size();i++){                           //This section fills the first window group with [on, off, on, off,...]
+        int count=0;                                                            //The second window group with [on, on, off, off, ...]
+        bool shadesEmployed=true;
+        for (int j=0;j<combinations.size();j++){
+            count++;
+            combinations[j][i]=shadesEmployed;
+            if (count==int(std::pow(2,i))){
+                count=0;
+                if (shadesEmployed==true){
+                    shadesEmployed=false;
+                }else{
+                    shadesEmployed=true;
+                }
+            }
+        }
+    }
+
+    //Parse the direct illuminance files and store objects in vectors for both base and setting cases.
+    std::vector<DaylightIlluminanceData> baseDirectIlls;
+    for (int i=0;i<model->windowGroups().size();i++){
+        DaylightIlluminanceData illBase;
+        illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill");
+        baseDirectIlls.push_back(illBase);
+    }
+
+    //Find the combination closest to the sDAPercent without going over
+    std::vector<std::vector<int>> shadeSchedule;
+    shadeSchedule.resize(baseDirectIlls[0].illuminance().size());
+    for (int i=0;i<baseDirectIlls[0].illuminance().size();i++){
+        shadeSchedule[i].resize(model->windowGroups().size());
+    }
+    for (int i=0;i<baseDirectIlls[0].illuminance().size();i++){         //Loop through the number of hours in the year
+
+    }
+
 
     return true;
 }
@@ -266,7 +346,7 @@ bool Metrics::parseOccupancy(std::string file, double threshold){
     std::string line;
     while (std::getline(occFile, line)){
         std::vector<std::string> vals;
-        vals=split(line, ' ');
+        vals=split(line, ',');
         if (toDouble(vals[3])<threshold){
             m_Occupancy.push_back(false);
         }else{

@@ -82,6 +82,14 @@ int TemporalIlluminance::day(){
 double TemporalIlluminance::hour(){
     return m_Hour;
 }
+bool TemporalIlluminance::allZeros(){
+    for (int i=0;i<m_Illuminance.size();i++){
+        if (m_Illuminance[i]>0){
+            return false;
+        }
+    }
+    return true;
+}
 
 DaylightIlluminanceData::DaylightIlluminanceData()
 {

@@ -149,7 +149,9 @@ double GridMaker::zHeight(){
 std::vector<std::vector<std::vector<double> > > GridMaker::points(){
     return m_FinalPoints;
 }
-
+double GridMaker::area(){
+    return m_Area;
+}
 
 //Utilities
 bool GridMaker::makeGrid(){
@@ -253,7 +255,17 @@ bool GridMaker::viewPTS(std::string location, std::string vType){
 
     return true;
 }
+bool GridMaker::calcArea(){
+    if (!parseRad()){
+        return false;
+    }
+    double area=0;
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        area=area+boost::geometry::area(m_UnitedPolygon[i]);
+    }
 
+    return true;
+}
 
 
 //Private

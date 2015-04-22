@@ -241,6 +241,9 @@ bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, do
 void Control::setCalcsDA(bool run){
     m_sDA=run;
 }
+bool Control::setsDAwgSettings(std::vector<int> settingNumbers){
+    m_sDAwgSettings=settingNumbers;
+}
 bool Control::setOccsDA(bool run, double illum, double DAFrac){
     m_OccsDA=run;
     if (illum>0){
@@ -450,6 +453,10 @@ double Control::sDAStart(){
 double Control::sDAEnd(){
     return m_sDAEnd;
 }
+std::vector<int> Control::sDAwgSettings(){
+    return m_sDAwgSettings;
+}
+
 bool Control::runOccsDA(){
     return m_OccsDA;
 }
@@ -879,6 +886,16 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         if (!setsDA(calculate, illum, frac, startTime, endTime)){
             return false;
         }
+        list=getArray(treeVal.get(), "window_group_settings", "The key \"window_group_settings\" does not appear within \"sDA\" in the STADIC Control File.", Severity::Warning);
+        std::vector<int> tempIntVec;
+        if (list.get().size()<1){
+            STADIC_LOG(Severity::Warning, "No window group settings have been listed for the space named \""+m_SpaceName+"\"");
+        }
+        for (unsigned index=0;index<list.get().size();index++){
+            tempIntVec.push_back(list.get()[index].asInt());
+        }
+        setsDAwgSettings(tempIntVec);
+        list.reset();
         treeVal.reset();
     }
 

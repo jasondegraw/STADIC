@@ -52,6 +52,7 @@ public:
     int month();                                                                //Function that returns the month as an int
     int day();                                                                  //Function that returns the day as an int
     double hour();                                                              //Function that returns the hour as a double
+    bool allZeros();                                                            //Function that returns true if all values in the illuminance vector are zero.
 
 private:
     std::vector<double> m_Illuminance;                                          //Vector holding the illuminance values for a given interval
