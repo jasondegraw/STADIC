@@ -47,18 +47,16 @@ public:
 //Setters
     bool setRadFile(std::vector<std::string> files);                    //Function to set the rad files to be used for leak checking
     void setFloorLayers(std::vector<std::string> layers);               //Function to set the floor layers to ensure the point is within the polygons
-    bool setUnits(int unit);
-    bool setReflectance(int ref);                                       //Function to set the reflectance which must be either 1 or 0
+    bool setUnits(std::string unit);
 
 private:
     std::vector<std::string> m_RadFiles;                                //Vector holding the rad files
     std::vector<std::string> m_FloorLayers;                             //Vector holding the floor layers
-    std::vector<std::vector<std::vector<double> > > m_Points;             //Vector holding the position of each of the analysis points
-    int m_Units;                                                        //Variable holding the unit type 0=in, 1=ft, 2=mm, 3=m
-    double m_Reflectance;                                               //Variable holding the reflectance
+    std::vector<std::vector<std::vector<double> > > m_Points;           //Vector holding the position of each of the analysis points
+    std::string m_Units;                                                //Variable holding the unit type 0=in, 1=ft, 2=mm, 3=m
 
     bool makeGrid();                                                    //Function to make the analysis grid using GridMaker
-    bool writeExtraRad();                                               //Function to write the sky and ground rad files
+    bool writeExtraRad();                                               //Function to write the new material files
     bool xformModifiers();                                              //Function to xform the layers to black if necessary
     bool createOct();                                                   //Function to create the octree
     bool runCalc();                                                     //Function to run the calculation

@@ -107,56 +107,42 @@ bool LeakCheck::setRadFile(std::vector<std::string> files){
 void LeakCheck::setFloorLayers(std::vector<std::string> layers){
     m_FloorLayers=layers;
 }
-bool LeakCheck::setUnits(int unit){
-    if (unit>=0 &&unit<=3){
+bool LeakCheck::setUnits(std::string unit){
+    if (unit=="ft"||unit=="in"||unit=="mm"||unit=="m"){
         m_Units=unit;
         return true;
     }
     return false;
 }
 
-bool LeakCheck::setReflectance(int ref){
-    if (ref!=0 && ref!=1){
-        STADIC_ERROR("The reflectance needs to be either 0 or 1.");
-        return false;
-    }
-    m_Reflectance=ref;
-    return true;
-}
-
 //Private
 bool LeakCheck::makeGrid(){
     GridMaker grid(m_RadFiles);
     grid.setLayerNames(m_FloorLayers);
-    switch (m_Units){
-        case 0:
-            //Inches
-            grid.setOffset(24);
-            grid.setSpaceX(24);
-            grid.setSpaceY(24);
-            grid.setOffsetZ(30);
-            break;
-        case 1:
-            //Feet
-            grid.setOffset(2);
-            grid.setSpaceX(2);
-            grid.setSpaceY(2);
-            grid.setOffsetZ(2.5);
-            break;
-        case 2:
-            //Millimeters
-            grid.setOffset(609.6);
-            grid.setSpaceX(609.6);
-            grid.setSpaceY(609.6);
-            grid.setOffsetZ(762);
-            break;
-        case 3:
-            //Millimeters
-            grid.setOffset(.6096);
-            grid.setSpaceX(.6096);
-            grid.setSpaceY(.6096);
-            grid.setOffsetZ(.762);
-            break;
+    if (m_Units=="in"){
+        //Inches
+        grid.setOffset(24);
+        grid.setSpaceX(24);
+        grid.setSpaceY(24);
+        grid.setOffsetZ(30);
+    }else if (m_Units=="ft"){
+        //Feet
+        grid.setOffset(2);
+        grid.setSpaceX(2);
+        grid.setSpaceY(2);
+        grid.setOffsetZ(2.5);
+    }else if (m_Units=="mm"){
+        //Millimeters
+        grid.setOffset(609.6);
+        grid.setSpaceX(609.6);
+        grid.setSpaceY(609.6);
+        grid.setOffsetZ(762);
+    }else{
+        //Meters
+        grid.setOffset(.6096);
+        grid.setSpaceX(.6096);
+        grid.setSpaceY(.6096);
+        grid.setOffsetZ(.762);
     }
     if (!grid.makeGrid()){
         return false;
@@ -203,14 +189,9 @@ bool LeakCheck::writeExtraRad(){
     if (!oFile.is_open()){
         return false;
     }
-    oFile<<"void glow sky_glow"<<std::endl;
-    oFile<<"0"<<std::endl<<"0"<<std::endl<<"4 1 1 1 0"<<std::endl<<std::endl;
-    oFile<<"sky_glow source sky"<<std::endl;
-    oFile<<"0"<<std::endl<<"0"<<std::endl<<"4 0 0 1 180"<<std::endl<<std::endl;
-
     oFile<<"void plastic modified"<<std::endl;
     oFile<<"0"<<std::endl<<"0"<<std::endl;
-    oFile<<"5 "<<m_Reflectance<<" "<<m_Reflectance<<" "<<m_Reflectance<<" 0 0"<<std::endl;
+    oFile<<"5 1 1 1 0 0"<<std::endl;
     oFile.close();
 
     return true;
@@ -237,11 +218,7 @@ bool LeakCheck::runCalc(){
     arguments.push_back("-I");
     arguments.push_back("-h");
     arguments.push_back("-ab");
-    if (m_Reflectance<1){
-        arguments.push_back("0");
-    }else{
-        arguments.push_back("4");
-    }
+    arguments.push_back("4");
     arguments.push_back("-ad");
     arguments.push_back("5000");
     arguments.push_back("-as");
