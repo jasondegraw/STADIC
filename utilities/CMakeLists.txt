@@ -20,3 +20,6 @@ target_link_libraries(dxdaylight stadic_core)
 
 add_executable(dxanalemma dxanalemma.cpp)
 target_link_libraries(dxanalemma stadic_core)
+
+add_executable(dxmetrics dxmetrics.cpp)
+target_link_libraries(dxmetrics stadic_core)
