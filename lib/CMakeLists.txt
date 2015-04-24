@@ -19,6 +19,7 @@ set(SRCS analemma.cpp
          logging.cpp
          materialprimitives.cpp
          metrics.cpp
+         photosensor.cpp
          radfiledata.cpp
          radparser.cpp
          radprimitive.cpp
@@ -37,6 +38,7 @@ set(HDRS stadicapi.h
          controlzone.h
          logging.h
          gridmaker.h
+         photosensor.h
          radfiledata.h
          radparser.h
          radprimitive.h
