@@ -77,7 +77,7 @@ bool Photosensor::writeCosine(std::ostream& out){
     out<<"degrees\t0\t90\t180\t270"<<std::endl;
     double sensitivity;
     for (int i=0;i<=90;i++){
-        sensitivity=std::cos((90-i)*PI/180);
+        sensitivity=std::cos((i)*PI/180);
         out<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
     }
 
@@ -89,7 +89,7 @@ bool Photosensor::writeCosineSquared(std::ostream& out){
     out<<"degrees\t0\t90\t180\t270"<<std::endl;
     double sensitivity;
     for (int i=0;i<=90;i++){
-        sensitivity=std::cos((90-i)*PI/180)*std::cos((90-i)*PI/180);
+        sensitivity=std::cos((i)*PI/180)*std::cos((i)*PI/180);
         out<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
     }
     return true;
