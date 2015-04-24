@@ -28,35 +28,21 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef PHOTOSENSOR_H
-#define PHOTOSENSOR_H
+#include "photosensor.h"
+#include "gtest/gtest.h"
 
-#include "stadicapi.h"
-#include <string>
-
-namespace stadic {
-
-class STADIC_API Photosensor
+TEST(SensorTests, CosineSensor)
 {
-public:
-    explicit Photosensor();
-    bool setType(std::string type);
-
-    //Getters
-
-
-    //utilities
-    bool writeSensorFile(std::string file);
-    bool writeSensorFile();
-private:
-    std::string m_Type;
-
-    bool writeCosine(std::ostream& out);
-    bool writeCosineSquared(std::ostream& out);
-
-    bool writeSensorFile(std::ostream& out);
-};
+  stadic::Photosensor sensor;
+  ASSERT_TRUE(sensor.setType("cosine"));
+  ASSERT_TRUE(sensor.writeSensorFile("cosine.sen"));
 
 }
 
-#endif // PHOTOSENSOR_H
+TEST(SensorTests, CosineSquaredSensor)
+{
+  stadic::Photosensor sensor;
+  ASSERT_TRUE(sensor.setType("cosine_squared"));
+  ASSERT_TRUE(sensor.writeSensorFile("cosineSquared.sen"));
+
+}

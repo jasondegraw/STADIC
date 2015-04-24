@@ -28,35 +28,57 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef PHOTOSENSOR_H
-#define PHOTOSENSOR_H
-
-#include "stadicapi.h"
+#include "photosensor.h"
+#include "logging.h"
+#include "functions.h"
+#include <iostream>
 #include <string>
 
-namespace stadic {
-
-class STADIC_API Photosensor
-{
-public:
-    explicit Photosensor();
-    bool setType(std::string type);
-
-    //Getters
-
-
-    //utilities
-    bool writeSensorFile(std::string file);
-    bool writeSensorFile();
-private:
-    std::string m_Type;
-
-    bool writeCosine(std::ostream& out);
-    bool writeCosineSquared(std::ostream& out);
-
-    bool writeSensorFile(std::ostream& out);
-};
+void usage(){
+    std::cerr << "dxmakesensor" << std::endl;
+    std::cerr << stadic::wrapAtN("Create a photosensor distibution for input to rsensor.", 72) << std::endl;
+    std::cerr << std::endl;
+    std::cerr << stadic::wrapAtN("-f name  Set the sensor file name. This file contains the radiance polygons that will"
+        " be used for creating the analysis points.  Multiple files may be added with each preceded by a \"-f\".  This"
+        " is a mandatory option.", 72, 9, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-t type  Set the sensor type (\"cosine\", \"cosine_squared\") for the sensitivity.", 72, 9, true) << std::endl;
 
 }
 
-#endif // PHOTOSENSOR_H
+int main (int argc, char *argv[])
+{
+    if(argc == 1) {
+        usage();
+    }
+    std::string fileName;
+    std::string type;
+    for (int i=1;i<argc;i++){
+        if (std::string("-f")==argv[i]){
+            i++;
+            fileName=argv[i];
+        }else if(std::string("-t")==argv[i]){
+            i++;
+            type=argv[i];
+        }else{
+            std::string temp=argv[i];
+            STADIC_ERROR("Invalid option \""+temp+"\".  Run with no arguments to get usage.");
+            return EXIT_FAILURE;
+        }
+    }
+    stadic::Photosensor sensor;
+    if (!sensor.setType(type)){
+        return EXIT_FAILURE;
+    }
+    if (fileName.empty()){
+        if(!sensor.writeSensorFile()){
+            return EXIT_FAILURE;
+        }
+    }else{
+        if (!sensor.writeSensorFile(fileName)){
+            return EXIT_FAILURE;
+        }
+    }
+
+
+    return EXIT_SUCCESS;
+}

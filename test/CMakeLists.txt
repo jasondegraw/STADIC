@@ -23,7 +23,10 @@ add_custom_command(TARGET weathertests POST_BUILD
 add_custom_command(TARGET weathertests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/LancasterTMY.csv $<TARGET_FILE_DIR:weathertests>)
-
+add_executable(sensortests sensortests.cpp)
+add_test(sensortests sensortests)
+target_link_libraries(sensortests stadic_core gtest gtest_main
+)
 add_executable(primitivetests primitivetests.cpp)
 add_test(primitivetests primitivetests)
 target_link_libraries(primitivetests stadic_core gtest gtest_main)

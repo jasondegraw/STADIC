@@ -23,3 +23,6 @@ target_link_libraries(dxanalemma stadic_core)
 
 add_executable(dxmetrics dxmetrics.cpp)
 target_link_libraries(dxmetrics stadic_core)
+
+add_executable(dxmakesensor dxmakesensor.cpp)
+target_link_libraries(dxmakesensor stadic_core)

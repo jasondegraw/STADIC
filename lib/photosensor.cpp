@@ -32,6 +32,7 @@
 #include "logging.h"
 #include <fstream>
 #include <cmath>
+#include <iostream>
 
 namespace stadic {
 
@@ -53,55 +54,56 @@ bool Photosensor::setType(std::string type){
 
 //utilities
 bool Photosensor::writeSensorFile(std::string file){
-    if (m_Type=="cosine"){
-        if (!writeCosine(file)){
-            return false;
-        }
-    }else if (m_Type=="cosine_squared"){
-        if (!writeCosineSquared(file)){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-//private
-bool Photosensor::writeCosine(std::string file){
-    double PI=3.1415926535897932;
     std::ofstream sensorOut;
     sensorOut.open(file);
     if (!sensorOut.is_open()){
         STADIC_LOG(Severity::Warning, "The opening of the file "+file+" for writing the photosensor sensitivity has failed.");
         return false;
     }
-    sensorOut<<"degrees\t0\t90\180\270"<<std::endl;
+    if (!writeSensorFile(sensorOut)){
+        STADIC_LOG(Severity::Error, "The writing of the file "+file+" has failed.");
+        return false;
+    }
+    sensorOut.close();
+    return true;
+}
+bool Photosensor::writeSensorFile(){
+    return writeSensorFile(std::cout);
+}
+
+//private
+bool Photosensor::writeCosine(std::ostream& out){
+    double PI=3.1415926535897932;
+    out<<"degrees\t0\t90\t180\t270"<<std::endl;
     double sensitivity;
     for (int i=0;i<=90;i++){
         sensitivity=std::cos((90-i)*PI/180);
-        sensorOut<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
+        out<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
     }
-    sensorOut.close();
+
     return true;
 }
 
-bool Photosensor::writeCosineSquared(std::string file){
+bool Photosensor::writeCosineSquared(std::ostream& out){
     double PI=3.1415926535897932;
-    std::ofstream sensorOut;
-    sensorOut.open(file);
-    if (!sensorOut.is_open()){
-        STADIC_LOG(Severity::Warning, "The opening of the file "+file+" for writing the photosensor sensitivity has failed.");
-        return false;
-    }
-    sensorOut<<"degrees\t0\t90\180\270"<<std::endl;
+    out<<"degrees\t0\t90\t180\t270"<<std::endl;
     double sensitivity;
     for (int i=0;i<=90;i++){
         sensitivity=std::cos((90-i)*PI/180)*std::cos((90-i)*PI/180);
-        sensorOut<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
+        out<<i<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<"\t"<<sensitivity<<std::endl;
     }
-    sensorOut.close();
     return true;
 }
-
+bool Photosensor::writeSensorFile(std::ostream& out){
+    if (m_Type=="cosine"){
+        if (!writeCosine(out)){
+            return false;
+        }
+    }else if (m_Type=="cosine_squared"){
+        if (!writeCosineSquared(out)){
+            return false;
+        }
+    }
+    return true;
+}
 }
