@@ -59,9 +59,17 @@ public:
     double elevationAzimuth();
     std::vector<double> angleSettings();
     std::vector<double> location();
+    double xLoc();
+    double yLoc();
+    double zLoc();
+    double xDir();
+    double yDir();
+    double zDir();
+    double spin();
     std::vector<double> signalSettings();
     std::string sensorType();
     std::string sensorFile();
+    bool needsSensor();
 
 
 private:

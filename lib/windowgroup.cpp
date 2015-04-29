@@ -66,6 +66,10 @@ bool WindowGroup::isBSDF() const
 {
     return m_BSDF;
 }
+bool WindowGroup::runBase() const
+{
+    return m_RunBase;
+}
 std::string WindowGroup::baseGeometry() const
 {
     return m_BaseGeometry;

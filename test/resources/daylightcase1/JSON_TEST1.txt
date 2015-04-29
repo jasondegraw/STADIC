@@ -77,9 +77,9 @@
 	"radiance_parameters" : {
 		"default" : {
 			"ab" : 5,
-			"ad" : 300,
+			"ad" : 1000,
 			"as" : 20,
-			"ar" : 150,
+			"ar" : 300,
 			"aa" : 0.1,
 			"lr" : 6,
 			"st" : 0.1500,

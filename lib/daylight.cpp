@@ -37,6 +37,7 @@
 #include "materialprimitives.h"
 #include "gridmaker.h"
 #include "weatherdata.h"
+#include "photosensor.h"
 
 namespace stadic {
 Daylight::Daylight(BuildingControl *model) :
@@ -612,91 +613,10 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 }
 
 bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
-    //rcontrib for sky
-    std::vector<std::string> arguments;
-    arguments.push_back("-I+");
-    if (model->getParamSet("default")){
-        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
-        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-            if (it->first!="sj"){
-                arguments.push_back("-"+it->first);
-                arguments.push_back(it->second);
-            }
-        }
-    }else{
-        STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
-    }
-    arguments.push_back("-e");
-    arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
-    arguments.push_back("-f");
-    arguments.push_back("reinhart.cal");
-    arguments.push_back("-b");
-    arguments.push_back("rbin");
-    arguments.push_back("-bn");
-    arguments.push_back("Nrbins");
-    arguments.push_back("-m");
-    arguments.push_back("sky_glow");
-    arguments.push_back("-faa");
-    std::string rcontribProgram="rcontrib";
-
-
-    std::string skyDC;
-    if (setting==-1){
-        //This is the base case
-        arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
-        skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
-    }else{
-        arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
-        skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
-    }
-    Process rcontrib(rcontribProgram,arguments);
-    rcontrib.setStandardOutputFile(skyDC);
-
-    //Test whether the points file exists.  If it doesn't, test whether the necessary arguments to create one exist.
-    if (stadic::exists(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0])){
-        rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
-    }else{
-        if (model->xSpacing()&&model->ySpacing()&& model->offset() && model->zOffset()&& (model->modifiers()||model->identifiers())){
-            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  The creation of a new points file will be attempted.");
-            GridMaker ptsCreator(model->spaceDirectory()+model->geoDirectory()+ model->geoFile());
-            ptsCreator.setSpaceX(toDouble(model->xSpacing().get()));
-            ptsCreator.setSpaceY(toDouble(model->ySpacing().get()));
-            ptsCreator.setOffset(toDouble(model->offset().get()));
-            ptsCreator.setOffsetZ(toDouble(model->zOffset().get()));
-            if (model->modifiers()){
-                ptsCreator.setLayerNames(model->modifiers().get());
-            }else{
-                ptsCreator.setIdentifiers(model->identifiers().get());
-            }
-            if (ptsCreator.makeGrid()){
-                if (!ptsCreator.writePTS(model->spaceDirectory()+model->inputDirectory()+model->spaceName()+"_AutoGen.pts")){
-                    STADIC_LOG(stadic::Severity::Error, "The writing of the points file has failed.");
-                    return false;
-                }
-                std::vector<std::string> ptsFiles;
-                ptsFiles.push_back(model->spaceName()+"_AutoGen.pts");
-                model->setPTSFile(ptsFiles);
-            }else{
-                STADIC_LOG(stadic::Severity::Error, "The creation of the points file has failed.");
-                return false;
-            }
-        }else{
-            STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  And no arguments exist for one to be generated.");
-            return false;
-        }
-        rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
-        STADIC_LOG(stadic::Severity::Info, "A new points file has been successfully generated.");
-    }
-
-    rcontrib.start();
-    if (!rcontrib.wait()){
-        STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
-        STADIC_LOG(stadic::Severity::Info, "The command line entry is as follows:\n\t"+rcontrib.commandLine());
-        return false;
-    }
-
-    //Create Suns
+    bool writeCL=true;
+    std::ofstream outCL;
+    outCL.open(model->spaceDirectory()+"commandLine.bat");
+    //Get number of suns
     int nSuns;
     if(model->sunDivisions()==1){
         nSuns=145;
@@ -710,153 +630,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         nSuns=3601;
     }else if (model->sunDivisions()==6){
         nSuns=5185;
-    } 
-    std::string tempFile=model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
-    if(!isFile(tempFile)){
-        arguments.clear();
-        arguments.push_back(std::to_string(nSuns));
-        std::string cntProgram="cnt";
-        Process cnt(cntProgram,arguments);
-
-        std::vector<std::string> arguments2;
-        arguments2.push_back("-e");
-        arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
-        arguments2.push_back("-f");
-        arguments2.push_back("reinsrc.cal");
-        arguments2.push_back("-e");
-        arguments2.push_back("Rbin=recno");
-        arguments2.push_back("-o");
-        arguments2.push_back("\"solar source sun 0 0 4 ${ Dx } ${ Dy } ${ Dz } 0.533\"");
-        std::string rcalcProgram="rcalc";
-        Process rcalc(rcalcProgram,arguments2);
-        cnt.setStandardOutputProcess(&rcalc);
-        rcalc.setStandardOutputFile(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
-
-        cnt.start();
-        rcalc.start();
-
-        if(!rcalc.wait()){
-            STADIC_ERROR("The running of rcalc for the suns has failed.");
-            //I want to display the errors here if the standard error has any errors to show.
-
-            return false;
-        }
     }
-
-    //Create suns octree
-    std::vector<std::string> octFiles;
-    std::string sunsOct;
-    if (setting==-1){
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad");
-        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
-        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_base.oct";
-
-    }else{
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.rad");
-        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
-        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
-        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_set"+std::to_string(setting+1)+"_std.oct";
-
-    }
-    if(!createOctree(octFiles,sunsOct)){
-        return false;
-    }
-
-    //rcontrib for sun
-    arguments.clear();
-    arguments.push_back("-I+");
-    if (model->getParamSet("default")){
-        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
-        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-            if (it->first!="sj"){
-                arguments.push_back("-"+it->first);
-                arguments.push_back(it->second);
-            }
-        }
-    }else{
-        STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
-    }
-    arguments.push_back("-e");
-    arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
-    arguments.push_back("-f");
-    arguments.push_back("reinhart.cal");
-    arguments.push_back("-b");
-    arguments.push_back("rbin");
-    arguments.push_back("-bn");
-    arguments.push_back("Nrbins");
-    arguments.push_back("-m");
-    arguments.push_back("solar");
-    arguments.push_back("-faa");
-    std::string sunDC;
-    arguments.push_back(sunsOct);
-    if (setting==-1){
-        //This is the base case
-        sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
-    }else{
-        //This is for the settings
-        sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
-    }
-    Process rcontrib2(rcontribProgram,arguments);
-    rcontrib2.setStandardOutputFile(sunDC);
-    rcontrib2.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
-    rcontrib2.start();
-    if (!rcontrib2.wait()){
-        STADIC_ERROR("The sun rcontrib run failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
-
-        return false;
-    }
-
-    //rcontrib for direct sun (sDA & ASE)
-    arguments.clear();
-    arguments.push_back("-I+");
-    if (model->getParamSet("default")){
-        std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
-        for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-            if (it->first!="sj" && it->first!="ab"){
-                arguments.push_back("-"+it->first);
-                arguments.push_back(it->second);
-            }
-        }
-        arguments.push_back("-ab");
-        arguments.push_back("0");
-    }else{
-        STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
-    }
-    arguments.push_back("-e");
-    arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
-    arguments.push_back("-f");
-    arguments.push_back("reinhart.cal");
-    arguments.push_back("-b");
-    arguments.push_back("rbin");
-    arguments.push_back("-bn");
-    arguments.push_back("Nrbins");
-    arguments.push_back("-m");
-    arguments.push_back("solar");
-    arguments.push_back("-faa");
-    std::string directSunDC;
-    arguments.push_back(sunsOct);
-    if (setting==-1){
-        //This is the base case
-        directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d_direct.dc";
-    }else{
-        //This is for the settings
-        directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std_direct.dc";
-    }
-    Process rcontrib3(rcontribProgram,arguments);
-    rcontrib3.setStandardOutputFile(directSunDC);
-    rcontrib3.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
-    rcontrib3.start();
-    if (!rcontrib3.wait()){
-        STADIC_ERROR("The direct sun rcontrib run failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
-        return false;
-    }
-
-
     //Generate Weather file if it hasn't been generated already.
     if (!m_WeaFileName){
         WeatherData tmpWeather;
@@ -882,243 +656,778 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             return false;
         }
     }
-
-    //gendaymtx for sun
-    arguments.clear();
-    arguments.push_back("-m");
-    arguments.push_back(std::to_string( model->sunDivisions()));
-    arguments.push_back("-5");
-    arguments.push_back("-d");
-    arguments.push_back("-ho");
-    arguments.push_back(m_WeaFileName.get());
-    std::string gendaymtxProgram="gendaymtx";
-    Process gendaymtx(gendaymtxProgram,arguments);
-
-    std::string sunSMX;
-    if (setting==-1){
-        sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.smx";
-    }else{
-        sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_d_std.smx";
-    }
-    gendaymtx.setStandardOutputFile(sunSMX);
-    gendaymtx.start();
-    if (!gendaymtx.wait()){
-        STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
-        return false;
-    }
-
-
-    //gendaymtx for sky
-    arguments.clear();
-    arguments.push_back("-m");
-    arguments.push_back(std::to_string( model->skyDivisions()));
-    arguments.push_back("-c");
-    arguments.push_back("1");
-    arguments.push_back("1");
-    arguments.push_back("1");
-    arguments.push_back("-ho");
-    arguments.push_back(m_WeaFileName.get());
-    Process gendaymtx2(gendaymtxProgram,arguments);
-
+    std::vector<std::string> arguments;
+    std::string skyDC;
     std::string skySMX;
-    if (setting==-1){
-        skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_k.smx";
-    }else{
-        skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_k_std.smx";
-    }
-    gendaymtx2.setStandardOutputFile(skySMX);
-    gendaymtx2.start();
-    if (!gendaymtx2.wait()){
-        STADIC_ERROR("The creation of the sky has failed with the following errors.");
-        //I want to display the errors here if the standard error has any errors to show.
-
-        return false;
-    }
-
-    //gendaymtx for sun in patches
-    arguments.clear();
-    arguments.push_back("-m");
-    arguments.push_back(std::to_string( model->skyDivisions()));
-    arguments.push_back("-d");
-    arguments.push_back("-ho");
-    arguments.push_back(m_WeaFileName.get());
-    Process gendaymtx3(gendaymtxProgram,arguments);
-
+    std::string sunDC;
+    std::string sunSMX;
+    std::string directSunDC;
     std::string sunPatchSMX;
-    if (setting==-1){
-        sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.smx";
-    }else{
-        sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_kd_std.smx";
+    std::string sensorSkyDC;
+    std::string sensorSunDC;
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
+        //rcontrib for sky
+        arguments.push_back("-I+");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="lw"){
+                    arguments.push_back("-"+it->first);
+                    arguments.push_back(it->second);
+                }else if (it->first=="lw"){
+                    arguments.push_back("-lw");
+                    arguments.push_back("0.00005");
+                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                }
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments.push_back("-e");
+        arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
+        arguments.push_back("-f");
+        arguments.push_back("reinhart.cal");
+        arguments.push_back("-b");
+        arguments.push_back("rbin");
+        arguments.push_back("-bn");
+        arguments.push_back("Nrbins");
+        arguments.push_back("-m");
+        arguments.push_back("sky_glow");
+        arguments.push_back("-faa");
+        std::string rcontribProgram="rcontrib";
+
+
+
+        if (setting==-1){
+            //This is the base case
+            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+            skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
+        }else{
+            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
+            skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
+        }
+        Process rcontrib(rcontribProgram,arguments);
+        rcontrib.setStandardOutputFile(skyDC);
+
+        //Test whether the points file exists.  If it doesn't, test whether the necessary arguments to create one exist.
+        if (stadic::exists(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0])){
+            rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        }else{
+            if (model->xSpacing()&&model->ySpacing()&& model->offset() && model->zOffset()&& (model->modifiers()||model->identifiers())){
+                STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  The creation of a new points file will be attempted.");
+                GridMaker ptsCreator(model->spaceDirectory()+model->geoDirectory()+ model->geoFile());
+                ptsCreator.setSpaceX(toDouble(model->xSpacing().get()));
+                ptsCreator.setSpaceY(toDouble(model->ySpacing().get()));
+                ptsCreator.setOffset(toDouble(model->offset().get()));
+                ptsCreator.setOffsetZ(toDouble(model->zOffset().get()));
+                if (model->modifiers()){
+                    ptsCreator.setLayerNames(model->modifiers().get());
+                }else{
+                    ptsCreator.setIdentifiers(model->identifiers().get());
+                }
+                if (ptsCreator.makeGrid()){
+                    if (!ptsCreator.writePTS(model->spaceDirectory()+model->inputDirectory()+model->spaceName()+"_AutoGen.pts")){
+                        STADIC_LOG(stadic::Severity::Error, "The writing of the points file has failed.");
+                        return false;
+                    }
+                    std::vector<std::string> ptsFiles;
+                    ptsFiles.push_back(model->spaceName()+"_AutoGen.pts");
+                    model->setPTSFile(ptsFiles);
+                }else{
+                    STADIC_LOG(stadic::Severity::Error, "The creation of the points file has failed.");
+                    return false;
+                }
+            }else{
+                STADIC_LOG(stadic::Severity::Info, "The points file "+model->ptsFile()[0] + " does not exist.  And no arguments exist for one to be generated.");
+                return false;
+            }
+            rcontrib.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+            STADIC_LOG(stadic::Severity::Info, "A new points file has been successfully generated.");
+        }
+        if (writeCL){
+            outCL<<rcontrib.commandLine()<<std::endl<<std::endl;;
+        }
+
+        rcontrib.start();
+        if (!rcontrib.wait()){
+            STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
+            //I want to display the errors here if the standard error has any errors to show.
+            STADIC_LOG(stadic::Severity::Info, "The command line entry is as follows:\n\t"+rcontrib.commandLine());
+            return false;
+        }
+
+
+        std::string tempFile=model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad";
+        if(!isFile(tempFile)){
+            arguments.clear();
+            arguments.push_back(std::to_string(nSuns));
+            std::string cntProgram="cnt";
+            Process cnt(cntProgram,arguments);
+
+            std::vector<std::string> arguments2;
+            arguments2.push_back("-e");
+            arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
+            arguments2.push_back("-f");
+            arguments2.push_back("reinsrc.cal");
+            arguments2.push_back("-e");
+            arguments2.push_back("Rbin=recno");
+            arguments2.push_back("-o");
+            arguments2.push_back("\"solar source sun 0 0 4 ${ Dx } ${ Dy } ${ Dz } 0.533\"");
+            std::string rcalcProgram="rcalc";
+            Process rcalc(rcalcProgram,arguments2);
+            cnt.setStandardOutputProcess(&rcalc);
+            rcalc.setStandardOutputFile(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
+            if (writeCL){
+                outCL<<"## Pipe the next two lines together."<<std::endl;
+                outCL<<cnt.commandLine()<<std::endl;
+                outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+            }
+
+            cnt.start();
+            rcalc.start();
+
+            if(!rcalc.wait()){
+                STADIC_ERROR("The running of rcalc for the suns has failed.");
+                //I want to display the errors here if the standard error has any errors to show.
+
+                return false;
+            }
+        }
     }
-    gendaymtx3.setStandardOutputFile(sunPatchSMX);
-    gendaymtx3.start();
-    if (!gendaymtx3.wait()){
-        STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
+    //Create suns octree
+    std::vector<std::string> octFiles;
+    std::string sunsOct;
+    if (setting==-1){
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad");
+        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
+        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_base.oct";
+
+    }else{
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.rad");
+        //Added the next line because oconv produced a fatal error with undefined modifier "solar" without it.
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns.rad");
+        octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
+        sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_set"+std::to_string(setting+1)+"_std.oct";
+
+    }
+    if(!createOctree(octFiles,sunsOct)){
         return false;
     }
-
-    //dctimestep | rcollate for the sky
-    arguments.clear();
-    arguments.push_back("-n");
-    arguments.push_back("8760");
-    //Added this line from an email that didn't exist before
-    arguments.push_back(skyDC);
-    arguments.push_back(skySMX);
-    std::string dctimestepProgram="dctimestep";
-    Process dctimestep(dctimestepProgram,arguments);
-
-    std::vector<std::string> arguments2;
-    arguments2.push_back("-ho");
-    arguments2.push_back("-oc");
-    arguments2.push_back("1");
-    std::string rcollateProgram="rcollate";
-    Process rcollate(rcollateProgram,arguments2);
-    dctimestep.setStandardOutputProcess(&rcollate);
-
-    std::string skyCollated;
-    if (setting==-1){
-        skyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sky.txt";
-    }else{
-        skyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sky_std.txt";
+    if (writeCL){
+        outCL<<"## Create the suns octree here"<<std::endl<<std::endl;;
     }
-    rcollate.setStandardOutputFile(skyCollated);
-    dctimestep.start();
-    rcollate.start();
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
+        //rcontrib for sun
+        arguments.clear();
+        arguments.push_back("-I+");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj"){
+                    arguments.push_back("-"+it->first);
+                    arguments.push_back(it->second);
+                }
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments.push_back("-e");
+        arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments.push_back("-f");
+        arguments.push_back("reinhart.cal");
+        arguments.push_back("-b");
+        arguments.push_back("rbin");
+        arguments.push_back("-bn");
+        arguments.push_back("Nrbins");
+        arguments.push_back("-m");
+        arguments.push_back("solar");
+        arguments.push_back("-faa");
+        arguments.push_back(sunsOct);
+        if (setting==-1){
+            //This is the base case
+            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
+        }else{
+            //This is for the settings
+            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
+        }
+        std::string rcontribProgram="rcontrib";
+        Process rcontrib2(rcontribProgram,arguments);
+        rcontrib2.setStandardOutputFile(sunDC);
+        rcontrib2.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        if (writeCL){
+            outCL<<rcontrib2.commandLine()<<std::endl<<std::endl;;
+        }
+        rcontrib2.start();
+        if (!rcontrib2.wait()){
+            STADIC_ERROR("The sun rcontrib run failed with the following errors.");
+            //I want to display the errors here if the standard error has any errors to show.
 
-    if(!rcollate.wait()){
-        STADIC_ERROR("The running of rcollate for the sky has failed.");
-        //I want to display the errors here if the standard error has any errors to show.
+            return false;
+        }
 
-        return false;
+        //rcontrib for direct sun (sDA & ASE)
+        arguments.clear();
+        arguments.push_back("-I+");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="ab"){
+                    arguments.push_back("-"+it->first);
+                    arguments.push_back(it->second);
+                }
+            }
+            arguments.push_back("-ab");
+            arguments.push_back("0");
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments.push_back("-e");
+        arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments.push_back("-f");
+        arguments.push_back("reinhart.cal");
+        arguments.push_back("-b");
+        arguments.push_back("rbin");
+        arguments.push_back("-bn");
+        arguments.push_back("Nrbins");
+        arguments.push_back("-m");
+        arguments.push_back("solar");
+        arguments.push_back("-faa");
+        arguments.push_back(sunsOct);
+        if (setting==-1){
+            //This is the base case
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d_direct.dc";
+        }else{
+            //This is for the settings
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std_direct.dc";
+        }
+        Process rcontrib3(rcontribProgram,arguments);
+        rcontrib3.setStandardOutputFile(directSunDC);
+        rcontrib3.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        if (writeCL){
+            outCL<<rcontrib3.commandLine()<<std::endl<<std::endl;;
+        }
+        rcontrib3.start();
+        if (!rcontrib3.wait()){
+            STADIC_ERROR("The direct sun rcontrib run failed with the following errors.");
+            //I want to display the errors here if the standard error has any errors to show.
+            return false;
+        }
+    }
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){
+        //rsensor and rcontrib for shade sensors for sky contribution
+        arguments.clear();
+        arguments.push_back("-h");
+        arguments.push_back("-rd");
+        arguments.push_back("10000");
+        //set view point (location of photosensor)
+        arguments.push_back("-vp");
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->xLoc()));
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->yLoc()));
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->zLoc()));
+        //set view direction
+        arguments.push_back("-vd");
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->xDir()));
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->yDir()));
+        arguments.push_back(toString(model->windowGroups()[blindGroupNum].shadeControl()->zDir()));
+        //set up direction for sensor (obtained from spin)
+        //************************
+        //************************
+        //The next three lines will have to be calculated
+        arguments.push_back("-vu");
+        arguments.push_back("1");
+        arguments.push_back("0");
+        arguments.push_back("0");
+        if (model->windowGroups()[blindGroupNum].shadeControl()->sensorType()!="sensitivity_file"){
+            Photosensor sensor;
+            if (!sensor.setType(model->windowGroups()[blindGroupNum].shadeControl()->sensorType())){
+                return false;
+            }
+            std::string sensorFileName=model->spaceDirectory()+model->inputDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade.sen";
+            if (!sensor.writeSensorFile(sensorFileName)){
+                return false;
+            }
+            arguments.push_back(sensorFileName);
+        }else{
+            arguments.push_back(model->windowGroups()[blindGroupNum].shadeControl()->sensorFile());
+        }
+        std::string rsensorProgram="rsensor";
+        Process rsensor(rsensorProgram, arguments);
+        std::vector<std::string> arguments2;
+
+
+        arguments2.clear();
+        arguments2.push_back("-c");
+        arguments2.push_back("10000");
+        arguments2.push_back("-e");
+        arguments2.push_back("MF:"+std::to_string(model->skyDivisions()));
+        arguments2.push_back("-f");
+        arguments2.push_back("reinhart.cal");
+        arguments2.push_back("-b");
+        arguments2.push_back("rbin");
+        arguments2.push_back("-bn");
+        arguments2.push_back("Nrbins");
+        arguments2.push_back("-m");
+        arguments2.push_back("sky_glow");
+        //arguments.push_back("-faa");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="lw"){
+                    arguments2.push_back("-"+it->first);
+                    arguments2.push_back(it->second);
+                }else if (it->first=="lw"){
+                    arguments2.push_back("-lw");
+                    arguments2.push_back("0.00005");
+                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                }
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments2.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+        std::string rcontribProgram="rcontrib";
+        Process rcontribSkySen(rcontribProgram, arguments2);
+        rsensor.setStandardOutputProcess(&rcontribSkySen);
+        sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.dc";
+        rcontribSkySen.setStandardOutputFile(sensorSkyDC);
+
+        rsensor.start();
+        rcontribSkySen.start();
+
+        if (!rcontribSkySen.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcontrib for the shade sensor has failed for window group "+model->windowGroups()[blindGroupNum].name()+" within "+model->spaceName()+".");
+            return false;
+        }
+
+        //rsensor and rcontrib for shade sensors for sun contribution
+        Process rsensor2(rsensorProgram, arguments);
+        arguments2.clear();
+        arguments2.push_back("-e");
+        arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments2.push_back("-f");
+        arguments2.push_back("reinhart.cal");
+        arguments2.push_back("-b");
+        arguments2.push_back("rbin");
+        arguments2.push_back("-bn");
+        arguments2.push_back("Nrbins");
+        arguments2.push_back("-m");
+        arguments2.push_back("solar");
+        //arguments.push_back("-faa");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="lw"){
+                    arguments2.push_back("-"+it->first);
+                    arguments2.push_back(it->second);
+                }else if (it->first=="lw"){
+                    arguments2.push_back("-lw");
+                    arguments2.push_back("0.00005");
+                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                }
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments2.push_back(sunsOct);
+        Process rcontribSunSen(rcontribProgram, arguments2);
+        rsensor2.setStandardOutputProcess(&rcontribSunSen);
+        sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.dc";
+        rcontribSunSen.setStandardOutputFile(sensorSunDC);
+
+        rsensor2.start();
+        rcontribSunSen.start();
+
+        if (!rcontribSunSen.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcontrib for the shade sensor has failed for window group "+model->windowGroups()[blindGroupNum].name()+" within "+model->spaceName()+".");
+            return false;
+        }
+        arguments2.clear();
+
+
     }
 
-    //dctimestep | rcollate for the sun
-    //Added this line from an email that didn't exist before
-    arguments[2]=sunDC;
-    arguments[3]=sunSMX;
-    Process dctimestep2(dctimestepProgram,arguments);
-    std::string sunCollated;
-    if (setting==-1){
-        sunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun.txt";
-    }else{
-        sunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std.txt";
-    }
-    Process rcollate2(rcollateProgram,arguments2);
-    dctimestep2.setStandardOutputProcess(&rcollate2);
-    rcollate2.setStandardOutputFile(sunCollated);
-    dctimestep2.start();
-    rcollate2.start();
 
-    if(!rcollate2.wait()){
-        STADIC_ERROR("The running of rcollate for the sun has failed.");
-        //I want to display the errors here if the standard error has any errors to show.
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting]) || (model->windowGroups()[blindGroupNum].shadeControl()->needsSensor()&&setting==-1)){
+        //gendaymtx for sun
+        arguments.clear();
+        arguments.push_back("-m");
+        arguments.push_back(std::to_string( model->sunDivisions()));
+        arguments.push_back("-5");
+        arguments.push_back("-d");
+        arguments.push_back("-ho");
+        arguments.push_back(m_WeaFileName.get());
+        std::string gendaymtxProgram="gendaymtx";
+        Process gendaymtx(gendaymtxProgram,arguments);
 
-        return false;
-    }
+        std::string sunSMX;
+        if (setting==-1){
+            sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.smx";
+        }else{
+            sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_d_std.smx";
+        }
+        gendaymtx.setStandardOutputFile(sunSMX);
+        if (writeCL){
+            outCL<<gendaymtx.commandLine()<<std::endl<<std::endl;;
+        }
+        gendaymtx.start();
+        if (!gendaymtx.wait()){
+            STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
+            return false;
+        }
 
-    //dctimestep | rcollate for the direct sun (sDA & ASE)
-    //Added this line from an email that didn't exist before
-    arguments[2]=directSunDC;
-    arguments[3]=sunSMX;
-    Process dctimestep3(dctimestepProgram,arguments);
-    std::string directSunCollated;
-    if (setting==-1){
-        directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun_direct.txt";
-    }else{
-        directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std_direct.txt";
-    }
-    Process rcollate3(rcollateProgram,arguments2);
-    dctimestep3.setStandardOutputProcess(&rcollate3);
-    rcollate3.setStandardOutputFile(directSunCollated);
-    dctimestep3.start();
-    rcollate3.start();
 
-    if(!rcollate3.wait()){
-        STADIC_ERROR("The running of rcollate for the direct sun has failed.");
-        //I want to display the errors here if the standard error has any errors to show.
+        //gendaymtx for sky
+        arguments.clear();
+        arguments.push_back("-m");
+        arguments.push_back(std::to_string( model->skyDivisions()));
+        arguments.push_back("-c");
+        arguments.push_back("1");
+        arguments.push_back("1");
+        arguments.push_back("1");
+        arguments.push_back("-ho");
+        arguments.push_back(m_WeaFileName.get());
+        Process gendaymtx2(gendaymtxProgram,arguments);
 
-        return false;
-    }
+        if (setting==-1){
+            skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_k.smx";
+        }else{
+            skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_k_std.smx";
+        }
+        gendaymtx2.setStandardOutputFile(skySMX);
+        if (writeCL){
+            outCL<<gendaymtx2.commandLine()<<std::endl<<std::endl;;
+        }
+        gendaymtx2.start();
+        if (!gendaymtx2.wait()){
+            STADIC_ERROR("The creation of the sky has failed with the following errors.");
+            //I want to display the errors here if the standard error has any errors to show.
 
-    //dctimestep | rcollate for the sun patch
-    //Added this line from an email that didn't exist before
-    arguments[2]=skyDC;
-    arguments[3]=sunPatchSMX;
-    Process dctimestep4(dctimestepProgram,arguments);
-    std::string sunPatchCollated;
-    if (setting==-1){
-        sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sunPatch.txt";
-    }else{
-        sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sunPatch_std.txt";
-    }
-    Process rcollate4(rcollateProgram,arguments2);
-    dctimestep4.setStandardOutputProcess(&rcollate4);
-    rcollate4.setStandardOutputFile(sunPatchCollated);
-    dctimestep4.start();
-    rcollate4.start();
+            return false;
+        }
 
-    if(!rcollate4.wait()){
-        STADIC_ERROR("The running of rcollate for the sun patches has failed.");
-        //I want to display the errors here if the standard error has any errors to show.
+        //gendaymtx for sun in patches
+        arguments.clear();
+        arguments.push_back("-m");
+        arguments.push_back(std::to_string( model->skyDivisions()));
+        arguments.push_back("-d");
+        arguments.push_back("-ho");
+        arguments.push_back(m_WeaFileName.get());
+        Process gendaymtx3(gendaymtxProgram,arguments);
 
-        return false;
-    }
-
-    //rlam | rcalc bringing it all together
-    arguments.clear();
-    arguments.push_back(skyCollated);
-    arguments.push_back(sunPatchCollated);
-    arguments.push_back(sunCollated);
-
-    std::string rlamProgram="rlam";
-    Process rlam(rlamProgram,arguments);
-
-    arguments2.clear();
-    arguments2.push_back("-e");
-    arguments2.push_back("r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9");
-    arguments2.push_back("-e");
-    arguments2.push_back("ill=179*(.265*r+.670*g+.065*b)");
-    arguments2.push_back("-e");
-    arguments2.push_back("$1=floor(ill+.5)");
-    std::string rcalcProgram="rcalc";
-    Process rcalc(rcalcProgram,arguments2);
-    rlam.setStandardOutputProcess(&rcalc);
-
-    std::string finalIll;
-    if (setting==-1){
-        finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_ill.tmp";
-    }else{
-        finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_ill_std.tmp";
+        std::string sunPatchSMX;
+        if (setting==-1){
+            sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.smx";
+        }else{
+            sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_kd_std.smx";
+        }
+        gendaymtx3.setStandardOutputFile(sunPatchSMX);
+        if (writeCL){
+            outCL<<gendaymtx3.commandLine()<<std::endl<<std::endl;;
+        }
+        gendaymtx3.start();
+        if (!gendaymtx3.wait()){
+            STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
+            return false;
+        }
     }
 
-    rcalc.setStandardOutputFile(finalIll);
-    rlam.start();
-    rcalc.start();
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){
+        //dctimestep | rcollate for the sensor for the sky
+        arguments.clear();
+        arguments.push_back("-n");
+        arguments.push_back("8760");
+        arguments.push_back(sensorSkyDC);
+        arguments.push_back(skySMX);
+        std::string dctimestepProgram="dctimestep";
+        Process dctimestep(dctimestepProgram, arguments);
 
-    if(!rcalc.wait()){
-        return false;
+        std::vector<std::string> arguments2;
+        arguments2.push_back("-ho");
+        arguments2.push_back("-oc");
+        arguments2.push_back("1");
+        std::string rcollateProgram="rcollate";
+        Process rcollate(rcollateProgram,arguments2);
+        dctimestep.setStandardOutputProcess(&rcollate);
+
+        std::string sensorSkyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.txt";
+        rcollate.setStandardOutputFile(sensorSkyCollated);
+
+        dctimestep.start();
+        rcollate.start();
+        if (!rcollate.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcollate for the sensor sky contribution has failed.");
+            return false;
+        }
+
+        //dctimestep | rcollate for the sensor for the sun
+        //Added this line from an email that didn't exist before
+        arguments[2]=sensorSunDC;
+        arguments[3]=sunSMX;
+        Process dctimestep2(dctimestepProgram,arguments);
+        std::string sensorSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.txt";
+        Process rcollate2(rcollateProgram,arguments2);
+        dctimestep2.setStandardOutputProcess(&rcollate2);
+        rcollate2.setStandardOutputFile(sensorSunCollated);
+
+        dctimestep2.start();
+        rcollate2.start();
+
+        if(!rcollate2.wait()){
+            STADIC_ERROR("The running of rcollate for the sensor sun contribution has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+
+        //dctimestep | rcollate for the sensor for the sun patch
+        //Added this line from an email that didn't exist before
+        arguments[2]=sensorSkyDC;
+        arguments[3]=sunPatchSMX;
+        Process dctimestep3(dctimestepProgram,arguments);
+        std::string sensorSunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun_patch.txt";
+        Process rcollate3(rcollateProgram,arguments2);
+        dctimestep3.setStandardOutputProcess(&rcollate3);
+        rcollate3.setStandardOutputFile(sensorSunPatchCollated);
+
+        dctimestep3.start();
+        rcollate3.start();
+
+        if(!rcollate3.wait()){
+            STADIC_ERROR("The running of rcollate for the sensor sun patch contribution has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+
+        //rlam | rcalc bringing it all together for the sensors
+        arguments.clear();
+        arguments.push_back(sensorSkyCollated);
+        arguments.push_back(sensorSunPatchCollated);
+        arguments.push_back(sensorSunCollated);
+
+        std::string rlamProgram="rlam";
+        Process rlam(rlamProgram,arguments);
+
+        arguments2.clear();
+        arguments2.push_back("-e");
+        arguments2.push_back("r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9");
+        arguments2.push_back("-e");
+        arguments2.push_back("ill=179*(.265*r+.670*g+.065*b)");
+        arguments2.push_back("-e");
+        arguments2.push_back("$1=floor(ill+.5)");
+        std::string rcalcProgram="rcalc";
+        Process rcalc(rcalcProgram,arguments2);
+        rlam.setStandardOutputProcess(&rcalc);
+
+        std::string finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[blindGroupNum].name()+"_shade_sig.tmp";
+        rcalc.setStandardOutputFile(finalIll);
+
+        rlam.start();
+        rcalc.start();
+
+        if(!rcalc.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcalc for the shade signal file for "+model->spaceName()+" has failed.");
+            return false;
+        }
     }
 
-    //rcalc for the direct component illuminance file by itself
-    arguments.clear();
-    arguments.push_back("-e");
-    arguments.push_back("ill=179*(.265*$1+.670*$2+.065*$3)");
-    arguments.push_back("-e");
-    arguments.push_back("$1=floor(ill+.5)");
-    Process rcalc2(rcalcProgram, arguments);
-    rcalc2.setStandardInputFile(directSunCollated);
-    std::string directIll;
-    if (setting==-1){
-        directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_direct_ill.tmp";
-    }else{
-        directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_direct_ill_std.tmp";
-    }
-    rcalc2.setStandardOutputFile(directIll);
-    rcalc2.start();
+    if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
+        //dctimestep | rcollate for the sky
+        arguments.clear();
+        arguments.push_back("-n");
+        arguments.push_back("8760");
+        //Added this line from an email that didn't exist before
+        arguments.push_back(skyDC);
+        arguments.push_back(skySMX);
+        std::string dctimestepProgram="dctimestep";
+        Process dctimestep(dctimestepProgram,arguments);
 
-    if (!rcalc2.wait()){
-        return false;
+        std::vector<std::string> arguments2;
+        arguments2.push_back("-ho");
+        arguments2.push_back("-oc");
+        arguments2.push_back("1");
+        std::string rcollateProgram="rcollate";
+        Process rcollate(rcollateProgram,arguments2);
+        dctimestep.setStandardOutputProcess(&rcollate);
+
+        std::string skyCollated;
+        if (setting==-1){
+            skyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sky.txt";
+        }else{
+            skyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sky_std.txt";
+        }
+        rcollate.setStandardOutputFile(skyCollated);
+        if (writeCL){
+            outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep.commandLine()<<std::endl;
+            outCL<<rcollate.commandLine()<<std::endl<<std::endl;;
+        }
+        dctimestep.start();
+        rcollate.start();
+
+        if(!rcollate.wait()){
+            STADIC_ERROR("The running of rcollate for the sky has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+        //dctimestep | rcollate for the sun
+        //Added this line from an email that didn't exist before
+        arguments[2]=sunDC;
+        arguments[3]=sunSMX;
+        Process dctimestep2(dctimestepProgram,arguments);
+        std::string sunCollated;
+        if (setting==-1){
+            sunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun.txt";
+        }else{
+            sunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std.txt";
+        }
+        Process rcollate2(rcollateProgram,arguments2);
+        dctimestep2.setStandardOutputProcess(&rcollate2);
+        rcollate2.setStandardOutputFile(sunCollated);
+        if (writeCL){
+            outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep2.commandLine()<<std::endl;
+            outCL<<rcollate2.commandLine()<<std::endl<<std::endl;;
+        }
+        dctimestep2.start();
+        rcollate2.start();
+
+        if(!rcollate2.wait()){
+            STADIC_ERROR("The running of rcollate for the sun has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+        //dctimestep | rcollate for the direct sun (sDA & ASE)
+        //Added this line from an email that didn't exist before
+        arguments[2]=directSunDC;
+        arguments[3]=sunSMX;
+        Process dctimestep3(dctimestepProgram,arguments);
+        std::string directSunCollated;
+        if (setting==-1){
+            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun_direct.txt";
+        }else{
+            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std_direct.txt";
+        }
+        Process rcollate3(rcollateProgram,arguments2);
+        dctimestep3.setStandardOutputProcess(&rcollate3);
+        rcollate3.setStandardOutputFile(directSunCollated);
+        if (writeCL){
+            outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep3.commandLine()<<std::endl;
+            outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
+        }
+        dctimestep3.start();
+        rcollate3.start();
+
+        if(!rcollate3.wait()){
+            STADIC_ERROR("The running of rcollate for the direct sun has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+        //dctimestep | rcollate for the sun patch
+        //Added this line from an email that didn't exist before
+        arguments[2]=skyDC;
+        arguments[3]=sunPatchSMX;
+        Process dctimestep4(dctimestepProgram,arguments);
+        std::string sunPatchCollated;
+        if (setting==-1){
+            sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sunPatch.txt";
+        }else{
+            sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sunPatch_std.txt";
+        }
+        Process rcollate4(rcollateProgram,arguments2);
+        dctimestep4.setStandardOutputProcess(&rcollate4);
+        rcollate4.setStandardOutputFile(sunPatchCollated);
+        if (writeCL){
+            outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep4.commandLine()<<std::endl;
+            outCL<<rcollate4.commandLine()<<std::endl<<std::endl;;
+        }
+        dctimestep4.start();
+        rcollate4.start();
+
+        if(!rcollate4.wait()){
+            STADIC_ERROR("The running of rcollate for the sun patches has failed.");
+            //I want to display the errors here if the standard error has any errors to show.
+
+            return false;
+        }
+
+        //rlam | rcalc bringing it all together
+        arguments.clear();
+        arguments.push_back(skyCollated);
+        arguments.push_back(sunPatchCollated);
+        arguments.push_back(sunCollated);
+
+        std::string rlamProgram="rlam";
+        Process rlam(rlamProgram,arguments);
+
+        arguments2.clear();
+        arguments2.push_back("-e");
+        arguments2.push_back("r=$1-$4+$7;g=$2-$5+$8;b=$3-$6+$9");
+        arguments2.push_back("-e");
+        arguments2.push_back("ill=179*(.265*r+.670*g+.065*b)");
+        arguments2.push_back("-e");
+        arguments2.push_back("$1=floor(ill+.5)");
+        std::string rcalcProgram="rcalc";
+        Process rcalc(rcalcProgram,arguments2);
+        rlam.setStandardOutputProcess(&rcalc);
+
+        std::string finalIll;
+        if (setting==-1){
+            finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_ill.tmp";
+        }else{
+            finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_ill_std.tmp";
+        }
+
+        rcalc.setStandardOutputFile(finalIll);
+        if (writeCL){
+            outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<rlam.commandLine()<<std::endl;
+            outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+        }
+        rlam.start();
+        rcalc.start();
+
+        if(!rcalc.wait()){
+            return false;
+        }
+
+        //rcalc for the direct component illuminance file by itself
+        arguments.clear();
+        arguments.push_back("-e");
+        arguments.push_back("ill=179*(.265*$1+.670*$2+.065*$3)");
+        arguments.push_back("-e");
+        arguments.push_back("$1=floor(ill+.5)");
+        Process rcalc2(rcalcProgram, arguments);
+        rcalc2.setStandardInputFile(directSunCollated);
+        std::string directIll;
+        if (setting==-1){
+            directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_direct_ill.tmp";
+        }else{
+            directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_direct_ill_std.tmp";
+        }
+        rcalc2.setStandardOutputFile(directIll);
+        if (writeCL){
+            outCL<<rcalc.commandLine()<<std::endl<<std::endl;
+        }
+        rcalc2.start();
+
+        if (!rcalc2.wait()){
+            return false;
+        }
     }
+    outCL.close();
     return true;
 }
 
@@ -2036,11 +2345,14 @@ bool Daylight::createOctree(std::vector<std::string> files, std::string octreeNa
 bool Daylight::sumIlluminanceFiles(Control *model){
     std::string FinalIllFileName;
     std::string tempFileName;
+    std::string finalSensorFileName;
+    std::string tempSensorFileName;
     for (int i=0;i<model->windowGroups().size();i++){
         //Base Illuminance files
         FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
         DaylightIlluminanceData baseIll;
+
         if(isFile(tempFileName)){
             if (!baseIll.parse(tempFileName,m_Model->weaDataFile().get())){
                 return false;
@@ -2076,6 +2388,46 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             }
             baseIll.writeIllFileLux(FinalIllFileName);
         }
+        //base signal files
+        finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
+        tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
+        DaylightIlluminanceData baseSig;
+        if(isFile(tempSensorFileName)){
+            if (!baseSig.parse(tempSensorFileName,m_Model->weaDataFile().get())){
+                return false;
+            }
+            if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
+                for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                    tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
+                    if(isFile(tempSensorFileName)){
+                        if (!baseSig.addIllFile(tempSensorFileName)){
+                            return false;
+                        }
+                    }
+                }
+            }
+            baseSig.writeIllFileLux(finalSensorFileName);
+        }else{
+            tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf0.sig";
+            if(isFile(tempSensorFileName)){
+                if (!baseSig.parse(tempSensorFileName, m_Model->weaDataFile().get())){
+                    return false;
+                }
+            }else{
+                STADIC_ERROR("The illuminance file "+tempSensorFileName+" does not exist.");
+                return false;
+            }
+            if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
+                for (int j=1;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                    tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
+                    if (!baseSig.addIllFile(tempSensorFileName)){
+                        return false;
+                    }
+                }
+            }
+            baseSig.writeIllFileLux(finalSensorFileName);
+        }
+
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
             DaylightIlluminanceData settingIll;
