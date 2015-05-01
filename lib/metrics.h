@@ -28,62 +28,37 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SHADECONTROL_H
-#define SHADECONTROL_H
+#ifndef METRICS_H
+#define METRICS_H
 
-#include <string>
+#include "spacecontrol.h"
+#include "buildingcontrol.h"
 #include <vector>
+#include <string>
+#include "dayill.h"
 
 #include "stadicapi.h"
-#include "jsonobjects.h"
 
 namespace stadic {
-
-class STADIC_API ShadeControl
+class STADIC_API Metrics
 {
 public:
-    explicit ShadeControl();
-    bool parseJson(const JsonObject &json);
-
-    //Setters
-    bool setMethod(std::string method);
-    bool setElevationAzimuth(double value);
-    bool setAngleSettings(double value);
-    bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setSignalSettings(double value);
-    bool setSensorType(std::string type);
-    void setSensorFile(std::string file);
-
-    //Getters
-    std::string controlMethod();
-    double elevationAzimuth();
-    std::vector<double> angleSettings();
-    std::vector<double> location();
-    double xLoc();
-    double yLoc();
-    double zLoc();
-    double xDir();
-    double yDir();
-    double zDir();
-    double spin();
-    std::vector<double> signalSettings();
-    std::string sensorType();
-    std::string sensorFile();
-    bool needsSensor();
-
+    explicit Metrics(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
+    bool processMetrics();
 
 private:
-    bool readAutoProf(const JsonObject &json, std::string method);
-    bool readAutoSign(const JsonObject &json, std::string method);
-    std::string m_Method;
-    double m_ElevationAzimuth;
-    std::vector<double> m_AngleSettings;
-    std::vector<double> m_Location;
-    std::vector<double>m_SignalSettings;
-    std::string m_SensorType;                                       //  Variable holding the sensor type
-    std::string m_SensorFile;                                       //  Variable holding the sensor file
+
+    bool calculateDA(Control *model, DaylightIlluminanceData *dayIll);
+    bool calculatecDA(Control *model, DaylightIlluminanceData *dayIll);
+    bool calculateDF(Control *model, DaylightIlluminanceData *dayIll);
+    bool calculateUDI(Control *model, DaylightIlluminanceData *dayIll);
+    bool calculatesDA(Control *model, DaylightIlluminanceData *dayIll);
+    bool calculateOccsDA(Control *model, DaylightIlluminanceData *dayIll);
+    bool parseOccupancy(std::string file, double threshold);
+    BuildingControl *m_Model;
+    std::vector<bool> m_Occupancy;
+
 };
 
 }
-
-#endif // SHADECONTROL_H
+#endif // METRICS_H

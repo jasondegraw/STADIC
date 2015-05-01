@@ -47,7 +47,7 @@ class STADIC_API GridMaker
 {
 public:
     GridMaker(std::vector<std::string> fileList);                                       //Constructor that takes a list of radiance geometry files
-
+    GridMaker(std::string file);                                                        //Constructor that takes a single radiane geometry file
     //Setters
     //Points
 
@@ -75,7 +75,7 @@ public:
     double offsetX();                                                                   //Function that returns the x offset as a double
     double offsetY();                                                                   //Function that returns the y offset as a double
     double zHeight();                                                                   //Function that returns the absolute z height as a double
-
+    double area();                                                                      //Function to retrieve the area of the polygons.
     std::vector<std::vector<std::vector<double> > > points();                           //Function that returns the points that are used for analysis
 
     //Utilities
@@ -85,7 +85,7 @@ public:
     bool writePTS(std::string file);                                                    //Function to write the points file to a file
     bool writePTScsv(std::string file);                                                 //Function to write the pts file to a file in a csv format
     bool viewPTS(std::string location, std::string vType);                              //Function to render a bmp of the points file and the layers chosen for the grid
-
+    bool calcArea();                                                                      //Function to obtain the area of the polygons within the space
 
 private:
     //Points
@@ -94,6 +94,8 @@ private:
     //Polygons
     std::vector<boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true> > > m_UnitedPolygon;  //Vector containing a multipolygon at each elevation that holds each of the joined polygons
 
+    //Area
+    double m_Area;
 
     //InputData
     std::vector<std::string> m_LayerNames;                      //Vector holding the layer names on which to place the grid

@@ -52,6 +52,8 @@ public:
     int month();                                                                //Function that returns the month as an int
     int day();                                                                  //Function that returns the day as an int
     double hour();                                                              //Function that returns the hour as a double
+    bool allZeros();                                                            //Function that returns true if all values in the illuminance vector are zero.
+    double fractionAboveTarget(double target);                                  //Function that returns the fraction of points above the target value
 
 private:
     std::vector<double> m_Illuminance;                                          //Vector holding the illuminance values for a given interval
@@ -71,8 +73,9 @@ public:
     bool addTimeBasedIll(std::string fileName);                                 //Function to add the illuminance of a file that contains time values to the object
     bool writeIllFileLux(std::string fileName);                                    //Function to write the illuminance file in lux
     bool writeIllFileFC(std::string fileName);                                  //Function to write the illuminance file in fc
+    void addDataPoint(TemporalIlluminance dataPoint);
     //Getters
-    std::vector<TemporalIlluminance> illuminance();                             //Function that returns the illuminance values in a vector
+    std::vector<TemporalIlluminance> illuminance() const;                             //Function that returns the illuminance values in a vector
 
     //int hoursGreaterThan(double value, int point);
 

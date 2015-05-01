@@ -194,6 +194,9 @@ bool Control::setDA(bool run, double illum){
     }
     return true;
 }
+void Control::setCalcDA(bool run){
+    m_DA=run;
+}
 bool Control::setcDA(bool run, double illum){
     m_cDA=run;
     if (illum>0){
@@ -203,6 +206,9 @@ bool Control::setcDA(bool run, double illum){
         return false;
     }
     return true;
+}
+void Control::setCalccDA(bool run){
+    m_cDA=run;
 }
 bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, double endTime){
     m_sDA=run;
@@ -232,6 +238,12 @@ bool Control::setsDA(bool run, double illum, double DAFrac, double startTime, do
     }
     return true;
 }
+void Control::setCalcsDA(bool run){
+    m_sDA=run;
+}
+bool Control::setsDAwgSettings(std::vector<int> settingNumbers){
+    m_sDAwgSettings=settingNumbers;
+}
 bool Control::setOccsDA(bool run, double illum, double DAFrac){
     m_OccsDA=run;
     if (illum>0){
@@ -248,6 +260,9 @@ bool Control::setOccsDA(bool run, double illum, double DAFrac){
     }
     return true;
 }
+void Control::setCalcOccsDA(bool run){
+    m_OccsDA=run;
+}
 void Control::setDF(bool run){
     m_DF=run;
 }
@@ -262,7 +277,9 @@ bool Control::setUDI(bool run, double minIllum, double maxIllum){
     m_UDIMax=maxIllum;
     return true;
 }
-
+void Control::setCalcUDI(bool run){
+    m_UDI=run;
+}
 
 
 //Getters
@@ -288,7 +305,7 @@ std::string Control::inputDirectory(){
     return m_InputDirectory;
 }
 std::string Control::intermediateDataDirectory(){
-    return m_ResultsDirectory +"intermediateData\\";
+    return m_ResultsDirectory +"intermediateData/";
 }
 
 //******************
@@ -436,6 +453,10 @@ double Control::sDAStart(){
 double Control::sDAEnd(){
     return m_sDAEnd;
 }
+std::vector<int> Control::sDAwgSettings(){
+    return m_sDAwgSettings;
+}
+
 bool Control::runOccsDA(){
     return m_OccsDA;
 }
@@ -586,10 +607,10 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     treeVal=getObject(json, "analysis_points", "The key \"analysis_points\" does not appear in the STADIC Control File.", Severity::Fatal);
     //files
     boost::optional<JsonObject> list;
-    list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Fatal);
+    list=getArray(treeVal.get(), "files", "The key \"files\" does not appear within \"analysis_points\" in the STADIC Control File.", Severity::Warning);
     std::vector<std::string> tempVec;
     if (list.get().size()<1){
-        STADIC_LOG(Severity::Fatal, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
+        STADIC_LOG(Severity::Warning, "No analysis points file has been listed for the space named \""+m_SpaceName+"\"");
     }
     for (unsigned index=0;index<list.get().size();index++){
         tempVec.push_back(list.get()[index].asString());
@@ -597,29 +618,57 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
     setPTSFile(tempVec);
     list.reset();
     //x-spacing
+    dVal=getDouble(treeVal.get(), "x_spacing");
+    if (dVal){
+        setXSpacing(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "x_spacing");
     if (sVal){
         setXSpacing(sVal.get());
         sVal.reset();
     }
+    */
     //y-spacing
+    dVal=getDouble(treeVal.get(), "y_spacing");
+    if (dVal){
+        setYSpacing(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "y_spacing");
     if (sVal){
         setYSpacing(sVal.get());
         sVal.reset();
     }
+    */
     //offset
+    dVal=getDouble(treeVal.get(), "offset");
+    if (dVal){
+        setOffset(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "offset");
     if (sVal){
         setOffset(sVal.get());
         sVal.reset();
     }
+    */
     //z-offset
+    dVal=getDouble(treeVal.get(), "z_offset");
+    if (dVal){
+        setZOffset(toString(dVal.get()));
+        dVal.reset();
+    }
+    /*
     sVal=getString(treeVal.get(), "z_offset");
     if (sVal){
         setZOffset(sVal.get());
         sVal.reset();
     }
+    */
     //identifier
     list=getArray(treeVal.get(),"identifier");
     if (list){
@@ -837,6 +886,16 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         if (!setsDA(calculate, illum, frac, startTime, endTime)){
             return false;
         }
+        list=getArray(treeVal.get(), "window_group_settings", "The key \"window_group_settings\" does not appear within \"sDA\" in the STADIC Control File.", Severity::Warning);
+        std::vector<int> tempIntVec;
+        if (list.get().size()<1){
+            STADIC_LOG(Severity::Warning, "No window group settings have been listed for the space named \""+m_SpaceName+"\"");
+        }
+        for (unsigned index=0;index<list.get().size();index++){
+            tempIntVec.push_back(list.get()[index].asInt());
+        }
+        setsDAwgSettings(tempIntVec);
+        list.reset();
         treeVal.reset();
     }
 
@@ -962,82 +1021,104 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
 
 bool Control::verifyParameters(){
     bool allOk=true;
-    //ab
-    if (!checkParameter("dmx", "ab", "int")){
-        allOk=false;
+    bool bsdfSets=false;
+    for (int i=0;i<m_WindowGroups.size();i++){
+        if (m_WindowGroups[i].isBSDF()){
+            bsdfSets=true;
+        }
     }
-    if (!checkParameter("vmx", "ab", "int")){
-        allOk=false;
+    //ab
+    if (bsdfSets){
+        if (!checkParameter("dmx", "ab", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "ab", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "ab", "int")){
         allOk=false;
     }
     //ad
-    if (!checkParameter("dmx", "ad", "int")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "ad", "int")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "ad", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "ad", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "ad", "int")){
         allOk=false;
     }
     //as
-    if (!checkParameter("dmx", "as", "int")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "as", "int")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "as", "int")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "as", "int")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "as", "int")){
         allOk=false;
     }
     //dt
-    if (!checkParameter("dmx", "dt", "double")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dt", "double")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dt", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dt", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dt", "double")){
         allOk=false;
     }
     //dc
-    if (!checkParameter("dmx", "dc", "double")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dc", "double")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dc", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dc", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dc", "double")){
         allOk=false;
     }
     //dj
-    if (!checkParameter("dmx", "dj", "double")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dj", "double")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dj", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dj", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dj", "double")){
         allOk=false;
     }
     //dp
-    if (!checkParameter("dmx", "dp", "double")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "dp", "double")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "dp", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "dp", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "dp", "double")){
         allOk=false;
     }
     //lw
-    if (!checkParameter("dmx", "lw", "double")){
-        allOk=false;
-    }
-    if (!checkParameter("vmx", "lw", "double")){
-        allOk=false;
+    if (bsdfSets){
+        if (!checkParameter("dmx", "lw", "double")){
+            allOk=false;
+        }
+        if (!checkParameter("vmx", "lw", "double")){
+            allOk=false;
+        }
     }
     if (!checkParameter("default", "lw", "double")){
         allOk=false;
@@ -1053,20 +1134,18 @@ bool Control::checkParameter(std::string setName, std::string parameter, std::st
         if (varType=="int"){
             toInteger(check.get(), &ok);
             if (!ok){
-                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
+                STADIC_LOG(Severity::Fatal, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not an integer.");
             }
         }else if (varType=="double"){
             toDouble(check.get(), &ok);
             if (!ok){
-                STADIC_LOG(Severity::Error, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
+                STADIC_LOG(Severity::Fatal, "The parameter "+parameter+" within the "+setName+" set in "+m_SpaceName +" is not a double.");
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The variable type for the verification of the parameters is not a known type.  This can be either \"int\" or \"double\".");
         }
 
         check.reset();
-    }else{
-        STADIC_LOG(Severity::Error, "The parameter "+parameter+" is not found within the "+setName+" in "+m_SpaceName +".");
     }
     return false; // Add return for VS
 }

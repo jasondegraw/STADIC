@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2014-2015, The Pennsylvania State University
+ * Copyright (c) 2014, The Pennsylvania State University
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,62 +28,18 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SHADECONTROL_H
-#define SHADECONTROL_H
+#include "buildingcontrol.h"
+#include "daylight.h"
+#include "gtest/gtest.h"
+#include <iostream>
 
-#include <string>
-#include <vector>
 
-#include "stadicapi.h"
-#include "jsonobjects.h"
-
-namespace stadic {
-
-class STADIC_API ShadeControl
+TEST(DaylightTests, Case1)
 {
-public:
-    explicit ShadeControl();
-    bool parseJson(const JsonObject &json);
-
-    //Setters
-    bool setMethod(std::string method);
-    bool setElevationAzimuth(double value);
-    bool setAngleSettings(double value);
-    bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setSignalSettings(double value);
-    bool setSensorType(std::string type);
-    void setSensorFile(std::string file);
-
-    //Getters
-    std::string controlMethod();
-    double elevationAzimuth();
-    std::vector<double> angleSettings();
-    std::vector<double> location();
-    double xLoc();
-    double yLoc();
-    double zLoc();
-    double xDir();
-    double yDir();
-    double zDir();
-    double spin();
-    std::vector<double> signalSettings();
-    std::string sensorType();
-    std::string sensorFile();
-    bool needsSensor();
-
-
-private:
-    bool readAutoProf(const JsonObject &json, std::string method);
-    bool readAutoSign(const JsonObject &json, std::string method);
-    std::string m_Method;
-    double m_ElevationAzimuth;
-    std::vector<double> m_AngleSettings;
-    std::vector<double> m_Location;
-    std::vector<double>m_SignalSettings;
-    std::string m_SensorType;                                       //  Variable holding the sensor type
-    std::string m_SensorFile;                                       //  Variable holding the sensor file
-};
+    stadic::BuildingControl model;
+    ASSERT_TRUE(model.parseJson("daylightcase1/JSON_TEST1.txt"));
+    //ASSERT_TRUE(model.parseJson("JSON_TEST1.txt"));
+    stadic::Daylight sim(&model);
+    ASSERT_TRUE(sim.simDaylight());
 
 }
-
-#endif // SHADECONTROL_H

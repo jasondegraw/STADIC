@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
     }
     std::vector<std::string> radFiles;     //  Variable holding the radiance geometry/material file names
     std::vector<std::string> floorLayers;  //  Variable holding the floor layer names for testing whether the given point is in the polygons
-    int unit;
+    std::string unit;
     double reflectance=1;                  //  Variable holding the reflectance
 
     for (int i=1;i<argc;i++){
@@ -71,18 +71,7 @@ int main (int argc, char *argv[])
             radFiles.push_back(argv[i]);
         }else if (std::string("-u")==argv[i]){
             i++;
-            if (std::string("in")==argv[i]){
-                unit=0;
-            }else if (std::string("ft")==argv[i]){
-                unit=1;
-            }else if (std::string("mm")==argv[i]){
-                unit=2;
-            }else if (std::string("m")==argv[i]){
-                unit=3;
-            }else{
-                usage();
-                EXIT_FAILURE;
-            }
+            unit=argv[i];
         }else if(std::string("-l")==argv[i]){
             i++;
             floorLayers.push_back(argv[i]);
@@ -110,9 +99,6 @@ int main (int argc, char *argv[])
     }
     leakChecker.setFloorLayers(floorLayers);
     if (!leakChecker.setUnits(unit)){
-        return EXIT_FAILURE;
-    }
-    if(!leakChecker.setReflectance(reflectance)){
         return EXIT_FAILURE;
     }
     leakChecker.isEnclosed();

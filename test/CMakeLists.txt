@@ -23,7 +23,10 @@ add_custom_command(TARGET weathertests POST_BUILD
 add_custom_command(TARGET weathertests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/LancasterTMY.csv $<TARGET_FILE_DIR:weathertests>)
-
+add_executable(sensortests sensortests.cpp)
+add_test(sensortests sensortests)
+target_link_libraries(sensortests stadic_core gtest gtest_main
+)
 add_executable(primitivetests primitivetests.cpp)
 add_test(primitivetests primitivetests)
 target_link_libraries(primitivetests stadic_core gtest gtest_main)
@@ -61,6 +64,8 @@ add_custom_command(TARGET radfiletests POST_BUILD
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/materialsingleline.rad $<TARGET_FILE_DIR:radfiletests>)
+#This was in here previously
+#                   ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/rad/mat1.rad $<TARGET_FILE_DIR:radfiletests>)
 
 add_executable(leaktests leaktests.cpp)
 add_test(leaktests leaktests)
@@ -101,6 +106,13 @@ add_custom_command(TARGET gridtests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/diamond.rad $<TARGET_FILE_DIR:gridtests>)
 
+add_executable(daylighttest daylighttest.cpp)
+add_test(daylighttest daylighttest.cpp)
+target_link_libraries(daylighttest stadic_core gtest gtest_main)
+add_custom_command(TARGET daylighttest POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/ $<TARGET_FILE_DIR:daylighttest>/daylightcase1/)
+
 
 set(RESOURCES resources/simple.rad
               resources/simplehole.rad
@@ -111,9 +123,4 @@ set(RESOURCES resources/simple.rad
               resources/badglassmaterial.rad
               resources/badtransmaterial.rad
               resources/badpolygongeometry.rad
-			  resources/standard/SimpleStd.json
-			  resources/standard/data/Lancaster.wea
-			  resources/standard/rad/material.rad
-			  resources/standard/rad/Simple.rad
-			  resources/standard/rad/SimpleShadesFull.rad
-			  resources/standard/rad/SimpleShadesHalf.rad)
+                          resources/daylightcase1/JSON_TEST1.txt)

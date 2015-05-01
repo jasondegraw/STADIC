@@ -28,62 +28,33 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SHADECONTROL_H
-#define SHADECONTROL_H
+#include "metrics.h"
+#include "logging.h"
+#include "buildingcontrol.h"
+#include <iostream>
 
-#include <string>
-#include <vector>
-
-#include "stadicapi.h"
-#include "jsonobjects.h"
-
-namespace stadic {
-
-class STADIC_API ShadeControl
+void usage()
 {
-public:
-    explicit ShadeControl();
-    bool parseJson(const JsonObject &json);
-
-    //Setters
-    bool setMethod(std::string method);
-    bool setElevationAzimuth(double value);
-    bool setAngleSettings(double value);
-    bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setSignalSettings(double value);
-    bool setSensorType(std::string type);
-    void setSensorFile(std::string file);
-
-    //Getters
-    std::string controlMethod();
-    double elevationAzimuth();
-    std::vector<double> angleSettings();
-    std::vector<double> location();
-    double xLoc();
-    double yLoc();
-    double zLoc();
-    double xDir();
-    double yDir();
-    double zDir();
-    double spin();
-    std::vector<double> signalSettings();
-    std::string sensorType();
-    std::string sensorFile();
-    bool needsSensor();
-
-
-private:
-    bool readAutoProf(const JsonObject &json, std::string method);
-    bool readAutoSign(const JsonObject &json, std::string method);
-    std::string m_Method;
-    double m_ElevationAzimuth;
-    std::vector<double> m_AngleSettings;
-    std::vector<double> m_Location;
-    std::vector<double>m_SignalSettings;
-    std::string m_SensorType;                                       //  Variable holding the sensor type
-    std::string m_SensorFile;                                       //  Variable holding the sensor file
-};
-
+    std::cout << "dxmetrics - Process the requested metrics by space and whole building." << std::endl;
+    std::cout << "usage: dxmetrics <STADIC Control File>" << std::endl;
 }
 
-#endif // SHADECONTROL_H
+
+int main (int argc, char *argv[]){
+    if (argc < 2){
+        usage();
+        return EXIT_FAILURE;
+    }
+    std::string fileName=argv[1];
+    stadic::BuildingControl model;
+    //stadic::Control model;
+    if (!model.parseJson(fileName)){
+        return EXIT_FAILURE;
+    }
+    stadic::Metrics analyze(&model);
+    if (!analyze.processMetrics()){
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

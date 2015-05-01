@@ -66,6 +66,7 @@ private:
     std::vector<int> m_SimCase;                                                     //Vector holding the simulation case for each window group
     BuildingControl *m_Model;                                                               //Control object
     std::vector<RadFileData* > m_RadFiles;                                          //Vector of RadFileData objects
+    boost::optional<std::string> m_WeaFileName;                                                      //String that holds the name of the wea data file for input to gendaymtx.
 
 };
 

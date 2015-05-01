@@ -136,6 +136,54 @@ std::vector<double> ShadeControl::location()
 {
     return m_Location;
 }
+double ShadeControl::xLoc(){
+    if (!m_Location.empty()){
+        return m_Location[0];
+    }
+    return 0;
+}
+
+double ShadeControl::yLoc(){
+    if (!m_Location.empty()){
+        return m_Location[1];
+    }
+    return 0;
+}
+
+double ShadeControl::zLoc(){
+    if (!m_Location.empty()){
+        return m_Location[2];
+    }
+    return 0;
+}
+
+double ShadeControl::xDir(){
+    if (!m_Location.empty()){
+        return m_Location[3];
+    }
+    return 0;
+}
+
+double ShadeControl::yDir(){
+    if (!m_Location.empty()){
+        return m_Location[4];
+    }
+    return 0;
+}
+
+double ShadeControl::zDir(){
+    if (!m_Location.empty()){
+        return m_Location[5];
+    }
+    return 0;
+}
+
+double ShadeControl::spin(){
+    if (!m_Location.empty()){
+        return m_Location[6];
+    }
+    return 0;
+}
 
 std::vector<double> ShadeControl::signalSettings()
 {
@@ -150,6 +198,12 @@ std::string ShadeControl::sensorType()
 std::string ShadeControl::sensorFile()
 {
     return m_SensorFile;
+}
+bool ShadeControl::needsSensor(){
+    if (m_Method=="automated_profile_angle_signal" ||m_Method=="automated_signal"){
+        return true;
+    }
+    return false;
 }
 
 bool ShadeControl::readAutoProf(const JsonObject &json, std::string method)

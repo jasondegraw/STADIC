@@ -366,6 +366,7 @@ TEST(GridTests, ComplicatedNoThreshold)
     iFile.close();
     EXPECT_EQ(1668, counter);
 }
+
 TEST(GridTests, Diamond)
 {
     std::vector<std::string> files;

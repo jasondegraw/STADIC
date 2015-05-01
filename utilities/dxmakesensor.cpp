@@ -28,62 +28,57 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SHADECONTROL_H
-#define SHADECONTROL_H
-
+#include "photosensor.h"
+#include "logging.h"
+#include "functions.h"
+#include <iostream>
 #include <string>
-#include <vector>
 
-#include "stadicapi.h"
-#include "jsonobjects.h"
-
-namespace stadic {
-
-class STADIC_API ShadeControl
-{
-public:
-    explicit ShadeControl();
-    bool parseJson(const JsonObject &json);
-
-    //Setters
-    bool setMethod(std::string method);
-    bool setElevationAzimuth(double value);
-    bool setAngleSettings(double value);
-    bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setSignalSettings(double value);
-    bool setSensorType(std::string type);
-    void setSensorFile(std::string file);
-
-    //Getters
-    std::string controlMethod();
-    double elevationAzimuth();
-    std::vector<double> angleSettings();
-    std::vector<double> location();
-    double xLoc();
-    double yLoc();
-    double zLoc();
-    double xDir();
-    double yDir();
-    double zDir();
-    double spin();
-    std::vector<double> signalSettings();
-    std::string sensorType();
-    std::string sensorFile();
-    bool needsSensor();
-
-
-private:
-    bool readAutoProf(const JsonObject &json, std::string method);
-    bool readAutoSign(const JsonObject &json, std::string method);
-    std::string m_Method;
-    double m_ElevationAzimuth;
-    std::vector<double> m_AngleSettings;
-    std::vector<double> m_Location;
-    std::vector<double>m_SignalSettings;
-    std::string m_SensorType;                                       //  Variable holding the sensor type
-    std::string m_SensorFile;                                       //  Variable holding the sensor file
-};
+void usage(){
+    std::cerr << "dxmakesensor" << std::endl;
+    std::cerr << stadic::wrapAtN("Create a photosensor distibution for input to rsensor.", 72) << std::endl;
+    std::cerr << std::endl;
+    std::cerr << stadic::wrapAtN("-f name  Set the sensor file name. This file contains the radiance polygons that will"
+        " be used for creating the analysis points.  Multiple files may be added with each preceded by a \"-f\".  This"
+        " is a mandatory option.", 72, 9, true) << std::endl;
+    std::cerr << stadic::wrapAtN("-t type  Set the sensor type (\"cosine\", \"cosine_squared\") for the sensitivity.", 72, 9, true) << std::endl;
 
 }
 
-#endif // SHADECONTROL_H
+int main (int argc, char *argv[])
+{
+    if(argc == 1) {
+        usage();
+    }
+    std::string fileName;
+    std::string type;
+    for (int i=1;i<argc;i++){
+        if (std::string("-f")==argv[i]){
+            i++;
+            fileName=argv[i];
+        }else if(std::string("-t")==argv[i]){
+            i++;
+            type=argv[i];
+        }else{
+            std::string temp=argv[i];
+            STADIC_ERROR("Invalid option \""+temp+"\".  Run with no arguments to get usage.");
+            return EXIT_FAILURE;
+        }
+    }
+    stadic::Photosensor sensor;
+    if (!sensor.setType(type)){
+        return EXIT_FAILURE;
+    }
+    if (fileName.empty()){
+        if(!sensor.writeSensorFile()){
+            return EXIT_FAILURE;
+        }
+    }else{
+        if (!sensor.writeSensorFile(fileName)){
+            return EXIT_FAILURE;
+        }
+    }
+
+
+    return EXIT_SUCCESS;
+}

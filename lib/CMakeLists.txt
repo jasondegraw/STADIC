@@ -18,6 +18,8 @@ set(SRCS analemma.cpp
          leakcheck.cpp
          logging.cpp
          materialprimitives.cpp
+         metrics.cpp
+         photosensor.cpp
          radfiledata.cpp
          radparser.cpp
          radprimitive.cpp
@@ -36,6 +38,7 @@ set(HDRS stadicapi.h
          controlzone.h
          logging.h
          gridmaker.h
+         photosensor.h
          radfiledata.h
          radparser.h
          radprimitive.h
@@ -45,6 +48,7 @@ set(HDRS stadicapi.h
          elecill.h
          daylight.h
          materialprimitives.h
+         metrics.h
          leakcheck.h
          functions.h
          filepath.h

@@ -98,11 +98,17 @@ public:
     //Metrics
     //******************
     bool setDA(bool run, double illum);
+    void setCalcDA(bool run);
     bool setcDA(bool run, double illum);
+    void setCalccDA(bool run);
     bool setsDA(bool run, double illum, double DAFrac, double startTime, double endTime);
+    bool setsDAwgSettings(std::vector<int> settingNumbers);         //these are assumed to be base 1
+    void setCalcsDA(bool run);
     bool setOccsDA(bool run, double illum, double DAFrac);
+    void setCalcOccsDA(bool run);
     void setDF(bool run);
     bool setUDI(bool run, double minIllum, double maxIllum);
+    void setCalcUDI(bool run);
 
 
     //Getters
@@ -170,6 +176,7 @@ public:
     double sDAFrac();
     double sDAStart();
     double sDAEnd();
+    std::vector<int> sDAwgSettings();
     bool runOccsDA();
     double occsDAIllum();
     double occsDAFrac();
@@ -246,6 +253,7 @@ private:
     double m_sDAFrac;                                   //  Variable holding the DA fraction for the sDA analysis
     double m_sDAStart;                                  //  Variable holding the start time for the sDA analysis
     double m_sDAEnd;                                    //  Variable holding the end time for the sDA analysis
+    std::vector<int> m_sDAwgSettings;
     bool m_OccsDA;                                      //  Variable holding whether the occupancy schedule based sDA should be completed
     double m_OccsDAIllum;                               //  Variable holding the illuminance for the occupancy schedule based sDA analysis
     double m_OccsDAFrac;                                //  Variable holding the DA fraction for the occupancy schedule based sDA analysis

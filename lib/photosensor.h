@@ -28,62 +28,36 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef SHADECONTROL_H
-#define SHADECONTROL_H
+#ifndef PHOTOSENSOR_H
+#define PHOTOSENSOR_H
 
+#include "stadicapi.h"
 #include <string>
 #include <vector>
 
-#include "stadicapi.h"
-#include "jsonobjects.h"
-
 namespace stadic {
 
-class STADIC_API ShadeControl
+class STADIC_API Photosensor
 {
 public:
-    explicit ShadeControl();
-    bool parseJson(const JsonObject &json);
-
-    //Setters
-    bool setMethod(std::string method);
-    bool setElevationAzimuth(double value);
-    bool setAngleSettings(double value);
-    bool setLocation(double x, double y, double z, double xd, double yd, double zd, double spin);
-    bool setSignalSettings(double value);
-    bool setSensorType(std::string type);
-    void setSensorFile(std::string file);
+    explicit Photosensor();
+    bool setType(std::string type);
 
     //Getters
-    std::string controlMethod();
-    double elevationAzimuth();
-    std::vector<double> angleSettings();
-    std::vector<double> location();
-    double xLoc();
-    double yLoc();
-    double zLoc();
-    double xDir();
-    double yDir();
-    double zDir();
-    double spin();
-    std::vector<double> signalSettings();
-    std::string sensorType();
-    std::string sensorFile();
-    bool needsSensor();
+    std::vector<double> getVup(double xd, double yd, double zd, double spin_ccw);
 
+    //utilities
+    bool writeSensorFile(std::string file);
+    bool writeSensorFile();
 
 private:
-    bool readAutoProf(const JsonObject &json, std::string method);
-    bool readAutoSign(const JsonObject &json, std::string method);
-    std::string m_Method;
-    double m_ElevationAzimuth;
-    std::vector<double> m_AngleSettings;
-    std::vector<double> m_Location;
-    std::vector<double>m_SignalSettings;
-    std::string m_SensorType;                                       //  Variable holding the sensor type
-    std::string m_SensorFile;                                       //  Variable holding the sensor file
+    std::string m_Type;
+
+    bool writeCosine(std::ostream& out);
+    bool writeCosineSquared(std::ostream& out);
+    bool writeSensorFile(std::ostream& out);
 };
 
 }
 
-#endif // SHADECONTROL_H
+#endif // PHOTOSENSOR_H

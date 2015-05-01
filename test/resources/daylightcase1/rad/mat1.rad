@@ -1,0 +1,35 @@
+#####################################################
+# Daysim Material File           
+#####################################################
+# This file has been created with radfiles2daysim     
+# Copyright (c) Christoph Reinhart           	      
+# National Research Council Canada           	      
+# IRC, Lighting Group                               
+# Ont K1A 0R6, Canada                               
+#####################################################
+ 
+# radfiles2daysima is a converter used by the DAYSIM GUI to
+# import regular RADIANCE scene and material into DAYSIM
+# format, i.e. only materials supported by Daysim are 
+# admitted. Those admitted are turned monochrome.
+ 
+# This file contains the definitions of all materials in
+# the RADIANCE scene.
+# The scene geometry is stored in 'c:/1002-sda/rad/test_geometry.rad'.
+ 
+
+# SOURCE FILE: C:/0917/rad/2_geometry.rad 
+
+
+# SOURCE FILE: C:/0917/rad/2_material.rad 
+
+void plastic l_walls 0 0 5 0.6000 0.6000 0.6000 0.0000 0.0000 
+
+void plastic l_ceiling 0 0 5 0.8000 0.8000 0.8000 0.0000 0.0000 
+
+void plastic l_floor 0 0 5 0.2490 0.2490 0.2490 0.0000 0.0000 
+
+void glass l_glazingE 0 0 3 0.5452 0.5452 0.5452 
+
+void glass l_glazingS 0 0 3 0.5452 0.5452 0.5452 
+
