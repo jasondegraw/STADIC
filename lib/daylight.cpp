@@ -1061,7 +1061,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         std::string gendaymtxProgram="gendaymtx";
         Process gendaymtx(gendaymtxProgram,arguments);
 
-        std::string sunSMX;
         if (setting==-1){
             sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.smx";
         }else{
@@ -1116,7 +1115,6 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(m_WeaFileName.get());
         Process gendaymtx3(gendaymtxProgram,arguments);
 
-        std::string sunPatchSMX;
         if (setting==-1){
             sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.smx";
         }else{
@@ -1247,6 +1245,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process dctimestep(dctimestepProgram,arguments);
 
         std::vector<std::string> arguments2;
+        arguments2.clear();
         arguments2.push_back("-ho");
         arguments2.push_back("-oc");
         arguments2.push_back("1");
@@ -1279,6 +1278,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         //dctimestep | rcollate for the sun
         //Added this line from an email that didn't exist before
         arguments[2]=sunDC;
+        STADIC_LOG(Severity::Info, "sunSMX file = "+sunSMX);
         arguments[3]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sunCollated;
@@ -1295,6 +1295,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             outCL<<dctimestep2.commandLine()<<std::endl;
             outCL<<rcollate2.commandLine()<<std::endl<<std::endl;;
         }
+        STADIC_LOG(Severity::Info, dctimestep2.commandLine());
+        STADIC_LOG(Severity::Info, rcollate2.commandLine());
         dctimestep2.start();
         rcollate2.start();
 

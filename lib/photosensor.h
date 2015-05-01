@@ -33,6 +33,7 @@
 
 #include "stadicapi.h"
 #include <string>
+#include <vector>
 
 namespace stadic {
 
@@ -43,17 +44,17 @@ public:
     bool setType(std::string type);
 
     //Getters
-
+    std::vector<double> getVup(double xd, double yd, double zd, double spin_ccw);
 
     //utilities
     bool writeSensorFile(std::string file);
     bool writeSensorFile();
+
 private:
     std::string m_Type;
 
     bool writeCosine(std::ostream& out);
     bool writeCosineSquared(std::ostream& out);
-
     bool writeSensorFile(std::ostream& out);
 };
 

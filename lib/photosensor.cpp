@@ -51,6 +51,77 @@ bool Photosensor::setType(std::string type){
     return false;
 }
 
+//getters
+std::vector<double> Photosensor::getVup(double xd, double yd, double zd, double spin_ccw){
+    double PI=3.1415926535897932;
+    std::vector<double> vUp;
+    if (xd==0 && yd==0){
+        //vUp rotates about the z axis only starting pointing east with 0 rotation
+        //rotation is done around nadir of the photosensor using the right hand rule
+        if (spin_ccw==0||spin_ccw==360||spin_ccw==-360){
+            vUp.push_back(1);
+            vUp.push_back(0);
+            vUp.push_back(0);
+        }else if (spin_ccw==90 ||spin_ccw==-270){
+            vUp.push_back(0);
+            vUp.push_back(1);
+            vUp.push_back(0);
+        }else if (spin_ccw==180 || spin_ccw==-180){
+            vUp.push_back(-1);
+            vUp.push_back(0);
+            vUp.push_back(0);
+        }else if (spin_ccw==270 || spin_ccw==-90){
+            vUp.push_back(0);
+            vUp.push_back(-1);
+            vUp.push_back(0);
+        }else{
+            double xTemp;
+            double yTemp;
+            double zTemp;
+            xTemp=cos(spin_ccw*PI/180);
+            yTemp=sin(spin_ccw*PI/180);
+            zTemp=0;
+            if ((spin_ccw>0 && spin_ccw<90) || (spin_ccw>-360 && spin_ccw<-270)){
+                //First quadrant (x is positive, y is positive)
+                //Nothing needs to happen
+            }else if ((spin_ccw>90 && spin_ccw<180)|| (spin_ccw>-270&&spin_ccw<-180)){
+                //Second quadrant (x is negative, y is positive)
+                xTemp=xTemp*-1;
+            }else if ((spin_ccw>180 && spin_ccw<270)||(spin_ccw>-180&&spin_ccw<-90)){
+                //Third quadrant (x is negative, y is negative)
+                xTemp=xTemp*-1;
+                yTemp=yTemp*-1;
+            }else if ((spin_ccw>270 && spin_ccw<360)||(spin_ccw>-90 &&spin_ccw<0)){
+                //Fourth quadrant (x is positive, y is negative)
+                yTemp=yTemp*-1;
+            }else{
+                STADIC_LOG(Severity::Error, "The spin angle for the photosensor is outside the range of -360 to 360.  The vector will be set to 1,0,0.");
+                vUp.push_back(1);
+                vUp.push_back(0);
+                vUp.push_back(0);
+            }
+            vUp.push_back(xTemp);
+            vUp.push_back(yTemp);
+            vUp.push_back(zTemp);
+        }
+    }else{
+        //vUp starts out pointing vertically from 90 degrees from Nadir.
+        double xRotation;
+        double yRotation;
+        //#1 determine rotation to get nadir vector aligned with -z
+        double length;
+        //yRotation=
+        //xRotation=atan2(yd,zd);
+
+        //#2 rotate about nadir
+
+        //#3 reverse rotation from step #1
+
+    }
+
+    return vUp;
+}
+
 
 //utilities
 bool Photosensor::writeSensorFile(std::string file){
