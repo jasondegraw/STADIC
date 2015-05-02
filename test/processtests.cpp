@@ -170,6 +170,10 @@ TEST(ProcessTests, ProcessPipeBigOut)
     stadic::Process proc1(PROGRAM, args);
     proc0.setStandardOutputProcess(&proc1);
     proc1.setStandardOutputFile("output.txt");
+    std::cout << proc0.commandLine() << std::endl;
+    std::cout << proc1.commandLine() << std::endl;
+    std::string cmdLn = std::string(PROGRAM) + " -B | " + PROGRAM + " -d > output.txt";
+    EXPECT_EQ(cmdLn, proc0.commandLine());
     proc0.start();
     proc1.start();
     ASSERT_TRUE(proc0.wait());

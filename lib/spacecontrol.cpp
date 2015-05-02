@@ -243,6 +243,7 @@ void Control::setCalcsDA(bool run){
 }
 bool Control::setsDAwgSettings(std::vector<int> settingNumbers){
     m_sDAwgSettings=settingNumbers;
+    return true;
 }
 bool Control::setOccsDA(bool run, double illum, double DAFrac){
     m_OccsDA=run;
