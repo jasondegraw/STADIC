@@ -110,6 +110,8 @@ public:
     }
 
 private:
+    std::string singleCommandLine() const;
+
 #ifdef USE_QT
     QProcess m_process;
 #else

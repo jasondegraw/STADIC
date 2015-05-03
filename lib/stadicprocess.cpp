@@ -223,7 +223,7 @@ std::string Process::quote(const std::string &string)
 #endif
 }
 
-std::string Process::commandLine()
+std::string Process::singleCommandLine() const
 {
 #ifdef USE_QT
     return std::string;
@@ -240,6 +240,31 @@ std::string Process::commandLine()
     }
     if(!m_errorFile.empty()) {
         command += " 2> " + m_errorFile;
+    }
+    return command;
+#endif
+}
+
+std::string Process::commandLine()
+{
+#ifdef USE_QT
+    return std::string;
+#else
+    std::string command;
+    Process *first = this;
+    if(m_inputProcess == nullptr && m_outputProcess == nullptr) { // This is the simple case
+        command = singleCommandLine();
+    } else { // This is a pipeline situation, get everything
+        // Get to the first command
+        while(first->m_inputProcess) {
+            first = first->m_inputProcess;
+        }
+        command = first->singleCommandLine();
+        Process *current = first->m_outputProcess;
+        while(current) {
+          command += " | " + current->singleCommandLine();
+          current = current->m_outputProcess;
+        }
     }
     return command;
 #endif
