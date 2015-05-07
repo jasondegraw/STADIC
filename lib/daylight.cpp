@@ -778,9 +778,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             cnt.setStandardOutputProcess(&rcalc);
             rcalc.setStandardOutputFile(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
             if (writeCL){
-                outCL<<"## Pipe the next two lines together."<<std::endl;
-                outCL<<cnt.commandLine()<<std::endl;
-                outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+                //outCL<<"## Pipe the next two lines together."<<std::endl;
+                outCL<<cnt.commandLine()<<std::endl<<std::endl;;
             }
 
             cnt.start();
@@ -1261,9 +1260,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         }
         rcollate.setStandardOutputFile(skyCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep.commandLine()<<std::endl;
-            outCL<<rcollate.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep.commandLine()<<std::endl<<std::endl;;
         }
         dctimestep.start();
         rcollate.start();
@@ -1291,12 +1289,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         dctimestep2.setStandardOutputProcess(&rcollate2);
         rcollate2.setStandardOutputFile(sunCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep2.commandLine()<<std::endl;
-            outCL<<rcollate2.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep2.commandLine()<<std::endl<<std::endl;;
         }
         STADIC_LOG(Severity::Info, dctimestep2.commandLine());
-        STADIC_LOG(Severity::Info, rcollate2.commandLine());
         dctimestep2.start();
         rcollate2.start();
 
@@ -1322,9 +1318,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         dctimestep3.setStandardOutputProcess(&rcollate3);
         rcollate3.setStandardOutputFile(directSunCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep3.commandLine()<<std::endl;
-            outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep3.commandLine()<<std::endl<<std::endl;;
         }
         dctimestep3.start();
         rcollate3.start();
@@ -1351,9 +1346,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         dctimestep4.setStandardOutputProcess(&rcollate4);
         rcollate4.setStandardOutputFile(sunPatchCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep4.commandLine()<<std::endl;
-            outCL<<rcollate4.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep4.commandLine()<<std::endl<<std::endl;;
         }
         dctimestep4.start();
         rcollate4.start();
@@ -1394,9 +1388,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         rcalc.setStandardOutputFile(finalIll);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<rlam.commandLine()<<std::endl;
-            outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<rlam.commandLine()<<std::endl<<std::endl;;
         }
         rlam.start();
         rcalc.start();
