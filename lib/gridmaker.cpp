@@ -232,6 +232,9 @@ bool GridMaker::writePTScsv(std::string file){
     return true;
 }
 bool GridMaker::viewPTS(std::string location, std::string vType){
+    return viewPTS(location, vType, "grid.pts");
+}
+bool GridMaker::viewPTS(std::string location, std::string vType, std::string name){
     //The file names need to be adjusted
     m_RadPolyFile=location+"poly.rad";
     if (!writeRadPoly(m_RadPolyFile)){
@@ -249,12 +252,13 @@ bool GridMaker::viewPTS(std::string location, std::string vType){
     }
 
     m_picFile=location;
-    if (!runrpict(vType)){
+    if (!runrpict(vType, name)){
         return false;
     }
 
     return true;
 }
+
 bool GridMaker::calcArea(){
     if (!parseRad()){
         return false;
@@ -700,10 +704,10 @@ bool GridMaker::runoconv(std::string file){
     return true;
 }
 
-bool GridMaker::runrpict(std::string vType){
+bool GridMaker::runrpict(std::string vType, std::string name){
     std::string picFile=m_picFile+"grid.pic";
     std::string pfiltFile=m_picFile+"gridfiltered.pic";
-    std::string bmpFile=m_picFile+"grid.bmp";
+    std::string bmpFile=m_picFile+name;
     std::vector<std::string> args;
     double deltaX=m_MaxXRad-m_MinXRad;
     double deltaY=m_MaxYRad-m_MinYRad;

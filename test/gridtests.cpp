@@ -92,6 +92,8 @@ TEST(GridTests, ComplicatedThreshold)
     grid.setThreshold(73);      //This line prevents the stairs (@72" long) from being included in the points generation
     ASSERT_TRUE(grid.makeGrid());
     ASSERT_TRUE(grid.writePTS("complicatedgrid1.pts"));
+    ASSERT_TRUE(grid.viewPTS("", "p", "complicatedNoStairs.bmp"));
+    ASSERT_TRUE(grid.viewPTS("", "se", "complicatedNoStairsISO.bmp"));
     std::ifstream iFile;
     iFile.open("complicatedgrid1.pts");
     ASSERT_TRUE(iFile.is_open());
@@ -288,7 +290,7 @@ TEST(GridTests, ComplicatedNoThreshold)
     grid.setOffsetZ(30);
     ASSERT_TRUE(grid.makeGrid());
     ASSERT_TRUE(grid.writePTS("complicatedgrid3.pts"));
-    ASSERT_TRUE(grid.viewPTS("", "se"));
+    ASSERT_TRUE(grid.viewPTS("", "se", "complicateNoThreshold.bmp"));
     std::ifstream iFile;
     iFile.open("complicatedgrid3.pts");
     ASSERT_TRUE(iFile.is_open());
@@ -384,7 +386,7 @@ TEST(GridTests, Diamond)
     grid.setRotation(45);
     ASSERT_TRUE(grid.makeGrid());
     ASSERT_TRUE(grid.writePTS("diamondgrid.pts"));
-    ASSERT_TRUE(grid.viewPTS("", "p"));
+    ASSERT_TRUE(grid.viewPTS("", "p", "diamond.bmp"));
     std::ifstream iFile;
     iFile.open("diamondgrid.pts");
     ASSERT_TRUE(iFile.is_open());
