@@ -787,9 +787,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             rcalc.start();
 
             if(!rcalc.wait()){
-                STADIC_ERROR("The running of rcalc for the suns has failed.");
+                STADIC_LOG(Severity::Error, "The running of rcalc for the suns has failed.");
                 //I want to display the errors here if the standard error has any errors to show.
-
+                PathName badFile(tempFile);
+                if (!badFile.remove()){
+                    STADIC_LOG(Severity::Error, "The deletion of the file "+tempFile+" has failed.  Please manually delete this file.");
+                }
                 return false;
             }
         }
