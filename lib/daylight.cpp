@@ -786,9 +786,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             rcalc.start();
 
             if(!rcalc.wait()){
-                STADIC_ERROR("The running of rcalc for the suns has failed.");
+                STADIC_LOG(Severity::Error, "The running of rcalc for the suns has failed.");
                 //I want to display the errors here if the standard error has any errors to show.
-
+                PathName badFile(tempFile);
+                if (!badFile.remove()){
+                    STADIC_LOG(Severity::Error, "The deletion of the file "+tempFile+" has failed.  Please manually delete this file.");
+                }
                 return false;
             }
         }
@@ -2384,45 +2387,46 @@ bool Daylight::sumIlluminanceFiles(Control *model){
             baseIll.writeIllFileLux(FinalIllFileName);
         }
         //base signal files
-        finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
-        tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
-        DaylightIlluminanceData baseSig;
-        if(isFile(tempSensorFileName)){
-            if (!baseSig.parse(tempSensorFileName,m_Model->weaDataFile().get())){
-                return false;
-            }
-            if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
-                for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
-                    tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
-                    if(isFile(tempSensorFileName)){
+        if (model->windowGroups()[i].shadeControl()->needsSensor()){
+            finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
+            tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
+            DaylightIlluminanceData baseSig;
+            if(isFile(tempSensorFileName)){
+                if (!baseSig.parse(tempSensorFileName,m_Model->weaDataFile().get())){
+                    return false;
+                }
+                if (model->windowGroups()[i].bsdfBaseLayers().size()>0){
+                    for (int j=0;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                        tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
+                        if(isFile(tempSensorFileName)){
+                            if (!baseSig.addIllFile(tempSensorFileName)){
+                                return false;
+                            }
+                        }
+                    }
+                }
+                baseSig.writeIllFileLux(finalSensorFileName);
+            }else{
+                tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf0.sig";
+                if(isFile(tempSensorFileName)){
+                    if (!baseSig.parse(tempSensorFileName, m_Model->weaDataFile().get())){
+                        return false;
+                    }
+                }else{
+                    STADIC_ERROR("The illuminance file "+tempSensorFileName+" does not exist.");
+                    return false;
+                }
+                if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
+                    for (int j=1;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
+                        tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
                         if (!baseSig.addIllFile(tempSensorFileName)){
                             return false;
                         }
                     }
                 }
+                baseSig.writeIllFileLux(finalSensorFileName);
             }
-            baseSig.writeIllFileLux(finalSensorFileName);
-        }else{
-            tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf0.sig";
-            if(isFile(tempSensorFileName)){
-                if (!baseSig.parse(tempSensorFileName, m_Model->weaDataFile().get())){
-                    return false;
-                }
-            }else{
-                STADIC_ERROR("The illuminance file "+tempSensorFileName+" does not exist.");
-                return false;
-            }
-            if (model->windowGroups()[i].bsdfBaseLayers().size()>1){
-                for (int j=1;j<model->windowGroups()[i].bsdfBaseLayers().size();j++){
-                    tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf"+std::to_string(j)+".sig";
-                    if (!baseSig.addIllFile(tempSensorFileName)){
-                        return false;
-                    }
-                }
-            }
-            baseSig.writeIllFileLux(finalSensorFileName);
         }
-
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
             DaylightIlluminanceData settingIll;

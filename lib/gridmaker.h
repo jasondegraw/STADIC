@@ -85,6 +85,7 @@ public:
     bool writePTS(std::string file);                                                    //Function to write the points file to a file
     bool writePTScsv(std::string file);                                                 //Function to write the pts file to a file in a csv format
     bool viewPTS(std::string location, std::string vType);                              //Function to render a bmp of the points file and the layers chosen for the grid
+    bool viewPTS(std::string location, std::string vType, std::string name);            //Function to render a bmp of the points file with a given name
     bool calcArea();                                                                      //Function to obtain the area of the polygons within the space
 
 private:
@@ -147,7 +148,7 @@ private:
     bool writeRadPoly(std::string file);                        //Function for writing the radiance polygon of the listed layers
     bool writeRadPoints(std::string file);                      //Function for writing the points file as spheres
     bool runoconv(std::string file);                            //Function for running oconv
-    bool runrpict(std::string vType);                           //Function for running rpict and ra_bmp
+    bool runrpict(std::string vType, std::string name);         //Function for running rpict and ra_bmp
 
 };
 
