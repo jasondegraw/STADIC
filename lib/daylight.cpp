@@ -49,6 +49,28 @@ bool Daylight::simDaylight()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
     for (int i=0;i<spaces.size();i++){
+        //Set up the directories if they do not already exist
+        PathName resDir(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory());
+        if (!resDir.exists()){
+            if (!resDir.create()){
+                STADIC_LOG(Severity::Fatal, "The creation of the results directory failed at "+resDir.toString());
+                return false;
+            }
+        }
+        PathName intermediateDir(spaces[i].get()->spaceDirectory()+spaces[i].get()->intermediateDataDirectory());
+        if (!intermediateDir.exists()){
+            if (!intermediateDir.create()){
+                STADIC_LOG(Severity::Fatal, "The creation of the intermediate directory failed at "+intermediateDir.toString());
+                return false;
+            }
+        }
+        PathName inputDir(spaces[i].get()->spaceDirectory()+spaces[i].get()->inputDirectory());
+        if (!inputDir.exists()){
+            if (!inputDir.create()){
+                STADIC_LOG(Severity::Fatal, "The creation of the input directory failed at "+inputDir.toString());
+                return false;
+            }
+        }
 
         if (!uniqueGlazingMaterials(spaces[i].get())){
             return false;
