@@ -44,7 +44,7 @@ class STADIC_API ProcessShade
 public:
     explicit ProcessShade(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
     bool processShades();
-    bool writeSched(std::string file);
+    bool writeSched(std::vector<std::vector<int>> shadeSched, std::string file);
 
 private:
 
@@ -52,7 +52,7 @@ private:
     std::vector<int> automatedSignal(Control *model, int windowGroup);
     std::vector<int> automatedProfileAngle(Control *model, int windowGroup);
     std::vector<int> automatedProfileAngleSignal(Control *model, int windowGroup);
-
+    std::vector<std::vector<std::string>> m_TimeIntervals;
     BuildingControl *m_Model;
 
 

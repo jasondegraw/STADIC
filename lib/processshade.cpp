@@ -45,21 +45,21 @@ bool ProcessShade::processShades()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
     for (int i=0;i<spaces.size();i++){
+        //populate the time interval vector
+        m_TimeIntervals.clear();
+
+
+
+        //start processing shade algorithms
         if (!makeShadeSched(spaces[i].get())){
             STADIC_LOG(Severity::Error, "The creation of the shade schedule for "+spaces[i].get()->spaceName()+" has failed.");
             return false;
         }
-
-        DaylightIlluminanceData finalIll;
-
-
-        std::vector<double> finalTemporalIll;
-
     }
 
     return true;
 }
-bool ProcessShade::writeSched(std::string file){
+bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::string file){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
@@ -67,7 +67,13 @@ bool ProcessShade::writeSched(std::string file){
         return false;
     }
     //Write out the shade schedule here.  M D H WG1Set WG2Set...
-
+    for (int i=0;i<m_TimeIntervals.size();i++){
+        oFile<<m_TimeIntervals[i][0]<<" "<<m_TimeIntervals[i][1]<<" "<<m_TimeIntervals[i][2];
+        for (int j=0;j<shadeSched[i].size();j++){
+            oFile<<" "<<shadeSched[i][j];
+        }
+        oFile<<std::endl;
+    }
 
     oFile.close();
     return true;
@@ -75,6 +81,7 @@ bool ProcessShade::writeSched(std::string file){
 
 bool ProcessShade::makeShadeSched(Control *model){
     std::vector<std::vector<int>> shadeSchedule;
+    //determine schedule for each window group
     for (int j=0;j<model->windowGroups().size();j++){
         if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_signal"){
             shadeSchedule.push_back(automatedSignal(model, j));
@@ -84,10 +91,16 @@ bool ProcessShade::makeShadeSched(Control *model){
             shadeSchedule.push_back(automatedProfileAngleSignal(model, j));
         }
     }
-
-    if (!writeSched(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shade.sch")){
+    //Write out completed schedule
+    if (!writeSched(shadeSchedule, model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shade.sch")){
         return false;
     }
+    //determine final illuminance values using completed schedule
+
+
+    //Write Illuminance File
+
+
     return true;
 }
 //Shade Control Algorithms
