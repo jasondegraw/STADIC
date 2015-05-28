@@ -34,6 +34,7 @@
 #include "spacecontrol.h"
 #include "buildingcontrol.h"
 #include "dayill.h"
+#include <vector>
 
 #include "stadicapi.h"
 
@@ -43,10 +44,19 @@ class STADIC_API ProcessShade
 public:
     explicit ProcessShade(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
     bool processShades();
+    bool writeSched();
+    bool writeSched(std::ostream& out);
+    bool writeSched(std::string file);
 
 private:
 
+    bool makeShadeSched(Control *model);
+    std::vector<int> automatedSignal(Control *model, int windowGroup);
+    std::vector<int> automatedProfileAngle(Control *model, int windowGroup);
+    std::vector<int> automatedProfileAngleSignal(Control *model, int windowGroup);
+
     BuildingControl *m_Model;
+
 
 
 };

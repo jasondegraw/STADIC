@@ -211,7 +211,10 @@ bool GridMaker::writePTS(std::string file){
         STADIC_ERROR("The opening of the file "+file+" has failed.");
         return false;
     }
-    return writePTS(oFile);
+    if (!writePTS(oFile)){
+        oFile.close();
+        return false;
+    }
     oFile.close();
     return true;
 }
