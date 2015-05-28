@@ -59,14 +59,6 @@ bool ProcessShade::processShades()
 
     return true;
 }
-bool ProcessShade::writeSched(){
-    return writeSched(std::cout);
-}
-
-bool ProcessShade::writeSched(std::ostream& out){
-    //This function does all of the writing.
-}
-
 bool ProcessShade::writeSched(std::string file){
     std::ofstream oFile;
     oFile.open(file);
@@ -74,13 +66,13 @@ bool ProcessShade::writeSched(std::string file){
         STADIC_LOG(Severity::Error, "The opening of the file "+ file + " has failed.");
         return false;
     }
-    if (!writeSched(oFile)){
-        oFile.close();
-        return false;
-    }
+    //Write out the shade schedule here.  M D H WG1Set WG2Set...
+
+
     oFile.close();
     return true;
 }
+
 bool ProcessShade::makeShadeSched(Control *model){
     std::vector<std::vector<int>> shadeSchedule;
     for (int j=0;j<model->windowGroups().size();j++){
@@ -91,11 +83,11 @@ bool ProcessShade::makeShadeSched(Control *model){
         }else if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_profile_angle_signal"){
             shadeSchedule.push_back(automatedProfileAngleSignal(model, j));
         }
-
     }
 
-
-
+    if (!writeSched(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shade.sch")){
+        return false;
+    }
     return true;
 }
 //Shade Control Algorithms

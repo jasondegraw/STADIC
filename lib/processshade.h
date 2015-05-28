@@ -44,8 +44,6 @@ class STADIC_API ProcessShade
 public:
     explicit ProcessShade(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
     bool processShades();
-    bool writeSched();
-    bool writeSched(std::ostream& out);
     bool writeSched(std::string file);
 
 private:
