@@ -698,8 +698,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments.push_back(it->second);
                 }else if (it->first=="lw"){
                     arguments.push_back("-lw");
-                    arguments.push_back("0.00005");
-                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                    if (toDouble(it->second)>0.00002){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                        arguments.push_back("0.00002");
+                    }else{
+                        arguments.push_back(it->second);
+                    }
                 }
             }
         }else{
@@ -1002,9 +1006,13 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments2.push_back("-"+it->first);
                     arguments2.push_back(it->second);
                 }else if (it->first=="lw"){
-                    arguments2.push_back("-lw");
-                    arguments2.push_back("0.00005");
-                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                    arguments.push_back("-lw");
+                    if (toDouble(it->second)>0.00002){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+                        arguments.push_back("0.00002");
+                    }else{
+                        arguments.push_back(it->second);
+                    }
                 }
             }
         }else{
