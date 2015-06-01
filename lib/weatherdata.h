@@ -74,6 +74,7 @@ public:
     double timeZoneDeg() const;                             //Function that returns the timezone as a double in degrees
     std::string elevation() const;                          //Function that returns the elevation as a string
     std::vector<int> julianDate() const;                    //Function that returns the julian date as a vector
+    std::vector<double> getProfileAngles(double elevationAzimuth);      //Function that returns the profile angles of the sun position for the year.
 
 private:
     bool parseEPW(std::string file);                        //Function to parse an EPW file

@@ -35,6 +35,7 @@
 #include <iostream>
 #include <fstream>
 #include "functions.h"
+#include "weatherdata.h"
 
 namespace stadic {
 ProcessShade::ProcessShade(BuildingControl *model) :
@@ -161,8 +162,25 @@ std::vector<int> ProcessShade::automatedSignal(Control *model, int windowGroup){
 
 std::vector<int> ProcessShade::automatedProfileAngle(Control *model, int windowGroup){
     std::vector<int> shadeSchedule;
-
-
+    WeatherData weaData;
+    if (!weaData.parseWeather(model->weaFile())){
+        return shadeSchedule;
+    }
+    std::vector<double> profAngle;
+    profAngle=weaData.getProfileAngles(model->windowGroups()[windowGroup].shadeControl()->elevationAzimuth());
+    for (int j=0;j<profAngle.size();j++){
+        if (profAngle[j]==-1){
+            shadeSchedule.push_back(0);
+        }else{
+            bool settingFound=false;
+            for (int i=0;i<model->windowGroups()[windowGroup].shadeControl()->angleSettings().size();i++){
+                if (profAngle[j]<model->windowGroups()[windowGroup].shadeControl()->angleSettings()[i]&&settingFound==false){
+                    shadeSchedule.push_back(i+1);
+                    settingFound=true;
+                }
+            }
+        }
+    }
     return shadeSchedule;
 }
 std::vector<int> ProcessShade::automatedProfileAngleSignal(Control *model, int windowGroup){
