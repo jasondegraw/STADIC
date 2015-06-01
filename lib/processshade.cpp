@@ -34,6 +34,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include "functions.h"
 
 namespace stadic {
 ProcessShade::ProcessShade(BuildingControl *model) :
@@ -47,8 +48,17 @@ bool ProcessShade::processShades()
     for (int i=0;i<spaces.size();i++){
         //populate the time interval vector
         m_TimeIntervals.clear();
-
-
+        DaylightIlluminanceData timeData;
+        if (!timeData.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+spaces[i].get()->windowGroups()[0].name()+"_base.ill")){
+            return false;
+        }
+        for (int j=0;j<timeData.illuminance().size();j++){
+            std::vector<std::string> tempVec;
+            tempVec.push_back(toString(timeData.illuminance()[j].month()));
+            tempVec.push_back(toString(timeData.illuminance()[j].day()));
+            tempVec.push_back(toString(timeData.illuminance()[j].hour()));
+            m_TimeIntervals.push_back(tempVec);
+        }
 
         //start processing shade algorithms
         if (!makeShadeSched(spaces[i].get())){
