@@ -79,8 +79,8 @@ bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::str
     //Write out the shade schedule here.  M D H WG1Set WG2Set...
     for (int i=0;i<m_TimeIntervals.size();i++){
         oFile<<m_TimeIntervals[i][0]<<" "<<m_TimeIntervals[i][1]<<" "<<m_TimeIntervals[i][2];
-        for (int j=0;j<shadeSched[i].size();j++){
-            oFile<<" "<<shadeSched[i][j];
+        for (int j=0;j<shadeSched.size();j++){
+            oFile<<" "<<shadeSched[j][i];           //The shadeSched vector is filled with a fector of one window group first then the second...
         }
         oFile<<std::endl;
     }
@@ -106,10 +106,48 @@ bool ProcessShade::makeShadeSched(Control *model){
         return false;
     }
     //determine final illuminance values using completed schedule
-
+    std::vector<DaylightIlluminanceData> baseIlls;
+    std::vector<std::vector<DaylightIlluminanceData>> settingIlls;
+    for (int i=0;i<model->windowGroups().size();i++){
+        DaylightIlluminanceData illBase;
+        illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
+        baseIlls.push_back(illBase);
+        std::vector<DaylightIlluminanceData> tempSettingIlls;
+        for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
+            DaylightIlluminanceData illSetting;
+            illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(model->sDAwgSettings()[i])+".ill");
+            tempSettingIlls.push_back(illSetting);
+        }
+        settingIlls.push_back(tempSettingIlls);
+    }
+    DaylightIlluminanceData finalIlluminance;
+    std::vector<double> finalTemporalIll;
+    for (int i=0;i<shadeSchedule[0].size();i++){               //Loop over the entire year
+        finalTemporalIll.clear();
+        for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
+            finalTemporalIll.push_back(0);
+        }
+        for (int j=0;j<shadeSchedule.size();j++){        //Loop over window groups
+            if (shadeSchedule[j][i]==0){           //use base condition
+                for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
+                }
+            }else{                              //shades employed
+                for (int k=0;k<settingIlls[j][shadeSchedule[j][i]-1].illuminance()[i].lux().size();k++){
+                    finalTemporalIll[k]=finalTemporalIll[k] + settingIlls[j][shadeSchedule[j][i]-1].illuminance()[i].lux()[k];
+                }
+            }
+        }
+        TemporalIlluminance dataPoint(baseIlls[0].illuminance()[i].month(), baseIlls[0].illuminance()[i].day(), baseIlls[0].illuminance()[i].hour(), finalTemporalIll);
+        finalIlluminance.addDataPoint(dataPoint);
+    }
 
     //Write Illuminance File
-
+    if (model->illumUnits()=="lux"){
+        finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_final.ill");
+    }else{
+        finalIlluminance.writeIllFileFC(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_final.ill");
+    }
 
     return true;
 }
