@@ -38,6 +38,7 @@
 #include "gridmaker.h"
 #include "weatherdata.h"
 #include "photosensor.h"
+#include <iostream>
 
 namespace stadic {
 Daylight::Daylight(BuildingControl *model) :
@@ -655,6 +656,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
     //Generate Weather file if it hasn't been generated already.
     if (!m_WeaFileName){
+        if (writeCL){
+            std::cout<<"***\nParsing the weather file.\n***"<<std::endl;
+        }
         WeatherData tmpWeather;
         if (m_Model->weaDataFile()){
             if (!tmpWeather.parseWeather(m_Model->weaDataFile().get())){
@@ -773,7 +777,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<rcontrib.commandLine()<<std::endl<<std::endl;;
         }
-
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sky.\n"<<rcontrib.commandLine()<<"\n***"<<std::endl;
+        }
         rcontrib.start();
         if (!rcontrib.wait()){
             STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
@@ -808,7 +814,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                 outCL<<cnt.commandLine()<<std::endl;
                 outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
             }
-
+            if (writeCL){
+                std::cout<<"***\nRunning cnt and rcalc for the suns.\n"<<cnt.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+            }
             cnt.start();
             rcalc.start();
 
@@ -840,6 +848,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         octFiles.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
         sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_set"+std::to_string(setting+1)+"_std.oct";
 
+    }
+    if (writeCL){
+            std::cout<<"***\nCreating suns octree.\n***"<<std::endl;
     }
     if(!createOctree(octFiles,sunsOct)){
         return false;
@@ -887,6 +898,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcontrib2.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
         if (writeCL){
             outCL<<rcontrib2.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun.\n"<<rcontrib2.commandLine()<<"\n***"<<std::endl;
         }
         rcontrib2.start();
         if (!rcontrib2.wait()){
@@ -936,6 +950,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcontrib3.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
         if (writeCL){
             outCL<<rcontrib3.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun (direct).\n"<<rcontrib3.commandLine()<<"\n***"<<std::endl;
         }
         rcontrib3.start();
         if (!rcontrib3.wait()){
@@ -1025,7 +1042,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rsensor.setStandardOutputProcess(&rcontribSkySen);
         sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.dc";
         rcontribSkySen.setStandardOutputFile(sensorSkyDC);
-
+        if (writeCL){
+            std::cout<<"***\nRunning rsensor and rcontrib for the sky (sensor).\n"<<rsensor.commandLine()<<"\n is piped to\n"<<rcontribSkySen.commandLine()<<"\n***"<<std::endl;
+        }
         rsensor.start();
         rcontribSkySen.start();
 
@@ -1069,6 +1088,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.dc";
         rcontribSunSen.setStandardOutputFile(sensorSunDC);
 
+        if (writeCL){
+            std::cout<<"***\nRunning rsensor and rcontrib for the sun (sensor).\n"<<rsensor.commandLine()<<"\n is piped to\n"<<rcontribSunSen.commandLine()<<"\n***"<<std::endl;
+        }
         rsensor2.start();
         rcontribSunSen.start();
 
@@ -1103,6 +1125,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<gendaymtx.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx for the sun.\n"<<gendaymtx.commandLine()<<"\n***"<<std::endl;
+        }
         gendaymtx.start();
         if (!gendaymtx.wait()){
             STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
@@ -1131,6 +1156,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<gendaymtx2.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx sky.\n"<<gendaymtx2.commandLine()<<"\n***"<<std::endl;
+        }
         gendaymtx2.start();
         if (!gendaymtx2.wait()){
             STADIC_ERROR("The creation of the sky has failed with the following errors.");
@@ -1156,6 +1184,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         gendaymtx3.setStandardOutputFile(sunPatchSMX);
         if (writeCL){
             outCL<<gendaymtx3.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx for the sun patches.\n"<<gendaymtx3.commandLine()<<"\n***"<<std::endl;
         }
         gendaymtx3.start();
         if (!gendaymtx3.wait()){
@@ -1184,7 +1215,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::string sensorSkyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.txt";
         rcollate.setStandardOutputFile(sensorSkyCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sky (sensor).\n"<<dctimestep.commandLine()<<"\n is piped to\n"<<rcollate.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep.start();
         rcollate.start();
         if (!rcollate.wait()){
@@ -1201,7 +1234,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process rcollate2(rcollateProgram,arguments2);
         dctimestep2.setStandardOutputProcess(&rcollate2);
         rcollate2.setStandardOutputFile(sensorSunCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun (sensor).\n"<<dctimestep2.commandLine()<<"\n is piped to\n"<<rcollate2.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep2.start();
         rcollate2.start();
 
@@ -1222,7 +1257,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process rcollate3(rcollateProgram,arguments2);
         dctimestep3.setStandardOutputProcess(&rcollate3);
         rcollate3.setStandardOutputFile(sensorSunPatchCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun patch (sensor).\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep3.start();
         rcollate3.start();
 
@@ -1256,7 +1293,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::string finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[blindGroupNum].name()+"_shade_sig.tmp";
         rcalc.setStandardOutputFile(finalIll);
-
+        if (writeCL){
+            std::cout<<"***\nRunning rlam and rcalc (sensor).\n"<<rlam.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+        }
         rlam.start();
         rcalc.start();
 
@@ -1298,6 +1337,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             outCL<<dctimestep.commandLine()<<std::endl;
             outCL<<rcollate.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sky.\n"<<dctimestep.commandLine()<<"\n is piped to\n"<<rcollate.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep.start();
         rcollate.start();
 
@@ -1330,6 +1372,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         }
         STADIC_LOG(Severity::Info, dctimestep2.commandLine());
         STADIC_LOG(Severity::Info, rcollate2.commandLine());
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun.\n"<<dctimestep2.commandLine()<<"\n is piped to\n"<<rcollate2.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep2.start();
         rcollate2.start();
 
@@ -1359,6 +1404,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             outCL<<dctimestep3.commandLine()<<std::endl;
             outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the direct sun.\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep3.start();
         rcollate3.start();
 
@@ -1387,6 +1435,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             outCL<<"## Pipe the next two lines together"<<std::endl;
             outCL<<dctimestep4.commandLine()<<std::endl;
             outCL<<rcollate4.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun patches.\n"<<dctimestep4.commandLine()<<"\n is piped to\n"<<rcollate4.commandLine()<<"\n***"<<std::endl;
         }
         dctimestep4.start();
         rcollate4.start();
@@ -1431,6 +1482,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             outCL<<rlam.commandLine()<<std::endl;
             outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning rlam and rcalc.\n"<<rlam.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+        }
         rlam.start();
         rcalc.start();
 
@@ -1455,6 +1509,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcalc2.setStandardOutputFile(directIll);
         if (writeCL){
             outCL<<rcalc.commandLine()<<std::endl<<std::endl;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcalc fr the direct component.\n"<<rcalc2.commandLine()<<"\n***"<<std::endl;
         }
         rcalc2.start();
 
