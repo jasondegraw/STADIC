@@ -81,12 +81,16 @@ bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::str
         return false;
     }
     //Write out the shade schedule here.  M D H WG1Set WG2Set...
+    // int i=0;
+    // for (auto illum : dayIll->illuminance()){
     for (int i=0;i<dayIll->illuminance().size();i++){
+        // oFile << illum.month() << " " << illum.day() << " " << illum.hour();
         oFile<<dayIll->illuminance()[i].month()<<" "<<dayIll->illuminance()[i].day()<<" "<<dayIll->illuminance()[i].hour();
         for (int j=0;j<shadeSched.size();j++){
             oFile<<" "<<shadeSched[j][i];           //The shadeSched vector is filled with a fector of one window group first then the second...
         }
         oFile<<std::endl;
+        // ++i;
     }
 
     oFile.close();
