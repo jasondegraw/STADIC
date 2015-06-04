@@ -2504,7 +2504,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         }
         //base signal files
         if (model->windowGroups()[i].shadeControl()->needsSensor()){
-            finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
+            finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";
             tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
             DaylightIlluminanceData baseSig("lux");
             if(isFile(tempSensorFileName)){

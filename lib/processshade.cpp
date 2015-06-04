@@ -94,12 +94,22 @@ bool ProcessShade::makeShadeSched(Control *model){
     std::vector<std::vector<int>> shadeSchedule;
     //determine schedule for each window group
     for (int j=0;j<model->windowGroups().size();j++){
+        std::vector<int> tempVector;
         if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_signal"){
-            shadeSchedule.push_back(automatedSignal(model, j));
+            tempVector=automatedSignal(model, j);
+            if (tempVector.size()>0){
+                shadeSchedule.push_back(tempVector);
+            }
         }else if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_profile_angle"){
-            shadeSchedule.push_back(automatedProfileAngle(model, j));
+            tempVector=automatedProfileAngle(model, j);
+            if (tempVector.size()>0){
+                shadeSchedule.push_back(tempVector);
+            }
         }else if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_profile_angle_signal"){
-            shadeSchedule.push_back(automatedProfileAngleSignal(model, j));
+            tempVector=automatedProfileAngleSignal(model, j);
+            if (tempVector.size()>0){
+                shadeSchedule.push_back(tempVector);
+            }
         }
     }
     //Write out completed schedule
@@ -155,8 +165,35 @@ bool ProcessShade::makeShadeSched(Control *model){
 //Shade Control Algorithms
 std::vector<int> ProcessShade::automatedSignal(Control *model, int windowGroup){
     std::vector<int> shadeSchedule;
-
-
+    DaylightIlluminanceData shadeSignal(model->illumUnits());
+    if(!shadeSignal.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[windowGroup].name()+"_shade.sig")){
+        return shadeSchedule;
+    }
+    for (int j=0;j<shadeSignal.illuminance().size();j++){
+        if (shadeSignal.illuminance()[j].lux()[0]==0){
+            shadeSchedule.push_back(0);
+        }else{
+            bool settingFound=false;
+            if (model->illumUnits()=="lux"){
+                for (int i=0;i<model->windowGroups()[windowGroup].shadeControl()->signalSettings().size();i++){
+                    if (shadeSignal.illuminance()[j].lux()[0]>model->windowGroups()[windowGroup].shadeControl()->signalSettings()[i]&&settingFound==false){
+                        shadeSchedule.push_back(i+1);
+                        settingFound=true;
+                    }
+                }
+            }else{
+                for (int i=0;i<model->windowGroups()[windowGroup].shadeControl()->signalSettings().size();i++){
+                    if (shadeSignal.illuminance()[j].fc()[0]>model->windowGroups()[windowGroup].shadeControl()->signalSettings()[i]&&settingFound==false){
+                        shadeSchedule.push_back(i+1);
+                        settingFound=true;
+                    }
+                }
+            }
+            if (settingFound==false){
+                shadeSchedule.push_back(0);
+            }
+        }
+    }
     return shadeSchedule;
 }
 
@@ -179,14 +216,30 @@ std::vector<int> ProcessShade::automatedProfileAngle(Control *model, int windowG
                     settingFound=true;
                 }
             }
+            if (settingFound==false){
+                shadeSchedule.push_back(0);
+            }
         }
     }
     return shadeSchedule;
 }
 std::vector<int> ProcessShade::automatedProfileAngleSignal(Control *model, int windowGroup){
     std::vector<int> shadeSchedule;
-
-
+    std::vector<int> profSchedule;
+    profSchedule=automatedProfileAngle(model, windowGroup);
+    std::vector<int> sigSchedule;
+    sigSchedule=automatedSignal(model, windowGroup);
+    for (int i=0;i<sigSchedule.size();i++){
+        if (sigSchedule[i]==0 || profSchedule[i]==0){
+            shadeSchedule.push_back(0);
+        }else{
+            if (sigSchedule[i]>profSchedule[i]){
+                shadeSchedule.push_back(sigSchedule[i]);
+            }else{
+                shadeSchedule.push_back(profSchedule[i]);
+            }
+        }
+    }
     return shadeSchedule;
 }
 
