@@ -81,16 +81,16 @@ bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::str
         return false;
     }
     //Write out the shade schedule here.  M D H WG1Set WG2Set...
-    // int i=0;
-    // for (auto illum : dayIll->illuminance()){
-    for (int i=0;i<dayIll->illuminance().size();i++){
-        // oFile << illum.month() << " " << illum.day() << " " << illum.hour();
-        oFile<<dayIll->illuminance()[i].month()<<" "<<dayIll->illuminance()[i].day()<<" "<<dayIll->illuminance()[i].hour();
+    int i=0;
+    for (auto illum : dayIll->illuminance()){
+    //for (int i=0;i<dayIll->illuminance().size();i++){
+        oFile << illum.month() << " " << illum.day() << " " << illum.hour();
+        //oFile<<dayIll->illuminance()[i].month()<<" "<<dayIll->illuminance()[i].day()<<" "<<dayIll->illuminance()[i].hour();
         for (int j=0;j<shadeSched.size();j++){
             oFile<<" "<<shadeSched[j][i];           //The shadeSched vector is filled with a fector of one window group first then the second...
         }
         oFile<<std::endl;
-        // ++i;
+        ++i;
     }
 
     oFile.close();
@@ -156,20 +156,38 @@ bool ProcessShade::makeShadeSched(Control *model, DaylightIlluminanceData *dayIl
     }
     DaylightIlluminanceData finalIlluminance(model->illumUnits());
     std::vector<double> finalTemporalIll;
+    finalTemporalIll.resize(baseIlls[0].illuminance()[0].lux().size());
     for (int i=0;i<shadeSchedule[0].size();i++){               //Loop over the entire year
-        finalTemporalIll.clear();
-        for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
-            finalTemporalIll.push_back(0);
-        }
+        //finalTemporalIll.clear();
+        //for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
+        //    finalTemporalIll.push_back(0);
+        //}
+        std::fill(finalTemporalIll.begin(), finalTemporalIll.end(), 0);
         for (int j=0;j<shadeSchedule.size();j++){        //Loop over window groups
             if (shadeSchedule[j][i]==0){           //use base condition
-                for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
-                    finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
+                if (!baseIlls[j].illuminance()[i].allZeros()){
+                    int k=0;
+                    for (auto illum : baseIlls[j].illuminance()[i].lux()){
+                        finalTemporalIll[k]=finalTemporalIll[k] + illum;
+                        k++;
+                    }
+                    /*
+                    for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
+                        finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
+                    }
+                    */
                 }
             }else{                              //shades employed
+                int k=0;
+                for (auto illum : settingIlls[j][shadeSchedule[j][i]-1].illuminance()[i].lux()){
+                    finalTemporalIll[k]=finalTemporalIll[k] + illum;
+                    k++;
+                }
+                /*
                 for (int k=0;k<settingIlls[j][shadeSchedule[j][i]-1].illuminance()[i].lux().size();k++){
                     finalTemporalIll[k]=finalTemporalIll[k] + settingIlls[j][shadeSchedule[j][i]-1].illuminance()[i].lux()[k];
                 }
+                */
             }
         }
         TemporalIlluminance dataPoint(baseIlls[0].illuminance()[i].month(), baseIlls[0].illuminance()[i].day(), baseIlls[0].illuminance()[i].hour(), finalTemporalIll);
