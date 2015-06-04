@@ -45,7 +45,7 @@ bool Metrics::processMetrics()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
     for (int i=0;i<spaces.size();i++){
-        DaylightIlluminanceData daylightIll;
+        DaylightIlluminanceData daylightIll(spaces[i].get()->illumUnits());
         daylightIll.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+".ill");
         //Test whether Daylight Autonomy needs to be calculated
         if (spaces[i].get()->runDA()){
@@ -313,7 +313,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     //Parse the direct illuminance files and store objects in vectors for both base and setting cases.
     std::vector<DaylightIlluminanceData> baseDirectIlls;
     for (int i=0;i<model->windowGroups().size();i++){
-        DaylightIlluminanceData illBase;
+        DaylightIlluminanceData illBase(model->illumUnits());
         illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill");
         baseDirectIlls.push_back(illBase);
     }
@@ -413,14 +413,14 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     std::vector<DaylightIlluminanceData> baseIlls;
     std::vector<DaylightIlluminanceData> settingIlls;
     for (int i=0;i<model->windowGroups().size();i++){
-        DaylightIlluminanceData illBase;
+        DaylightIlluminanceData illBase(model->illumUnits());
         illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
         baseIlls.push_back(illBase);
-        DaylightIlluminanceData illSetting;
+        DaylightIlluminanceData illSetting(model->illumUnits());
         illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(model->sDAwgSettings()[i])+".ill");
         settingIlls.push_back(illSetting);
     }
-    DaylightIlluminanceData finalIlluminance;
+    DaylightIlluminanceData finalIlluminance(model->illumUnits());
     std::vector<double> finalTemporalIll;
     for (int i=0;i<shadeSchedule.size();i++){               //Loop over the entire year
         finalTemporalIll.clear();
@@ -551,17 +551,17 @@ bool Metrics::calculateOccsDA(Control *model, DaylightIlluminanceData *dayIll)
     std::vector<std::vector<DaylightIlluminanceData>> settingIlls;
     settingIlls.resize(model->windowGroups().size());
     for (int i=0;i<model->windowGroups().size();i++){
-        DaylightIlluminanceData illBase;
+        DaylightIlluminanceData illBase(model->illumUnits());
         illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
         baseIlls.push_back(illBase);
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData illSetting;
+            DaylightIlluminanceData illSetting(model->illumUnits());
             illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(j+1)+".ill");
             settingIlls[i].push_back(illSetting);
         }
 
     }
-    DaylightIlluminanceData finalIlluminance;
+    DaylightIlluminanceData finalIlluminance(model->illumUnits());
     std::vector<double> finalTemporalIll;
     for (int i=0;i<shadeSchedule.size();i++){               //Loop over the entire year
         finalTemporalIll.clear();

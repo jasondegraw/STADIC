@@ -2443,7 +2443,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         //Base Illuminance files
         FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
-        DaylightIlluminanceData baseIll;
+        DaylightIlluminanceData baseIll("lux");
 
         if(isFile(tempFileName)){
             if (!baseIll.parse(tempFileName,m_Model->weaDataFile().get())){
@@ -2506,7 +2506,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         if (model->windowGroups()[i].shadeControl()->needsSensor()){
             finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
             tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
-            DaylightIlluminanceData baseSig;
+            DaylightIlluminanceData baseSig("lux");
             if(isFile(tempSensorFileName)){
                 if (!baseSig.parse(tempSensorFileName,m_Model->weaDataFile().get())){
                     return false;
@@ -2567,7 +2567,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         }
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData settingIll;
+            DaylightIlluminanceData settingIll("lux");
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
             FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
             if(isFile(tempFileName)){
@@ -2633,7 +2633,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         //Base Illuminance files
         directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill";
         directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct_ill.tmp";
-        DaylightIlluminanceData baseIllDirect;
+        DaylightIlluminanceData baseIllDirect("lux");
         if(isFile(directTempFileName)){
             if (!baseIllDirect.parse(directTempFileName,m_Model->weaDataFile().get())){
                 return false;
@@ -2693,7 +2693,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         }
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData settingIllDirect;
+            DaylightIlluminanceData settingIllDirect("lux");
             directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct_ill_std.tmp";
             directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct.ill";
             if(isFile(tempFileName)){

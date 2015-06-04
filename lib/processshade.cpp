@@ -49,7 +49,7 @@ bool ProcessShade::processShades()
     for (int i=0;i<spaces.size();i++){
         //populate the time interval vector
         m_TimeIntervals.clear();
-        DaylightIlluminanceData timeData;
+        DaylightIlluminanceData timeData(spaces[i].get()->illumUnits());
         if (!timeData.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+spaces[i].get()->windowGroups()[0].name()+"_base.ill")){
             return false;
         }
@@ -110,18 +110,18 @@ bool ProcessShade::makeShadeSched(Control *model){
     std::vector<DaylightIlluminanceData> baseIlls;
     std::vector<std::vector<DaylightIlluminanceData>> settingIlls;
     for (int i=0;i<model->windowGroups().size();i++){
-        DaylightIlluminanceData illBase;
+        DaylightIlluminanceData illBase(model->illumUnits());
         illBase.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill");
         baseIlls.push_back(illBase);
         std::vector<DaylightIlluminanceData> tempSettingIlls;
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData illSetting;
+            DaylightIlluminanceData illSetting(model->illumUnits());
             illSetting.parseTimeBased(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+toString(model->sDAwgSettings()[i])+".ill");
             tempSettingIlls.push_back(illSetting);
         }
         settingIlls.push_back(tempSettingIlls);
     }
-    DaylightIlluminanceData finalIlluminance;
+    DaylightIlluminanceData finalIlluminance(model->illumUnits());
     std::vector<double> finalTemporalIll;
     for (int i=0;i<shadeSchedule[0].size();i++){               //Loop over the entire year
         finalTemporalIll.clear();
