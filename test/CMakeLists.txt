@@ -94,6 +94,10 @@ add_executable(analemmatests analemmatests.cpp)
 add_test(analemmatests analemmatests)
 target_link_libraries(analemmatests stadic_core gtest gtest_main)
 
+add_executable(processshadetests shadeprocesstest.cpp)
+add_test(processshadetests processshadetests)
+target_link_libraries(processshadetests stadic_core gtest gtest_main)
+
 add_executable(testprogram testprogram.cpp)
 
 add_executable(gridtests gridtests.cpp)

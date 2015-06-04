@@ -45,24 +45,27 @@ ProcessShade::ProcessShade(BuildingControl *model) :
 
 bool ProcessShade::processShades()
 {
-    std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
+    std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();    
+    //populate the time interval vector
+    DaylightIlluminanceData timeData(spaces[0].get()->illumUnits());
+    if (!timeData.parseTimeBased(spaces[0].get()->spaceDirectory()+spaces[0].get()->resultsDirectory()+spaces[0].get()->spaceName()+"_"+spaces[0].get()->windowGroups()[0].name()+"_base.ill")){
+        return false;
+    }
+    /*
+    std::cout<<"setting up TimeIntervals"<<std::endl;
+    m_Months.resize(timeData.illuminance().size());
+    m_Days.resize(timeData.illuminance().size());
+    m_Hours.resize(timeData.illuminance().size());
+    for (int j=0;j<timeData.illuminance().size();j++){
+        m_Months[j]=timeData.illuminance()[j].month();
+        m_Days[j]=timeData.illuminance()[j].day();
+        m_Hours[j]=timeData.illuminance()[j].hour();
+    }
+    std::cout<<"finished populating TimerIntervals"<<std::endl;
+    */
     for (int i=0;i<spaces.size();i++){
-        //populate the time interval vector
-        m_TimeIntervals.clear();
-        DaylightIlluminanceData timeData(spaces[i].get()->illumUnits());
-        if (!timeData.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+spaces[i].get()->windowGroups()[0].name()+"_base.ill")){
-            return false;
-        }
-        for (int j=0;j<timeData.illuminance().size();j++){
-            std::vector<std::string> tempVec;
-            tempVec.push_back(toString(timeData.illuminance()[j].month()));
-            tempVec.push_back(toString(timeData.illuminance()[j].day()));
-            tempVec.push_back(toString(timeData.illuminance()[j].hour()));
-            m_TimeIntervals.push_back(tempVec);
-        }
-
         //start processing shade algorithms
-        if (!makeShadeSched(spaces[i].get())){
+        if (!makeShadeSched(spaces[i].get(), &timeData)){
             STADIC_LOG(Severity::Error, "The creation of the shade schedule for "+spaces[i].get()->spaceName()+" has failed.");
             return false;
         }
@@ -70,7 +73,7 @@ bool ProcessShade::processShades()
 
     return true;
 }
-bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::string file){
+bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::string file, DaylightIlluminanceData *dayIll){
     std::ofstream oFile;
     oFile.open(file);
     if (!oFile.is_open()){
@@ -78,8 +81,8 @@ bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::str
         return false;
     }
     //Write out the shade schedule here.  M D H WG1Set WG2Set...
-    for (int i=0;i<m_TimeIntervals.size();i++){
-        oFile<<m_TimeIntervals[i][0]<<" "<<m_TimeIntervals[i][1]<<" "<<m_TimeIntervals[i][2];
+    for (int i=0;i<dayIll->illuminance().size();i++){
+        oFile<<dayIll->illuminance()[i].month()<<" "<<dayIll->illuminance()[i].day()<<" "<<dayIll->illuminance()[i].hour();
         for (int j=0;j<shadeSched.size();j++){
             oFile<<" "<<shadeSched[j][i];           //The shadeSched vector is filled with a fector of one window group first then the second...
         }
@@ -90,32 +93,48 @@ bool ProcessShade::writeSched(std::vector<std::vector<int>> shadeSched, std::str
     return true;
 }
 
-bool ProcessShade::makeShadeSched(Control *model){
+bool ProcessShade::makeShadeSched(Control *model, DaylightIlluminanceData *dayIll){
     std::vector<std::vector<int>> shadeSchedule;
     //determine schedule for each window group
     for (int j=0;j<model->windowGroups().size();j++){
+        STADIC_LOG(Severity::Info, "Now processing window group "+model->windowGroups()[j].name() +" from "+ model->spaceName()+".");
         std::vector<int> tempVector;
+        tempVector.clear();
         if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_signal"){
             tempVector=automatedSignal(model, j);
             if (tempVector.size()>0){
                 shadeSchedule.push_back(tempVector);
+            }else{
+                STADIC_LOG(Severity::Error, "The shade schedule for "+model->windowGroups()[j].name() +" from "+ model->spaceName()+ "is empty.");
+                return false;
             }
         }else if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_profile_angle"){
             tempVector=automatedProfileAngle(model, j);
             if (tempVector.size()>0){
                 shadeSchedule.push_back(tempVector);
+            }else{
+                STADIC_LOG(Severity::Error, "The shade schedule for "+model->windowGroups()[j].name() +" from "+ model->spaceName()+ "is empty.");
+                return false;
             }
         }else if (model->windowGroups()[j].shadeControl()->controlMethod()=="automated_profile_angle_signal"){
             tempVector=automatedProfileAngleSignal(model, j);
             if (tempVector.size()>0){
                 shadeSchedule.push_back(tempVector);
+            }else{
+                STADIC_LOG(Severity::Error, "The shade schedule for "+model->windowGroups()[j].name() +" from "+ model->spaceName()+ "is empty.");
+                return false;
             }
+        }else{
+            STADIC_LOG(Severity::Error, "The shade control algortithm for "+model->windowGroups()[j].name() +" from "+ model->spaceName()+" is not valid.");
+            return false;
         }
     }
+    STADIC_LOG(Severity::Info, "Now writing out the schedule.");
     //Write out completed schedule
-    if (!writeSched(shadeSchedule, model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shade.sch")){
+    if (!writeSched(shadeSchedule, model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_shade.sch", dayIll)){
         return false;
     }
+    STADIC_LOG(Severity::Info, "Combining the final illuminance file.");
     //determine final illuminance values using completed schedule
     std::vector<DaylightIlluminanceData> baseIlls;
     std::vector<std::vector<DaylightIlluminanceData>> settingIlls;
@@ -152,7 +171,7 @@ bool ProcessShade::makeShadeSched(Control *model){
         TemporalIlluminance dataPoint(baseIlls[0].illuminance()[i].month(), baseIlls[0].illuminance()[i].day(), baseIlls[0].illuminance()[i].hour(), finalTemporalIll);
         finalIlluminance.addDataPoint(dataPoint);
     }
-
+    STADIC_LOG(Severity::Info, "Now writing out the final illuminance file.");
     //Write Illuminance File
     if (model->illumUnits()=="lux"){
         finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_final.ill");
