@@ -2459,7 +2459,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll.writeIllFileLux(FinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIll.writeIllFileLux(FinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIll.writeIllFileFC(FinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }else{
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
             if(isFile(tempFileName)){
@@ -2478,7 +2489,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll.writeIllFileLux(FinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIll.writeIllFileLux(FinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIll.writeIllFileFC(FinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }
         //base signal files
         if (model->windowGroups()[i].shadeControl()->needsSensor()){
@@ -2499,7 +2521,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                baseSig.writeIllFileLux(finalSensorFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!baseSig.writeIllFileLux(finalSensorFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!baseSig.writeIllFileFC(finalSensorFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf0.sig";
                 if(isFile(tempSensorFileName)){
@@ -2518,7 +2551,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                baseSig.writeIllFileLux(finalSensorFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!baseSig.writeIllFileLux(finalSensorFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!baseSig.writeIllFileFC(finalSensorFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }
         }
         //Shade Setting Illuminance files
@@ -2538,7 +2582,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                settingIll.writeIllFileLux(FinalIllFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!settingIll.writeIllFileLux(FinalIllFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!settingIll.writeIllFileFC(FinalIllFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
                 if(isFile(tempFileName)){
@@ -2551,7 +2606,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                             settingIll.addIllFile(tempFileName);
                         }
                     }
-                    settingIll.writeIllFileLux(FinalIllFileName);
+                    if (model->illumUnits()=="lux"){
+                        if (!settingIll.writeIllFileLux(FinalIllFileName)){
+                            return false;
+                        }
+                    }else if (model->illumUnits()=="fc"){
+                        if (!settingIll.writeIllFileFC(FinalIllFileName)){
+                            return false;
+                        }
+                    }else{
+                        STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                        return false;
+                    }
                 }else{
                     STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                     return false;
@@ -2582,7 +2648,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIllDirect.writeIllFileLux(directFinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIllDirect.writeIllFileFC(directFinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }else{
             directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0_direct.ill";
             if(isFile(directTempFileName)){
@@ -2601,7 +2678,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIllDirect.writeIllFileLux(directFinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIllDirect.writeIllFileFC(directFinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
@@ -2620,7 +2708,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                settingIllDirect.writeIllFileLux(directFinalIllFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!settingIllDirect.writeIllFileLux(directFinalIllFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!settingIllDirect.writeIllFileFC(directFinalIllFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0_direct.ill";
                 if(isFile(directTempFileName)){
@@ -2633,7 +2732,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                             settingIllDirect.addIllFile(directTempFileName);
                         }
                     }
-                    settingIllDirect.writeIllFileLux(directFinalIllFileName);
+                    if (model->illumUnits()=="lux"){
+                        if (!settingIllDirect.writeIllFileLux(directFinalIllFileName)){
+                            return false;
+                        }
+                    }else if (model->illumUnits()=="fc"){
+                        if (!settingIllDirect.writeIllFileFC(directFinalIllFileName)){
+                            return false;
+                        }
+                    }else{
+                        STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                        return false;
+                    }
                 }else{
                     STADIC_ERROR("The illuminance file "+directTempFileName+" does not exist.");
                     return false;
