@@ -553,9 +553,13 @@ bool GridMaker::testPoints(){
     for (int i=0;i<m_PolySetHeight.size();i++){      
         //Create vector of test points
         double x=m_MinX[i];
-        while (x<=m_MaxX[i]){
+        while (x<=m_MaxX[i]+.0001){
             double y=m_MinY[i];
-            while (y<=m_MaxY[i]){
+            while (y<=m_MaxY[i]+.0001){
+                if (boost::geometry::within(boost::geometry::model::point<double,2,boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
+                        addTestPoints(x,y,i);
+                }
+                /*
                 if (m_UseOffset){
                     if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
                         addTestPoints(x,y,i);
@@ -565,6 +569,7 @@ bool GridMaker::testPoints(){
                         addTestPoints(x,y,i);
                     }
                 }
+                */
                 y=y+spaceY();
             }
             x=x+spaceX();
