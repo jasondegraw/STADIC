@@ -235,7 +235,7 @@ bool GridMaker::writePTScsv(std::string file){
     return true;
 }
 bool GridMaker::viewPTS(std::string location, std::string vType){
-    return viewPTS(location, vType, "grid.pts");
+    return viewPTS(location, vType, "grid.bmp");
 }
 bool GridMaker::viewPTS(std::string location, std::string vType, std::string name){
     //The file names need to be adjusted
