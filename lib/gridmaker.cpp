@@ -659,6 +659,42 @@ bool GridMaker::writeRadPoly(std::string file){
                 oFile<<std::endl;
             }
         }
+        for (int j=0;j<m_Identifiers.size();j++){
+            if (m_RadFile.geometry().at(i)->name().find(m_Identifiers[j])!=std::string::npos){
+                oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+                oFile<<"0\t0\t"<<m_RadFile.geometry().at(i)->arg3().size()<<std::endl;
+                int coordinate=0;
+                for (int k=0;k<m_RadFile.geometry().at(i)->arg3().size();k++){
+                    oFile<<"\t"<<m_RadFile.geometry().at(i)->arg3()[k];
+                    if (coordinate==0){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxXRad){
+                            m_MaxXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinXRad){
+                            m_MinXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else if (coordinate==1){
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxYRad){
+                            m_MaxYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinYRad){
+                            m_MinYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate++;
+                    }else{
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxZRad){
+                            m_MaxZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinZRad){
+                            m_MinZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
+                        }
+                        coordinate=0;
+                    }
+                }
+                oFile<<std::endl;
+            }
+        }
     }
 
     /*
