@@ -188,6 +188,18 @@ bool GridMaker::makeGrid(){
             m_FinalPoints.push_back(tempVect);
         }
     }
+    /*
+    for (int i=0;i<m_UnitedPolygon.size();i++){
+        std::cout<<"PolySet"<<i<<std::endl;
+        std::cout<<boost::geometry::dsv(m_UnitedPolygon[i])<<std::endl;
+
+        //for (int j=0;j>boost::geometry::num_points(m_UnitedPolygon[i]);j++){
+
+        //}
+
+    }
+    */
+
     return true;
 }
 
@@ -293,6 +305,50 @@ bool GridMaker::parseRad(){
             tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+2]);
         }
         tempZ=tempZ/(m_RadFile.geometry().at(i)->arg3().size()/3.0);
+        /*//This section is used for error checking
+        if (boost::geometry::is_valid(tempPolygon)){
+            std::cout<<"The polygon is valid."<<std::endl;
+        }else{
+            //boost::geometry::validity_failure_type failure;
+            //boost::geometry::is_valid(tempPolygon, failure);
+            //std::cout<<"Failure: "<<failure<<std::endl;
+            std::cout<<"The polygon is not valid."<<std::endl;
+            std::cout<<"The point set before correction is:"<<std::endl;
+            std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+            boost::geometry::correct(tempPolygon);
+            if (boost::geometry::is_valid(tempPolygon)){
+                std::cout<<"The polygon is valid after correction."<<std::endl;
+                std::cout<<"The point set after correction is:"<<std::endl;
+                std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+            }else{
+                std::cout<<"The polygon is still not valid."<<std::endl;
+                std::cout<<"The point set after correction is:"<<std::endl;
+                std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+                boost::geometry::reverse(tempPolygon);
+                if (boost::geometry::is_valid(tempPolygon)){
+                    std::cout<<"The polygon is valid after reversing it."<<std::endl;
+                    std::cout<<"The point set after reversing is:"<<std::endl;
+                    std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+                }else{
+                    std::cout<<"The polygon is not valid after reversing it."<<std::endl;
+                    std::cout<<"The point set after reversing is:"<<std::endl;
+                    std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+                    boost::geometry::correct(tempPolygon);
+                    if (boost::geometry::is_valid(tempPolygon)){
+                        std::cout<<"The polygon is valid after correction."<<std::endl;
+                        std::cout<<"The point set after correction is:"<<std::endl;
+                        std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+                    }else{
+                        std::cout<<"The polygon still isn't valid after all of the fixes."<<std::endl;
+                        std::cout<<"The point set after correction is:"<<std::endl;
+                        std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+                    }
+                }
+                //std::cout<<"The point set after a failed correction is:"<<std::endl;
+                //std::cout<<boost::geometry::dsv(tempPolygon)<<std::endl;
+            }
+        }
+        */
         boost::geometry::correct(tempPolygon);
         if (boost::geometry::is_valid(tempPolygon)){
             //unite polygons that are the right layer name
@@ -320,15 +376,15 @@ bool GridMaker::parseRad(){
                 }else{
                     bool heightFound=false;
                     for (int j=0;j<m_PolySetHeight.size();j++){
-                        if (tempZ>(m_PolySetHeight[j]*.99)&&tempZ<(m_PolySetHeight[j]*1.01)){
+                        if (tempZ>=(m_PolySetHeight[j]*.99)&&tempZ<=(m_PolySetHeight[j]*1.01)){
                             heightFound=true;
                             setPos=j;
                         }
                     }
                     if (!heightFound){
-                            m_PolySetHeight.push_back(tempZ);
-                            firstPolygon.push_back(true);
-                            setPos=m_PolySetHeight.size()-1;
+                        m_PolySetHeight.push_back(tempZ);
+                        firstPolygon.push_back(true);
+                        setPos=m_PolySetHeight.size()-1;
                     }
                 }
                 if (firstPolygon[setPos]){
@@ -344,11 +400,16 @@ bool GridMaker::parseRad(){
             }
         }
     }
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
-            STADIC_ERROR("There was a problem uniting the polygons.");
-            return false;
+    if (m_UnitedPolygon.size()>0){
+        for (int i=0;i<m_UnitedPolygon.size();i++){
+            if (!boost::geometry::is_valid(m_UnitedPolygon[i])||boost::geometry::num_points(m_UnitedPolygon[i])==0){
+                STADIC_ERROR("There was a problem uniting the polygons.");
+                return false;
+            }
         }
+    }else{
+        STADIC_LOG(Severity::Error, "There was a problem with the geometry for boost.");
+        return false;
     }
     return true;
 }
@@ -556,10 +617,11 @@ bool GridMaker::testPoints(){
         while (x<=m_MaxX[i]+.0001){
             double y=m_MinY[i];
             while (y<=m_MaxY[i]+.0001){
+                /*
                 if (boost::geometry::within(boost::geometry::model::point<double,2,boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
                         addTestPoints(x,y,i);
                 }
-                /*
+                */
                 if (m_UseOffset){
                     if (boost::geometry::covered_by(boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(x,y),m_UnitedPolygon[i])){
                         addTestPoints(x,y,i);
@@ -569,7 +631,6 @@ bool GridMaker::testPoints(){
                         addTestPoints(x,y,i);
                     }
                 }
-                */
                 y=y+spaceY();
             }
             x=x+spaceX();
