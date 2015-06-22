@@ -687,10 +687,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     std::string skySMX;
     std::string sunDC;
     std::string sunSMX;
+    std::string stdOct;
     std::string directSunDC;
     std::string sunPatchSMX;
     std::string sensorSkyDC;
     std::string sensorSunDC;
+    std::string sensorDirSunDC;
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //rcontrib for sky
         arguments.push_back("-I+");
@@ -730,10 +732,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         if (setting==-1){
             //This is the base case
-            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+            stdOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct";
+            arguments.push_back(stdOct);
             skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
         }else{
-            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
+            stdOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct";
+            arguments.push_back(stdOct);
             skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
         }
         Process rcontrib(rcontribProgram,arguments);
@@ -865,10 +869,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-                if (it->first!="sj"){
+                if (it->first!="sj" && it->first!="ab"){
                     arguments.push_back("-"+it->first);
                     arguments.push_back(it->second);
                 }
+                arguments.push_back("-ab");
+                arguments.push_back("0");
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
@@ -884,10 +890,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-m");
         arguments.push_back("solar");
         arguments.push_back("-faa");
-        arguments.push_back(sunsOct);
+        arguments.push_back(stdOct);
         if (setting==-1){
             //This is the base case
-            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
+            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.dc";
         }else{
             //This is for the settings
             sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
@@ -910,7 +916,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             return false;
         }
 
-        //rcontrib for direct sun (sDA & ASE)
+        //rcontrib for direct sun
         arguments.clear();
         arguments.push_back("-I+");
         if (model->getParamSet("default")){
@@ -940,10 +946,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(sunsOct);
         if (setting==-1){
             //This is the base case
-            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d_direct.dc";
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.dc";
         }else{
             //This is for the settings
-            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std_direct.dc";
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_d_std.dc";
         }
         Process rcontrib3(rcontribProgram,arguments);
         rcontrib3.setStandardOutputFile(directSunDC);
@@ -1036,11 +1042,11 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
-        arguments2.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+        arguments2.push_back(stdOct);
         std::string rcontribProgram="rcontrib";
         Process rcontribSkySen(rcontribProgram, arguments2);
         rsensor.setStandardOutputProcess(&rcontribSkySen);
-        sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.dc";
+        sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_k.dc";
         rcontribSkySen.setStandardOutputFile(sensorSkyDC);
         if (writeCL){
             std::cout<<"***\nRunning rsensor and rcontrib for the sky (sensor).\n"<<rsensor.commandLine()<<"\n is piped to\n"<<rcontribSkySen.commandLine()<<"\n***"<<std::endl;
@@ -1070,7 +1076,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-                if (it->first!="sj" && it->first!="lw"){
+                if (it->first!="sj" && it->first!="lw" && it->first!="ab"){
                     arguments2.push_back("-"+it->first);
                     arguments2.push_back(it->second);
                 }else if (it->first=="lw"){
@@ -1078,14 +1084,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments2.push_back("0.00005");
                     STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
                 }
+                arguments.push_back("-ab");
+                arguments.push_back("0");
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
-        arguments2.push_back(sunsOct);
+        arguments2.push_back(stdOct);
         Process rcontribSunSen(rcontribProgram, arguments2);
         rsensor2.setStandardOutputProcess(&rcontribSunSen);
-        sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.dc";
+        sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_kd.dc";
         rcontribSunSen.setStandardOutputFile(sensorSunDC);
 
         if (writeCL){
@@ -1100,6 +1108,53 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         }
         arguments2.clear();
 
+        //rcontrib for direct sun for shades
+        Process rsensor3 (rsensorProgram, arguments);
+        arguments2.clear();
+        arguments2.push_back("-I+");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="ab"){
+                    arguments2.push_back("-"+it->first);
+                    arguments2.push_back(it->second);
+                }
+            }
+            arguments2.push_back("-ab");
+            arguments2.push_back("0");
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments2.push_back("-e");
+        arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments2.push_back("-f");
+        arguments2.push_back("reinhart.cal");
+        arguments2.push_back("-b");
+        arguments2.push_back("rbin");
+        arguments2.push_back("-bn");
+        arguments2.push_back("Nrbins");
+        arguments2.push_back("-m");
+        arguments2.push_back("solar");
+        arguments2.push_back("-faa");
+        arguments2.push_back(sunsOct);
+        Process rcontribDirSunSen(rcontribProgram,arguments2);
+        rsensor3.setStandardOutputProcess(&rcontribDirSunSen);
+        sensorDirSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_kd.dc";
+        rcontribDirSunSen.setStandardOutputFile(directSunDC);
+        rcontribDirSunSen.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        if (writeCL){
+            outCL<<rcontribDirSunSen.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun (direct).\n"<<rcontribDirSunSen.commandLine()<<"\n***"<<std::endl;
+        }
+        rsensor3.start();
+        rcontribDirSunSen.start();
+        if (!rcontribDirSunSen.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcontrib for the shade sensor has failed for window group "+model->windowGroups()[blindGroupNum].name()+" within "+model->spaceName()+".");
+            return false;
+        }
+
 
     }
 
@@ -1109,8 +1164,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->sunDivisions()));
-        arguments.push_back("-5");
         arguments.push_back("-d");
+        arguments.push_back("-5");
         arguments.push_back("-ho");
         arguments.push_back(m_WeaFileName.get());
         std::string gendaymtxProgram="gendaymtx";
@@ -1227,7 +1282,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorSunDC;
+        arguments[2]=sensorDirSunDC;
         arguments[3]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sensorSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.txt";
@@ -1250,7 +1305,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorSkyDC;
+        arguments[2]=sensorSunDC;
         arguments[3]=sunPatchSMX;
         Process dctimestep3(dctimestepProgram,arguments);
         std::string sensorSunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun_patch.txt";
@@ -1352,7 +1407,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=sunDC;
+        arguments[2]=directSunDC;
         STADIC_LOG(Severity::Info, "sunSMX file = "+sunSMX);
         arguments[3]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
@@ -1385,64 +1440,32 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             return false;
         }
 
-        //dctimestep | rcollate for the direct sun (sDA & ASE)
-        //Added this line from an email that didn't exist before
-        arguments[2]=directSunDC;
-        arguments[3]=sunSMX;
-        Process dctimestep3(dctimestepProgram,arguments);
-        std::string directSunCollated;
-        if (setting==-1){
-            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun_direct.txt";
-        }else{
-            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std_direct.txt";
-        }
-        Process rcollate3(rcollateProgram,arguments2);
-        dctimestep3.setStandardOutputProcess(&rcollate3);
-        rcollate3.setStandardOutputFile(directSunCollated);
-        if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep3.commandLine()<<std::endl;
-            outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
-        }
-        if (writeCL){
-            std::cout<<"***\nRunning dctimestep and rcollate for the direct sun.\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
-        }
-        dctimestep3.start();
-        rcollate3.start();
-
-        if(!rcollate3.wait()){
-            STADIC_ERROR("The running of rcollate for the direct sun has failed.");
-            //I want to display the errors here if the standard error has any errors to show.
-
-            return false;
-        }
-
         //dctimestep | rcollate for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=skyDC;
+        arguments[2]=sunDC;
         arguments[3]=sunPatchSMX;
-        Process dctimestep4(dctimestepProgram,arguments);
+        Process dctimestep3(dctimestepProgram,arguments);
         std::string sunPatchCollated;
         if (setting==-1){
             sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sunPatch.txt";
         }else{
             sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sunPatch_std.txt";
         }
-        Process rcollate4(rcollateProgram,arguments2);
-        dctimestep4.setStandardOutputProcess(&rcollate4);
-        rcollate4.setStandardOutputFile(sunPatchCollated);
+        Process rcollate3(rcollateProgram,arguments2);
+        dctimestep3.setStandardOutputProcess(&rcollate3);
+        rcollate3.setStandardOutputFile(sunPatchCollated);
         if (writeCL){
             outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep4.commandLine()<<std::endl;
-            outCL<<rcollate4.commandLine()<<std::endl<<std::endl;;
+            outCL<<dctimestep3.commandLine()<<std::endl;
+            outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
         }
         if (writeCL){
-            std::cout<<"***\nRunning dctimestep and rcollate for the sun patches.\n"<<dctimestep4.commandLine()<<"\n is piped to\n"<<rcollate4.commandLine()<<"\n***"<<std::endl;
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun patches.\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
         }
-        dctimestep4.start();
-        rcollate4.start();
+        dctimestep3.start();
+        rcollate3.start();
 
-        if(!rcollate4.wait()){
+        if(!rcollate3.wait()){
             STADIC_ERROR("The running of rcollate for the sun patches has failed.");
             //I want to display the errors here if the standard error has any errors to show.
 
@@ -1499,7 +1522,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-e");
         arguments.push_back("$1=floor(ill+.5)");
         Process rcalc2(rcalcProgram, arguments);
-        rcalc2.setStandardInputFile(directSunCollated);
+        rcalc2.setStandardInputFile(sunCollated);
         std::string directIll;
         if (setting==-1){
             directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_direct_ill.tmp";
