@@ -872,10 +872,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                 if (it->first!="sj" && it->first!="ab"){
                     arguments.push_back("-"+it->first);
                     arguments.push_back(it->second);
-                }
-                arguments.push_back("-ab");
-                arguments.push_back("0");
+                }    
             }
+            arguments.push_back("-ab");
+            arguments.push_back("0");
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
@@ -888,7 +888,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-bn");
         arguments.push_back("Nrbins");
         arguments.push_back("-m");
-        arguments.push_back("solar");
+        arguments.push_back("sky_glow");
         arguments.push_back("-faa");
         arguments.push_back(stdOct);
         if (setting==-1){
@@ -1166,7 +1166,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(std::to_string( model->sunDivisions()));
         arguments.push_back("-d");
         arguments.push_back("-5");
+        arguments.push_back("0.533");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
         std::string gendaymtxProgram="gendaymtx";
         Process gendaymtx(gendaymtxProgram,arguments);
@@ -1198,7 +1201,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("1");
         arguments.push_back("1");
         arguments.push_back("1");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
         Process gendaymtx2(gendaymtxProgram,arguments);
 
@@ -1227,7 +1232,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->skyDivisions()));
         arguments.push_back("-d");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
         Process gendaymtx3(gendaymtxProgram,arguments);
 
@@ -1253,8 +1260,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){
         //dctimestep | rcollate for the sensor for the sky
         arguments.clear();
+        /* eliminating this per Dr. Mistrick's request
         arguments.push_back("-n");
         arguments.push_back("8760");
+        */
         arguments.push_back(sensorSkyDC);
         arguments.push_back(skySMX);
         std::string dctimestepProgram="dctimestep";
@@ -1363,8 +1372,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //dctimestep | rcollate for the sky
         arguments.clear();
+        /* eliminating this per Dr. Mistrick's request
         arguments.push_back("-n");
         arguments.push_back("8760");
+        */
         //Added this line from an email that didn't exist before
         arguments.push_back(skyDC);
         arguments.push_back(skySMX);
