@@ -704,9 +704,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments.push_back(it->second);
                 }else if (it->first=="lw"){
                     arguments.push_back("-lw");
-                    if (toDouble(it->second)>0.00002){
-                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
-                        arguments.push_back("0.00002");
+                    if (toDouble(it->second)>0.0000002){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000002 .");
+                        arguments.push_back("0.0000002");
                     }else{
                         arguments.push_back(it->second);
                     }
@@ -863,16 +863,25 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         outCL<<"## Create the suns octree here"<<std::endl<<std::endl;;
     }
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
-        //rcontrib for sun
+        //rcontrib for sun (sky patch version)
         arguments.clear();
         arguments.push_back("-I+");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-                if (it->first!="sj" && it->first!="ab"){
+                if (it->first!="sj" && it->first!="ab" && it->first!="lw"){
                     arguments.push_back("-"+it->first);
                     arguments.push_back(it->second);
-                }    
+                }
+                else if (it->first=="lw"){
+                    arguments.push_back("-lw");
+                    if (toDouble(it->second)>0.0000002){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000002 .");
+                        arguments.push_back("0.0000002");
+                    }else{
+                        arguments.push_back(it->second);
+                    }
+                }
             }
             arguments.push_back("-ab");
             arguments.push_back("0");
@@ -880,7 +889,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
         arguments.push_back("-e");
-        arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
         arguments.push_back("-f");
         arguments.push_back("reinhart.cal");
         arguments.push_back("-b");
