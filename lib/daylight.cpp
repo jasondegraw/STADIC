@@ -1270,7 +1270,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process dctimestep(dctimestepProgram, arguments);
 
         std::vector<std::string> arguments2;
-        arguments2.push_back("-ho");
+        //arguments2.push_back("-ho");
         arguments2.push_back("-oc");
         arguments2.push_back("1");
         std::string rcollateProgram="rcollate";
@@ -1291,8 +1291,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorDirSunDC;
-        arguments[3]=sunSMX;
+        arguments[0]=sensorDirSunDC;
+        arguments[1]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sensorSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.txt";
         Process rcollate2(rcollateProgram,arguments2);
@@ -1314,8 +1314,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorSunDC;
-        arguments[3]=sunPatchSMX;
+        arguments[0]=sensorSunDC;
+        arguments[1]=sunPatchSMX;
         Process dctimestep3(dctimestepProgram,arguments);
         std::string sensorSunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun_patch.txt";
         Process rcollate3(rcollateProgram,arguments2);
@@ -1384,7 +1384,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::vector<std::string> arguments2;
         arguments2.clear();
-        arguments2.push_back("-ho");
+        //arguments2.push_back("-ho");
         arguments2.push_back("-oc");
         arguments2.push_back("1");
         std::string rcollateProgram="rcollate";
@@ -1418,9 +1418,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=directSunDC;
+        arguments[0]=directSunDC;
         STADIC_LOG(Severity::Info, "sunSMX file = "+sunSMX);
-        arguments[3]=sunSMX;
+        arguments[1]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sunCollated;
         if (setting==-1){
@@ -1453,8 +1453,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=sunDC;
-        arguments[3]=sunPatchSMX;
+        arguments[0]=sunDC;
+        arguments[1]=sunPatchSMX;
         Process dctimestep3(dctimestepProgram,arguments);
         std::string sunPatchCollated;
         if (setting==-1){
