@@ -1279,7 +1279,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process dctimestep(dctimestepProgram, arguments);
 
         std::vector<std::string> arguments2;
-        //arguments2.push_back("-ho");
+        arguments2.push_back("-ho");
         arguments2.push_back("-oc");
         arguments2.push_back("1");
         std::string rcollateProgram="rcollate";
@@ -1393,7 +1393,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::vector<std::string> arguments2;
         arguments2.clear();
-        //arguments2.push_back("-ho");
+        arguments2.push_back("-ho");
         arguments2.push_back("-oc");
         arguments2.push_back("1");
         std::string rcollateProgram="rcollate";
