@@ -10,8 +10,9 @@ set(SRCS analemma.cpp
          dayill.cpp
          daylight.cpp
          elecill.cpp
-         functions.cpp
+         electriclight.cpp
          filepath.cpp
+         functions.cpp
          geometryprimitives.cpp
          gridmaker.cpp
          jsonobjects.cpp
@@ -24,39 +25,40 @@ set(SRCS analemma.cpp
          radfiledata.cpp
          radparser.cpp
          radprimitive.cpp
-         spacecontrol.cpp
          shadecontrol.cpp
+         spacecontrol.cpp
          stadicprocess.cpp
          weatherdata.cpp
          windowgroup.cpp)
 
-set(HDRS stadicapi.h
-         sharedvector.h
-         spacecontrol.h
+set(HDRS analemma.h
          buildingcontrol.h
-         windowgroup.h
-         shadecontrol.h
          controlzone.h
-         logging.h
+         dayill.h
+         daylight.h
+         elecill.h
+         electriclight.h
+         filepath.h
+         functions.h
+         geometryprimitives.h
          gridmaker.h
+         jsonobjects.h
+         leakcheck.h
+         logging.h
+         materialprimitives.h
+         metrics.h
          photosensor.h
          processshade.h
          radfiledata.h
          radparser.h
          radprimitive.h
-         geometryprimitives.h
-         weatherdata.h
-         dayill.h
-         elecill.h
-         daylight.h
-         materialprimitives.h
-         metrics.h
-         leakcheck.h
-         functions.h
-         filepath.h
-         analemma.h
+         shadecontrol.h
+         sharedvector.h
+         spacecontrol.h
+         stadicapi.h
          stadicprocess.h
-         jsonobjects.h)
+         weatherdata.h
+         windowgroup.h)
 
  add_library(stadic_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
  add_dependencies(stadic_core boost-geometry)
