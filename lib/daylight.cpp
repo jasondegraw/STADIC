@@ -1173,6 +1173,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->sunDivisions()));
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-d");
         arguments.push_back("-5");
         arguments.push_back("0.533");
@@ -1206,6 +1210,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->skyDivisions()));
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-c");
         arguments.push_back("1");
         arguments.push_back("1");
@@ -1240,6 +1248,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->skyDivisions()));
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-d");
         /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
