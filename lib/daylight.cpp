@@ -695,7 +695,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     std::string sensorDirSunDC;
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //rcontrib for sky
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -704,9 +704,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments.push_back(it->second);
                 }else if (it->first=="lw"){
                     arguments.push_back("-lw");
-                    if (toDouble(it->second)>0.0000002){
-                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000002 .");
-                        arguments.push_back("0.0000002");
+                    if (toDouble(it->second)>0.0000001){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000001 .");
+                        arguments.push_back("0.0000001");
                     }else{
                         arguments.push_back(it->second);
                     }
@@ -865,7 +865,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //rcontrib for sun (sky patch version)
         arguments.clear();
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -875,16 +875,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                 }
                 else if (it->first=="lw"){
                     arguments.push_back("-lw");
-                    if (toDouble(it->second)>0.0000002){
-                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000002 .");
-                        arguments.push_back("0.0000002");
+                    if (toDouble(it->second)>0.0000001){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000001 .");
+                        arguments.push_back("0.0000001");
                     }else{
                         arguments.push_back(it->second);
                     }
                 }
             }
             arguments.push_back("-ab");
-            arguments.push_back("0");
+            arguments.push_back("1");
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
@@ -927,7 +927,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //rcontrib for direct sun
         arguments.clear();
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -1039,12 +1039,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments2.push_back("-"+it->first);
                     arguments2.push_back(it->second);
                 }else if (it->first=="lw"){
-                    arguments.push_back("-lw");
+                    arguments2.push_back("-lw");
                     if (toDouble(it->second)>0.00002){
                         STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
-                        arguments.push_back("0.00002");
+                        arguments2.push_back("0.00002");
                     }else{
-                        arguments.push_back(it->second);
+                        arguments2.push_back(it->second);
                     }
                 }
             }
@@ -1072,7 +1072,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process rsensor2(rsensorProgram, arguments);
         arguments2.clear();
         arguments2.push_back("-e");
-        arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments2.push_back("MF:"+std::to_string(model->skyDivisions()));
         arguments2.push_back("-f");
         arguments2.push_back("reinhart.cal");
         arguments2.push_back("-b");
@@ -1080,7 +1080,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments2.push_back("-bn");
         arguments2.push_back("Nrbins");
         arguments2.push_back("-m");
-        arguments2.push_back("solar");
+        arguments2.push_back("sky_glow");
         //arguments.push_back("-faa");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
@@ -1093,8 +1093,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments2.push_back("0.00005");
                     STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
                 }
-                arguments.push_back("-ab");
-                arguments.push_back("0");
+                arguments2.push_back("-ab");
+                arguments2.push_back("1");
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
@@ -1120,7 +1120,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         //rcontrib for direct sun for shades
         Process rsensor3 (rsensorProgram, arguments);
         arguments2.clear();
-        arguments2.push_back("-I+");
+        arguments2.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -1148,8 +1148,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments2.push_back(sunsOct);
         Process rcontribDirSunSen(rcontribProgram,arguments2);
         rsensor3.setStandardOutputProcess(&rcontribDirSunSen);
-        sensorDirSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_kd.dc";
-        rcontribDirSunSen.setStandardOutputFile(directSunDC);
+        sensorDirSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_d.dc";
+        rcontribDirSunSen.setStandardOutputFile(sensorDirSunDC);
         rcontribDirSunSen.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
         if (writeCL){
             outCL<<rcontribDirSunSen.commandLine()<<std::endl<<std::endl;;
@@ -1184,6 +1184,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-ho");
         */
         arguments.push_back(m_WeaFileName.get());
+        arguments.push_back(".");
         std::string gendaymtxProgram="gendaymtx";
         Process gendaymtx(gendaymtxProgram,arguments);
 
@@ -1222,6 +1223,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-ho");
         */
         arguments.push_back(m_WeaFileName.get());
+        arguments.push_back(".");
         Process gendaymtx2(gendaymtxProgram,arguments);
 
         if (setting==-1){
@@ -1257,6 +1259,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-ho");
         */
         arguments.push_back(m_WeaFileName.get());
+        arguments.push_back(".");
         Process gendaymtx3(gendaymtxProgram,arguments);
 
         if (setting==-1){
@@ -2455,9 +2458,9 @@ bool Daylight::createBaseRadFiles(Control *model){
                     return false;
                 }
                 for (int k=0;k<model->windowGroups()[j].glazingLayers().size();k++){
-//                    if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
-//                        return false;
-//                    }
+                    //if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
+                    //    return false;
+                    //}
                 }
             }
         }
