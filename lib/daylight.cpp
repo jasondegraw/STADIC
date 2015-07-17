@@ -636,7 +636,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
 }
 
 bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
-    bool writeCL=true;
+    bool writeCL=false;
     std::ofstream outCL;
     outCL.open(model->spaceDirectory()+"commandLine.bat");
     //Get number of suns
