@@ -47,6 +47,10 @@ bool Metrics::processMetrics()
     for (int i=0;i<spaces.size();i++){
         DaylightIlluminanceData daylightIll(spaces[i].get()->illumUnits());
         daylightIll.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+".ill");
+        if (!parseOccupancy(spaces[i].get()->occSchedule(),0.10)){
+            STADIC_LOG(Severity::Fatal, "The occupancy file failed to parse and the program must now quit.");
+            return false;
+        }
         //Test whether Daylight Autonomy needs to be calculated
         if (spaces[i].get()->runDA()){
             if(calculateDA(spaces[i].get(), &daylightIll)){
