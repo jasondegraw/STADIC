@@ -99,16 +99,51 @@ bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
         pointCount.push_back(0);
     }
     int hourCount=0;
-    for (int i=0;i<dayIll->illuminance().size();i++){
-        if(m_Occupancy[i]){
-            hourCount++;
-            if (model->illumUnits()=="lux"){
+    if (model->illumUnits()=="lux"){
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if (m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.lux()){
+                    if (p>model->DAIllum()){
+                        pointCount[j]++;
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+        /*
+        for (int i=0;i<dayIll->illuminance().size();i++){
+            if(m_Occupancy[i]){
+                hourCount++;
                 for (int j=0;j<dayIll->illuminance()[i].lux().size();j++){
                     if (dayIll->illuminance()[i].lux()[j]>model->DAIllum()){
                         pointCount[j]++;
                     }
                 }
-            }else{
+            }
+        }
+        */
+    }else{
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if (m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.fc()){
+                    if (p>model->DAIllum()){
+                        pointCount[j]++;
+                    }
+                    j++;
+                }
+            }
+        }
+        /*
+        for (int i=0;i<dayIll->illuminance().size();i++){
+            if(m_Occupancy[i]){
+                hourCount++;
                 for (int j=0;j<dayIll->illuminance()[i].fc().size();j++){
                     if (dayIll->illuminance()[i].fc()[j]>model->DAIllum()){
                         pointCount[j]++;
@@ -116,6 +151,7 @@ bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
                 }
             }
         }
+        */
     }
 
     std::ofstream outDA;
@@ -139,6 +175,42 @@ bool Metrics::calculatecDA(Control *model, DaylightIlluminanceData *dayIll)
         pointCount.push_back(0);
     }
     int hourCount=0;
+    if (model->illumUnits()=="lux"){
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if (m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.lux()){
+                    if (p>model->cDAIllum()){
+                        pointCount[j]++;
+                    }else{
+                        pointCount[j]=pointCount[j]+p/model->cDAIllum();
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+    }else{
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if (m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.fc()){
+                    if (p>model->cDAIllum()){
+                        pointCount[j]++;
+                    }else{
+                        pointCount[j]=pointCount[j]+p/model->cDAIllum();
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+    }
+    /*
     for (int i=0;i<dayIll->illuminance().size();i++){
         if(m_Occupancy[i]){
             hourCount++;
@@ -153,7 +225,7 @@ bool Metrics::calculatecDA(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     std::ofstream outcDA;
     std::string tmpFileName;
     tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_cDA.res";
