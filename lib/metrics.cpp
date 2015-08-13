@@ -256,7 +256,48 @@ bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
         countBelow.push_back(0);
         countAbove.push_back(0);
     }
+
     int hourCount=0;
+    if (model->illumUnits()=="lux"){
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if(m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.lux()){
+                    if (p<model->UDIMin()){
+                        countBelow[j]++;
+                    }else if(p<=model->UDIMax()){
+                        countWithin[j]++;
+                    }else{
+                        countAbove[j]++;
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+    }else{
+        int i=0;
+        for (auto &v : dayIll->illuminance()){
+            if(m_Occupancy[i]){
+                hourCount++;
+                int j=0;
+                for (auto &p : v.fc()){
+                    if (p<model->UDIMin()){
+                        countBelow[j]++;
+                    }else if(p<=model->UDIMax()){
+                        countWithin[j]++;
+                    }else{
+                        countAbove[j]++;
+                    }
+                    j++;
+                }
+            }
+            i++;
+        }
+    }
+    /*
     for (int i=0;i<dayIll->illuminance().size();i++){
         if(m_Occupancy[i]){
             hourCount++;
@@ -283,7 +324,7 @@ bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     std::ofstream outUDIbelow;
     std::string tmpFileName;
     tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_below_UDI.res";
