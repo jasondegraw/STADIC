@@ -12,12 +12,14 @@ parser.add_argument("--destination",
                     default = '../stadic-export',
                     help="directory to write exported files to")
 parser.add_argument("--git",
-                    default = 'C:\\Program Files (x86)\\Git\\bin\\git',
+                    default = 'C:\\Program Files (x86)\\Git\\bin\\git.exe',
                     help="full path to git executable")
 args = parser.parse_args()
 
 destination = args.destination
 gitcmd = args.git
+
+print(args.git)
 
 print('Exporting STADIC to "%s"...' % destination)
 
@@ -97,7 +99,7 @@ for file in (src+hdr):
 #
 # Copy utilities that are to be built
 #
-print("Copying utility source files")
+print("Copying utility source files...")
 os.makedirs(destination+'/utilities')
 cmakeTxt = """cmake_minimum_required(VERSION 2.8.11)
 
@@ -130,7 +132,7 @@ for file in src:
 #
 # Write top level files
 #
-print("Writing top level CMakeLists.txt and README files")
+print("Writing top level CMakeLists.txt and README files...")
 cmakeTxt = """cmake_minimum_required(VERSION 2.8.11)
 
 project(stadic)
@@ -210,4 +212,4 @@ a subset created from git commit %s on %s with export.py.
 fp = open(destination+'/README.txt', 'w')
 fp.write(readmeTxt)
 fp.close()
-print("Export complete")
+print("Export complete.")
