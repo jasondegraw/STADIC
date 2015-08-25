@@ -1,13 +1,31 @@
 import os
 import shutil
 import subprocess
+import argparse
+import datetime
 
-destination = '../stadic-export'
+#
+# Set up optional arguments
+#
+parser = argparse.ArgumentParser()
+parser.add_argument("--destination",
+                    default = '../stadic-export',
+                    help="directory to write exported files to")
+parser.add_argument("--git",
+                    default = 'C:\\Program Files (x86)\\Git\\bin\\git',
+                    help="full path to git executable")
+args = parser.parse_args()
+
+destination = args.destination
+gitcmd = args.git
+
+print('Exporting STADIC to "%s"...' % destination)
 
 if os.path.exists(destination):
-    exit('Destination path %s already exists!' % destination)
+    exit('Destination path "%s" already exists!' % destination)
 
 os.makedirs(destination)
+print("Copying dependencies...")
 #
 # Copy all dependencies
 #
@@ -19,6 +37,7 @@ shutil.copytree('dependencies', destination + '/dependencies')
 #
 # Prune lib down to only the files we absolutely need
 #
+print("Copying library source files...")
 os.makedirs(destination+'/lib')
 cmakeTxt = """cmake_minimum_required(VERSION 2.8.11)
 
@@ -36,7 +55,7 @@ add_dependencies(stadic_core boost-geometry)"""
 filesBoth = [#'analemma',
              'buildingcontrol',
              'controlzone',
-             #'dayill.cpp',
+             #'dayill',
              #'daylight',
              #'elecill',
              'functions',
@@ -78,6 +97,7 @@ for file in (src+hdr):
 #
 # Copy utilities that are to be built
 #
+print("Copying utility source files")
 os.makedirs(destination+'/utilities')
 cmakeTxt = """cmake_minimum_required(VERSION 2.8.11)
 
@@ -110,6 +130,7 @@ for file in src:
 #
 # Write top level files
 #
+print("Writing top level CMakeLists.txt and README files")
 cmakeTxt = """cmake_minimum_required(VERSION 2.8.11)
 
 project(stadic)
@@ -159,9 +180,18 @@ fp = open(destination+'/CMakeLists.txt', 'w')
 fp.write(cmakeTxt)
 fp.close()
 
-gitcmd = 'C:\\Program Files (x86)\\Git\\bin\\git'
-output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
-                          stdout=subprocess.PIPE).communicate()[0]
+
+#
+# Try to get the git SHA of this commit
+#
+gitSha = 'UNKNOWN'
+try:
+    if os.path.exists(gitcmd):
+        output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
+                                  stdout=subprocess.PIPE).communicate()[0]
+        gitSha = output.decode('utf-8').strip()
+except:
+    gitSha = 'UNKNOWN'
 
 readmeTxt = """STADIC
 ======
@@ -174,9 +204,10 @@ Description
 -----------
 
 STADIC is based upon the Radiance ray-tracing software system. This is
-a subset created from git commit %s with export.py.
-""" % output.decode('utf-8').strip()
+a subset created from git commit %s on %s with export.py.
+""" % (gitSha, datetime.datetime.now().strftime('%c'))
 
 fp = open(destination+'/README.txt', 'w')
 fp.write(readmeTxt)
 fp.close()
+print("Export complete")
