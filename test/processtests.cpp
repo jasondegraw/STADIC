@@ -52,7 +52,7 @@ std::string readFileToString(const std::string &filename)
     string.erase(std::remove_if(string.begin(), string.end(), ::iscntrl), string.end());
     stream.close();
     return stadic::trim(string);
-	UNLINK("");
+    UNLINK("");
 }
 
 TEST(ProcessTests, ProcessBadProgram)
@@ -97,17 +97,17 @@ TEST(ProcessTests, ProcessProgramArgs)
     stadic::Process proc("date", args);
     time_t result = time(NULL);
     struct tm *current = localtime(&result);
-	// This is an ugly hack, should be fixed
-	std::string monthPad = "";
-	std::string dayPad = "";
-	if(current->tm_mon < 9) {
-		monthPad = "0";
-	}
-	if(current->tm_mday < 10) {
-		dayPad = "0";
-	}
+    // This is an ugly hack, should be fixed
+    std::string monthPad = "";
+    std::string dayPad = "";
+    if(current->tm_mon < 9) {
+        monthPad = "0";
+    }
+    if(current->tm_mday < 10) {
+        dayPad = "0";
+    }
     std::string datestring = days[current->tm_wday] + " " + stadic::toString(current->tm_year+1900) + "-"
-			+ monthPad + stadic::toString(current->tm_mon+1) + "-" + dayPad + stadic::toString(current->tm_mday);
+            + monthPad + stadic::toString(current->tm_mon+1) + "-" + dayPad + stadic::toString(current->tm_mday);
 #endif
     proc.setStandardOutputFile("output.txt");
     proc.start();
