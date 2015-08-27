@@ -12,7 +12,7 @@ parser.add_argument("--destination",
                     default = '../stadic-export',
                     help="directory to write exported files to")
 parser.add_argument("--git",
-                    default = 'git',
+                    default = '',
                     #'C:\\Program Files (x86)\\Git\\bin\\git.exe',
                     help="full path to git executable")
 parser.add_argument("--boost-prefix",
@@ -200,6 +200,12 @@ try:
         output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
                                   stdout=subprocess.PIPE).communicate()[0]
         gitSha = output.decode('utf-8').strip()
+    else:
+        gitcmd = shutil.which('git')
+        if os.path.exists(gitcmd):
+            output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
+                                      stdout=subprocess.PIPE).communicate()[0]
+            gitSha = output.decode('utf-8').strip()
 except:
     gitSha = 'UNKNOWN'
 
@@ -217,7 +223,7 @@ STADIC is based upon the Radiance ray-tracing software system. This is
 a subset created from git commit %s on %s with export.py.
 """ % (gitSha, datetime.datetime.now().strftime('%c'))
 
-fp = open(destination+'/README.txt', 'w')
+fp = open(destination+'/README.md', 'w')
 fp.write(readmeTxt)
 fp.close()
 print("Export complete.")
