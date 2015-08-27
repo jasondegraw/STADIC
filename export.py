@@ -12,14 +12,18 @@ parser.add_argument("--destination",
                     default = '../stadic-export',
                     help="directory to write exported files to")
 parser.add_argument("--git",
-                    default = 'C:\\Program Files (x86)\\Git\\bin\\git.exe',
+                    default = 'git',
+                    #'C:\\Program Files (x86)\\Git\\bin\\git.exe',
                     help="full path to git executable")
+parser.add_argument("--boost-prefix",
+                    dest = 'prefix',
+                    default = '',
+                    help="prefix for hardcoded addresses to locate boost")
 args = parser.parse_args()
 
 destination = args.destination
 gitcmd = args.git
-
-print(args.git)
+prefix = args.prefix
 
 print('Exporting STADIC to "%s"...' % destination)
 
@@ -52,7 +56,10 @@ set(SRCS %s)
 set(HDRS %s)
 
 add_library(stadic_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
-add_dependencies(stadic_core boost-geometry)"""
+add_dependencies(stadic_core boost-geometry)
+
+install(TARGETS stadic_core
+	LIBRARY DESTINATION bin)"""
 
 filesBoth = [#'analemma',
              #'buildingcontrol',
@@ -111,13 +118,15 @@ include_directories(../lib)
 
 exeTxt = """add_executable(%s %s.cpp)
 target_link_libraries(%s stadic_core)
+install(TARGETS %s
+	RUNTIME DESTINATION bin)
 
 """
 
 utils = ['dxgridmaker']
 
 for exe in utils:
-    cmakeTxt += (exeTxt % (exe, exe, exe))
+    cmakeTxt += (exeTxt % (exe, exe, exe, exe))
 
 # Write the CMake file
 fp = open(destination+'/utilities/CMakeLists.txt', 'w')
@@ -146,7 +155,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(MSVC)
   # Visual Studio compiler check, totally borrowed from OpenStudio
-  # http://en.wikipedia.org/wiki/Visual_C%2B%2B#32-bit_and_64-bit_versions
+  # http://en.wikipedia.org/wiki/Visual_C%%2B%%2B#32-bit_and_64-bit_versions
   if(${CMAKE_C_COMPILER_VERSION} VERSION_LESS "18.0.21005.1")
     message(FATAL_ERROR "Visual Studio earlier than VS2013 is not supported")
   endif()
@@ -164,11 +173,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Boost
 include(ExternalProject)
 ExternalProject_Add(boost-geometry
-  URL ${CMAKE_SOURCE_DIR}/dependencies/boost-geometry-1_57.tar.gz
+  URL ${CMAKE_SOURCE_DIR}/%sdependencies/boost-geometry-1_57.tar.gz
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND "")
-set(Boost_INCLUDE_DIR ${CMAKE_BINARY_DIR}/boost-geometry-prefix/src/boost-geometry)
+set(Boost_INCLUDE_DIR ${CMAKE_BINARY_DIR}/%sboost-geometry-prefix/src/boost-geometry)
 include_directories(${Boost_INCLUDE_DIR})
 
 # JSON Dependency
@@ -176,12 +185,11 @@ include_directories("dependencies/jsoncpp")
 
 add_subdirectory(lib)
 add_subdirectory(utilities)
-"""
+""" % (prefix, prefix)
 
 fp = open(destination+'/CMakeLists.txt', 'w')
 fp.write(cmakeTxt)
 fp.close()
-
 
 #
 # Try to get the git SHA of this commit
