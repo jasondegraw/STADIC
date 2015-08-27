@@ -36,20 +36,19 @@
 #include <iostream>
 #ifdef _MSC_VER
 #include <Windows.h>
-#else
+#include <direct.h>
+#else //POSIX
 #include <sys/stat.h>
 #include <string.h>
+#include <unistd.h>
 #endif
-
-// May need to fix later for POSIX
-#include <direct.h>
 
 #ifdef _WIN32
 #define PATHSEPARATOR '\\'
 #define MKDIR _mkdir
-#else
+#else //POSIX
 #define PATHSEPARATOR '/'
-#define MKDIR mkdir
+#define MKDIR(dir) mkdir(dir, 0777)
 #endif
 
 namespace stadic{
