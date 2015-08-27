@@ -55,8 +55,8 @@ add_library(stadic_core SHARED ${HDRS} ${SRCS} ${DEP_SRCS})
 add_dependencies(stadic_core boost-geometry)"""
 
 filesBoth = [#'analemma',
-             'buildingcontrol',
-             'controlzone',
+             #'buildingcontrol',
+             #'controlzone',
              #'dayill',
              #'daylight',
              #'elecill',
@@ -64,7 +64,7 @@ filesBoth = [#'analemma',
              'filepath',
              'geometryprimitives',
              'gridmaker',
-             'jsonobjects',
+             #'jsonobjects',
              #'leakcheck',
              'logging',
              'materialprimitives',
@@ -74,11 +74,11 @@ filesBoth = [#'analemma',
              'radfiledata',
              'radparser',
              'radprimitive',
-             'spacecontrol',
-             'shadecontrol',
+             #'spacecontrol',
+             #'shadecontrol',
              'stadicprocess',
              #'weatherdata',
-             'windowgroup'
+             #'windowgroup'
              ]
 
 filesHeader = ['stadicapi.h', 'sharedvector.h']
