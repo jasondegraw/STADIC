@@ -306,7 +306,7 @@ bool GridMaker::parseRad(){
     std::vector<bool> firstPolygon;
 
     if (m_RadFile.geometry().empty()){
-        std::cerr<<"There are no polygons."<<std::endl;
+		STADIC_LOG(stadic::Severity::Error, "There are no polygons.");
         return false;
     }
 
@@ -598,7 +598,7 @@ bool GridMaker::testPoints(){
             return false;
         }
         if (m_PointSet[i].empty()){
-            std::cerr<<"The points array is empty."<<std::endl;
+			STADIC_LOG(stadic::Severity::Error, "The points array is empty.");
             return false;
         }
     }

@@ -32,13 +32,22 @@ Set the input file name containing the RADIANCE primitives to
 Multiple files may be listed, however each file must have the '-f' option 
 preceding it.
 .TP
+.BI -i \ name
+Set the identifier sub-string that will be used to find the polygons for use
+in creating the analysis grid to 
+.IR name .
+Multiple identifier sub-strings may be listed, however each one must have 
+the '-i' option preceding it.  If neither this option nor the '-l' option is
+specified, all polygons will be used.
+.TP
 .BI -l \ name
 Set the layer name that will be used to find the polygons for use in creating
 the analysis grid to 
 .IR name .
 This layer name is equivalent to the modifier for the RADIANCE primitive of 
 interest.  Multiple layer names may be listed, however each name must have 
-the '-l' option preceding it.
+the '-l' option preceding it.  If neither this option nor the '-i' option is
+specified, all polygons will be used.
 .TP
 .BI -o \ val
 Set the overall offset to 

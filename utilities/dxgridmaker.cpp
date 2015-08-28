@@ -213,7 +213,6 @@ int main (int argc, char *argv[])
     }
     if (geometryNamed==false){
         STADIC_LOG(stadic::Severity::Warning,"All geometry will be used to generate points.");
-        return EXIT_FAILURE;
     }
     grid.setSpaceX(sx);
     grid.setSpaceY(sy);
