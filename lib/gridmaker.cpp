@@ -274,6 +274,30 @@ bool GridMaker::calcArea(){
     return true;
 }
 
+static bool noCheck(std::shared_ptr<RadPrimitive> /*primitive*/, std::vector<std::string> strings)
+{
+    return true;
+}
+
+static bool modCheck(std::shared_ptr<RadPrimitive> primitive, std::vector<std::string> strings)
+{
+    for(auto &name : strings) {
+        if(primitive->modifierName()==name){
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool idCheck(std::shared_ptr<RadPrimitive> primitive, std::vector<std::string> strings)
+{
+    for(auto &name : strings) {
+        if (primitive->name().find(name)!=std::string::npos){
+            return true;
+        }
+    }
+    return false;
+}
 
 //Private
 //Functions
@@ -285,32 +309,32 @@ bool GridMaker::parseRad(){
         std::cerr<<"There are no polygons."<<std::endl;
         return false;
     }
-    for (int i=0;i<m_RadFile.geometry().size();i++){
+
+    // Determine the selection strategy, default to no check
+    bool (*filter)(std::shared_ptr<RadPrimitive>, std::vector<std::string>) = &noCheck;
+    std::vector<std::string> names;
+
+    if (m_LayerNames.size()){
+        filter = &modCheck;
+        names = m_LayerNames;
+    }
+    else if (m_Identifiers.size()){
+        filter = &idCheck;
+        names = m_Identifiers;
+    }
+    for(auto &radPoly : m_RadFile.geometry()) {
+    //for (int i=0;i<m_RadFile.geometry().size();i++){
         boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> tempPolygon;
         double tempZ=0;
-        for (int j=0;j<m_RadFile.geometry().at(i)->arg3().size()/3;j++){
-            boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(m_RadFile.geometry().at(i)->arg3()[j*3]), toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+1])));
-            tempZ=tempZ+toDouble(m_RadFile.geometry().at(i)->arg3()[j*3+2]);
+        for (int j=0;j<radPoly->arg3().size()/3;j++){
+            boost::geometry::append(tempPolygon,boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>(toDouble(radPoly->arg3()[j*3]), toDouble(radPoly->arg3()[j*3+1])));
+            tempZ=tempZ+toDouble(radPoly->arg3()[j*3+2]);
         }
-        tempZ=tempZ/(m_RadFile.geometry().at(i)->arg3().size()/3.0);
+        tempZ=tempZ/(radPoly->arg3().size()/3.0);
         boost::geometry::correct(tempPolygon);
         if (boost::geometry::is_valid(tempPolygon)){
             //unite polygons that are the right layer name
-            bool properName=false;
-            if (m_LayerNames.size()>0){
-                for (int j=0;j<m_LayerNames.size();j++){
-                    if (m_RadFile.geometry().at(i)->modifierName()==m_LayerNames.at(j)){
-                        properName=true;
-                    }
-                }
-            }
-            if (m_Identifiers.size()>0){
-                for (int j=0;j<m_Identifiers.size();j++){
-                    if (m_RadFile.geometry().at(i)->name().find(m_Identifiers[j])!=std::string::npos){
-                        properName=true;
-                    }
-                }
-            }
+            bool properName = filter(radPoly, names);
             int setPos;
             if (properName==true){
                 if (m_PolySetHeight.empty()){
