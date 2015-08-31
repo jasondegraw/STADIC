@@ -36,9 +36,6 @@ print("Copying dependencies...")
 # Copy all dependencies
 #
 shutil.copytree('dependencies', destination + '/dependencies')
-#
-# Copy all docs?
-#
 
 #
 # Prune lib down to only the files we absolutely need
@@ -139,6 +136,22 @@ for file in src:
     shutil.copy('utilities/'+file, destination+'/utilities/'+file)
 
 #
+# Look for documentation
+#
+print('Looking for documentation...')
+docs = [exe+'.1' for exe in utils]
+found = []
+for page in docs:
+    if os.path.exists('doc/'+page):
+        found.append(page)
+    else:
+        print('\tFailed to find '+page)
+if found:
+    os.makedirs(destination+'/doc')
+    for page in found:
+       shutil.copy('doc/'+page, destination+'/doc/'+page) 
+
+#
 # Write top level files
 #
 print("Writing top level CMakeLists.txt and README files...")
@@ -200,12 +213,6 @@ try:
         output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
                                   stdout=subprocess.PIPE).communicate()[0]
         gitSha = output.decode('utf-8').strip()
-    else:
-        gitcmd = shutil.which('git')
-        if os.path.exists(gitcmd):
-            output = subprocess.Popen([gitcmd, 'rev-parse', '--short', 'HEAD'],
-                                      stdout=subprocess.PIPE).communicate()[0]
-            gitSha = output.decode('utf-8').strip()
 except:
     gitSha = 'UNKNOWN'
 
