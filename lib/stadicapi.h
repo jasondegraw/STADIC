@@ -46,4 +46,8 @@
 #pragma warning(disable: 4251)
 #endif
 
+#define VERSIONMAJOR 1
+#define VERSIONMINOR 0
+#define VERSIONPATCH 0
+
 #endif // STADICAPI_H
