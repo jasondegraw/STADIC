@@ -276,6 +276,12 @@ bool RadFileData::addPrimitive(std::shared_ptr<RadPrimitive> primitive)
     return true;
 }
 
+bool RadFileData::setPrimitives(const shared_vector<RadPrimitive> &primitives)
+{
+    m_primitives = primitives;
+    return true;
+}
+
 //Getters
 shared_vector<RadPrimitive> RadFileData::geometry() const
 {

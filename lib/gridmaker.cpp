@@ -154,7 +154,8 @@ double GridMaker::area(){
 }
 
 //Utilities
-bool GridMaker::makeGrid(){
+bool GridMaker::makeGrid()
+{
     if (!parseRad()){
         return false;
     }
@@ -322,8 +323,9 @@ bool GridMaker::parseRad(){
         filter = &idCheck;
         names = m_Identifiers;
     }
+
+    shared_vector<RadPrimitive> accepted;
     for(auto &radPoly : m_RadFile.geometry()) {
-    //for (int i=0;i<m_RadFile.geometry().size();i++){
         boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>,true,true> tempPolygon;
         double tempZ=0;
         for (int j=0;j<radPoly->arg3().size()/3;j++){
@@ -337,6 +339,7 @@ bool GridMaker::parseRad(){
             bool properName = filter(radPoly, names);
             int setPos;
             if (properName==true){
+                accepted.push_back(radPoly);
                 if (m_PolySetHeight.empty()){
                     m_PolySetHeight.push_back(tempZ);
                     firstPolygon.push_back(true);
@@ -368,6 +371,8 @@ bool GridMaker::parseRad(){
             }
         }
     }
+    // Replace the contents of the RadFileData with the accepted polygons
+    m_RadFile.setPrimitives(accepted);
     for (int i=0;i<m_UnitedPolygon.size();i++){
         if (!boost::geometry::is_valid(m_UnitedPolygon[i])){
             STADIC_ERROR("There was a problem uniting the polygons.");
@@ -483,7 +488,9 @@ bool GridMaker::insetPolygons(){
 }
 
 
-void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>, true, true> > polygonSet, int set){
+void GridMaker::boundingBox(boost::geometry::model::multi_polygon<boost::geometry::model::polygon<boost::geometry::model::point<double, 2,
+  boost::geometry::cs::cartesian>, true, true> > polygonSet, int set)
+{
     m_MinX.resize(m_PolySetHeight.size());
     m_MinY.resize(m_PolySetHeight.size());
     m_MaxX.resize(m_PolySetHeight.size());
@@ -630,54 +637,54 @@ void GridMaker::addTestPoints(double x, double y, int set){
 bool GridMaker::writeRadPoly(std::string file){
     std::ofstream oFile;
     oFile.open(file);
-    if (!oFile.is_open()){
-        STADIC_ERROR("The opening of the file "+file+" has failed.");
+    if(!oFile.is_open()){
+        STADIC_ERROR("The opening of the file " + file + " has failed.");
         return false;
     }
-    oFile<<"void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0"<<std::endl<<std::endl;
-    m_MaxXRad=-1000;
-    m_MinXRad=1000;
-    m_MaxYRad=-1000;
-    m_MinYRad=1000;
-    m_MaxZRad=-1000;
-    m_MinZRad=1000;
-    for (int i=0;i<m_RadFile.geometry().size();i++){
-        for (int j=0;j<m_LayerNames.size();j++){
-            if (m_RadFile.geometry().at(i)->modifierName()==m_LayerNames.at(j)){
-                oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
-                oFile<<"0\t0\t"<<m_RadFile.geometry().at(i)->arg3().size()<<std::endl;
-                int coordinate=0;
-                for (int k=0;k<m_RadFile.geometry().at(i)->arg3().size();k++){
-                    oFile<<"\t"<<m_RadFile.geometry().at(i)->arg3()[k];
-                    if (coordinate==0){
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxXRad){
-                            m_MaxXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinXRad){
-                            m_MinXRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        coordinate++;
-                    }else if (coordinate==1){
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxYRad){
-                            m_MaxYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinYRad){
-                            m_MinYRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        coordinate++;
-                    }else{
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])>m_MaxZRad){
-                            m_MaxZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        if (toDouble(m_RadFile.geometry().at(i)->arg3()[k])<m_MinZRad){
-                            m_MinZRad=toDouble(m_RadFile.geometry().at(i)->arg3()[k]);
-                        }
-                        coordinate=0;
-                    }
+    oFile << "void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0" << std::endl << std::endl;
+    // This next bit looks bad
+    m_MaxXRad = -1000;
+    m_MinXRad = 1000;
+    m_MaxYRad = -1000;
+    m_MinYRad = 1000;
+    m_MaxZRad = -1000;
+    m_MinZRad = 1000;
+    // Should do this differently
+    int i = 0;
+    for(auto &radPoly : m_RadFile.geometry()) {
+        oFile << "floor\tpolygon\tfloor" << i << std::endl;
+        i++;
+        oFile << "0\t0\t" << radPoly->arg3().size() << std::endl;
+        int coordinate = 0;
+        for(int k = 0; k<radPoly->arg3().size(); k++){
+            oFile << "\t" << radPoly->arg3()[k];
+            if(coordinate == 0){
+                if(toDouble(radPoly->arg3()[k])>m_MaxXRad){
+                    m_MaxXRad = toDouble(radPoly->arg3()[k]);
                 }
-                oFile<<std::endl;
+                if(toDouble(radPoly->arg3()[k]) < m_MinXRad){
+                    m_MinXRad = toDouble(radPoly->arg3()[k]);
+                }
+                coordinate++;
+            } else if(coordinate == 1){
+                if(toDouble(radPoly->arg3()[k]) > m_MaxYRad){
+                    m_MaxYRad = toDouble(radPoly->arg3()[k]);
+                }
+                if(toDouble(radPoly->arg3()[k]) < m_MinYRad){
+                    m_MinYRad = toDouble(radPoly->arg3()[k]);
+                }
+                coordinate++;
+            } else{
+                if(toDouble(radPoly->arg3()[k]) > m_MaxZRad){
+                    m_MaxZRad = toDouble(radPoly->arg3()[k]);
+                }
+                if(toDouble(radPoly->arg3()[k]) < m_MinZRad){
+                    m_MinZRad = toDouble(radPoly->arg3()[k]);
+                }
+                coordinate = 0;
             }
         }
+        oFile << std::endl;
     }
 
     /*
@@ -690,6 +697,30 @@ bool GridMaker::writeRadPoly(std::string file){
         oFile<<std::endl;
     }
     */
+    oFile.close();
+    return true;
+}
+
+bool GridMaker::writeUnitedRadPoly(std::string file){
+    std::ofstream oFile;
+    oFile.open(file);
+    if(!oFile.is_open()){
+        STADIC_ERROR("The opening of the file " + file + " has failed.");
+        return false;
+    }
+    oFile << "void plastic floor\n0\n0\n5\t.5\t.5\t.5\t0\t0" << std::endl << std::endl;
+    int i = 0;
+    for(auto &multiPoly : m_UnitedPolygon) {
+        for(auto &poly : multiPoly) {
+            oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
+            i++;
+            oFile << "0\t0\t" << (poly.outer().size() - 1) * 3 << std::endl;
+            for(int j = 0; j < poly.outer().size() - 1; j++){
+                oFile << "\t" << "\t" << poly.outer()[j].get<0>() << "\t" << poly.outer()[j].get<1>() << "\t0" << std::endl;
+            }
+        }
+        oFile<<std::endl;
+    }
     oFile.close();
     return true;
 }
