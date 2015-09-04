@@ -248,13 +248,11 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-    /*
     if (!polyFile.empty()){
-        if (!grid.writeRadPoly(polyFile)){
+        if (!grid.writeUnitedRadPoly(polyFile)){
             return EXIT_FAILURE;
         }
     }
-    */
     if (!csvFile.empty()){
         if (!grid.writePTScsv(csvFile)){
             return EXIT_FAILURE;

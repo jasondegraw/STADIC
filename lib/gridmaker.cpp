@@ -335,7 +335,7 @@ bool GridMaker::parseRad(){
         tempZ=tempZ/(radPoly->arg3().size()/3.0);
         boost::geometry::correct(tempPolygon);
         if (boost::geometry::is_valid(tempPolygon)){
-            //unite polygons that are the right layer name
+            //unite polygons that pass the test
             bool properName = filter(radPoly, names);
             int setPos;
             if (properName==true){
@@ -687,16 +687,6 @@ bool GridMaker::writeRadPoly(std::string file){
         oFile << std::endl;
     }
 
-    /*
-    for (int i=0;i<m_UnitedPolygon.size();i++){
-        oFile<<"floor\tpolygon\tfloor"<<i<<std::endl;
-        oFile<<"0\t0\t"<<(m_UnitedPolygon[i].outer().size()-1)*3<<std::endl;
-        for (int j=0;j<m_UnitedPolygon[i].outer().size()-1;j++){
-            oFile<<"\t"<<"\t"<<m_UnitedPolygon[i].outer()[j].get<0>()<<"\t"<<m_UnitedPolygon[i].outer()[j].get<1>()<<"\t0"<<std::endl;
-        }
-        oFile<<std::endl;
-    }
-    */
     oFile.close();
     return true;
 }
