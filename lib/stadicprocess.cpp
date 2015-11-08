@@ -42,7 +42,7 @@ namespace stadic{
 //*************************
 //Process
 //*************************
-Process::Process(const std::string &program)
+Process::Process(const std::string &program, OutputMode outputMode)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -51,10 +51,11 @@ Process::Process(const std::string &program)
     m_inputProcess = nullptr;
     m_outputProcess = nullptr;
     m_program = program;
+    m_outputMode = outputMode;
 #endif
 }
 
-Process::Process(const std::string &program, const std::vector<std::string> &args)
+Process::Process(const std::string &program, const std::vector<std::string> &args, OutputMode outputMode)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -68,6 +69,7 @@ Process::Process(const std::string &program, const std::vector<std::string> &arg
     m_inputProcess = nullptr;
     m_outputProcess = nullptr;
     m_program = program;
+    m_outputMode = outputMode;
     m_args = args;
 #endif
 }
@@ -229,7 +231,13 @@ std::string Process::processCommandLine() const
         command += " < " + m_inputFile;
     }
     if(!m_outputFile.empty()) {
-        command += " > " + m_outputFile;
+        switch(m_outputMode) {
+        case AppendStdOut:
+          command += " >> " + m_outputFile;
+          break;
+        default: // OverWrite
+          command += " > " + m_outputFile;
+        }
     }
     if(!m_errorFile.empty()) {
         command += " 2> " + m_errorFile;
