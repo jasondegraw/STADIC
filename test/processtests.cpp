@@ -140,7 +140,7 @@ TEST(ProcessTests, ProcessFileOutErr)
 
 TEST(ProcessTests, ProcessAppendFileOutErr)
 {
-  stadic::Process proc(PROGRAM, stadic::Process::AppendStdOut);
+  stadic::Process proc(PROGRAM);
   proc.setStandardErrorFile("error.txt");
   proc.setStandardOutputFile("output.txt");
   proc.start();
@@ -149,9 +149,9 @@ TEST(ProcessTests, ProcessAppendFileOutErr)
   std::string error = readFileToString("error.txt");
   EXPECT_EQ("This is the standard output", output);
   EXPECT_EQ("This is the standard error", error);
-  stadic::Process proc2(PROGRAM, stadic::Process::AppendStdOut);
+  stadic::Process proc2(PROGRAM);
   proc2.setStandardErrorFile("error.txt");
-  proc2.setStandardOutputFile("output.txt");
+  proc2.setStandardOutputFile("output.txt", stadic::Process::AppendOutput);
   proc2.start();
   ASSERT_TRUE(proc2.wait());
   output = readFileToString("output.txt");

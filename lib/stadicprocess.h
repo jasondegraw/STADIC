@@ -80,10 +80,10 @@ class STADIC_API Process
 {
 public:
     enum ProcessState { BadProgram, Initialized, ReadyToRun, Running, RunCompleted, RunFailed };
-    enum OutputMode { OverWrite, AppendStdOut };
+    enum OutputMode { OverWriteOutput, AppendOutput };
 
-    Process(const std::string &program, OutputMode outputMode=OverWrite);
-    Process(const std::string &program, const std::vector<std::string> &args, OutputMode outputMode = OverWrite);
+    Process(const std::string &program);
+    Process(const std::string &program, const std::vector<std::string> &args);
 
     std::string commandLine();
     static std::string quote(const std::string &string);
@@ -98,7 +98,7 @@ public:
     void setStandardOutputProcess(Process *destination);
     bool setStandardErrorFile(const std::string &fileName);
     bool setStandardInputFile(const std::string &fileName);
-    bool setStandardOutputFile(const std::string &fileName);
+    bool setStandardOutputFile(const std::string &fileName, OutputMode mode = OverWriteOutput);
 
     //static bool findProgram(const std::string &program);
     ProcessState state() const
@@ -117,7 +117,7 @@ private:
     QProcess m_process;
 #else
     ProcessState m_state;     // Flag that describes the current state of the object
-    OutputMode m_outputMode;  // Flag that determines what happens with stdout and stderr output
+    OutputMode m_stdoutMode;  // Flag that determines what happens with stdout
     Process *m_inputProcess;  // Upstream process whose stdout stream will be directed to this object's stdin
     Process *m_outputProcess; // Downstream process whose stdin stream will get this object's stdout
     std::string m_program;    // Program name

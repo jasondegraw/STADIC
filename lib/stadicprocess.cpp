@@ -42,7 +42,7 @@ namespace stadic{
 //*************************
 //Process
 //*************************
-Process::Process(const std::string &program, OutputMode outputMode)
+Process::Process(const std::string &program)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -51,11 +51,10 @@ Process::Process(const std::string &program, OutputMode outputMode)
     m_inputProcess = nullptr;
     m_outputProcess = nullptr;
     m_program = program;
-    m_outputMode = outputMode;
 #endif
 }
 
-Process::Process(const std::string &program, const std::vector<std::string> &args, OutputMode outputMode)
+Process::Process(const std::string &program, const std::vector<std::string> &args)
 {
 #ifdef USE_QT
     m_process.setProgram(QString::fromStdString(program));
@@ -69,7 +68,6 @@ Process::Process(const std::string &program, const std::vector<std::string> &arg
     m_inputProcess = nullptr;
     m_outputProcess = nullptr;
     m_program = program;
-    m_outputMode = outputMode;
     m_args = args;
 #endif
 }
@@ -191,7 +189,7 @@ bool Process::setStandardInputFile(const std::string &fileName)
 #endif
 }
 
-bool Process::setStandardOutputFile(const std::string &fileName)
+bool Process::setStandardOutputFile(const std::string &fileName, OutputMode mode)
 {
 #ifdef USE_QT
     m_process.setStandardOutputFile(QString::fromStdString(fileName));
@@ -199,6 +197,7 @@ bool Process::setStandardOutputFile(const std::string &fileName)
 #else
     if(m_state == Initialized) {
         m_outputFile = fileName;
+        m_stdoutMode = mode;
         if(m_outputProcess) {
             m_outputProcess->m_inputProcess = nullptr;
             m_outputProcess = nullptr;
@@ -231,11 +230,11 @@ std::string Process::processCommandLine() const
         command += " < " + m_inputFile;
     }
     if(!m_outputFile.empty()) {
-        switch(m_outputMode) {
-        case AppendStdOut:
+        switch(m_stdoutMode) {
+        case AppendOutput:
           command += " >> " + m_outputFile;
           break;
-        default: // OverWrite
+        default: // OverWriteOutput
           command += " > " + m_outputFile;
         }
     }
