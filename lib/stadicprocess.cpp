@@ -189,7 +189,7 @@ bool Process::setStandardInputFile(const std::string &fileName)
 #endif
 }
 
-bool Process::setStandardOutputFile(const std::string &fileName)
+bool Process::setStandardOutputFile(const std::string &fileName, OutputMode mode)
 {
 #ifdef USE_QT
     m_process.setStandardOutputFile(QString::fromStdString(fileName));
@@ -197,6 +197,7 @@ bool Process::setStandardOutputFile(const std::string &fileName)
 #else
     if(m_state == Initialized) {
         m_outputFile = fileName;
+        m_stdoutMode = mode;
         if(m_outputProcess) {
             m_outputProcess->m_inputProcess = nullptr;
             m_outputProcess = nullptr;
@@ -229,7 +230,13 @@ std::string Process::processCommandLine() const
         command += " < " + m_inputFile;
     }
     if(!m_outputFile.empty()) {
-        command += " > " + m_outputFile;
+        switch(m_stdoutMode) {
+        case AppendOutput:
+          command += " >> " + m_outputFile;
+          break;
+        default: // OverWriteOutput
+          command += " > " + m_outputFile;
+        }
     }
     if(!m_errorFile.empty()) {
         command += " 2> " + m_errorFile;

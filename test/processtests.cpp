@@ -138,6 +138,30 @@ TEST(ProcessTests, ProcessFileOutErr)
     UNLINK("error.txt");
 }
 
+TEST(ProcessTests, ProcessAppendFileOutErr)
+{
+  stadic::Process proc(PROGRAM);
+  proc.setStandardErrorFile("error.txt");
+  proc.setStandardOutputFile("output.txt");
+  proc.start();
+  ASSERT_TRUE(proc.wait());
+  std::string output = readFileToString("output.txt");
+  std::string error = readFileToString("error.txt");
+  EXPECT_EQ("This is the standard output", output);
+  EXPECT_EQ("This is the standard error", error);
+  stadic::Process proc2(PROGRAM);
+  proc2.setStandardErrorFile("error.txt");
+  proc2.setStandardOutputFile("output.txt", stadic::Process::AppendOutput);
+  proc2.start();
+  ASSERT_TRUE(proc2.wait());
+  output = readFileToString("output.txt");
+  error = readFileToString("error.txt");
+  EXPECT_EQ("This is the standard outputThis is the standard output", output);
+  EXPECT_EQ("This is the standard error", error);
+  UNLINK("output.txt");
+  UNLINK("error.txt");
+}
+
 /*
 TEST(ProcessTests, ProcessCaptureOutErr)
 {
