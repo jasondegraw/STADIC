@@ -31,7 +31,7 @@
 #include "dayill.h"
 #include "gtest/gtest.h"
 
-TEST(IlluminanceTests, ReadTimeBased)
+TEST(IlluminanceTests, ReadWriteTimeBased)
 {
 
   stadic::DaylightIlluminanceData testIll("lux");
@@ -52,6 +52,25 @@ TEST(IlluminanceTests, ReadTimeBased)
   EXPECT_EQ(testIll.illuminance()[23].lux()[9],0);
   EXPECT_EQ(testIll.illuminance()[17].lux().size(),10);
 
+  ASSERT_TRUE(testIll.writeIllFileLux("10PointsTestLux.ill"));
+  ASSERT_TRUE(testIll.writeIllFileFC("10PointsTestFC.ill"));
+  stadic::DaylightIlluminanceData testIllFC("fc");
+  ASSERT_TRUE(testIllFC.parseTimeBased("10PointsTestFC.ill"));
+  EXPECT_EQ(testIllFC.illuminance()[0].lux()[0],0);
+  EXPECT_EQ(testIllFC.illuminance()[0].lux()[9],0);
+  EXPECT_EQ(testIllFC.illuminance()[0].lux().size(),10);
+  EXPECT_NEAR(testIllFC.illuminance()[8].lux()[0],252,1);
+  EXPECT_NEAR(testIllFC.illuminance()[8].lux()[9],748,1);
+  EXPECT_EQ(testIllFC.illuminance()[8].lux().size(),10);
+  EXPECT_NEAR(testIllFC.illuminance()[16].lux()[0],118,1);
+  EXPECT_NEAR(testIllFC.illuminance()[16].lux()[9],103,1);
+  EXPECT_EQ(testIllFC.illuminance()[16].lux().size(),10);
+  EXPECT_EQ(testIllFC.illuminance()[17].lux()[0],0);
+  EXPECT_EQ(testIllFC.illuminance()[17].lux()[9],0);
+  EXPECT_EQ(testIllFC.illuminance()[17].lux().size(),10);
+  EXPECT_EQ(testIllFC.illuminance()[23].lux()[0],0);
+  EXPECT_EQ(testIllFC.illuminance()[23].lux()[9],0);
+  EXPECT_EQ(testIllFC.illuminance()[17].lux().size(),10);
 }
 /*
 TEST(SensorTests, ReadWriteNonTimeBased)
