@@ -185,7 +185,7 @@ bool DaylightIlluminanceData::parseTimeBased(std::string fileName){
         }
         std::vector<double> ill;
 
-        for (int i=3;i<vals.size()-3;i++){
+        for (int i=3;i<vals.size();i++){
             ill.push_back(atof(vals[i].c_str()));
         }
         if (m_Units=="fc"){

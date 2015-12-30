@@ -98,6 +98,16 @@ add_executable(processshadetests shadeprocesstest.cpp)
 add_test(processshadetests processshadetests)
 target_link_libraries(processshadetests stadic_core gtest gtest_main)
 
+add_executable(illuminancetests illuminancetests.cpp)
+add_test(illuminancetests illuminancetests)
+target_link_libraries(illuminancetests stadic_core gtest gtest_main)
+add_custom_command(TARGET illuminancetests POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_SOURCE_DIR}/test/resources/10PointsTimeBased.ill $<TARGET_FILE_DIR:illuminancetests>)
+add_custom_command(TARGET illuminancetests POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_SOURCE_DIR}/test/resources/10PointsNonTimeBased.ill $<TARGET_FILE_DIR:illuminancetests>)
+
 add_executable(testprogram testprogram.cpp)
 
 add_executable(gridtests gridtests.cpp)

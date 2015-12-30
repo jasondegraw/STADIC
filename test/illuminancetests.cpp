@@ -28,36 +28,38 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef ELECTRICLIGHT_H
-#define ELECTRICLIGHT_H
+#include "dayill.h"
+#include "gtest/gtest.h"
 
-#include "spacecontrol.h"
-#include "buildingcontrol.h"
-#include "spacecontrol.h"
-#include <vector>
-#include <string>
-#include "stadicapi.h"
-
-namespace stadic{
-
-class STADIC_API ElectricLight
+TEST(IlluminanceTests, ReadTimeBased)
 {
-public:
-    explicit ElectricLight(BuildingControl *model);
-    bool simElectricLight();
 
-//Setters
-
-
-private:
-    bool lum2Rad(ControlZone zone, std::string zoneRadFile, std::string iesFile, std::string units, std::string iesDirectory);
-    bool simZone(std::vector<std::string> radFiles, std::string ptsFile, std::string zoneIllFile);
-    int getLampLumens(std::string iesFile);
-    BuildingControl *m_Model;                                                               //Control object
-
-
-};
+  stadic::DaylightIlluminanceData testIll("lux");
+  ASSERT_TRUE(testIll.parseTimeBased("10PointsTimeBased.ill"));
+  EXPECT_EQ(testIll.illuminance()[0].lux()[0],0);
+  EXPECT_EQ(testIll.illuminance()[0].lux()[9],0);
+  EXPECT_EQ(testIll.illuminance()[0].lux().size(),10);
+  EXPECT_EQ(testIll.illuminance()[8].lux()[0],252);
+  EXPECT_EQ(testIll.illuminance()[8].lux()[9],748);
+  EXPECT_EQ(testIll.illuminance()[8].lux().size(),10);
+  EXPECT_EQ(testIll.illuminance()[16].lux()[0],118);
+  EXPECT_EQ(testIll.illuminance()[16].lux()[9],103);
+  EXPECT_EQ(testIll.illuminance()[16].lux().size(),10);
+  EXPECT_EQ(testIll.illuminance()[17].lux()[0],0);
+  EXPECT_EQ(testIll.illuminance()[17].lux()[9],0);
+  EXPECT_EQ(testIll.illuminance()[17].lux().size(),10);
+  EXPECT_EQ(testIll.illuminance()[23].lux()[0],0);
+  EXPECT_EQ(testIll.illuminance()[23].lux()[9],0);
+  EXPECT_EQ(testIll.illuminance()[17].lux().size(),10);
 
 }
+/*
+TEST(SensorTests, ReadWriteNonTimeBased)
+{
 
-#endif // ELECTRICLIGHT_H
+  stadic::Photosensor sensor;
+  ASSERT_TRUE(sensor.setType("cosine_squared"));
+  ASSERT_TRUE(sensor.writeSensorFile("cosineSquared.sen"));
+
+}
+*/
