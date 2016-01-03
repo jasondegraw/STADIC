@@ -75,10 +75,5 @@ TEST(IlluminanceTests, ReadWriteTimeBased)
 /*
 TEST(SensorTests, ReadWriteNonTimeBased)
 {
-
-  stadic::Photosensor sensor;
-  ASSERT_TRUE(sensor.setType("cosine_squared"));
-  ASSERT_TRUE(sensor.writeSensorFile("cosineSquared.sen"));
-
 }
 */

@@ -436,9 +436,11 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     }
     //Calculate ASE
     std::vector<int> countASE;
-    for (int i=0;i<baseDirectIlls[0].illuminance()[0].lux().size();i++){            //Loop over points
+    int numPoints=baseDirectIlls[0].illuminance()[0].lux().size();  //Added this to stop the multiple function calls.  This should increase speed.
+    int numHours=baseDirectIlls[0].illuminance().size();
+    for (int i=0;i<numPoints;i++){            //Loop over points
         countASE.push_back(0);
-        for (int j=0;j<baseDirectIlls[0].illuminance().size();j++){                 //Loop over hours in the year
+        for (int j=0;j<numHours;j++){                 //Loop over hours in the year
             if (baseDirectIlls[0].illuminance()[j].hour()>=model->sDAStart()&&baseDirectIlls[0].illuminance()[j].hour()<=model->sDAEnd()){
                 double tempIll=0;
                 for (int k=0;k<baseDirectIlls.size();k++){                          //Loop over window groups
@@ -451,7 +453,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
         }
     }
     int totalPoints=0;
-    for (int i=0;i<countASE.size();i++){
+    for (int i=0;i<numPoints;i++){
         if (countASE[i]>250){
             totalPoints++;
         }
@@ -475,7 +477,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
             shadeSchedule[i].push_back(0);
         }
     }
-    for (int i=0;i<baseDirectIlls[0].illuminance().size();i++){         //Loop through the number of hours in the year
+    for (int i=0;i<numHours;i++){         //Loop through the number of hours in the year
         bool allZeros=true;
         for (int p=0;p<model->windowGroups().size();p++){
             if (!baseDirectIlls[p].illuminance()[i].allZeros()){
@@ -517,7 +519,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
         STADIC_LOG(Severity::Error, "The opening of the file "+tempFileName+" has failed.");
         return false;
     }
-    for (int i=0;i<shadeSchedule.size();i++){
+    for (int i=0;i<numHours;i++){
         sDAShades<<toString(baseDirectIlls[0].illuminance()[i].month())<<" ";
         sDAShades<<toString(baseDirectIlls[0].illuminance()[i].day())<<" ";
         sDAShades<<toString(baseDirectIlls[0].illuminance()[i].hour());
@@ -539,20 +541,34 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     }
     DaylightIlluminanceData finalIlluminance(model->illumUnits());
     std::vector<double> finalTemporalIll;
-    for (int i=0;i<shadeSchedule.size();i++){               //Loop over the entire year
+    for (int i=0;i<numHours;i++){               //Loop over the entire year
         finalTemporalIll.clear();
-        for (int j=0;j<baseIlls[0].illuminance()[0].lux().size();j++){      //Set the illuminance vector to zero for all points
+        for (int j=0;j<numPoints;j++){      //Set the illuminance vector to zero for all points
             finalTemporalIll.push_back(0);
         }
         for (int j=0;j<shadeSchedule[i].size();j++){        //Loop over window groups
             if (shadeSchedule[i][j]){           //Shades Employed
+                int k=0;    //Added to keep the vector moving forward with the "auto-for"
+                for (auto &p : settingIlls[j].illuminance()[i].lux()){
+                    finalTemporalIll[k]=finalTemporalIll[k]+p;
+                    k++;
+                }
+                /*
                 for (int k=0;k<settingIlls[j].illuminance()[i].lux().size();k++){
                     finalTemporalIll[k]=finalTemporalIll[k] + settingIlls[j].illuminance()[i].lux()[k];
                 }
+                */
             }else{                              //Use base condition
+                int k=0;     //Added to keep the vector moving forward with the "auto-for"
+                for (auto &p : baseIlls[j].illuminance()[i].lux()){
+                    finalTemporalIll[k]=finalTemporalIll[k]+p;
+                    k++;
+                }
+                /*
                 for (int k=0;k<baseIlls[j].illuminance()[i].lux().size();k++){
                     finalTemporalIll[k]=finalTemporalIll[k] + baseIlls[j].illuminance()[i].lux()[k];
                 }
+                */
             }
         }
         TemporalIlluminance dataPoint(baseDirectIlls[0].illuminance()[i].month(), baseDirectIlls[0].illuminance()[i].day(), baseDirectIlls[0].illuminance()[i].hour(), finalTemporalIll);
@@ -563,6 +579,19 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     std::vector<int> sDACount;
     sDACount.resize(finalIlluminance.illuminance()[0].lux().size());
     if (model->illumUnits()=="lux"){
+        for (auto &v : finalIlluminance.illuminance()){
+            if (v.hour()>model->sDAStart()&& v.hour()<=model->sDAEnd()){
+                countHours++;
+                int j=0;
+                for (auto &p : v.lux()){
+                    if (p > model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                    j++;
+                }
+            }
+        }
+        /*
         for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
             if (finalIlluminance.illuminance()[i].hour()>=model->sDAStart()&&finalIlluminance.illuminance()[i].hour()<=model->sDAEnd()){
                 countHours++;
@@ -573,7 +602,21 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
                 }
             }
         }
+        */
     }else{
+        for (auto &v : finalIlluminance.illuminance()){
+            if (v.hour()>model->sDAStart()&& v.hour()<=model->sDAEnd()){
+                countHours++;
+                int j=0;
+                for (auto &p : v.fc()){
+                    if (p > model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                    j++;
+                }
+            }
+        }
+        /*
         for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
             if (finalIlluminance.illuminance()[i].hour()>=model->sDAStart()&&finalIlluminance.illuminance()[i].hour()<=model->sDAEnd()){
                 countHours++;
@@ -584,6 +627,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
                 }
             }
         }
+        */
     }
 
     finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_sDA.ill");
