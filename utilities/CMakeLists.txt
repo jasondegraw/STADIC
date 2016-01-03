@@ -29,3 +29,6 @@ target_link_libraries(dxmakesensor stadic_core)
 
 add_executable(dxprocessshade dxprocessshade.cpp)
 target_link_libraries(dxprocessshade stadic_core)
+
+add_executable(dxelectric dxelectric.cpp)
+target_link_libraries(dxelectric stadic_core)

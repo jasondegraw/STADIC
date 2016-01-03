@@ -185,9 +185,7 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
         if (i==0){
             xform.setStandardOutputFile(zoneRadFile);
         }else{
-            //I will need to append to the previous output file by some means of set standard output process append.
-            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            xform.setStandardOutputFile(zoneRadFile, Process::AppendOutput);
         }
 
         xform.start();
