@@ -814,9 +814,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             cnt.setStandardOutputProcess(&rcalc);
             rcalc.setStandardOutputFile(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_suns_m"+std::to_string(model->sunDivisions())+".rad");
             if (writeCL){
-                outCL<<"## Pipe the next two lines together."<<std::endl;
-                outCL<<cnt.commandLine()<<std::endl;
-                outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+                //outCL<<"## Pipe the next two lines together."<<std::endl;
+                outCL<<cnt.commandLine()<<std::endl<<std::endl;;
             }
             if (writeCL){
                 std::cout<<"***\nRunning cnt and rcalc for the suns.\n"<<cnt.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
@@ -1423,9 +1422,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         }
         rcollate.setStandardOutputFile(skyCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep.commandLine()<<std::endl;
-            outCL<<rcollate.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep.commandLine()<<std::endl<<std::endl;;
         }
         if (writeCL){
             std::cout<<"***\nRunning dctimestep and rcollate for the sky.\n"<<dctimestep.commandLine()<<"\n is piped to\n"<<rcollate.commandLine()<<"\n***"<<std::endl;
@@ -1456,12 +1454,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         dctimestep2.setStandardOutputProcess(&rcollate2);
         rcollate2.setStandardOutputFile(sunCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep2.commandLine()<<std::endl;
-            outCL<<rcollate2.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep2.commandLine()<<std::endl<<std::endl;;
         }
-        STADIC_LOG(Severity::Info, dctimestep2.commandLine());
-        STADIC_LOG(Severity::Info, rcollate2.commandLine());
         if (writeCL){
             std::cout<<"***\nRunning dctimestep and rcollate for the sun.\n"<<dctimestep2.commandLine()<<"\n is piped to\n"<<rcollate2.commandLine()<<"\n***"<<std::endl;
         }
@@ -1490,9 +1485,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         dctimestep3.setStandardOutputProcess(&rcollate3);
         rcollate3.setStandardOutputFile(sunPatchCollated);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep3.commandLine()<<std::endl;
-            outCL<<rcollate3.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<dctimestep3.commandLine()<<std::endl<<std::endl;;
         }
         if (writeCL){
             std::cout<<"***\nRunning dctimestep and rcollate for the sun patches.\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
@@ -1501,7 +1495,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcollate3.start();
 
         if(!rcollate3.wait()){
-            STADIC_ERROR("The running of rcollate for the sun patches has failed.");
+            STADIC_ERROR("The running of rcollate for the direct sun has failed.");
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
@@ -1536,9 +1530,8 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         rcalc.setStandardOutputFile(finalIll);
         if (writeCL){
-            outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<rlam.commandLine()<<std::endl;
-            outCL<<rcalc.commandLine()<<std::endl<<std::endl;;
+            //outCL<<"## Pipe the next two lines together"<<std::endl;
+            outCL<<rlam.commandLine()<<std::endl<<std::endl;;
         }
         if (writeCL){
             std::cout<<"***\nRunning rlam and rcalc.\n"<<rlam.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;

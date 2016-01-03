@@ -52,7 +52,7 @@ std::string readFileToString(const std::string &filename)
     string.erase(std::remove_if(string.begin(), string.end(), ::iscntrl), string.end());
     stream.close();
     return stadic::trim(string);
-    _unlink("");
+    UNLINK("");
 }
 
 TEST(ProcessTests, ProcessBadProgram)
@@ -97,8 +97,17 @@ TEST(ProcessTests, ProcessProgramArgs)
     stadic::Process proc("date", args);
     time_t result = time(NULL);
     struct tm *current = localtime(&result);
+    // This is an ugly hack, should be fixed
+    std::string monthPad = "";
+    std::string dayPad = "";
+    if(current->tm_mon < 9) {
+        monthPad = "0";
+    }
+    if(current->tm_mday < 10) {
+        dayPad = "0";
+    }
     std::string datestring = days[current->tm_wday] + " " + stadic::toString(current->tm_year+1900) + "-"
-            + stadic::toString(current->tm_mon+1) + "-" + stadic::toString(current->tm_mday);
+            + monthPad + stadic::toString(current->tm_mon+1) + "-" + dayPad + stadic::toString(current->tm_mday);
 #endif
     proc.setStandardOutputFile("output.txt");
     proc.start();
@@ -127,6 +136,30 @@ TEST(ProcessTests, ProcessFileOutErr)
     EXPECT_EQ("This is the standard error", error);
     UNLINK("output.txt");
     UNLINK("error.txt");
+}
+
+TEST(ProcessTests, ProcessAppendFileOutErr)
+{
+  stadic::Process proc(PROGRAM);
+  proc.setStandardErrorFile("error.txt");
+  proc.setStandardOutputFile("output.txt");
+  proc.start();
+  ASSERT_TRUE(proc.wait());
+  std::string output = readFileToString("output.txt");
+  std::string error = readFileToString("error.txt");
+  EXPECT_EQ("This is the standard output", output);
+  EXPECT_EQ("This is the standard error", error);
+  stadic::Process proc2(PROGRAM);
+  proc2.setStandardErrorFile("error.txt");
+  proc2.setStandardOutputFile("output.txt", stadic::Process::AppendOutput);
+  proc2.start();
+  ASSERT_TRUE(proc2.wait());
+  output = readFileToString("output.txt");
+  error = readFileToString("error.txt");
+  EXPECT_EQ("This is the standard outputThis is the standard output", output);
+  EXPECT_EQ("This is the standard error", error);
+  UNLINK("output.txt");
+  UNLINK("error.txt");
 }
 
 /*
@@ -170,6 +203,11 @@ TEST(ProcessTests, ProcessPipeBigOut)
     stadic::Process proc1(PROGRAM, args);
     proc0.setStandardOutputProcess(&proc1);
     proc1.setStandardOutputFile("output.txt");
+    //std::cout << proc0.commandLine() << std::endl;
+    //std::cout << proc1.commandLine() << std::endl;
+    std::string cmdLn = std::string(PROGRAM) + " -B | " + PROGRAM + " -d > output.txt";
+    EXPECT_EQ(cmdLn, proc0.commandLine());
+    EXPECT_EQ(cmdLn, proc1.commandLine());
     proc0.start();
     proc1.start();
     ASSERT_TRUE(proc0.wait());

@@ -78,21 +78,9 @@ bool Process::run()
     m_process.start();
 #else
     if(m_state == Initialized) {
-        std::string command;
-        Process *first = this;
-        if(m_inputProcess == nullptr && m_outputProcess == nullptr) { // This is the simple case
-            command = commandLine();
-        } else { // This is a pipeline situation, run everything
-            // Get to the first command
-            while(first->m_inputProcess) {
-                first = first->m_inputProcess;
-            }
-            command = first->commandLine();
-            Process *current = first->m_outputProcess;
-            while(current) {
-                command += " | " + current->commandLine();
-                current = current->m_outputProcess;
-            }
+        std::string command = commandLine();
+        if(command.empty()) {
+            return false;
         }
         // Run the command line
         int returnCode = system(command.c_str());
@@ -102,6 +90,11 @@ bool Process::run()
             m_state = RunFailed;
         }
         if(m_inputProcess || m_outputProcess) {
+            // Get to the first process
+            Process *first = this;
+            while(first->m_inputProcess) {
+                first = first->m_inputProcess;
+            }
             while(first) {
                 first->m_state = m_state;
                 first = first->m_outputProcess;
@@ -196,7 +189,7 @@ bool Process::setStandardInputFile(const std::string &fileName)
 #endif
 }
 
-bool Process::setStandardOutputFile(const std::string &fileName)
+bool Process::setStandardOutputFile(const std::string &fileName, OutputMode mode)
 {
 #ifdef USE_QT
     m_process.setStandardOutputFile(QString::fromStdString(fileName));
@@ -204,6 +197,7 @@ bool Process::setStandardOutputFile(const std::string &fileName)
 #else
     if(m_state == Initialized) {
         m_outputFile = fileName;
+        m_stdoutMode = mode;
         if(m_outputProcess) {
             m_outputProcess->m_inputProcess = nullptr;
             m_outputProcess = nullptr;
@@ -223,7 +217,7 @@ std::string Process::quote(const std::string &string)
 #endif
 }
 
-std::string Process::commandLine()
+std::string Process::processCommandLine() const
 {
 #ifdef USE_QT
     return std::string;
@@ -236,10 +230,41 @@ std::string Process::commandLine()
         command += " < " + m_inputFile;
     }
     if(!m_outputFile.empty()) {
-        command += " > " + m_outputFile;
+        switch(m_stdoutMode) {
+        case AppendOutput:
+          command += " >> " + m_outputFile;
+          break;
+        default: // OverWriteOutput
+          command += " > " + m_outputFile;
+        }
     }
     if(!m_errorFile.empty()) {
         command += " 2> " + m_errorFile;
+    }
+    return command;
+#endif
+}
+
+std::string Process::commandLine()
+{
+#ifdef USE_QT
+    return std::string;
+#else
+    std::string command;
+    Process *first = this;
+    if(m_inputProcess == nullptr && m_outputProcess == nullptr) { // This is the simple case
+        command = processCommandLine();
+    } else { // This is a pipeline situation, get everything
+        // Get to the first command
+        while(first->m_inputProcess) {
+            first = first->m_inputProcess;
+        }
+        command = first->processCommandLine();
+        Process *current = first->m_outputProcess;
+        while(current) {
+          command += " | " + current->processCommandLine();
+          current = current->m_outputProcess;
+        }
     }
     return command;
 #endif
