@@ -38,6 +38,7 @@
 void usage()
 {
     std::cerr << "Usage: dxgridmaker [OPTIONS]" << std::endl;
+    std::cerr << "Analysis point generator version " << VERSIONMAJOR << "." << VERSIONMINOR << "." << VERSIONPATCH << std::endl;
     std::cerr << stadic::wrapAtN("Generate a points file for use in Radiance analysis programs.  The program"
         " allows any number of polygons and any number of layer names to be used for the placement of points.  dxgridmaker"
         " joins all of the polygons and creates an array of points within the bounding rectangle and tests each"
@@ -67,10 +68,10 @@ void usage()
         72, 15, true) << std::endl;
     std::cerr << stadic::wrapAtN("-l name        Set the layer name that will be used to find the polygons for use in"
         " creating the analysis grid to name.  Multiple layer names can be used, but each one must have a -l preceding"
-        " it.  This is a mandatory option.", 72, 15, true) << std::endl;
+        " it.", 72, 15, true) << std::endl;
     std::cerr << stadic::wrapAtN("-r name        Set the output file to name.  This file contains a space separated file"
         " in the following format per line:   x y z xd yd zd.", 72, 15, true) << std::endl;
-    std::cerr << stadic::wrapAtN("-rz val\tSet the angle of rotation to val.  A positive value should be used when the"
+    std::cerr << stadic::wrapAtN("-rz val        Set the angle of rotation to val.  A positive value should be used when the"
         " building (or space) is rotated ccw.  Setting the rotation allows the points to be aligned with the space.", 72, 15, true) << std::endl;
     std::cerr << stadic::wrapAtN("-t dist        Set the threshold distance.  Should the polygons be too small after the"
         " offset, and the length as well as width of the polygon are less than the threshold, those polygons will be"
@@ -212,8 +213,7 @@ int main (int argc, char *argv[])
         geometryNamed=true;
     }
     if (geometryNamed==false){
-        STADIC_LOG(stadic::Severity::Fatal,"Geometry must be specified with either the -l or -i options.");
-        return EXIT_FAILURE;
+        STADIC_LOG(stadic::Severity::Warning,"All geometry will be used to generate points.");
     }
     grid.setSpaceX(sx);
     grid.setSpaceY(sy);
@@ -248,13 +248,11 @@ int main (int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-    /*
     if (!polyFile.empty()){
-        if (!grid.writeRadPoly(polyFile)){
+        if (!grid.writeUnitedRadPoly(polyFile)){
             return EXIT_FAILURE;
         }
     }
-    */
     if (!csvFile.empty()){
         if (!grid.writePTScsv(csvFile)){
             return EXIT_FAILURE;

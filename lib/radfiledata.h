@@ -55,6 +55,7 @@ public:
 
     bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
     bool addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
+    bool setPrimitives(const shared_vector<RadPrimitive> &primitives);  //!< Replace the contents of the primitives list
 
     //Getters
     shared_vector<RadPrimitive> geometry() const;                       //Function to get just the geometry primitives as a vector

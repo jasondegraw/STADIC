@@ -36,7 +36,6 @@
 #include <iostream>
 #ifdef _MSC_VER
 #include <Windows.h>
-#include <direct.h>
 #else //POSIX
 #include <sys/stat.h>
 #include <string.h>
@@ -44,6 +43,7 @@
 #endif
 
 #ifdef _WIN32
+#include <direct.h>
 #define PATHSEPARATOR '\\'
 #define MKDIR _mkdir
 #else //POSIX

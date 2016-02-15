@@ -47,7 +47,7 @@ class STADIC_API GridMaker
 {
 public:
     GridMaker(std::vector<std::string> fileList);                                       //Constructor that takes a list of radiance geometry files
-    GridMaker(std::string file);                                                        //Constructor that takes a single radiane geometry file
+    GridMaker(std::string file);                                                        //Constructor that takes a single radiance geometry file
     //Setters
     //Points
 
@@ -87,6 +87,7 @@ public:
     bool viewPTS(std::string location, std::string vType);                              //Function to render a bmp of the points file and the layers chosen for the grid
     bool viewPTS(std::string location, std::string vType, std::string name);            //Function to render a bmp of the points file with a given name
     bool calcArea();                                                                      //Function to obtain the area of the polygons within the space
+    bool writeUnitedRadPoly(std::string file);  //!< Write out the united polygons
 
 private:
     //Points
