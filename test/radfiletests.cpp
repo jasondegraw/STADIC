@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
- * Copyright (c) 2015, Jason W. DeGraw
+ * Copyright (c) 2015-2016, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -135,6 +135,46 @@ TEST(RadfileTests, SingleLine)
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
     ASSERT_EQ(6, radData.primitives().size());
+}
+
+TEST(RadfileTests, AddAndFind)
+{
+  stadic::RadFileData radData;
+  ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
+  ASSERT_EQ(6, radData.primitives().size());
+  stadic::RadPrimitive *black = new stadic::PlasticMaterial(0, 0, 0, 0, 0);
+  black->setModifier(stadic::RadPrimitive::sharedVoid());
+  black->setName("black");
+  radData.addPrimitive(black);
+  ASSERT_EQ(7, radData.primitives().size());
+  std::shared_ptr<stadic::RadPrimitive> found = nullptr;
+  for(auto poly : radData.geometry()) {
+    if(poly->name() == "l_wall") {
+      found = poly;
+      break;
+    }
+  }
+  ASSERT_EQ(nullptr, found);
+  for (auto matl : radData.materials()) {
+    if (matl->name() == "l_wall") {
+      found = matl;
+      break;
+    }
+  }
+  ASSERT_NE(nullptr, found);
+  found = nullptr;
+  for (auto matl : radData.materials()) {
+    if (matl->name() == "black") {
+      found = matl;
+      break;
+    }
+  }
+  ASSERT_NE(nullptr, found);
+}
+
+TEST(RadfileTests, Aliasing)
+{
+  ASSERT_TRUE(false);
 }
 
 bool isGlass(stadic::RadPrimitive* primitive)
