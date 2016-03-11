@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
- * Copyright (c) 2015, Jason W. DeGraw
+ * Copyright (c) 2015-2016, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -264,16 +264,16 @@ std::vector<double> RadFileData::surfaceNormal(const std::string &layer){
     return normalVector;
 }
 
-bool RadFileData::addPrimitive(RadPrimitive *primitive)
+std::shared_ptr<RadPrimitive> RadFileData::addPrimitive(RadPrimitive *primitive)
 {
     m_primitives.push_back(std::shared_ptr<RadPrimitive>(primitive));
-    return true;
+    return m_primitives.back();
 }
 
-bool RadFileData::addPrimitive(std::shared_ptr<RadPrimitive> primitive)
+std::shared_ptr<RadPrimitive> RadFileData::addPrimitive(std::shared_ptr<RadPrimitive> primitive)
 {
     m_primitives.push_back(primitive);
-    return true;
+    return primitive;
 }
 
 bool RadFileData::setPrimitives(const shared_vector<RadPrimitive> &primitives)

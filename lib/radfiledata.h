@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2014-2015, The Pennsylvania State University
- * Copyright (c) 2015, Jason W. DeGraw
+ * Copyright (c) 2015-2016, Jason W. DeGraw
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,8 +53,8 @@ public:
     bool writeRadFile(const std::string &file);                                //Function to write the rad file from the list of primitives
     std::vector<double> surfaceNormal(const std::string &layer);               //Function that returns the surface normal as a vector of doubles
 
-    bool addPrimitive(RadPrimitive *primitive);                         //Function to add a rad primitive to the list of primitives
-    bool addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
+    std::shared_ptr<RadPrimitive> addPrimitive(RadPrimitive *primitive);    //!< Add a rad primitive to the list of primitives
+    std::shared_ptr<RadPrimitive> addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
     bool setPrimitives(const shared_vector<RadPrimitive> &primitives);  //!< Replace the contents of the primitives list
 
     //Getters
