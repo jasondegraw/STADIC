@@ -172,6 +172,11 @@ TEST(RadfileTests, AddAndFind)
   ASSERT_NE(nullptr, found);
 }
 
+TEST(RadfileTests, Aliasing)
+{
+  ASSERT_TRUE(false);
+}
+
 bool isGlass(stadic::RadPrimitive* primitive)
 {
     return primitive->type() == stadic::RadPrimitive::Glass;
