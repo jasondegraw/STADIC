@@ -331,6 +331,12 @@ std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitiv
     return m_aliases;
 }
 
+bool RadFileData::setAliases(const std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> &aliases)
+{
+    m_aliases = aliases;
+    return true; // At some point there will need to be rule checking
+}
+
 std::shared_ptr<RadPrimitive> RadFileData::findPrimitive(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
 {
     for (auto primitive : m_primitives) {

@@ -69,6 +69,7 @@ public:
 
     // Aliasing
     bool setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier);
+    bool setAliases(const std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> &aliases);
 
     // Consistency
     bool isConsistent();
