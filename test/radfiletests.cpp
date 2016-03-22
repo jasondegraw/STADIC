@@ -139,42 +139,85 @@ TEST(RadfileTests, SingleLine)
 
 TEST(RadfileTests, AddAndFind)
 {
-  stadic::RadFileData radData;
-  ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
-  ASSERT_EQ(6, radData.primitives().size());
-  stadic::RadPrimitive *black = new stadic::PlasticMaterial(0, 0, 0, 0, 0);
-  black->setModifier(stadic::RadPrimitive::sharedVoid());
-  black->setName("black");
-  radData.addPrimitive(black);
-  ASSERT_EQ(7, radData.primitives().size());
-  std::shared_ptr<stadic::RadPrimitive> found = nullptr;
-  for(auto poly : radData.geometry()) {
-    if(poly->name() == "l_wall") {
-      found = poly;
-      break;
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
+    ASSERT_EQ(6, radData.primitives().size());
+    stadic::RadPrimitive *black = new stadic::PlasticMaterial(0, 0, 0, 0, 0);
+    black->setModifier(stadic::RadPrimitive::sharedVoid());
+    black->setName("black");
+    radData.addPrimitive(black);
+    ASSERT_EQ(7, radData.primitives().size());
+    std::shared_ptr<stadic::RadPrimitive> found = nullptr;
+    for (auto poly : radData.geometry()) {
+        if (poly->name() == "l_wall") {
+            found = poly;
+            break;
+        }
     }
-  }
-  ASSERT_EQ(nullptr, found);
-  for (auto matl : radData.materials()) {
-    if (matl->name() == "l_wall") {
-      found = matl;
-      break;
+    ASSERT_EQ(nullptr, found);
+    std::shared_ptr<stadic::RadPrimitive> foundf = radData.findGeometry([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "l_wall"; });
+    ASSERT_EQ(nullptr, foundf);
+    for (auto matl : radData.materials()) {
+        if (matl->name() == "l_wall") {
+            found = matl;
+            break;
+        }
     }
-  }
-  ASSERT_NE(nullptr, found);
-  found = nullptr;
-  for (auto matl : radData.materials()) {
-    if (matl->name() == "black") {
-      found = matl;
-      break;
+    ASSERT_NE(nullptr, found);
+    foundf = radData.findPrimitive([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "l_wall"; });
+    ASSERT_EQ(found, foundf);
+    found = nullptr;
+    for (auto matl : radData.materials()) {
+        if (matl->name() == "black") {
+            found = matl;
+            break;
+        }
     }
-  }
-  ASSERT_NE(nullptr, found);
+    ASSERT_NE(nullptr, found);
+    foundf = radData.findMaterial([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "black"; });
+    ASSERT_EQ(found, foundf);
 }
 
 TEST(RadfileTests, Aliasing)
 {
-  ASSERT_TRUE(false);
+    // Set up the first set of data
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("materialsingleline.rad"));
+    ASSERT_EQ(6, radData.primitives().size());
+    stadic::RadPrimitive *black = new stadic::PlasticMaterial(0, 0, 0, 0, 0);
+    black->setModifier(stadic::RadPrimitive::sharedVoid());
+    black->setName("black");
+    std::shared_ptr<stadic::RadPrimitive> blackMaterial = radData.addPrimitive(black);
+    ASSERT_NE(nullptr, blackMaterial);
+    ASSERT_EQ(7, radData.primitives().size());
+    ASSERT_TRUE(radData.addRad("simple.rad"));
+    ASSERT_EQ(43, radData.primitives().size());
+    std::shared_ptr<stadic::RadPrimitive> windowMaterial;
+    windowMaterial = radData.findPrimitive([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "l_window"; });
+    ASSERT_NE(nullptr, windowMaterial);
+    ASSERT_TRUE(radData.setAlias(blackMaterial, windowMaterial));
+    ASSERT_EQ(1, radData.aliases().size());
+
+    // Copy the first set, then make additional changes
+    stadic::RadFileData otherRad = radData;
+    ASSERT_EQ(43, otherRad.primitives().size());
+    ASSERT_EQ(1, otherRad.aliases().size());
+    stadic::RadPrimitive *white = new stadic::PlasticMaterial(1, 1, 1, 0, 0);
+    white->setModifier(stadic::RadPrimitive::sharedVoid());
+    white->setName("white");
+    std::shared_ptr<stadic::RadPrimitive> whiteMaterial = otherRad.addPrimitive(white);
+    ASSERT_NE(nullptr, whiteMaterial);
+    std::shared_ptr<stadic::RadPrimitive> groundMaterial;
+    groundMaterial = radData.findPrimitive([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "l_ground"; });
+    ASSERT_NE(nullptr, groundMaterial);
+    ASSERT_TRUE(otherRad.setAlias(whiteMaterial, groundMaterial));
+    ASSERT_EQ(2, otherRad.aliases().size());
+
+    // Final size checks
+    EXPECT_EQ(43, radData.primitives().size());
+    EXPECT_EQ(1, radData.aliases().size());
+    EXPECT_EQ(44, otherRad.primitives().size());
+    ASSERT_EQ(2, otherRad.aliases().size());
 }
 
 bool isGlass(stadic::RadPrimitive* primitive)

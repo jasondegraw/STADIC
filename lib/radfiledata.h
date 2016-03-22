@@ -57,10 +57,15 @@ public:
     std::shared_ptr<RadPrimitive> addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
     bool setPrimitives(const shared_vector<RadPrimitive> &primitives);  //!< Replace the contents of the primitives list
 
+    std::shared_ptr<RadPrimitive> findPrimitive(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const;    //!< Find a particular primitive
+    std::shared_ptr<RadPrimitive> findMaterial(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const;    //!< Find a particular material
+    std::shared_ptr<RadPrimitive> findGeometry(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const;    //!< Find a particular geometry
+
     //Getters
-    shared_vector<RadPrimitive> geometry() const;                       //Function to get just the geometry primitives as a vector
-    shared_vector<RadPrimitive> materials() const;                      //Function to get just the material primitives as a vector
-    shared_vector<RadPrimitive> primitives() const;                     //Function that returns all of the primitives as a vector
+    shared_vector<RadPrimitive> geometry() const;  //!< Returns all geometry primitives as a vector
+    shared_vector<RadPrimitive> materials() const;  //!< Returns all material primitives as a vector
+    shared_vector<RadPrimitive> primitives() const;  //!< Returns all of the primitives as a vector
+    std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> aliases() const;  //!< Returns all of the aliases as a vector of pairs
 
     // Aliasing
     bool setAlias(std::shared_ptr<RadPrimitive> newModifier, std::shared_ptr<RadPrimitive> oldModifier);

@@ -326,4 +326,43 @@ bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> oldModifier, std::share
     return true; // At some point there will need to be rule checking
 }
 
+std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> RadFileData::aliases() const
+{
+    return m_aliases;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findPrimitive(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (predicate(primitive)) {
+            return primitive;
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findMaterial(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (primitive->isMaterial()) {
+            if (predicate(primitive)) {
+                return primitive;
+            }
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findGeometry(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (primitive->isGeometry()) {
+            if (predicate(primitive)) {
+                return primitive;
+            }
+        }
+    }
+    return nullptr;
+}
+
 }
