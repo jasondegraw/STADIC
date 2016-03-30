@@ -213,6 +213,12 @@ TEST(RadfileTests, Aliasing)
     ASSERT_TRUE(otherRad.setAlias(whiteMaterial, groundMaterial));
     ASSERT_EQ(2, otherRad.aliases().size());
 
+    // Try to add an alias that isn't in the rad file
+    std::shared_ptr<stadic::RadPrimitive> whiteMat = std::shared_ptr<stadic::RadPrimitive>(new stadic::PlasticMaterial(1, 1, 1, 0, 0));
+    whiteMat->setModifier(stadic::RadPrimitive::sharedVoid());
+    whiteMat->setName("white");
+    ASSERT_FALSE(otherRad.setAlias(whiteMat, groundMaterial));
+
     // Final size checks
     EXPECT_EQ(43, radData.primitives().size());
     EXPECT_EQ(1, radData.aliases().size());
@@ -235,44 +241,13 @@ bool nameStartsWith(stadic::RadPrimitive* primitive, const std::string &name)
 
 TEST(RadFileTests, SplitRadFile)
 {
-    // All of the split stuff needs to be reworked, so this test will fail until that happens
-    /*
-  stadic::RadFileData radData;
-  ASSERT_TRUE(radData.addRad("Simple.rad"));
-  ASSERT_EQ(36, radData.primitives().size());
-  ASSERT_EQ(36, radData.geometry().size());
-  ASSERT_EQ(0, radData.materials().size());
-  ASSERT_TRUE(radData.addRad("material.rad"));
-  //Testing to ensure all of the primitives are read in
-  ASSERT_EQ(42, radData.primitives().size());
-  ASSERT_EQ(36, radData.geometry().size());
-  ASSERT_EQ(6, radData.materials().size());
-  // Split based on whether the type is glass or not
-  QPair<stadic::RadFileData*, stadic::RadFileData*> splitGlass = radData.split(isGlass);
-  ASSERT_EQ(42, radData.primitives().size());
-  ASSERT_NE(nullptr, splitGlass.first);
-  ASSERT_NE(nullptr, splitGlass.second);
-  ASSERT_EQ(1, splitGlass.first->primitives().size());
-  ASSERT_EQ(41, splitGlass.second->primitives().size());
-  // Split based on what the name starts with
-  QPair<stadic::RadFileData*, stadic::RadFileData*> splitName = radData.split(nameStartsWith,QString("l_wa"));
-  ASSERT_EQ(42, radData.primitives().size());
-  ASSERT_NE(nullptr, splitName.first);
-  ASSERT_NE(nullptr, splitName.second);
-  ASSERT_EQ(17, splitName.first->primitives().size());
-  ASSERT_EQ(25, splitName.second->primitives().size());
-  // Split based on layer names
-  std::vector<QString> names;
-  names.push_back("l_ceiling");
-  names.push_back("l_floor");
-  QPair<stadic::RadFileData*, stadic::RadFileData*> splitLayers = radData.split(names);
-  ASSERT_EQ(42, radData.primitives().size());
-  ASSERT_NE(nullptr, splitLayers.first);
-  ASSERT_NE(nullptr, splitLayers.second);
-  ASSERT_EQ(4, splitLayers.first->primitives().size());
-  ASSERT_EQ(38, splitLayers.second->primitives().size());
-  */
-    ASSERT_TRUE(false);
+    std::vector<std::string> names = { "l_window" };
+    stadic::RadFileData radData;
+    ASSERT_TRUE(radData.addRad("simple.rad"));
+    EXPECT_EQ(36, radData.primitives().size());
+    std::pair<shared_vector<stadic::RadPrimitive>, shared_vector<stadic::RadPrimitive> > split = radData.split(names);
+    EXPECT_EQ(2, split.first.size());
+    EXPECT_EQ(34, split.second.size());
 }
 
 TEST(RadFileTests, ParseComplicatedRadFile)
@@ -405,6 +380,4 @@ TEST(RadFileTests, ParseInconsistentRadFile)
     stadic::RadFileData radData;
     ASSERT_TRUE(radData.addRad("simple.rad"));
     ASSERT_FALSE(radData.isConsistent());
-    //ASSERT_FALSE(radData.buildModifierTree());
-    //ASSERT_FALSE(radData.isConsistent());
 }

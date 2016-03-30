@@ -76,10 +76,7 @@ public:
     bool buildModifierTree();
 
     template<class T> shared_vector<T> getPrimitives();
-    // Splitting is officially broken
-    //QPair<RadFileData *, RadFileData *> split(bool (*f)(RadPrimitive*));
-    //template <class T> QPair<RadFileData*, RadFileData*> split(bool(*f)(RadPrimitive*, const T&), const T &label);
-    // This one is the one that is most critical, but it needs to be redone
+    // This one is the one that is most critical, but it needs to be redone or possibly removed
     std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
 
 private:
@@ -99,30 +96,6 @@ template<class T> shared_vector<T> RadFileData::getPrimitives()
     }
     return primitives;
 }
-
-/*
-template <class T> QPair<RadFileData*, RadFileData*> RadFileData::split(bool(*f)(RadPrimitive*, const T&), const T &label)
-{
-    std::vector<RadPrimitive*> in, out;
-    for (RadPrimitive *primitive : m_Primitives) {
-        if (f(primitive, label)) {
-          in.push_back(primitive);
-        } else {
-            out.push_back(primitive);
-        }
-    }
-    // Account for 0 size vectors
-    RadFileData *first = nullptr;
-    RadFileData *second = nullptr;
-    if (in.size() > 0) {
-      first = new RadFileData(in, this->parent());
-    }
-    if (out.size() > 0) {
-      second = new RadFileData(out, this->parent());
-    }
-    return QPair<RadFileData*, RadFileData*>(first, second);
-}
-*/
 
 }
 
