@@ -132,59 +132,6 @@ std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileDat
     return std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive>>(in, out);
 }
 
-/*
-static bool checkLayer(RadPrimitive *primitive, const QString &name)
-{
-    if(primitive->isMaterial() && primitive->name() == name) {
-        return true;
-    } else if(primitive->isGeometry() && primitive->modifier() == name) {
-        return true;
-    }
-    return false;
-}
-
-static bool checkLayers(RadPrimitive *primitive, const std::vector<QString> &names)
-{
-    for (int i=0;i<names.size();i++){
-        if(primitive->isMaterial() && primitive->name() == names[i]) {
-            return true;
-        } else if(primitive->isGeometry() && primitive->modifier() == names[i]) {
-            return true;
-        }
-    }
-    return false;
-}
-*/
-/*
-bool RadFileData::removeLayer(const QString &layer, const QString &removing, const QString &rest)
-{
-    QFile oFile1;
-    oFile1.setFileName(removing);
-    oFile1.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile1.exists()){
-        STADIC_ERROR("The opening of the rad file named " + removing +" has failed.");
-        return false;
-    }
-
-    QFile oFile2;
-    oFile2.setFileName(rest);
-    oFile2.open(QIODevice::WriteOnly | QIODevice::Text);
-    if (!oFile2.exists()){
-        STADIC_ERROR("The opening of the rad file named " + rest +" has failed.");
-        return false;
-    }
-
-    //QPair<RadFileData*,RadFileData*> results = split(checkLayer,layer);
-
-    // Write out the two files
-
-    oFile1.close();
-    oFile2.close();
-
-    return false;
-}
-*/
-
 bool RadFileData::writeRadFile(const std::string &file)
 {
     std::ofstream oFile;
@@ -322,8 +269,69 @@ bool RadFileData::buildModifierTree()
 
 bool RadFileData::setAlias(std::shared_ptr<RadPrimitive> oldModifier, std::shared_ptr<RadPrimitive> newModifier)
 {
+    shared_vector<RadPrimitive> mats = materials();
+    if (std::find(mats.begin(), mats.end(), oldModifier) == mats.end()) {
+        return false; // Bail out, oldModifier is not in this file
+    }
+    if (std::find(mats.begin(), mats.end(), newModifier) == mats.end()) {
+        return false; // Bail out, newModifier is not in this file
+    }
     m_aliases.push_back(std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>(oldModifier, newModifier));
-    return true; // At some point there will need to be rule checking
+    return true;
+}
+
+std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> RadFileData::aliases() const
+{
+    return m_aliases;
+}
+
+bool RadFileData::setAliases(const std::vector<std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> &aliases)
+{
+    shared_vector<RadPrimitive> mats = materials();
+    for (auto pair : aliases) {
+        if (std::find(mats.begin(), mats.end(), pair.first) == mats.end()) {
+            return false; // Bail out, oldModifier is not in this file
+        }
+        if (std::find(mats.begin(), mats.end(), pair.second) == mats.end()) {
+            return false; // Bail out, newModifier is not in this file
+        }
+    }
+    m_aliases = aliases;
+    return true;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findPrimitive(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (predicate(primitive)) {
+            return primitive;
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findMaterial(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (primitive->isMaterial()) {
+            if (predicate(primitive)) {
+                return primitive;
+            }
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<RadPrimitive> RadFileData::findGeometry(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const
+{
+    for (auto primitive : m_primitives) {
+        if (primitive->isGeometry()) {
+            if (predicate(primitive)) {
+                return primitive;
+            }
+        }
+    }
+    return nullptr;
 }
 
 }
