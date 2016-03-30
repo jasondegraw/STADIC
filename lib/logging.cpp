@@ -49,6 +49,11 @@ void STADIC_LOG(stadic::Severity severity, std::string mesg)
 {
     std::string string;
     switch(severity) {
+    case stadic::Severity::Debug: // Not an error, write out information
+        // We should change this so it only writes out for debug builds
+        string = "DEBUG: " + mesg;
+        std::cerr << string << std::endl;
+        break;
     case stadic::Severity::Info: // Not an error, write out information
         string = "INFO: "+mesg;
         std::cerr << string << std::endl;
