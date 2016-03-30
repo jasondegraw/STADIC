@@ -108,6 +108,23 @@ QPair<RadFileData*,RadFileData*> RadFileData::split(bool (*f)(RadPrimitive*))
 }
 */
 
+std::shared_ptr<RadPrimitive> RadFileData::glazingsearch(std::string name)
+
+{
+	//shared_vector<RadPrimitive> in, out;
+	std::shared_ptr<RadPrimitive> foundglazinglayer = nullptr;
+	for (std::shared_ptr<RadPrimitive> primitive : m_primitives) {
+		if (primitive->isMaterial()) {
+			if (primitive->name() == name)
+			{
+				foundglazinglayer = primitive;
+				return foundglazinglayer;
+			}
+		}
+	}
+	return foundglazinglayer;
+}
+
 std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> >  RadFileData::split(const std::vector<std::string> &vector)
 {
 	shared_vector<RadPrimitive> in, out;

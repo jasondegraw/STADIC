@@ -139,6 +139,20 @@ std::string WeatherData::elevation() const
     return m_Elevation;
 }
 
+std::vector<double> WeatherData::getProfileAngles(double elevationAzimuth){
+    std::vector<double> profileAngles;
+    for (int i=0;i<m_Month.size();i++){
+        if (m_SolarAlt[i]>0){
+            profileAngles.push_back(180-atan2(tan(m_SolarAlt[i]),cos(m_SolarAz[i]-elevationAzimuth*PI/180.))*180/PI);
+			// xxx = 100+int(elevationAzimuth);
+			//profileAngles.push_back(xxx);
+
+        }else{
+            profileAngles.push_back(-1);
+        }
+    }
+    return profileAngles;
+}
 
 //Utilities
 bool WeatherData::parseWeather(std::string file)
