@@ -100,8 +100,9 @@ double TemporalIlluminance::fractionAboveTarget(double target){
     return tempFrac/m_Illuminance.size();
 }
 
-DaylightIlluminanceData::DaylightIlluminanceData()
+DaylightIlluminanceData::DaylightIlluminanceData(std::string units)
 {
+    m_Units=units;
 }
 
 
@@ -127,6 +128,11 @@ bool DaylightIlluminanceData::parse(std::string fileName, std::string weaFile){
         if (firstPoint){
             std::vector<double> tmpIll;
             tmpIll.push_back(toDouble(line));
+            if (m_Units=="fc"){
+                for (int i=0;i<tmpIll.size();i++){
+                    tmpIll[i]=tmpIll[i]*10.764;
+                }
+            }
             illData.push_back(tmpIll);
         }else{
             illData[countHours-1].push_back(toDouble(line));
@@ -179,10 +185,14 @@ bool DaylightIlluminanceData::parseTimeBased(std::string fileName){
         }
         std::vector<double> ill;
 
-        for (int i=3;i<vals.size()-3;i++){
+        for (int i=3;i<vals.size();i++){
             ill.push_back(atof(vals[i].c_str()));
         }
-
+        if (m_Units=="fc"){
+            for (int i=0;i<ill.size();i++){
+                ill[i]=ill[i]*10.764;
+            }
+        }
         TemporalIlluminance datapoint(month,day,hour,ill);
         m_data.push_back(datapoint);
     }
@@ -209,6 +219,11 @@ bool DaylightIlluminanceData::addIllFile(std::string fileName){
         for (int j=0;j<vals.size();j++){
             ill.push_back(atof(vals[j].c_str()));
         }
+        if (m_Units=="fc"){
+            for (int i=0;i<ill.size();i++){
+                ill[i]=ill[i]*10.764;
+            }
+        }
         m_data[i].add(ill);
         i++;
     }
@@ -234,6 +249,11 @@ bool DaylightIlluminanceData::addTimeBasedIll(std::string fileName){
 
         for (int j=3;j<vals.size();j++){
             ill.push_back(atof(vals[j].c_str()));
+        }
+        if (m_Units=="fc"){
+            for (int i=0;i<ill.size();i++){
+                ill[i]=ill[i]*10.764;
+            }
         }
         m_data[i].add(ill);
         i++;
