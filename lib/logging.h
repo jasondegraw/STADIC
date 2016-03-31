@@ -36,7 +36,7 @@
 #include "stadicapi.h"
 
 namespace stadic {
-enum class Severity {Info, Warning, Error, Fatal};
+enum class Severity {Debug, Info, Warning, Error, Fatal};
 }
 
 void STADIC_API STADIC_ERROR(std::string mesg);
