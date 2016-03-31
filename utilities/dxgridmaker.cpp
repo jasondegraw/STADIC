@@ -39,7 +39,7 @@
 void usage()
 {
     std::cerr << "Usage: dxgridmaker [OPTIONS]" << std::endl;
-   // std::cerr << "Analysis point generator version " << VERSIONMAJOR << "." << VERSIONMINOR << "." << VERSIONPATCH << std::endl;
+   std::cerr << "Analysis point generator version " << VERSIONMAJOR << "." << VERSIONMINOR << "." << VERSIONPATCH << std::endl;
     std::cerr << stadic::wrapAtN("Generate a points file for use in Radiance analysis programs.  The program"
         " allows any number of polygons and any number of layer names to be used for the placement of points.  dxgridmaker"
         " joins all of the polygons and creates an array of points within the bounding rectangle and tests each"
