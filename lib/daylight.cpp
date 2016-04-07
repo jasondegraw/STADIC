@@ -46,7 +46,7 @@ Daylight::Daylight(BuildingControl *model) :
     m_Model(model)
 {
 }
-
+ 
 bool Daylight::simDaylight()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
@@ -2486,14 +2486,16 @@ for(auto materil : Rad->materials()) {
 
                 for (int k=0;k<model->windowGroups()[j].glazingLayers().size();k++){ 
 					//std::shared_ptr<RadPrimitive> RadFileData::glazingsearch( std::string name);
-					auto materialaddress = radModel.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+					auto materialaddress = radModel.findMaterial([](std::shared_ptr<stadic::RadPrimitive> p)ret{urn p->name() == wgRadModel; })
+						//radModel.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
 
-					STADIC_LOG(Severity::Info, "SET ALIAS IS NEXT" + layers1[0]);
 
-					wgRadModel->setAlias(materialaddress, found);
+					//STADIC_LOG(Severity::Info, "SET ALIAS IS NEXT" + layers1[0]);
+
+					bool aliasCheck->setAlias(materialaddress, found);
 						//wgRadModel->setAlias(found, found);
-	std::string xsx = toString(wgRadModel->m_aliases.size()); 
-	STADIC_LOG(Severity::Warning, "after SETTING++"+xsx);
+	//std::string xsx = toString(wgRadModel->m_aliases.size()); 
+	//STADIC_LOG(Severity::Warning, "after SETTING++"+xsx);
 					                    //if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
                     //    return false;
                     //}
