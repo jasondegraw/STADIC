@@ -1611,7 +1611,7 @@ bool Daylight::simCase1(int blindGroupNum, Control *model)
     //NOTE that blindGroupNum is really a window group number *******
     STADIC_LOG(Severity::Warning, "FIRST POINT");
 
-    RadFileData baseRad = m_RadFiles[blindGroupNum]->primitives();
+    RadFileData baseRad(m_RadFiles[blindGroupNum]->primitives());
     //baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
     //baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
 
@@ -1678,7 +1678,7 @@ bool Daylight::simCase1(int blindGroupNum, Control *model)
         for (unsigned int i = 0; i < model->windowGroups()[blindGroupNum].shadeSettingGeometry().size(); i++) {
             STADIC_LOG(Severity::Warning, "1 POINT");
 
-            RadFileData wgRad = m_RadFiles[blindGroupNum]->primitives();
+            RadFileData wgRad(m_RadFiles[blindGroupNum]->primitives());
             //RadFileData wgRad;
             STADIC_LOG(Severity::Warning, "2 POINT");
 
@@ -1687,8 +1687,12 @@ bool Daylight::simCase1(int blindGroupNum, Control *model)
             //new RadFileData(m_RadFiles[blindGroupNum]->primitives());
             //black->setModifier(RadPrimitive::sharedVoid());
             //black->setName("black");
-
-            auto found1 = wgRad.addPrimitive(black);
+            
+            // Without the added logic here, the "black" material was being added twice
+            std::shared_ptr<stadic::RadPrimitive> found1 = wgRad.findMaterial([](std::shared_ptr<stadic::RadPrimitive> p){return p->name() == "black"; });
+            if (found1 == nullptr) {
+                found1 = wgRad.addPrimitive(black);
+            }
             STADIC_LOG(Severity::Warning, "3 POINT");
 
             wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());

@@ -172,10 +172,6 @@ bool RadFileData::writeRadFile(const std::string &file)
         }
     }
 
-	int asize = m_aliases.size();
-std::string asiz = toString(asize);
-	STADIC_LOG(Severity::Warning, "The alias size is " + asiz);
-
     // Write out the aliases - I'm not sure this is actually correct
     if(m_aliases.size()) {
         oFile << "## Aliases" << std::endl;
