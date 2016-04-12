@@ -78,7 +78,7 @@ public:
 
 private:
     bool parseEPW(std::string file);                        //Function to parse an EPW file
-    bool parseTMY(std::string file);                        //Function to pase a TMY file
+    bool parseTMY(std::string file);                        //Function to parse a TMY file
     bool calcDirectIll();                                   //Function to calculate the direct illuminance
     void setSolarPositions();                               //Function to set the solar positions
     double solarDec(int julianDate);                        //Function to calculate the solar declination angle
@@ -93,27 +93,27 @@ private:
     int skyBin(double epsilon);                             //Function to determine which bin epsilon fits into
     std::vector<double> directLumEff(double epsilon);       //Function that returns a vector of direct luminous efficiency multipliers
 
-    std::vector<int> m_Month;                               //Vector holding the month per interval
-    std::vector<int> m_Day;                                 //Vector holding the day per interval
-    std::vector<double> m_Hour;                             //Vector holding the hour per interval
-    std::vector<int> m_JulianDate;                          //Vector holding the julian date per interval
-    std::vector<std::string> m_DirectNormal;                //Vector holding the direct normal as a string per interval
-    std::vector<double> m_DirectIlluminance;                //Vector holding the direct illuminance as a double per interval
-    std::vector<std::string> m_DiffuseHorizontal;           //Vector holding the diffuse horizontal as a string per interval
-    std::vector<double> m_DewPointC;                        //Vector holding the dewpoint as a double per interval
-    std::vector<double> m_SolarDec;                         //Vector holding the solar declination angle as a double per interval
-    std::vector<double> m_SolarTimeAdj;                     //Vector holding the solar time adjustment as a double per interval
-    std::vector<double> m_SolarAlt;                         //Vector holding the solar altitude angle as a double per interval
-    std::vector<double> m_SolarAz;                          //Vector holding the solar azimuth angle as a double per interval
-    std::vector<double> m_SolarZenAng;                      //Vector holding the solar zenith angle as a double per interval
-    std::vector<double> m_Epsilon;                          //Vector holding the Sky's cleaness as a double per interval
-    std::vector<double> m_Delta;                            //Vector holding the Sky's brightness as a double per interval
+    std::vector<int> m_month;                               //Vector holding the month per interval
+    std::vector<int> m_day;                                 //Vector holding the day per interval
+    std::vector<double> m_hour;                             //Vector holding the hour per interval
+    std::vector<int> m_julianDate;                          //Vector holding the julian date per interval
+    std::vector<std::string> m_directNormal;                //Vector holding the direct normal as a string per interval
+    std::vector<double> m_directIlluminance;                //Vector holding the direct illuminance as a double per interval
+    std::vector<std::string> m_diffuseHorizontal;           //Vector holding the diffuse horizontal as a string per interval
+    std::vector<double> m_dewPointC;                        //Vector holding the dewpoint as a double per interval
+    std::vector<double> m_solarDec;                         //Vector holding the solar declination angle as a double per interval
+    std::vector<double> m_solarTimeAdj;                     //Vector holding the solar time adjustment as a double per interval
+    std::vector<double> m_solarAlt;                         //Vector holding the solar altitude angle as a double per interval
+    std::vector<double> m_solarAz;                          //Vector holding the solar azimuth angle as a double per interval
+    std::vector<double> m_solarZenAng;                      //Vector holding the solar zenith angle as a double per interval
+    std::vector<double> m_epsilon;                          //Vector holding the Sky's cleaness as a double per interval
+    std::vector<double> m_delta;                            //Vector holding the Sky's brightness as a double per interval
     std::vector<double> m_APWC;                             //Vector holding the Atmospheric preciptiable water content as a double per interval
-    std::string m_Place;                                    //Variable holding the place as a string
-    std::string m_Latitude;                                 //Variable holding the latitude as a string
-    std::string m_Longitude;                                //Variable holding the longitude as a string
-    std::string m_TimeZone;                                 //Variable holding the timezone as a string
-    std::string m_Elevation;                                //Variable holding the elevation as a string
+    std::string m_place;                                    //Variable holding the place as a string
+    std::string m_latitude;                                 //Variable holding the latitude as a string
+    std::string m_longitude;                                //Variable holding the longitude as a string
+    std::string m_timeZone;                                 //Variable holding the timezone as a string
+    std::string m_elevation;                                //Variable holding the elevation as a string
 
 };
 

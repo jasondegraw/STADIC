@@ -1605,157 +1605,150 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     return true;
 }
 
-bool Daylight::simCase1(int blindGroupNum, Control *model){
+bool Daylight::simCase1(int blindGroupNum, Control *model)
+{
     // Passing an integer blind group number is very, very dangerous
-    //Simulation Case 1 will be for window groups that do not contain BSDFs
-    //First simulate the base condition
-    // This is not making a copy *and* it is a memory leak.
+    //NOTE that blindGroupNum is really a window group number *******
+    STADIC_LOG(Severity::Warning, "FIRST POINT");
 
-	//NOTE that blindGroupNum is really a window group number *******
-	STADIC_LOG(Severity::Warning, "FIRST POINT");
+    RadFileData baseRad = m_RadFiles[blindGroupNum]->primitives();
+    //baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
+    //baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
 
-	RadFileData baseRad = m_RadFiles[blindGroupNum]->primitives();
-		//RadFileData  baseRad;
-		//new RadFileData
-		//(m_RadFiles[blindGroupNum]->primitives());    //This used to be (m_RadFiles[i],this), but the program failed to build
-		//baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
-		//baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
+    RadPrimitive *black = new PlasticMaterial(0, 0, 0, 0, 0);
+    black->setModifier(RadPrimitive::sharedVoid());
+    black->setName("black");
+    auto found = baseRad.addPrimitive(black);
+    std::string outFileName;
 
-		RadPrimitive *black = new PlasticMaterial(0, 0, 0, 0, 0);
-		black->setModifier(RadPrimitive::sharedVoid());
-		black->setName("black");
-		auto found = baseRad.addPrimitive(black);
-		std::string outFileName;
-		
-		baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
-		STADIC_LOG(Severity::Warning, "SECOND POINT");
+    baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
+    STADIC_LOG(Severity::Warning, "SECOND POINT");
 
-		for (int j = 0; j < model->windowGroups().size(); j++){
+    for (int j = 0; j < model->windowGroups().size(); j++) {
 
 
-			//STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
+        //STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
 
-			if (blindGroupNum != j){
-				if (!baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())){
-					return false;
-				}
-				std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
+        if (blindGroupNum != j) {
+            if (!baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())) {
+                return false;
+            }
+            std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
 
-				for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++){
-					std::string ccd = model->windowGroups()[j].glazingLayers()[k];
-					STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
+            for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++) {
+                std::string ccd = model->windowGroups()[j].glazingLayers()[k];
+                STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
 
-					auto materialaddress = baseRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
-					baseRad.setAlias(materialaddress, found);
-					int asize = baseRad.m_aliases.size();
-				//	std::string asi = toString(asize);
-
-
-				}
-			}
-		
-
-		std::string wgBaseFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.rad";
-		baseRad.writeRadFile(wgBaseFile);
-		//Test for primitive continuity once that is working
-		/*
-		if(!baseRad->isConsistent()){
-		STADIC_LOG(stadic::Severity::Error, "The base rad file for window group "+toString(blindGroupNum)+" is not continuous through the primitive tree.");
-		return false;
-		}
-		*/
-		std::vector<std::string> files;
-		files.push_back(wgBaseFile);
-		files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
-		std::string outFileName;
-
-		outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.oct";
-		if (!createOctree(files, outFileName)){
-			return false;
-		}
-		//Call Standard Radiance run
-
-		if (!simStandard(blindGroupNum, -1, model)){
-			return false;
-		}
-	}
-    //Loop through the shade settings
-    if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
-		for (unsigned int i = 0; i < model->windowGroups()[blindGroupNum].shadeSettingGeometry().size(); i++){
-			// Memory leak
-			STADIC_LOG(Severity::Warning, "1 POINT");
-
-			RadFileData wgRad = m_RadFiles[blindGroupNum]->primitives();
-			//RadFileData wgRad;
-			STADIC_LOG(Severity::Warning, "2 POINT");
-
-			//wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
-			wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
-			//new RadFileData(m_RadFiles[blindGroupNum]->primitives());
-			//black->setModifier(RadPrimitive::sharedVoid());
-			//black->setName("black");
-
-			auto found1 = wgRad.addPrimitive(black);
-			STADIC_LOG(Severity::Warning, "3 POINT");
-
-			wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
-			if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i])){
-				STADIC_LOG(Severity::Warning, "ADDRAD FALSE");
-			}
-			STADIC_LOG(Severity::Warning, "4 POINT");
-
-			std::string wgSetFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.rad";
-			// THE FOLLOWING IS NEW
-
-			STADIC_LOG(Severity::Warning, "Before j loop " + toString(i));
-
-			std::string ist, jst;
-			for (int j = 0; j < model->windowGroups().size(); j++){
-				ist = toString(i);
-				jst = toString(j);
-
-				STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
-				if (blindGroupNum != j){
-					if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())){
-						return false;
-					}
-					std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
-
-					for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++){
-						std::string ccd = model->windowGroups()[j].glazingLayers()[k];
-						STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
-
-						auto materialaddress = wgRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
-						wgRad.setAlias(materialaddress, found1);
+                auto materialaddress = baseRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+                baseRad.setAlias(materialaddress, found);
+                int asize = baseRad.m_aliases.size();
+                //	std::string asi = toString(asize);
 
 
-					}
-				}
-			}
+            }
+        }
 
 
-			// END OF NEW
-			wgRad.writeRadFile(wgSetFile);
-			std::vector<std::string> files;
-			files.clear();
-			files.push_back(wgSetFile);
-			files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
-			outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.oct";
-			if (!createOctree(files, outFileName)){
-				return false;
-			}
-			//call Standard Radiance run
-			STADIC_LOG(Severity::Warning, "SECOND POINT");
+        std::string wgBaseFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.rad";
+        baseRad.writeRadFile(wgBaseFile);
+        //Test for primitive continuity once that is working
+        /*
+        if(!baseRad->isConsistent()){
+        STADIC_LOG(stadic::Severity::Error, "The base rad file for window group "+toString(blindGroupNum)+" is not continuous through the primitive tree.");
+        return false;
+        }
+        */
+        std::vector<std::string> files;
+        files.push_back(wgBaseFile);
+        files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
+        std::string outFileName;
 
-			if (!simStandard(blindGroupNum, i, model)){
-				return false;
-			}
-			STADIC_LOG(Severity::Warning, "ended");
-		
-			//free(black);
+        outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.oct";
+        if (!createOctree(files, outFileName)) {
+            return false;
+        }
+        //Call Standard Radiance run
+
+        if (!simStandard(blindGroupNum, -1, model)) {
+            return false;
         }
     }
-	STADIC_LOG(Severity::Warning, "ended");
+    //Loop through the shade settings
+    if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size() > 0) {
+        for (unsigned int i = 0; i < model->windowGroups()[blindGroupNum].shadeSettingGeometry().size(); i++) {
+            STADIC_LOG(Severity::Warning, "1 POINT");
+
+            RadFileData wgRad = m_RadFiles[blindGroupNum]->primitives();
+            //RadFileData wgRad;
+            STADIC_LOG(Severity::Warning, "2 POINT");
+
+            //wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
+            wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
+            //new RadFileData(m_RadFiles[blindGroupNum]->primitives());
+            //black->setModifier(RadPrimitive::sharedVoid());
+            //black->setName("black");
+
+            auto found1 = wgRad.addPrimitive(black);
+            STADIC_LOG(Severity::Warning, "3 POINT");
+
+            wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
+            if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i])) {
+                STADIC_LOG(Severity::Warning, "ADDRAD FALSE");
+            }
+            STADIC_LOG(Severity::Warning, "4 POINT");
+
+            std::string wgSetFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.rad";
+            // THE FOLLOWING IS NEW
+
+            STADIC_LOG(Severity::Warning, "Before j loop " + toString(i));
+
+            std::string ist, jst;
+            for (int j = 0; j < model->windowGroups().size(); j++) {
+                ist = toString(i);
+                jst = toString(j);
+
+                STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
+                if (blindGroupNum != j) {
+                    if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())) {
+                        return false;
+                    }
+                    std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
+
+                    for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++) {
+                        std::string ccd = model->windowGroups()[j].glazingLayers()[k];
+                        STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
+
+                        auto materialaddress = wgRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+                        wgRad.setAlias(materialaddress, found1);
+
+
+                    }
+                }
+            }
+
+
+            // END OF NEW
+            wgRad.writeRadFile(wgSetFile);
+            std::vector<std::string> files;
+            files.clear();
+            files.push_back(wgSetFile);
+            files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
+            outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.oct";
+            if (!createOctree(files, outFileName)) {
+                return false;
+            }
+            //call Standard Radiance run
+            STADIC_LOG(Severity::Warning, "SECOND POINT");
+
+            if (!simStandard(blindGroupNum, i, model)) {
+                return false;
+            }
+            STADIC_LOG(Severity::Warning, "ended");
+
+            //free(black);
+        }
+    }
+    STADIC_LOG(Severity::Warning, "ended");
 
     return true;
 }
