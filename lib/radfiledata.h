@@ -46,8 +46,8 @@ namespace stadic {
 class STADIC_API RadFileData
 {
 public:
-    explicit RadFileData();
-    RadFileData(const shared_vector<RadPrimitive> &primitives);
+    RadFileData();
+    explicit RadFileData(const shared_vector<RadPrimitive> &primitives);
 
     bool addRad(const std::string &file);                                      //Function to add rad primitives from a rad file
     bool writeRadFile(const std::string &file);                                //Function to write the rad file from the list of primitives
