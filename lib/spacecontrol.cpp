@@ -887,15 +887,18 @@ bool Control::parseJson(const JsonObject &json, BuildingControl *buildingControl
         if (!setsDA(calculate, illum, frac, startTime, endTime)){
             return false;
         }
-        list=getArray(treeVal.get(), "window_group_settings", "The key \"window_group_settings\" does not appear within \"sDA\" in the STADIC Control File.", Severity::Warning);
-        std::vector<int> tempIntVec;
-        if (list.get().size()<1){
-            STADIC_LOG(Severity::Warning, "No window group settings have been listed for the space named \""+m_SpaceName+"\"");
+        list = getArray(treeVal.get(), "window_group_settings", "The key \"window_group_settings\" does not appear within \"sDA\" in the STADIC Control File for the space named \"" + m_SpaceName + "\".", Severity::Warning);
+        if (list) {
+            if (list.get().size() > 0) {
+                std::vector<int> tempIntVec;
+                for (unsigned index = 0; index < list.get().size(); index++) {
+                    tempIntVec.push_back(list.get()[index].asInt());
+                }
+                setsDAwgSettings(tempIntVec);
+            } else {
+                STADIC_LOG(Severity::Warning, "No window group settings have been listed for the space named \"" + m_SpaceName + "\"");
+            }
         }
-        for (unsigned index=0;index<list.get().size();index++){
-            tempIntVec.push_back(list.get()[index].asInt());
-        }
-        setsDAwgSettings(tempIntVec);
         list.reset();
         treeVal.reset();
     }
