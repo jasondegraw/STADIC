@@ -43,17 +43,9 @@ include_directories(${Boost_INCLUDE_DIR})
 
 # JSON Dependency
 include_directories("dependencies/jsoncpp")
+# Add the gtest directory
+add_subdirectory(dependencies/gtest-1.7.0)
 
 add_subdirectory(lib)
 add_subdirectory(utilities)
-
-# Include the tests if gtest is found
-if(EXISTS ${CMAKE_SOURCE_DIR}/gtest-1.7.0/)
-  if(MSVC)
-    set(gtest_force_shared_crt ON CACHE BOOL "Force gtest to use msvcrt.dll")
-  endif()
-  add_subdirectory(gtest-1.7.0)
-  add_subdirectory(test)
-else()
-  message(WARNING "Failed to find gtest 1.7.0, tests will not be built")
-endif()
+add_subdirectory(test)
