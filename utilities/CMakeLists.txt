@@ -26,3 +26,6 @@ target_link_libraries(dxmetrics stadic_core)
 
 add_executable(dxmakesensor dxmakesensor.cpp)
 target_link_libraries(dxmakesensor stadic_core)
+
+add_executable(dxelectric dxelectric.cpp)
+target_link_libraries(dxelectric stadic_core)

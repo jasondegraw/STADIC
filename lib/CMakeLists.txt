@@ -10,6 +10,7 @@ set(SRCS analemma.cpp
          dayill.cpp
          daylight.cpp
          elecill.cpp
+         electriclight.cpp
          functions.cpp
          filepath.cpp
          geometryprimitives.cpp
@@ -48,6 +49,7 @@ set(HDRS stadicapi.h
          weatherdata.h
          dayill.h
          elecill.h
+         electriclight.h
          daylight.h
          materialprimitives.h
          metrics.h

@@ -113,6 +113,12 @@ add_custom_command(TARGET daylighttest POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                     ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/ $<TARGET_FILE_DIR:daylighttest>/daylightcase1/)
 
+add_executable(electrictests electrictests.cpp)
+add_test(electrictests electrictests)
+target_link_libraries(electrictests stadic_core gtest gtest_main)
+add_custom_command(TARGET electrictests POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/ $<TARGET_FILE_DIR:electrictests>/daylightcase1/)
 
 set(RESOURCES resources/simple.rad
               resources/simplehole.rad
