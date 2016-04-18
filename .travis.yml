@@ -5,7 +5,6 @@ dist: trusty
 language: cpp
 # Compiler selection
 compiler:
-  - clang
   - gcc
 # Build steps
 script:
