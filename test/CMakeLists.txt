@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(test)
 
-enable_testing(true)
+#enable_testing(true)
 
 include_directories(../lib ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 add_executable(controltests controltests.cpp)
-add_test(controltests controltests)
+add_test(NAME controltests COMMAND controltests)
 target_link_libraries(controltests stadic_core gtest gtest_main)
 # This is suboptimal, but it works
 add_custom_command(TARGET controltests POST_BUILD
@@ -15,7 +15,7 @@ add_custom_command(TARGET controltests POST_BUILD
                    ${CMAKE_SOURCE_DIR}/test/resources/control.json $<TARGET_FILE_DIR:controltests>)
 
 add_executable(weathertests weathertests.cpp)
-add_test(weathertests weathertests)
+add_test(NAME weathertests COMMAND $<TARGET_FILE:weathertests>)
 target_link_libraries(weathertests stadic_core gtest gtest_main)
 add_custom_command(TARGET weathertests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
@@ -24,15 +24,15 @@ add_custom_command(TARGET weathertests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/LancasterTMY.csv $<TARGET_FILE_DIR:weathertests>)
 add_executable(sensortests sensortests.cpp)
-add_test(sensortests sensortests)
+add_test(NAME sensortests COMMAND $<TARGET_FILE:sensortests>)
 target_link_libraries(sensortests stadic_core gtest gtest_main
 )
 add_executable(primitivetests primitivetests.cpp)
-add_test(primitivetests primitivetests)
+add_test(NAME primitivetests COMMAND $<TARGET_FILE:primitivetests>)
 target_link_libraries(primitivetests stadic_core gtest gtest_main)
 
 add_executable(radfiletests radfiletests.cpp)
-add_test(radfiletests radfiletests)
+add_test(NAME radfiletests COMMAND $<TARGET_FILE:radfiletests>)
 target_link_libraries(radfiletests stadic_core gtest gtest_main)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
@@ -68,36 +68,36 @@ add_custom_command(TARGET radfiletests POST_BUILD
 #                   ${CMAKE_SOURCE_DIR}/test/resources/daylightcase1/rad/mat1.rad $<TARGET_FILE_DIR:radfiletests>)
 
 add_executable(leaktests leaktests.cpp)
-add_test(leaktests leaktests)
+add_test(NAME leaktests COMMAND $<TARGET_FILE:leaktests>)
 target_link_libraries(leaktests stadic_core gtest gtest_main)
 add_custom_command(TARGET leaktests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
                     ${CMAKE_SOURCE_DIR}/test/resources/simplehole.rad $<TARGET_FILE_DIR:leaktests>)
 
 add_executable(functiontests functiontests.cpp)
-add_test(functiontests functiontests)
+add_test(NAME functiontests COMMAND $<TARGET_FILE:functiontests>)
 target_link_libraries(functiontests stadic_core gtest gtest_main)
 
 add_executable(radparsertests radparsertests.cpp)
-add_test(radparsertests radparsertests)
+add_test(NAME radparsertests COMMAND $<TARGET_FILE:radparsertests>)
 target_link_libraries(radparsertests stadic_core gtest gtest_main)
 
 add_executable(filepathtests filepathtests.cpp)
-add_test(filepathtests filepathtests)
+add_test(NAME filepathtests COMMAND $<TARGET_FILE:filepathtests>)
 target_link_libraries(filepathtests stadic_core gtest gtest_main)
 
 add_executable(processtests processtests.cpp)
-add_test(processtests processtests)
+add_test(NAME processtests COMMAND $<TARGET_FILE:processtests>)
 target_link_libraries(processtests stadic_core gtest gtest_main)
 
 add_executable(analemmatests analemmatests.cpp)
-add_test(analemmatests analemmatests)
+add_test(NAME analemmatests COMMAND $<TARGET_FILE:analemmatests>)
 target_link_libraries(analemmatests stadic_core gtest gtest_main)
 
 add_executable(testprogram testprogram.cpp)
 
 add_executable(gridtests gridtests.cpp)
-add_test(gridtests gridtests)
+add_test(NAME gridtests COMMAND $<TARGET_FILE:gridtests>)
 target_link_libraries(gridtests stadic_core gtest gtest_main)
 add_custom_command(TARGET gridtests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy
@@ -107,7 +107,7 @@ add_custom_command(TARGET gridtests POST_BUILD
                     ${CMAKE_SOURCE_DIR}/test/resources/diamond.rad $<TARGET_FILE_DIR:gridtests>)
 
 add_executable(daylighttest daylighttest.cpp)
-add_test(daylighttest daylighttest.cpp)
+add_test(NAME daylighttest COMMAND $<TARGET_FILE:daylighttest>)
 target_link_libraries(daylighttest stadic_core gtest gtest_main)
 add_custom_command(TARGET daylighttest POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
