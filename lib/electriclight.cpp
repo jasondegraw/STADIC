@@ -151,7 +151,6 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
     Process ies2rad(ies2radProgram, arguments);
     ies2rad.setStandardOutputFile(zone.name()+".rad");
     ies2rad.start();
-    STADIC_LOG(Severity::Info, ies2rad.commandLine());
     if (!ies2rad.wait()){
         STADIC_LOG(Severity::Error, "The running of ies2rad has failed for creating the electric lighting rad file named "+zone.name()+".ies.");
         return false;
@@ -187,7 +186,6 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
         }else{
             xform.setStandardOutputFile(zoneRadFile, Process::AppendOutput);
         }
-        STADIC_LOG(Severity::Info, xform.commandLine());
         xform.start();
         if (!xform.wait()){
             STADIC_LOG(stadic::Severity::Error, "The running of xform has failed for creating the electric lighting zone rad file named "+zoneRadFile+".");
@@ -225,7 +223,8 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
     if (m_Model->spaces()[spaceIndex]->getParamSet("default")){
         std::unordered_map<std::string, std::string> tempMap=m_Model->spaces()[spaceIndex]->getParamSet("default").get();
         for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-            if (it->first!="sj" && it->first!="lw"){
+            if (it->first!="sj" && it->first!="lw" && it->first!="ad"){
+                //Don't pass the -ad value to rtrace for the electric light.
                 arguments.push_back("-"+it->first);
                 arguments.push_back(it->second);
             }else if (it->first=="lw"){
@@ -239,7 +238,6 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
                 }
                 */
                 arguments.push_back(it->second);
-
             }
         }
     }else{
@@ -255,11 +253,30 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
 
     Process rtrace(rtraceProgram, arguments);
     rtrace.setStandardInputFile(m_Model->spaces()[spaceIndex]->spaceDirectory()+m_Model->spaces()[spaceIndex]->inputDirectory()+ptsFile);
-    rtrace.setStandardOutputFile(zoneIllFile);
+    rtrace.setStandardOutputFile(zoneIllFile+".tmp");
     rtrace.start();
-    STADIC_LOG(Severity::Info, rtrace.commandLine());
     if (!rtrace.wait()){
-        STADIC_LOG(stadic::Severity::Error, "The running of rtrace has failed for creating the electric lighting illuminance file "+zoneIllFile+".");
+        STADIC_LOG(stadic::Severity::Error, "The running of rtrace has failed for creating the electric lighting illuminance file "+zoneIllFile+".tmp.");
+        return false;
+    }
+
+    //Read in the temporary illuminance file and generate the final illuminance file.
+    arguments.clear();
+    std::string rcalcProgram;
+    rcalcProgram="rcalc";
+    arguments.push_back("-e");
+    if (m_Model->illumUnits().get()=="lux"){
+        arguments.push_back("$1=47.4*$1+120*$2+11.6*$3");
+    }else{
+        arguments.push_back("$1=4.405*$1+11.152*$2+1.078*$3");
+    }
+
+    Process rcalc(rcalcProgram, arguments);
+    rcalc.setStandardInputFile(zoneIllFile+".tmp");
+    rcalc.setStandardOutputFile(zoneIllFile);
+    rcalc.start();
+    if (!rcalc.wait()){
+        STADIC_LOG(Severity::Error, "The running of rcalc has failed for creating the electric lighting illuminance file " + zoneIllFile+".");
         return false;
     }
 
