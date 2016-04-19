@@ -13,4 +13,4 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake .. && make && make test VERBOSE=1
+  - cmake .. && make && make test ARGS="-V"
