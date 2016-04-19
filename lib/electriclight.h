@@ -54,6 +54,7 @@ private:
     bool simZone(std::vector<std::string> radFiles, std::string ptsFile, std::string zoneIllFile, int spaceIndex);
     int getLampLumens(std::string iesFile);
     bool createOctree(std::vector<std::string> files, std::string octreeName);              //Function to create an octree given a vector of files
+    bool fixDatFile(std::string radFileName, std::string newRadFileName, std::string zoneName, std::string newDatFileName);                            //Function to fix the dat file reference in the rad files.
     BuildingControl *m_Model;                                                               //Control object
 
 

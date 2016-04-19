@@ -145,18 +145,22 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
     arguments.push_back("-m");
     arguments.push_back(toString(zone.llf()*zone.lampLumens()/double(initialLumens)));
     arguments.push_back("-o");
-    arguments.push_back(zone.name());
+    arguments.push_back(zone.name()+"_temp");
     arguments.push_back(iesFile);
 
     Process ies2rad(ies2radProgram, arguments);
-    ies2rad.setStandardOutputFile(zone.name()+".ies");
+    ies2rad.setStandardOutputFile(zone.name()+".rad");
     ies2rad.start();
     STADIC_LOG(Severity::Info, ies2rad.commandLine());
     if (!ies2rad.wait()){
-        STADIC_LOG(stadic::Severity::Error, "The running of ies2rad has failed for creating the electric lighting rad file named "+zone.name()+".ies.");
+        STADIC_LOG(Severity::Error, "The running of ies2rad has failed for creating the electric lighting rad file named "+zone.name()+".ies.");
         return false;
     }
 
+    if (!fixDatFile(iesDirectory+zone.name()+"_temp.rad", iesDirectory+zone.name()+".rad", zone.name()+"_temp.dat", iesDirectory+zone.name()+".dat")){
+        STADIC_LOG(Severity::Error, "The correcting of the .dat file reference has falied.");
+        return false;
+    }
 
 
     //Write the xform commands to move the luminaires from the origin.
@@ -226,12 +230,16 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
                 arguments.push_back(it->second);
             }else if (it->first=="lw"){
                 arguments.push_back("-lw");
+                /*
                 if (toDouble(it->second)>0.00002){
                     STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
                     arguments.push_back("0.00002");
                 }else{
                     arguments.push_back(it->second);
                 }
+                */
+                arguments.push_back(it->second);
+
             }
         }
     }else{
@@ -290,6 +298,42 @@ bool ElectricLight::createOctree(std::vector<std::string> files, std::string oct
 
         return false;
     }
+    return true;
+}
+
+bool ElectricLight::fixDatFile(std::string radFileName,  std::string newRadFileName, std::string zoneName, std::string newDatFileName){
+    std::ifstream iFile;
+    iFile.open(radFileName);
+    if (!iFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the .rad file named "+radFileName+ " failed.");
+        return false;
+    }
+
+    std::ofstream oFile;
+    oFile.open(newRadFileName);
+    if (!oFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the .rad file named "+newRadFileName+" failed.");
+        return false;
+    }
+
+    std::string line;
+
+    while (std::getline(iFile, line)){
+        std::vector<std::string> vals;
+        vals=split(line, ' ');
+        for (int i=0;i<vals.size();i++){
+            if(vals[i]==(zoneName)) {
+                vals[i]=newDatFileName;
+            }
+            if (i==(vals.size()-1)){
+                oFile<<vals[i]<<std::endl;
+            }else{
+                oFile<<vals[i]<<" ";
+            }
+        }
+    }
+    iFile.close();
+    oFile.close();
     return true;
 }
 
