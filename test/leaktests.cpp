@@ -37,7 +37,7 @@ TEST(LeakTests, EnclosedModel)
 {
   //This model should be fully enclosed
   stadic::LeakCheck leakChecker;
-  std::vector<std::string> radFiles = { "Simple.rad", "material.rad" };
+  std::vector<std::string> radFiles = { "simple.rad", "material.rad" };
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
   std::vector<std::string> layerNames = { "l_floor" };
   leakChecker.setFloorLayers(layerNames);
@@ -50,7 +50,7 @@ TEST(LeakTests, LeakModel)
 {
   //This model should contain a 10" x 10" square hole along the east side of the ceiling
   stadic::LeakCheck leakChecker;
-  std::vector<std::string> radFiles={"SimpleHole.rad","material.rad"};
+  std::vector<std::string> radFiles={"simplehole.rad","material.rad"};
   ASSERT_TRUE(leakChecker.setRadFile(radFiles));
   std::vector<std::string> layerNames;
   layerNames.clear();
