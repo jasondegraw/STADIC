@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 2.8.11)
 
 project(test)
 
-#enable_testing(true)
+# Macro to make test creation shorter
+macro(create_test target)
+  add_executable(${target} ${target}.cpp)
+  target_link_libraries(${target} stadic_core gtest gtest_main)
+  add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}> WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endmacro(create_test)
 
 include_directories(../lib ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
@@ -27,13 +32,18 @@ add_executable(sensortests sensortests.cpp)
 add_test(NAME sensortests COMMAND $<TARGET_FILE:sensortests>)
 target_link_libraries(sensortests stadic_core gtest gtest_main
 )
-add_executable(primitivetests primitivetests.cpp)
-add_test(NAME primitivetests COMMAND $<TARGET_FILE:primitivetests>)
-target_link_libraries(primitivetests stadic_core gtest gtest_main)
 
-add_executable(radfiletests radfiletests.cpp)
-add_test(NAME radfiletests COMMAND $<TARGET_FILE:radfiletests>)
-target_link_libraries(radfiletests stadic_core gtest gtest_main)
+create_test(primitivetests)
+#add_executable(primitivetests primitivetests.cpp)
+#add_test(NAME primitivetests COMMAND $<TARGET_FILE:primitivetests> WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+#target_link_libraries(primitivetests stadic_core gtest gtest_main)
+
+create_test(radfiletests)
+#add_executable(radfiletests radfiletests.cpp)
+#add_test(NAME radfiletests COMMAND radfiletests WORKING_DIRECTORY $<TARGET_FILE_DIR:radfiletests>)
+#add_test(NAME radfiletests COMMAND $<TARGET_FILE:radfiletests> WORKING_DIRECTORY $<TARGET_FILE_DIR:radfiletests>)
+#add_test(NAME radfiletests COMMAND $<TARGET_FILE:radfiletests> WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+#target_link_libraries(radfiletests stadic_core gtest gtest_main)
 add_custom_command(TARGET radfiletests POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_SOURCE_DIR}/test/resources/material.rad $<TARGET_FILE_DIR:radfiletests>)
