@@ -14,7 +14,7 @@ before_install:
   - ls -l
   - ls -l ray
   - cd ray
-  - cp ../makeall-modifed makeall
+  - cp ../makeall-modified makeall
   - sudo ./makeall install
 #  - pwd
 #  - ../radiance-build.sh
