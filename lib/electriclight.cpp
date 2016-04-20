@@ -142,6 +142,12 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
     arguments.push_back(units);
     arguments.push_back("-l");
     arguments.push_back(iesDirectory);
+    arguments.push_back("-c");
+    arguments.push_back("1");
+    arguments.push_back("1");
+    arguments.push_back("1");
+    arguments.push_back("-t");
+    arguments.push_back("default");
     arguments.push_back("-m");
     if (initialLumens<0){       //This is typical if the fixture is an LED module that cannot be replaced for higher/lower output versions.
         arguments.push_back(toString(zone.llf()));
@@ -160,7 +166,7 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
         return false;
     }
 
-    if (!fixDatFile(iesDirectory+zone.name()+"_temp.rad", iesDirectory+zone.name()+".rad", zone.name()+"_temp.dat", iesDirectory+zone.name()+".dat")){
+    if (!fixDatFile(iesDirectory+zone.name()+"_temp.rad", iesDirectory+zone.name()+".rad", zone.name()+"_temp.dat", iesDirectory+zone.name()+"_temp.dat")){
         STADIC_LOG(Severity::Error, "The correcting of the .dat file reference has falied.");
         return false;
     }
@@ -197,24 +203,6 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
         }
     }
 
-    //fix the references to the .dat file to be based from the space directory.
-
-
-    /*
-     * //	Write the first line of the batch file.  This is the IES2RAD Call line with all of the required parameters
-                    //	Write the first xform line
-                    BatchFile << "xform -c -rz " << LayoutLocOrient[j][5] << " -ry " << LayoutLocOrient[j][4] <<
-                        " -rz " << LayoutLocOrient[j][3] << " -t " << LayoutLocOrient[j][0] << " " << LayoutLocOrient[j][1] <<
-                        " " << LayoutLocOrient[j][2] << " " << project_directory << "ies\\" << LumLabel[LabelCounter] <<
-                        " > " << project_directory << "rad\\" << zone_label[i] << ".rad" <<endl;
-                }
-                //	Write the consecutive xform lines until the zone is complete
-                BatchFile << "xform -c -rz " << LayoutLocOrient[j][5] << " -ry " << LayoutLocOrient[j][4] <<
-                    " -rz " << LayoutLocOrient[j][3] << " -t " << LayoutLocOrient[j][0] << " " << LayoutLocOrient[j][1] <<
-                    " " << LayoutLocOrient[j][2] << " " << project_directory << "ies\\" << LumLabel[LabelCounter] <<
-                    " >> " << project_directory << "rad\\" << zone_label[i] << ".rad" <<endl;
-     *
-     */
     return true;
 }
 bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFile, std::string zoneIllFile, int spaceIndex){
@@ -223,6 +211,8 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
     std::string rtraceProgram;
     rtraceProgram="rtrace";
     arguments.clear();
+    arguments.push_back("-h");
+    arguments.push_back("-I");
     //Populate the arguments for rtrace at this point then start the program.
     if (m_Model->spaces()[spaceIndex]->getParamSet("default")){
         std::unordered_map<std::string, std::string> tempMap=m_Model->spaces()[spaceIndex]->getParamSet("default").get();
