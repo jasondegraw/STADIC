@@ -7,8 +7,19 @@ language: cpp
 compiler:
   - gcc
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y radiance
+  - wget http://www.radiance-online.org/download-install/radiance-source-code/latest-release/latest-release/rad5R0all.tar.gz
+  - tar xvf rad5R0all.tar.gz
+  - cd ray
+  - sed --in-place '/more License.txt/d' makeall
+  - echo "\ny\n" | sudo ./installib
+  - echo "\n\ny\n2\n\nn\n" | sudo ./makeall install
+#  - wget https://github.com/NREL/Radiance/archive/5.0.tar.gz
+#  - tar xvf 5.0.tar.gz
+#  - mkdir Radiance-5.0/build
+#  - cd Radiance-5.0/build && cmake .. && make
+#  - sudo make install
+#  - sudo apt-get -qq update
+#  - sudo apt-get install -y radiance
 # Build steps
 script:
   - mkdir build
