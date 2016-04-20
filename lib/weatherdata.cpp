@@ -267,13 +267,17 @@ bool WeatherData::parseTMY(std::string file){
         return false;
     }
     std::string line;
-    std::vector<std::string> vals;
-    vals.clear();
     getline(iFile,line);
-    vals=stadic::split(line,',');
-    std::vector<std::string> vals2;
-    vals2=stadic::split(vals[1],'\"');
-    setPlace(vals2[1]);
+    std::vector<std::string> vals = stadic::split(line, ',');
+    if (vals.size() < 7) {
+        STADIC_ERROR("Insufficient data on line 1 of weather file " + file);
+        return false;
+    }
+    // Should we reject without quotes?
+    if (vals[1][0] == '\"' && vals[1].back() == '\"') {
+        vals[1] = std::string(vals[1].begin() + 1, vals[1].end() - 1);
+    }
+    setPlace(vals[1]);
     setLatitude(vals[4]);
     setLongitude(toString(-1*toDouble(vals[5])));
     setTimeZone(toString(-1*toDouble(vals[3])));
