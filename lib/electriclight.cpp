@@ -143,7 +143,11 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
     arguments.push_back("-l");
     arguments.push_back(iesDirectory);
     arguments.push_back("-m");
-    arguments.push_back(toString(zone.llf()*zone.lampLumens()/double(initialLumens)));
+    if (initialLumens<0){       //This is typical if the fixture is an LED module that cannot be replaced for higher/lower output versions.
+        arguments.push_back(toString(zone.llf()));
+    }else{  //This is if the fixture has lamps that can be replaced.
+        arguments.push_back(toString(zone.llf()*zone.lampLumens()/double(initialLumens)));
+    }
     arguments.push_back("-o");
     arguments.push_back(zone.name()+"_temp");
     arguments.push_back(iesFile);
@@ -300,6 +304,7 @@ int ElectricLight::getLampLumens(std::string iesFile){
     }
     int tempInt;
     iesIn>>tempInt;
+    iesIn>>tempInt; //Pull in the initial lamp lumens from the ies file.
     return tempInt;
 }
 bool ElectricLight::createOctree(std::vector<std::string> files, std::string octreeName){
