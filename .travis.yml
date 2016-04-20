@@ -13,7 +13,10 @@ before_install:
   - pwd
   - ls -l
   - ls -l ray
-  - cd ray && ../radiance-build.sh
+  - cd ray
+  - pwd
+  - ../radiance-build.sh
+#  - cd ray && ../radiance-build.sh
 #  - ../radiance-build.sh
 #  - cd ..
 #  - sed --in-place '/more License.txt/d' makeall
