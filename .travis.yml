@@ -10,6 +10,9 @@ before_install:
 #  - ./radiance-build.sh
   - wget http://www.radiance-online.org/download-install/radiance-source-code/latest-release/latest-release/rad5R0all.tar.gz
   - tar xzf rad5R0all.tar.gz
+  - pwd
+  - ls -l
+  - ls -l ray
   - cd ray && ../radiance-build.sh
 #  - ../radiance-build.sh
 #  - cd ..
