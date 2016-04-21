@@ -7,8 +7,9 @@ language: cpp
 compiler:
   - gcc
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y radiance
+  #- sudo apt-get -qq update
+  #- sudo apt-get install -y radiance
+  - scripts/install-radiance.sh
 # Build steps
 script:
   - mkdir build
