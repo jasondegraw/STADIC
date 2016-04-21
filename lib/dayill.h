@@ -66,7 +66,7 @@ private:
 class STADIC_API DaylightIlluminanceData
 {
 public:
-    explicit DaylightIlluminanceData();
+    explicit DaylightIlluminanceData(std::string units);
     bool parse(std::string fileName,std::string weaFile);                       //Function to parse an illuminance file that doesn't contain time values
     bool parseTimeBased(std::string fileName);                                  //Function to parse an illuminance file that contains time values
     bool addIllFile(std::string fileName);                                      //Function to add the illuminance of a file that doesn't contain time values to the object
@@ -81,7 +81,7 @@ public:
 
 private:
     std::vector<TemporalIlluminance> m_data;                                    //Vector holding the illuminance values
-
+    std::string m_Units;
 };
 
 }

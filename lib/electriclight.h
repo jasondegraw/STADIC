@@ -28,37 +28,36 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef PROCESSSHADE_H
-#define PROCESSSHADE_H
+#ifndef ELECTRICLIGHT_H
+#define ELECTRICLIGHT_H
 
 #include "spacecontrol.h"
 #include "buildingcontrol.h"
-#include "dayill.h"
+#include "spacecontrol.h"
 #include <vector>
-
+#include <string>
 #include "stadicapi.h"
 
-namespace stadic {
-class STADIC_API ProcessShade
+namespace stadic{
+
+class STADIC_API ElectricLight
 {
 public:
-    explicit ProcessShade(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
-    bool processShades();
+    explicit ElectricLight(BuildingControl *model);
+    bool simElectricLight();
+
+//Setters
 
 
 private:
-
-    bool makeShadeSched(Control *model, DaylightIlluminanceData *dayIll);
-    bool writeSched(std::vector<std::vector<int>> shadeSched, std::string file, DaylightIlluminanceData *dayIll);
-    std::vector<int> automatedSignal(Control *model, int windowGroup);
-    std::vector<int> automatedProfileAngle(Control *model, int windowGroup);
-    std::vector<int> automatedProfileAngleSignal(Control *model, int windowGroup);
-
-    BuildingControl *m_Model;
-
+    bool lum2Rad(ControlZone zone, std::string zoneRadFile, std::string iesFile, std::string units, std::string iesDirectory);
+    bool simZone(std::vector<std::string> radFiles, std::string ptsFile, std::string zoneIllFile);
+    int getLampLumens(std::string iesFile);
+    BuildingControl *m_Model;                                                               //Control object
 
 
 };
 
 }
-#endif // PROCESSSHADE_H
+
+#endif // ELECTRICLIGHT_H

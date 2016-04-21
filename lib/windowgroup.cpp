@@ -168,7 +168,11 @@ bool WindowGroup::parseJson(const JsonObject &json){
         for(auto &v : treeVal.get()){
             sVal = asString(v, "There was a problem reading the shade_settings key for window group "+name()+".", Severity::Fatal);
             if (sVal){
+				//std::string svl = toString( sVal);
+				STADIC_LOG(Severity::Info, sVal.get() );
+
                 m_ShadeSettingGeometry.push_back(sVal.get());
+
                 sVal.reset();
             }
         }

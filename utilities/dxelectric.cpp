@@ -28,37 +28,33 @@
  * SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef PROCESSSHADE_H
-#define PROCESSSHADE_H
-
-#include "spacecontrol.h"
+#include "electriclight.h"
+#include "logging.h"
 #include "buildingcontrol.h"
-#include "dayill.h"
-#include <vector>
+#include <iostream>
 
-#include "stadicapi.h"
-
-namespace stadic {
-class STADIC_API ProcessShade
+void usage()
 {
-public:
-    explicit ProcessShade(BuildingControl *model);                         //Constructor that takes a Control object as an argument                                                           //Function to simulate the daylight
-    bool processShades();
-
-
-private:
-
-    bool makeShadeSched(Control *model, DaylightIlluminanceData *dayIll);
-    bool writeSched(std::vector<std::vector<int>> shadeSched, std::string file, DaylightIlluminanceData *dayIll);
-    std::vector<int> automatedSignal(Control *model, int windowGroup);
-    std::vector<int> automatedProfileAngle(Control *model, int windowGroup);
-    std::vector<int> automatedProfileAngleSignal(Control *model, int windowGroup);
-
-    BuildingControl *m_Model;
-
-
-
-};
-
+    std::cout << "dxelectric - Simulate the electric light for a space model" << std::endl;
+    std::cout << "usage: dxelectric <STADIC Control File>" << std::endl;
 }
-#endif // PROCESSSHADE_H
+
+
+int main (int argc, char *argv[]){
+    if (argc < 2){
+        usage();
+        return EXIT_FAILURE;
+    }
+    std::string fileName=argv[1];
+    stadic::BuildingControl model;
+    //stadic::Control model;
+    if (!model.parseJson(fileName)){
+        return EXIT_FAILURE;
+    }
+    stadic::ElectricLight sim(&model);
+    if (!sim.simElectricLight()){
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}

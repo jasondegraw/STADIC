@@ -56,6 +56,7 @@ public:
     std::shared_ptr<RadPrimitive> addPrimitive(RadPrimitive *primitive);    //!< Add a rad primitive to the list of primitives
     std::shared_ptr<RadPrimitive> addPrimitive(std::shared_ptr<RadPrimitive> primitive);  //!< Add a rad primitive to the list of primitives
     bool setPrimitives(const shared_vector<RadPrimitive> &primitives);  //!< Replace the contents of the primitives list
+    std::shared_ptr<RadPrimitive> RadFileData::glazingsearch(std::string name);
 
     std::shared_ptr<RadPrimitive> findPrimitive(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const;    //!< Find a particular primitive
     std::shared_ptr<RadPrimitive> findMaterial(std::function<bool(std::shared_ptr<RadPrimitive>)> predicate) const;    //!< Find a particular material
@@ -78,10 +79,11 @@ public:
     template<class T> shared_vector<T> getPrimitives();
     // This one is the one that is most critical, but it needs to be redone or possibly removed
     std::pair<shared_vector<RadPrimitive>, shared_vector<RadPrimitive> > split(const std::vector<std::string> &vector);
+    std::vector < std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> m_aliases;
 
 private:
     shared_vector<RadPrimitive> m_primitives; //Vector to hold EVERYTHING
-    std::vector < std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> m_aliases; // Stop-gap to get this done now
+    //std::vector < std::pair<std::shared_ptr<RadPrimitive>, std::shared_ptr<RadPrimitive>>> m_aliases; MOVED TO PUBLIC  Stop-gap to get this done now
 
 };
 

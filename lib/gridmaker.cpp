@@ -236,7 +236,7 @@ bool GridMaker::writePTScsv(std::string file){
     return true;
 }
 bool GridMaker::viewPTS(std::string location, std::string vType){
-    return viewPTS(location, vType, "grid.pts");
+    return viewPTS(location, vType, "grid.bmp");
 }
 bool GridMaker::viewPTS(std::string location, std::string vType, std::string name){
     //The file names need to be adjusted
@@ -347,7 +347,7 @@ bool GridMaker::parseRad(){
                 }else{
                     bool heightFound=false;
                     for (int j=0;j<m_PolySetHeight.size();j++){
-                        if (tempZ>(m_PolySetHeight[j]*.99)&&tempZ<(m_PolySetHeight[j]*1.01)){
+                        if (tempZ>=(m_PolySetHeight[j]*.99)&&tempZ<(m_PolySetHeight[j]*1.01)){
                             heightFound=true;
                             setPos=j;
                         }
@@ -584,7 +584,7 @@ bool GridMaker::testPoints(){
     for (int i=0;i<m_PolySetHeight.size();i++){      
         //Create vector of test points
         double x=m_MinX[i];
-        while (x<=m_MaxX[i]){
+        while (x<=m_MaxX[i]+.0001){
             double y=m_MinY[i];
             while (y<=m_MaxY[i]){
                 if (m_UseOffset){

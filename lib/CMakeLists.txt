@@ -10,6 +10,7 @@ set(SRCS analemma.cpp
          dayill.cpp
          daylight.cpp
          elecill.cpp
+	 electriclight.cpp
          functions.cpp
          filepath.cpp
          geometryprimitives.cpp
@@ -31,6 +32,10 @@ set(SRCS analemma.cpp
          windowgroup.cpp)
 
 set(HDRS stadicapi.h
+	 jsonobjects.h	
+	 analemma.h
+	 buildingcontrol.h
+	 electriclight.h
          sharedvector.h
          spacecontrol.h
          buildingcontrol.h

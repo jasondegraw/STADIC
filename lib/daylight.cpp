@@ -1,6 +1,6 @@
 /******************************************************************************
- * Copyright (c) 2014-2015, The Pennsylvania State University
- * All rights reserved.
+ * Copyright (c) 2014-2015, The Pennsylvania State University 
+ * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
  *****************************************************************************/
 
 #include "daylight.h"
+#include "radfiledata.h"
 #include "logging.h"
 #include "dayill.h"
 #include "filepath.h"
@@ -38,6 +39,7 @@
 #include "gridmaker.h"
 #include "weatherdata.h"
 #include "photosensor.h"
+#include <iostream>
 
 namespace stadic {
 Daylight::Daylight(BuildingControl *model) :
@@ -48,7 +50,9 @@ Daylight::Daylight(BuildingControl *model) :
 bool Daylight::simDaylight()
 {
     std::vector<std::shared_ptr<Control>> spaces=m_Model->spaces();
+
     for (int i=0;i<spaces.size();i++){
+
         //Set up the directories if they do not already exist
         PathName resDir(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory());
         if (!resDir.exists()){
@@ -64,6 +68,7 @@ bool Daylight::simDaylight()
                 return false;
             }
         }
+
         PathName inputDir(spaces[i].get()->spaceDirectory()+spaces[i].get()->inputDirectory());
         if (!inputDir.exists()){
             if (!inputDir.create()){
@@ -77,7 +82,8 @@ bool Daylight::simDaylight()
         }
         //If the next line causes a crash in the program, it is most likely in setSimCase having to do with the second test.
         // This comment is all well and good... but the program should never crash
-        if (!testSimCase(spaces[i].get())){
+     
+		if (!testSimCase(spaces[i].get())){
             return false;
         }
 
@@ -87,19 +93,27 @@ bool Daylight::simDaylight()
                 BSDFs=true;
             }
         }
+
         if (!writeSky(spaces[i].get())){
             return false;
         }
+
         if (!createBaseRadFiles(spaces[i].get())){
             return false;
         }
+
         //Configure the simulation for each window group
         for (int j=0;j<spaces[i].get()->windowGroups().size();j++){
+			STADIC_LOG(Severity::Warning, "SE***COND POINT");
+
+
             switch (m_SimCase[j]){
                 case 1:
                     if (!simCase1(j,spaces[i].get())){
                         return false;
                     }
+					STADIC_LOG(Severity::Warning, "ended11");
+
                     break;
                 case 2:
                     if (!simCase2(j, spaces[i].get())){
@@ -130,8 +144,11 @@ bool Daylight::simDaylight()
                         return false;
                     }
                     break;
+					STADIC_LOG(Severity::Warning, "ended1");
 
             }
+			STADIC_LOG(Severity::Warning, "ended2");
+
         }
         if(!sumIlluminanceFiles(spaces[i].get())){
             return false;
@@ -446,7 +463,7 @@ bool Daylight::simBSDF(int blindGroupNum, int setting, int bsdfNum, std::string 
         arguments.push_back("-r");
         arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
     }
-    arguments.push_back("-5");
+    //arguments.push_back("-5");  commented out by RGM on 3-28-16.
     arguments.push_back("-d");
     arguments.push_back(m_Model->weaDataFile().get());
     Process gendaymtx3(gendaymtxProgram,arguments);
@@ -655,6 +672,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
     //Generate Weather file if it hasn't been generated already.
     if (!m_WeaFileName){
+        if (writeCL){
+            std::cout<<"***\nParsing the weather file.\n***"<<std::endl;
+        }
         WeatherData tmpWeather;
         if (m_Model->weaDataFile()){
             if (!tmpWeather.parseWeather(m_Model->weaDataFile().get())){
@@ -683,13 +703,15 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     std::string skySMX;
     std::string sunDC;
     std::string sunSMX;
+    std::string stdOct;
     std::string directSunDC;
     std::string sunPatchSMX;
     std::string sensorSkyDC;
     std::string sensorSunDC;
+    std::string sensorDirSunDC;
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //rcontrib for sky
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -698,12 +720,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments.push_back(it->second);
                 }else if (it->first=="lw"){
                     arguments.push_back("-lw");
-                    if (toDouble(it->second)>0.00002){
-                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
-                        arguments.push_back("0.00002");
-                    }else{
+                   /* if (toDouble(it->second)>0a0001){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000001 .");
+                        arguments.push_back("0.0000001");
+                    }else{*/
                         arguments.push_back(it->second);
-                    }
+                    //}
                 }
             }
         }else{
@@ -726,10 +748,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         if (setting==-1){
             //This is the base case
-            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+            stdOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct";
+            arguments.push_back(stdOct);
             skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1k.dc";
         }else{
-            arguments.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct");
+            stdOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_std.oct";
+            arguments.push_back(stdOct);
             skyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1k_std.dc";
         }
         Process rcontrib(rcontribProgram,arguments);
@@ -773,7 +797,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<rcontrib.commandLine()<<std::endl<<std::endl;;
         }
-
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sky.\n"<<rcontrib.commandLine()<<"\n***"<<std::endl;
+        }
         rcontrib.start();
         if (!rcontrib.wait()){
             STADIC_ERROR("The rcontrib run for the sky has failed with the following errors.");
@@ -807,7 +833,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                 //outCL<<"## Pipe the next two lines together."<<std::endl;
                 outCL<<cnt.commandLine()<<std::endl<<std::endl;;
             }
-
+            if (writeCL){
+                std::cout<<"***\nRunning cnt and rcalc for the suns.\n"<<cnt.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+            }
             cnt.start();
             rcalc.start();
 
@@ -840,6 +868,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         sunsOct=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_sun_set"+std::to_string(setting+1)+"_std.oct";
 
     }
+    if (writeCL){
+            std::cout<<"***\nCreating suns octree.\n***"<<std::endl;
+    }
     if(!createOctree(octFiles,sunsOct)){
         return false;
     }
@@ -847,22 +878,33 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         outCL<<"## Create the suns octree here"<<std::endl<<std::endl;;
     }
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
-        //rcontrib for sun
+        //rcontrib for sun (sky patch version)
         arguments.clear();
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-                if (it->first!="sj"){
+                if (it->first!="sj" && it->first!="ab" && it->first!="lw"){
                     arguments.push_back("-"+it->first);
                     arguments.push_back(it->second);
                 }
+                else if (it->first=="lw"){
+                    arguments.push_back("-lw");
+                    /*if (toDouble(it->second)>0.0000001){
+                        STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .0000001 .");
+                        arguments.push_back("0.0000001");
+                    }else{*/
+                        arguments.push_back(it->second);
+                   // }
+                }
             }
+            arguments.push_back("-ab");
+            arguments.push_back("1");
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
         arguments.push_back("-e");
-        arguments.push_back("MF:"+std::to_string(model->sunDivisions()));
+        arguments.push_back("MF:"+std::to_string(model->skyDivisions()));
         arguments.push_back("-f");
         arguments.push_back("reinhart.cal");
         arguments.push_back("-b");
@@ -870,12 +912,12 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-bn");
         arguments.push_back("Nrbins");
         arguments.push_back("-m");
-        arguments.push_back("solar");
+        arguments.push_back("sky_glow");
         arguments.push_back("-faa");
-        arguments.push_back(sunsOct);
+        arguments.push_back(stdOct);
         if (setting==-1){
             //This is the base case
-            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d.dc";
+            sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.dc";
         }else{
             //This is for the settings
             sunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std.dc";
@@ -887,6 +929,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<rcontrib2.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun.\n"<<rcontrib2.commandLine()<<"\n***"<<std::endl;
+        }
         rcontrib2.start();
         if (!rcontrib2.wait()){
             STADIC_ERROR("The sun rcontrib run failed with the following errors.");
@@ -895,9 +940,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             return false;
         }
 
-        //rcontrib for direct sun (sDA & ASE)
+        //rcontrib for direct sun
         arguments.clear();
-        arguments.push_back("-I+");
+        arguments.push_back("-I");
         if (model->getParamSet("default")){
             std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
             for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
@@ -925,16 +970,19 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(sunsOct);
         if (setting==-1){
             //This is the base case
-            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_1d_direct.dc";
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.dc";
         }else{
             //This is for the settings
-            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_1d_std_direct.dc";
+            directSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_d_std.dc";
         }
         Process rcontrib3(rcontribProgram,arguments);
         rcontrib3.setStandardOutputFile(directSunDC);
         rcontrib3.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
         if (writeCL){
             outCL<<rcontrib3.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun (direct).\n"<<rcontrib3.commandLine()<<"\n***"<<std::endl;
         }
         rcontrib3.start();
         if (!rcontrib3.wait()){
@@ -945,6 +993,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     }
     if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){
         //rsensor and rcontrib for shade sensors for sky contribution
+		STADIC_ERROR("The direct sun rcontrib run failed with the following errors.");
         arguments.clear();
         arguments.push_back("-h");
         arguments.push_back("-rd");
@@ -968,18 +1017,31 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("0");
         arguments.push_back("0");
         if (model->windowGroups()[blindGroupNum].shadeControl()->sensorType()!="sensitivity_file"){
+
             Photosensor sensor;
             if (!sensor.setType(model->windowGroups()[blindGroupNum].shadeControl()->sensorType())){
                 return false;
             }
             std::string sensorFileName=model->spaceDirectory()+model->inputDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade.sen";
+
             if (!sensor.writeSensorFile(sensorFileName)){
                 return false;
             }
             arguments.push_back(sensorFileName);
-        }else{
-            arguments.push_back(model->windowGroups()[blindGroupNum].shadeControl()->sensorFile());
         }
+		else{
+			arguments.push_back(model->windowGroups()[blindGroupNum].shadeControl()->sensorFile());
+			//std::string xcc = model->windowGroups()[blindGroupNum].shadeControl()->sensorFile();
+            //arguments.push_back(xcc);
+
+        }
+		arguments.push_back(" . ");
+	//std::string wr;
+	//for (int i7 = 0; i7 < arguments.size(); i7++){
+		//wr.append (arguments[i7]);
+	//}
+	//STADIC_ERROR("The direct sun rcontrib run failed with the following errors." + wr);
+
         std::string rsensorProgram="rsensor";
         Process rsensor(rsensorProgram, arguments);
         std::vector<std::string> arguments2;
@@ -1006,25 +1068,27 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
                     arguments2.push_back("-"+it->first);
                     arguments2.push_back(it->second);
                 }else if (it->first=="lw"){
-                    arguments.push_back("-lw");
-                    if (toDouble(it->second)>0.00002){
+                    arguments2.push_back("-lw");
+                    /*if (toDouble(it->second)>0.00002){
                         STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
-                        arguments.push_back("0.00002");
-                    }else{
-                        arguments.push_back(it->second);
-                    }
+                        arguments2.push_back("0.00002");
+                    }else{*/
+                        arguments2.push_back(it->second);
+                   // }
                 }
             }
         }else{
             STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
         }
-        arguments2.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct");
+        arguments2.push_back(stdOct);
         std::string rcontribProgram="rcontrib";
         Process rcontribSkySen(rcontribProgram, arguments2);
         rsensor.setStandardOutputProcess(&rcontribSkySen);
-        sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.dc";
+        sensorSkyDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_k.dc";
         rcontribSkySen.setStandardOutputFile(sensorSkyDC);
-
+        if (writeCL){
+            std::cout<<"***\nRunning rsensor and rcontrib for the sky (sensor).\n"<<rsensor.commandLine()<<"\n is piped to\n"<<rcontribSkySen.commandLine()<<"\n***"<<std::endl;
+        }
         rsensor.start();
         rcontribSkySen.start();
 
@@ -1037,6 +1101,70 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         Process rsensor2(rsensorProgram, arguments);
         arguments2.clear();
         arguments2.push_back("-e");
+        arguments2.push_back("MF:"+std::to_string(model->skyDivisions()));
+        arguments2.push_back("-f");
+        arguments2.push_back("reinhart.cal");
+        arguments2.push_back("-b");
+        arguments2.push_back("rbin");
+        arguments2.push_back("-bn");
+        arguments2.push_back("Nrbins");
+        arguments2.push_back("-m");
+        arguments2.push_back("sky_glow");
+        //arguments.push_back("-faa");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="lw" && it->first!="ab"){
+                    arguments2.push_back("-"+it->first);
+                    arguments2.push_back(it->second);
+                }else if (it->first=="lw"){
+                    arguments2.push_back("-lw");
+                   // arguments2.push_back("0.00005");
+                   // STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
+					arguments2.push_back(it->second);
+                }
+                arguments2.push_back("-ab");
+                arguments2.push_back("1");
+            }
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments2.push_back(stdOct);
+        Process rcontribSunSen(rcontribProgram, arguments2);
+        rsensor2.setStandardOutputProcess(&rcontribSunSen);
+        sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_kd.dc";
+        rcontribSunSen.setStandardOutputFile(sensorSunDC);
+
+        if (writeCL){
+            std::cout<<"***\nRunning rsensor and rcontrib for the sun (sensor).\n"<<rsensor.commandLine()<<"\n is piped to\n"<<rcontribSunSen.commandLine()<<"\n***"<<std::endl;
+        }
+        rsensor2.start();
+        rcontribSunSen.start();
+
+        if (!rcontribSunSen.wait()){
+            STADIC_LOG(Severity::Error, "The running of rcontrib for the shade sensor has failed for window group "+model->windowGroups()[blindGroupNum].name()+" within "+model->spaceName()+".");
+            return false;
+        }
+        arguments2.clear();
+
+        //rcontrib for direct sun for shades
+        Process rsensor3 (rsensorProgram, arguments);
+        arguments2.clear();
+        arguments2.push_back("-I");
+        if (model->getParamSet("default")){
+            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
+            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
+                if (it->first!="sj" && it->first!="ab"){
+                    arguments2.push_back("-"+it->first);
+                    arguments2.push_back(it->second);
+                }
+            }
+            arguments2.push_back("-ab");
+            arguments2.push_back("0");
+        }else{
+            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
+        }
+        arguments2.push_back("-e");
         arguments2.push_back("MF:"+std::to_string(model->sunDivisions()));
         arguments2.push_back("-f");
         arguments2.push_back("reinhart.cal");
@@ -1046,36 +1174,25 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments2.push_back("Nrbins");
         arguments2.push_back("-m");
         arguments2.push_back("solar");
-        //arguments.push_back("-faa");
-        if (model->getParamSet("default")){
-            std::unordered_map<std::string, std::string> tempMap=model->getParamSet("default").get();
-            for (std::unordered_map<std::string, std::string>::iterator it=tempMap.begin(); it!=tempMap.end();++it){
-                if (it->first!="sj" && it->first!="lw"){
-                    arguments2.push_back("-"+it->first);
-                    arguments2.push_back(it->second);
-                }else if (it->first=="lw"){
-                    arguments2.push_back("-lw");
-                    arguments2.push_back("0.00005");
-                    STADIC_LOG(Severity::Info, "The lw argument has been changed from "+it->second+" to .00002 .");
-                }
-            }
-        }else{
-            STADIC_LOG(Severity::Fatal, "The default parameter set is not found for " + model->spaceName());
-        }
+        arguments2.push_back("-faa");
         arguments2.push_back(sunsOct);
-        Process rcontribSunSen(rcontribProgram, arguments2);
-        rsensor2.setStandardOutputProcess(&rcontribSunSen);
-        sensorSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.dc";
-        rcontribSunSen.setStandardOutputFile(sensorSunDC);
-
-        rsensor2.start();
-        rcontribSunSen.start();
-
-        if (!rcontribSunSen.wait()){
+        Process rcontribDirSunSen(rcontribProgram,arguments2);
+        rsensor3.setStandardOutputProcess(&rcontribDirSunSen);
+        sensorDirSunDC=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_d.dc";
+        rcontribDirSunSen.setStandardOutputFile(sensorDirSunDC);
+        rcontribDirSunSen.setStandardInputFile(model->spaceDirectory()+model->inputDirectory()+model->ptsFile()[0]);
+        if (writeCL){
+            outCL<<rcontribDirSunSen.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcontrib for the sun (direct).\n"<<rcontribDirSunSen.commandLine()<<"\n***"<<std::endl;
+        }
+        rsensor3.start();
+        rcontribDirSunSen.start();
+        if (!rcontribDirSunSen.wait()){
             STADIC_LOG(Severity::Error, "The running of rcontrib for the shade sensor has failed for window group "+model->windowGroups()[blindGroupNum].name()+" within "+model->spaceName()+".");
             return false;
         }
-        arguments2.clear();
 
 
     }
@@ -1086,10 +1203,18 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->sunDivisions()));
-        arguments.push_back("-5");
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-d");
+        //arguments.push_back("-5");
+        //arguments.push_back("0.533");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
+        //arguments.push_back(".");
         std::string gendaymtxProgram="gendaymtx";
         Process gendaymtx(gendaymtxProgram,arguments);
 
@@ -1102,6 +1227,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<gendaymtx.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx for the sun.\n"<<gendaymtx.commandLine()<<"\n***"<<std::endl;
+        }
         gendaymtx.start();
         if (!gendaymtx.wait()){
             STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
@@ -1113,12 +1241,19 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->skyDivisions()));
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-c");
         arguments.push_back("1");
         arguments.push_back("1");
         arguments.push_back("1");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
+        //arguments.push_back(".");
         Process gendaymtx2(gendaymtxProgram,arguments);
 
         if (setting==-1){
@@ -1129,6 +1264,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         gendaymtx2.setStandardOutputFile(skySMX);
         if (writeCL){
             outCL<<gendaymtx2.commandLine()<<std::endl<<std::endl;;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx sky.\n"<<gendaymtx2.commandLine()<<"\n***"<<std::endl;
         }
         gendaymtx2.start();
         if (!gendaymtx2.wait()){
@@ -1142,9 +1280,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.clear();
         arguments.push_back("-m");
         arguments.push_back(std::to_string( model->skyDivisions()));
+        if (m_Model->buildingRotation() && m_Model->buildingRotation().get()!=0){
+            arguments.push_back("-r");
+            arguments.push_back(std::to_string((-1)*m_Model->buildingRotation().get()));
+        }
         arguments.push_back("-d");
+        /*eliminating the following line per Dr. Mistrick's request
         arguments.push_back("-ho");
+        */
         arguments.push_back(m_WeaFileName.get());
+        //arguments.push_back(".");
         Process gendaymtx3(gendaymtxProgram,arguments);
 
         if (setting==-1){
@@ -1156,6 +1301,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         if (writeCL){
             outCL<<gendaymtx3.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning gendaymtx for the sun patches.\n"<<gendaymtx3.commandLine()<<"\n***"<<std::endl;
+        }
         gendaymtx3.start();
         if (!gendaymtx3.wait()){
             STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
@@ -1166,8 +1314,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){
         //dctimestep | rcollate for the sensor for the sky
         arguments.clear();
+        /* eliminating this per Dr. Mistrick's request
         arguments.push_back("-n");
         arguments.push_back("8760");
+        */
         arguments.push_back(sensorSkyDC);
         arguments.push_back(skySMX);
         std::string dctimestepProgram="dctimestep";
@@ -1183,7 +1333,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::string sensorSkyCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sky.txt";
         rcollate.setStandardOutputFile(sensorSkyCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sky (sensor).\n"<<dctimestep.commandLine()<<"\n is piped to\n"<<rcollate.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep.start();
         rcollate.start();
         if (!rcollate.wait()){
@@ -1193,14 +1345,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorSunDC;
-        arguments[3]=sunSMX;
+        arguments[0]=sensorDirSunDC;
+        arguments[1]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sensorSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun.txt";
         Process rcollate2(rcollateProgram,arguments2);
         dctimestep2.setStandardOutputProcess(&rcollate2);
         rcollate2.setStandardOutputFile(sensorSunCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun (sensor).\n"<<dctimestep2.commandLine()<<"\n is piped to\n"<<rcollate2.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep2.start();
         rcollate2.start();
 
@@ -1214,14 +1368,16 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sensor for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=sensorSkyDC;
-        arguments[3]=sunPatchSMX;
+        arguments[0]=sensorSunDC;
+        arguments[1]=sunPatchSMX;
         Process dctimestep3(dctimestepProgram,arguments);
         std::string sensorSunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_shade_sun_patch.txt";
         Process rcollate3(rcollateProgram,arguments2);
         dctimestep3.setStandardOutputProcess(&rcollate3);
         rcollate3.setStandardOutputFile(sensorSunPatchCollated);
-
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun patch (sensor).\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep3.start();
         rcollate3.start();
 
@@ -1255,7 +1411,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         std::string finalIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[blindGroupNum].name()+"_shade_sig.tmp";
         rcalc.setStandardOutputFile(finalIll);
-
+        if (writeCL){
+            std::cout<<"***\nRunning rlam and rcalc (sensor).\n"<<rlam.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+        }
         rlam.start();
         rcalc.start();
 
@@ -1268,8 +1426,10 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
     if ((setting==-1 && model->windowGroups()[blindGroupNum].runBase())||(setting>=0 && model->windowGroups()[blindGroupNum].runSetting()[setting])){
         //dctimestep | rcollate for the sky
         arguments.clear();
+        /* eliminating this per Dr. Mistrick's request
         arguments.push_back("-n");
         arguments.push_back("8760");
+        */
         //Added this line from an email that didn't exist before
         arguments.push_back(skyDC);
         arguments.push_back(skySMX);
@@ -1296,6 +1456,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             //outCL<<"## Pipe the next two lines together"<<std::endl;
             outCL<<dctimestep.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sky.\n"<<dctimestep.commandLine()<<"\n is piped to\n"<<rcollate.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep.start();
         rcollate.start();
 
@@ -1308,9 +1471,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
         //dctimestep | rcollate for the sun
         //Added this line from an email that didn't exist before
-        arguments[2]=sunDC;
+        arguments[0]=directSunDC;
         STADIC_LOG(Severity::Info, "sunSMX file = "+sunSMX);
-        arguments[3]=sunSMX;
+        arguments[1]=sunSMX;
         Process dctimestep2(dctimestepProgram,arguments);
         std::string sunCollated;
         if (setting==-1){
@@ -1325,7 +1488,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             //outCL<<"## Pipe the next two lines together"<<std::endl;
             outCL<<dctimestep2.commandLine()<<std::endl<<std::endl;;
         }
-        STADIC_LOG(Severity::Info, dctimestep2.commandLine());
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun.\n"<<dctimestep2.commandLine()<<"\n is piped to\n"<<rcollate2.commandLine()<<"\n***"<<std::endl;
+        }
         dctimestep2.start();
         rcollate2.start();
 
@@ -1336,57 +1501,32 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             return false;
         }
 
-        //dctimestep | rcollate for the direct sun (sDA & ASE)
-        //Added this line from an email that didn't exist before
-        arguments[2]=directSunDC;
-        arguments[3]=sunSMX;
-        Process dctimestep3(dctimestepProgram,arguments);
-        std::string directSunCollated;
-        if (setting==-1){
-            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sun_direct.txt";
-        }else{
-            directSunCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sun_std_direct.txt";
-        }
-        Process rcollate3(rcollateProgram,arguments2);
-        dctimestep3.setStandardOutputProcess(&rcollate3);
-        rcollate3.setStandardOutputFile(directSunCollated);
-        if (writeCL){
-            //outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep3.commandLine()<<std::endl<<std::endl;;
-        }
-        dctimestep3.start();
-        rcollate3.start();
-
-        if(!rcollate3.wait()){
-            STADIC_ERROR("The running of rcollate for the direct sun has failed.");
-            //I want to display the errors here if the standard error has any errors to show.
-
-            return false;
-        }
-
         //dctimestep | rcollate for the sun patch
         //Added this line from an email that didn't exist before
-        arguments[2]=skyDC;
-        arguments[3]=sunPatchSMX;
-        Process dctimestep4(dctimestepProgram,arguments);
+        arguments[0]=sunDC;
+        arguments[1]=sunPatchSMX;
+        Process dctimestep3(dctimestepProgram,arguments);
         std::string sunPatchCollated;
         if (setting==-1){
             sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_sunPatch.txt";
         }else{
             sunPatchCollated=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(setting+1)+"_sunPatch_std.txt";
         }
-        Process rcollate4(rcollateProgram,arguments2);
-        dctimestep4.setStandardOutputProcess(&rcollate4);
-        rcollate4.setStandardOutputFile(sunPatchCollated);
+        Process rcollate3(rcollateProgram,arguments2);
+        dctimestep3.setStandardOutputProcess(&rcollate3);
+        rcollate3.setStandardOutputFile(sunPatchCollated);
         if (writeCL){
             //outCL<<"## Pipe the next two lines together"<<std::endl;
-            outCL<<dctimestep4.commandLine()<<std::endl<<std::endl;;
+            outCL<<dctimestep3.commandLine()<<std::endl<<std::endl;;
         }
-        dctimestep4.start();
-        rcollate4.start();
+        if (writeCL){
+            std::cout<<"***\nRunning dctimestep and rcollate for the sun patches.\n"<<dctimestep3.commandLine()<<"\n is piped to\n"<<rcollate3.commandLine()<<"\n***"<<std::endl;
+        }
+        dctimestep3.start();
+        rcollate3.start();
 
-        if(!rcollate4.wait()){
-            STADIC_ERROR("The running of rcollate for the sun patches has failed.");
+        if(!rcollate3.wait()){
+            STADIC_ERROR("The running of rcollate for the direct sun has failed.");
             //I want to display the errors here if the standard error has any errors to show.
 
             return false;
@@ -1424,6 +1564,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             //outCL<<"## Pipe the next two lines together"<<std::endl;
             outCL<<rlam.commandLine()<<std::endl<<std::endl;;
         }
+        if (writeCL){
+            std::cout<<"***\nRunning rlam and rcalc.\n"<<rlam.commandLine()<<"\n is piped to\n"<<rcalc.commandLine()<<"\n***"<<std::endl;
+        }
         rlam.start();
         rcalc.start();
 
@@ -1438,7 +1581,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-e");
         arguments.push_back("$1=floor(ill+.5)");
         Process rcalc2(rcalcProgram, arguments);
-        rcalc2.setStandardInputFile(directSunCollated);
+        rcalc2.setStandardInputFile(sunCollated);
         std::string directIll;
         if (setting==-1){
             directIll=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_direct_ill.tmp";
@@ -1448,6 +1591,9 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         rcalc2.setStandardOutputFile(directIll);
         if (writeCL){
             outCL<<rcalc.commandLine()<<std::endl<<std::endl;
+        }
+        if (writeCL){
+            std::cout<<"***\nRunning rcalc fr the direct component.\n"<<rcalc2.commandLine()<<"\n***"<<std::endl;
         }
         rcalc2.start();
 
@@ -1464,51 +1610,153 @@ bool Daylight::simCase1(int blindGroupNum, Control *model){
     //Simulation Case 1 will be for window groups that do not contain BSDFs
     //First simulate the base condition
     // This is not making a copy *and* it is a memory leak.
-    RadFileData *baseRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());    //This used to be (m_RadFiles[i],this), but the program failed to build
-    baseRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].baseGeometry());
-    std::string wgBaseFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.rad";
-    baseRad->writeRadFile(wgBaseFile);
-    //Test for primitive continuity once that is working
-    /*
-    if(!baseRad->isConsistent()){
-        STADIC_LOG(stadic::Severity::Error, "The base rad file for window group "+toString(blindGroupNum)+" is not continuous through the primitive tree.");
-        return false;
-    }
-    */
-    std::vector<std::string> files;
-    files.push_back(wgBaseFile);
-    files.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+"sky_white1.rad");
-    std::string outFileName;
-    outFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base.oct";
-    if (!createOctree(files, outFileName)){
-        return false;
-    }
-    //Call Standard Radiance run
-    if (!simStandard(blindGroupNum,-1,model)){
-        return false;
-    }
 
+	//NOTE that blindGroupNum is really a window group number *******
+	STADIC_LOG(Severity::Warning, "FIRST POINT");
+
+	RadFileData baseRad = m_RadFiles[blindGroupNum]->primitives();
+		//RadFileData  baseRad;
+		//new RadFileData
+		//(m_RadFiles[blindGroupNum]->primitives());    //This used to be (m_RadFiles[i],this), but the program failed to build
+		//baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
+		//baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
+
+		RadPrimitive *black = new PlasticMaterial(0, 0, 0, 0, 0);
+		black->setModifier(RadPrimitive::sharedVoid());
+		black->setName("black");
+		auto found = baseRad.addPrimitive(black);
+		std::string outFileName;
+		
+		baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
+		STADIC_LOG(Severity::Warning, "SECOND POINT");
+
+		for (int j = 0; j < model->windowGroups().size(); j++){
+
+
+			//STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
+
+			if (blindGroupNum != j){
+				if (!baseRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())){
+					return false;
+				}
+				std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
+
+				for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++){
+					std::string ccd = model->windowGroups()[j].glazingLayers()[k];
+					STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
+
+					auto materialaddress = baseRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+					baseRad.setAlias(materialaddress, found);
+					int asize = baseRad.m_aliases.size();
+				//	std::string asi = toString(asize);
+
+
+				}
+			}
+		
+
+		std::string wgBaseFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.rad";
+		baseRad.writeRadFile(wgBaseFile);
+		//Test for primitive continuity once that is working
+		/*
+		if(!baseRad->isConsistent()){
+		STADIC_LOG(stadic::Severity::Error, "The base rad file for window group "+toString(blindGroupNum)+" is not continuous through the primitive tree.");
+		return false;
+		}
+		*/
+		std::vector<std::string> files;
+		files.push_back(wgBaseFile);
+		files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
+		std::string outFileName;
+
+		outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_base.oct";
+		if (!createOctree(files, outFileName)){
+			return false;
+		}
+		//Call Standard Radiance run
+
+		if (!simStandard(blindGroupNum, -1, model)){
+			return false;
+		}
+	}
     //Loop through the shade settings
     if (model->windowGroups()[blindGroupNum].shadeSettingGeometry().size()>0){
-        for (unsigned int i=0;i<model->windowGroups()[blindGroupNum].shadeSettingGeometry().size();i++){
-            // Memory leak
-            RadFileData *wgRad=new RadFileData(m_RadFiles[blindGroupNum]->primitives());
-            wgRad->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i]);
-            std::string wgSetFile=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_std.rad";
-            wgRad->writeRadFile(wgSetFile);
-            files.clear();
-            files.push_back(wgSetFile);
-            files.push_back(model->spaceDirectory()+model->intermediateDataDirectory()+"sky_white1.rad");
-            outFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_set"+std::to_string(i+1)+"_std.oct";
-            if (!createOctree(files, outFileName)){
-                return false;
-            }
-            //call Standard Radiance run
-            if (!simStandard(blindGroupNum,i,model)){
-                return false;
-            }
+		for (unsigned int i = 0; i < model->windowGroups()[blindGroupNum].shadeSettingGeometry().size(); i++){
+			// Memory leak
+			STADIC_LOG(Severity::Warning, "1 POINT");
+
+			RadFileData wgRad = m_RadFiles[blindGroupNum]->primitives();
+			//RadFileData wgRad;
+			STADIC_LOG(Severity::Warning, "2 POINT");
+
+			//wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].baseGeometry());
+			wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->matFile());
+			//new RadFileData(m_RadFiles[blindGroupNum]->primitives());
+			//black->setModifier(RadPrimitive::sharedVoid());
+			//black->setName("black");
+
+			auto found1 = wgRad.addPrimitive(black);
+			STADIC_LOG(Severity::Warning, "3 POINT");
+
+			wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->geoFile());
+			if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[blindGroupNum].shadeSettingGeometry()[i])){
+				STADIC_LOG(Severity::Warning, "ADDRAD FALSE");
+			}
+			STADIC_LOG(Severity::Warning, "4 POINT");
+
+			std::string wgSetFile = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.rad";
+			// THE FOLLOWING IS NEW
+
+			STADIC_LOG(Severity::Warning, "Before j loop " + toString(i));
+
+			std::string ist, jst;
+			for (int j = 0; j < model->windowGroups().size(); j++){
+				ist = toString(i);
+				jst = toString(j);
+
+				STADIC_LOG(Severity::Warning, "The alias size is  ij " + ist + jst);
+				if (blindGroupNum != j){
+					if (!wgRad.addRad(model->spaceDirectory() + model->geoDirectory() + model->windowGroups()[j].baseGeometry())){
+						return false;
+					}
+					std::vector<std::string> layers1 = model->windowGroups()[j].glazingLayers();
+
+					for (int k = 0; k < model->windowGroups()[j].glazingLayers().size(); k++){
+						std::string ccd = model->windowGroups()[j].glazingLayers()[k];
+						STADIC_LOG(Severity::Warning, "The alias size is  ccd " + ccd);
+
+						auto materialaddress = wgRad.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+						wgRad.setAlias(materialaddress, found1);
+
+
+					}
+				}
+			}
+
+
+			// END OF NEW
+			wgRad.writeRadFile(wgSetFile);
+			std::vector<std::string> files;
+			files.clear();
+			files.push_back(wgSetFile);
+			files.push_back(model->spaceDirectory() + model->intermediateDataDirectory() + "sky_white1.rad");
+			outFileName = model->spaceDirectory() + model->intermediateDataDirectory() + model->spaceName() + "_" + model->windowGroups()[blindGroupNum].name() + "_set" + std::to_string(i + 1) + "_std.oct";
+			if (!createOctree(files, outFileName)){
+				return false;
+			}
+			//call Standard Radiance run
+			STADIC_LOG(Severity::Warning, "SECOND POINT");
+
+			if (!simStandard(blindGroupNum, i, model)){
+				return false;
+			}
+			STADIC_LOG(Severity::Warning, "ended");
+		
+			//free(black);
         }
     }
+	STADIC_LOG(Severity::Warning, "ended");
+
     return true;
 }
 
@@ -1603,7 +1851,6 @@ bool Daylight::simCase2(int blindGroupNum, Control *model){
                 if (!createOctree(files, outFileName)){
                     return false;
                 }
-
                 //call Standard Radiance run
                 if (!simStandard(blindGroupNum,i,model)){
                     return false;
@@ -2316,9 +2563,17 @@ bool Daylight::createBaseRadFiles(Control *model){
     RadPrimitive *black = new PlasticMaterial(0,0,0,0,0);
     black->setModifier(RadPrimitive::sharedVoid());
     black->setName("black");
-    radModel.addPrimitive(black);
+    auto found = radModel.addPrimitive(black);
+/*std::shared_ptr<RadPrimitive> found = nullptr;
+for(auto materil : Rad->materials()) {
+	if (materil->Name() == "black") {
+    found = materil;
+   // break;
+  }
+}*/
     //Add the main geometry file to the primitive list
     radModel.addRad(model->spaceDirectory()+model->geoDirectory()+model->geoFile());
+
 
     //Create main rad files for each of the window groups
         //The window group rad file will contain the base rad files and each of the other
@@ -2335,10 +2590,22 @@ bool Daylight::createBaseRadFiles(Control *model){
                 if(!wgRadModel->addRad(model->spaceDirectory()+model->geoDirectory()+model->windowGroups()[j].baseGeometry())){
                     return false;
                 }
-                for (int k=0;k<model->windowGroups()[j].glazingLayers().size();k++){
-//                    if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
-//                        return false;
-//                    }
+
+
+
+                for (int k=0;k<model->windowGroups()[j].glazingLayers().size();k++){ 
+					//std::shared_ptr<RadPrimitive> RadFileData::glazingsearch( std::string name);
+					auto materialaddress = radModel.glazingsearch(model->windowGroups()[j].glazingLayers()[k]);
+
+
+
+					wgRadModel->setAlias(materialaddress, found);
+						//wgRadModel->setAlias(found, found);
+	std::string xsx = toString(wgRadModel->m_aliases.size()); 
+	STADIC_LOG(Severity::Warning, "after SETTING++"+xsx);
+					                    //if(!wgRadModel->blackOutLayer(model->windowGroups()[j].glazingLayers()[k])){
+                    //    return false;
+                    //}
                 }
             }
         }
@@ -2379,7 +2646,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         //Base Illuminance files
         FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base.ill";
         tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_ill.tmp";
-        DaylightIlluminanceData baseIll;
+        DaylightIlluminanceData baseIll("lux");
 
         if(isFile(tempFileName)){
             if (!baseIll.parse(tempFileName,m_Model->weaDataFile().get())){
@@ -2395,7 +2662,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll.writeIllFileLux(FinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIll.writeIllFileLux(FinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIll.writeIllFileFC(FinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }else{
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0.ill";
             if(isFile(tempFileName)){
@@ -2414,13 +2692,24 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIll.writeIllFileLux(FinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIll.writeIllFileLux(FinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIll.writeIllFileFC(FinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }
         //base signal files
         if (model->windowGroups()[i].shadeControl()->needsSensor()){
-            finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";;
+            finalSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade.sig";
             tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+ model->windowGroups()[i].name()+"_shade_sig.tmp";
-            DaylightIlluminanceData baseSig;
+            DaylightIlluminanceData baseSig("lux");
             if(isFile(tempSensorFileName)){
                 if (!baseSig.parse(tempSensorFileName,m_Model->weaDataFile().get())){
                     return false;
@@ -2435,7 +2724,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                baseSig.writeIllFileLux(finalSensorFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!baseSig.writeIllFileLux(finalSensorFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!baseSig.writeIllFileFC(finalSensorFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 tempSensorFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_shade_bsdf0.sig";
                 if(isFile(tempSensorFileName)){
@@ -2454,12 +2754,23 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                baseSig.writeIllFileLux(finalSensorFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!baseSig.writeIllFileLux(finalSensorFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!baseSig.writeIllFileFC(finalSensorFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }
         }
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData settingIll;
+            DaylightIlluminanceData settingIll("lux");
             tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_ill_std.tmp";
             FinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+".ill";
             if(isFile(tempFileName)){
@@ -2474,7 +2785,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                settingIll.writeIllFileLux(FinalIllFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!settingIll.writeIllFileLux(FinalIllFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!settingIll.writeIllFileFC(FinalIllFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 tempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0.ill";
                 if(isFile(tempFileName)){
@@ -2487,7 +2809,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                             settingIll.addIllFile(tempFileName);
                         }
                     }
-                    settingIll.writeIllFileLux(FinalIllFileName);
+                    if (model->illumUnits()=="lux"){
+                        if (!settingIll.writeIllFileLux(FinalIllFileName)){
+                            return false;
+                        }
+                    }else if (model->illumUnits()=="fc"){
+                        if (!settingIll.writeIllFileFC(FinalIllFileName)){
+                            return false;
+                        }
+                    }else{
+                        STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                        return false;
+                    }
                 }else{
                     STADIC_ERROR("The illuminance file "+tempFileName+" does not exist.");
                     return false;
@@ -2503,7 +2836,7 @@ bool Daylight::sumIlluminanceFiles(Control *model){
         //Base Illuminance files
         directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct.ill";
         directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_direct_ill.tmp";
-        DaylightIlluminanceData baseIllDirect;
+        DaylightIlluminanceData baseIllDirect("lux");
         if(isFile(directTempFileName)){
             if (!baseIllDirect.parse(directTempFileName,m_Model->weaDataFile().get())){
                 return false;
@@ -2518,7 +2851,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIllDirect.writeIllFileLux(directFinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIllDirect.writeIllFileFC(directFinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }else{
             directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_base_bsdf0_direct.ill";
             if(isFile(directTempFileName)){
@@ -2537,11 +2881,22 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                     }
                 }
             }
-            baseIllDirect.writeIllFileLux(directFinalIllFileName);
+            if (model->illumUnits()=="lux"){
+                if (!baseIllDirect.writeIllFileLux(directFinalIllFileName)){
+                    return false;
+                }
+            }else if (model->illumUnits()=="fc"){
+                if (!baseIllDirect.writeIllFileFC(directFinalIllFileName)){
+                    return false;
+                }
+            }else{
+                STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                return false;
+            }
         }
         //Shade Setting Illuminance files
         for (int j=0;j<model->windowGroups()[i].shadeSettingGeometry().size();j++){
-            DaylightIlluminanceData settingIllDirect;
+            DaylightIlluminanceData settingIllDirect("lux");
             directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct_ill_std.tmp";
             directFinalIllFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string((j+1))+"_direct.ill";
             if(isFile(tempFileName)){
@@ -2556,7 +2911,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                         }
                     }
                 }
-                settingIllDirect.writeIllFileLux(directFinalIllFileName);
+                if (model->illumUnits()=="lux"){
+                    if (!settingIllDirect.writeIllFileLux(directFinalIllFileName)){
+                        return false;
+                    }
+                }else if (model->illumUnits()=="fc"){
+                    if (!settingIllDirect.writeIllFileFC(directFinalIllFileName)){
+                        return false;
+                    }
+                }else{
+                    STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                    return false;
+                }
             }else{
                 directTempFileName=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[i].name()+"_set"+std::to_string(j)+"_bsdf0_direct.ill";
                 if(isFile(directTempFileName)){
@@ -2569,7 +2935,18 @@ bool Daylight::sumIlluminanceFiles(Control *model){
                             settingIllDirect.addIllFile(directTempFileName);
                         }
                     }
-                    settingIllDirect.writeIllFileLux(directFinalIllFileName);
+                    if (model->illumUnits()=="lux"){
+                        if (!settingIllDirect.writeIllFileLux(directFinalIllFileName)){
+                            return false;
+                        }
+                    }else if (model->illumUnits()=="fc"){
+                        if (!settingIllDirect.writeIllFileFC(directFinalIllFileName)){
+                            return false;
+                        }
+                    }else{
+                        STADIC_LOG(Severity::Error, "The illuminance units must be \"fc\" or \"lux\".");
+                        return false;
+                    }
                 }else{
                     STADIC_ERROR("The illuminance file "+directTempFileName+" does not exist.");
                     return false;
