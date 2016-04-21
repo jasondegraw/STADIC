@@ -12,6 +12,7 @@ cd ..
 wget http://www.radiance-online.org/download-install/radiance-source-code/archived-releases/latest-release/rad5R0supp.tar.gz
 tar xzf rad5R0supp.tar.gz
 wget http://download.osgeo.org/libtiff/tiff-4.0.6.tar.gz
+tar xzf tiff-4.0.6.tar.gz
 mv tiff-4.0.6 ray/src/px/tiff
 cd ray
 sed --in-place '/more License.txt/d' makeall
