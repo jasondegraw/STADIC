@@ -202,10 +202,10 @@ bool ControlZone::setLLF(double value)
 
 bool ControlZone::setLampLumens(int value)
 {
-    if (value>0){
+    if (value>0 || value==-1){
         m_LampLumens=value;
     }else{
-        STADIC_ERROR("The \"lamp_lumens\" must be greater than 0.");
+        STADIC_ERROR("The \"lamp_lumens\" must be greater than 0 for relative photometry or -1 for absolute photometry.");
         return false;
     }
     return true;

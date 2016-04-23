@@ -133,6 +133,9 @@ bool ElectricLight::lum2Rad(ControlZone zone, std::string zoneRadFile, std::stri
     if (initialLumens==0){
         return false;
     }
+    if (zone.lampLumens()>0 && initialLumens==-1){
+        STADIC_LOG(Severity::Info, "The ies file for "+zone.name()+" contains absolute photometry.  The lamp lumens in the control file will be ignored.");
+    }
     //Write the rad file format from the ies photometry file using ies2rad.
     std::vector<std::string> arguments;
     std::string ies2radProgram;
