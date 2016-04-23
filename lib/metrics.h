@@ -55,6 +55,7 @@ private:
     bool calculatesDA(Control *model, DaylightIlluminanceData *dayIll);
     bool calculateOccsDA(Control *model, DaylightIlluminanceData *dayIll);
     bool parseOccupancy(std::string file, double threshold);
+    bool calculateCP(Control *model, DaylightIlluminanceData *dayIll);
     BuildingControl *m_Model;
     std::vector<bool> m_Occupancy;
 

@@ -31,6 +31,7 @@
 #include "metrics.h"
 #include "logging.h"
 #include "dayill.h"
+#include "elecill.h"
 #include <fstream>
 #include "functions.h"
 #include "gridmaker.h"
@@ -654,5 +655,39 @@ bool Metrics::parseOccupancy(std::string file, double threshold){
     occFile.close();
     return true;
 }
+
+bool Metrics::calculateCP(Control *model, DaylightIlluminanceData *dayIll){
+    //Check to see how many dimmed zones there are.  Currently the critical point analysis can only handle one dimmed zone
+    int numDimZones;
+    numDimZones=0;
+    for (int i=0;i<model->controlZones().size();i++){
+        if (model->controlZones()[i].algorithm()!="null"){
+            numDimZones++;
+        }
+    }
+    if (numDimZones>1){
+        STADIC_LOG(Severity::Error, "The Critical Point analysis cannot be ran for the space named "+model->spaceName()+" because there is more than one dimmed zone.");
+        return false;
+    }
+    ElectricIlluminanceData dimmedZone;
+    std::vector<ElectricIlluminanceData> nonDimmedZones;
+
+    for (int i=0;model->controlZones().size();i++){
+        if (model->controlZones()[i].algorithm()!="null"){
+            dimmedZone.parseIlluminance(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->controlZones()[i].name()+".ill");
+        }else{
+            ElectricIlluminanceData tempZone;
+            tempZone.parseIlluminance(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_"+model->controlZones()[i].name()+".ill");
+            nonDimmedZones.push_back(tempZone);
+        }
+    }
+
+
+
+
+
+
+}
+
 
 }

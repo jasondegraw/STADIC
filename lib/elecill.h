@@ -63,6 +63,8 @@ class STADIC_API ElectricIlluminanceData
 public:
     ElectricIlluminanceData();
     bool parseIlluminance(std::string fileName);        //Function to parse an electric lighting illuminance file given the filename
+    bool parseNonSpatialIlluminance(std::string illFileName, std::string ptsFileName, std::string outFileName, std::string units);
+    bool writeIlluminanceFile(std::string fileName, std::string units);
 
     //Getters
     std::vector<SpatialIlluminance> illuminance();      //Function that returns the illuminance of an electric light zone as a vector of illuminance points in lux

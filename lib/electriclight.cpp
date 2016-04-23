@@ -36,6 +36,7 @@
 #include "stadicprocess.h"
 #include "gridmaker.h"
 #include "functions.h"
+#include "elecill.h"
 
 namespace stadic{
 
@@ -257,7 +258,7 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
         return false;
     }
 
-    //Read in the temporary illuminance file and generate the final illuminance file.
+    //Read in the temporary illuminance file and generate the final illuminance file once rcalc has been run.
     arguments.clear();
     std::string rcalcProgram;
     rcalcProgram="rcalc";
@@ -270,10 +271,15 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
 
     Process rcalc(rcalcProgram, arguments);
     rcalc.setStandardInputFile(zoneIllFile+".tmp");
-    rcalc.setStandardOutputFile(zoneIllFile);
+    rcalc.setStandardOutputFile(zoneIllFile+".tmp2");
     rcalc.start();
     if (!rcalc.wait()){
-        STADIC_LOG(Severity::Error, "The running of rcalc has failed for creating the electric lighting illuminance file " + zoneIllFile+".");
+        STADIC_LOG(Severity::Error, "The running of rcalc has failed for creating the electric lighting illuminance file " + zoneIllFile+".tmp2.");
+        return false;
+    }
+
+    ElectricIlluminanceData finalIll;
+    if (!finalIll.parseNonSpatialIlluminance(zoneIllFile+".tmp2", m_Model->spaces()[spaceIndex]->spaceDirectory()+m_Model->spaces()[spaceIndex]->inputDirectory()+ptsFile, zoneIllFile, m_Model->illumUnits().get())){
         return false;
     }
 

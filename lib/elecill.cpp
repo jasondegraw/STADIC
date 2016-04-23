@@ -115,5 +115,69 @@ bool ElectricIlluminanceData::parseIlluminance(std::string fileName){
     iFile.close();
     return true;
 }
+bool ElectricIlluminanceData::parseNonSpatialIlluminance(std::string illFileName, std::string ptsFileName, std::string outFileName, std::string units){
+    //Open all necessary files
+    std::ifstream illFile;
+    illFile.open(illFileName);
+    if (!illFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the illuminance file "+illFileName+" has failed.");
+        return false;
+    }
+
+    std::ifstream ptsFile;
+    ptsFile.open(ptsFileName);
+    if (!ptsFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the points file "+ptsFileName+" has failed.");
+        return false;
+    }
+
+    //Begin reading files to merge them into the spatial illuminance data.
+    std::string illLine;
+    std::string ptsLine;
+    while (std::getline(illFile, illLine)){
+        std::getline(ptsFile, ptsLine);
+        std::vector<std::string> ptsVals;
+        ptsVals=split(ptsLine, ' ');
+        if (ptsVals.size()!=6){
+            STADIC_LOG(Severity::Error, "The points file "+ptsFileName +" does not contain 6 items per line.");
+            return false;
+        }
+        m_Illuminance.push_back(SpatialIlluminance(ptsVals[0], ptsVals[1], ptsVals[2], toDouble(illLine)));
+    }
+
+    //Close all necessary files
+    illFile.close();
+    ptsFile.close();
+
+    //Write the illuminance file
+    if (!writeIlluminanceFile(outFileName, units)){
+        return false;
+    }
+
+    return true;
+}
+
+bool ElectricIlluminanceData::writeIlluminanceFile(std::string fileName, std::string units){
+    std::ofstream outFile;
+    outFile.open(fileName);
+    if (!outFile.is_open()){
+        STADIC_LOG(Severity::Error, "The opening of the output illuminance file named "+fileName+" has failed.");
+        return false;
+    }
+    for (int i=0;i<m_Illuminance.size();i++){
+        outFile<<m_Illuminance[i].x()<<" "<<m_Illuminance[i].y()<<" "<<m_Illuminance[i].z()<<" ";
+        if (units=="lux"){
+            outFile<<m_Illuminance[i].lux()<<std::endl;
+        }else if (units=="fc"){
+            outFile<<m_Illuminance[i].fc()<<std::endl;
+        }else{
+            STADIC_LOG(Severity::Error, "The units for writing an illumiance file must be \"lux\" or \"fc\".");
+            return false;
+        }
+    }
+    outFile.close();
+    return true;
+}
+
 
 }
