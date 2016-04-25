@@ -226,6 +226,48 @@ bool Metrics::calculateDF(Control *model, DaylightIlluminanceData *dayIll)
 }
 bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
 {
+
+    std::vector<double> countWithin;
+    std::vector<double> countBelow;
+    std::vector<double> countAbove;
+    for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
+        countWithin.push_back(0);
+        countBelow.push_back(0);
+        countAbove.push_back(0);
+    }
+
+    int hourCount=0;
+    for (auto v: dayIll->illuminance()){
+        if (m_Occupancy[hourCount]){
+            if (model->illumUnits()=="lux"){
+                int pointIndex=0;
+                for (auto p: v.lux()){
+                    if (p<model->UDIMin()){
+                        countBelow[pointIndex]++;
+                    }else if (p<=model->UDIMax()){
+                        countWithin[pointIndex]++;
+                    }else{
+                        countAbove[pointIndex]++;
+                    }
+                    pointIndex++;
+                }
+            }else{
+                int pointIndex=0;
+                for (auto p: v.fc()){
+                    if (p<model->UDIMin()){
+                        countBelow[pointIndex]++;
+                    }else if (p<=model->UDIMax()){
+                        countWithin[pointIndex]++;
+                    }else{
+                        countAbove[pointIndex]++;
+                    }
+                    pointIndex++;
+                }
+            }
+        }
+        hourCount++;
+    }
+    /*
     std::vector<double> countWithin;
     std::vector<double> countBelow;
     std::vector<double> countAbove;
@@ -261,7 +303,7 @@ bool Metrics::calculateUDI(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     std::ofstream outUDIbelow;
     std::string tmpFileName;
     tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_below_UDI.res";
