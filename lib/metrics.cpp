@@ -92,6 +92,35 @@ bool Metrics::processMetrics()
 bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
 {
     std::vector<int> pointCount;
+    for (auto v: dayIll->illuminance()[0].lux()){
+        pointCount.push_back(0);
+    }
+    int hourCount=0;
+    for (auto v: dayIll->illuminance()){
+        if (m_Occupancy[hourCount]){
+            if (model->illumUnits()=="lux"){
+                int pointIndex=0;
+                for (auto p: v.lux()){
+                    if (p>model->DAIllum()){
+                        pointCount[pointIndex]++;
+                    }
+                    pointIndex++;
+                }
+            }else{
+                int pointIndex=0;
+                for (auto p: v.fc()){
+                    if (p>model->DAIllum()){
+                        pointCount[pointIndex]++;
+                    }
+                    pointIndex++;
+                }
+            }
+        }
+        hourCount++;
+    }
+
+    /*
+    std::vector<int> pointCount;
     for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
         pointCount.push_back(0);
     }
@@ -114,7 +143,7 @@ bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     std::ofstream outDA;
     std::string tmpFileName;
     tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_DA.res";
@@ -131,6 +160,30 @@ bool Metrics::calculateDA(Control *model, DaylightIlluminanceData *dayIll)
 }
 bool Metrics::calculatecDA(Control *model, DaylightIlluminanceData *dayIll)
 {
+    std::vector<int> pointCount;
+    for (auto v: dayIll->illuminance()[0].lux()){
+        pointCount.push_back(0);
+    }
+    int hourCount=0;
+    for (auto v: dayIll->illuminance()){
+        if (m_Occupancy[hourCount]){
+            if (model->illumUnits()=="lux"){
+                int pointIndex=0;
+                for (auto p: v.lux()){
+                    pointCount[pointIndex]=pointCount[pointIndex]+p/model->cDAIllum();
+                    pointIndex++;
+                }
+            }else{
+                int pointIndex=0;
+                for (auto p: v.fc()){
+                    pointCount[pointIndex]=pointCount[pointIndex]+p/model->cDAIllum();
+                    pointIndex++;
+                }
+            }
+        }
+        hourCount++;
+    }
+    /*
     std::vector<double> pointCount;
     for (int i=0;i<dayIll->illuminance()[0].lux().size();i++){
         pointCount.push_back(0);
@@ -150,7 +203,7 @@ bool Metrics::calculatecDA(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     std::ofstream outcDA;
     std::string tmpFileName;
     tmpFileName=model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_cDA.res";
