@@ -137,6 +137,25 @@ bool Daylight::simDaylight()
             return false;
         }
     }
+
+    //CleanUp SMX files before the program runs again next time.
+    for (int i=0;i<m_Model->spaces().size();i++){
+        PathName skyPath(m_Model->spaces()[i]->spaceDirectory()+m_Model->spaces()[i]->intermediateDataDirectory()+"k.smx");
+        if (skyPath.exists()){
+            skyPath.remove();
+        }
+
+        PathName sunPath(m_Model->spaces()[i]->spaceDirectory()+m_Model->spaces()[i]->intermediateDataDirectory()+"d.smx");
+        if (sunPath.exists()){
+            sunPath.remove();
+        }
+
+        PathName sun2Path(m_Model->spaces()[i]->spaceDirectory()+m_Model->spaces()[i]->intermediateDataDirectory()+"kd.smx");
+        if (sun2Path.exists()){
+            sun2Path.remove();
+        }
+
+    }
     return true;
 }
 
@@ -1092,7 +1111,19 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back(m_WeaFileName.get());
         std::string gendaymtxProgram="gendaymtx";
         Process gendaymtx(gendaymtxProgram,arguments);
+        sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+"d.smx";
+        gendaymtx.setStandardOutputFile(sunSMX);
+        PathName sunsSMXpath(sunSMX);
+        if (!sunsSMXpath.exists()){
+            gendaymtx.start();
+            if (!gendaymtx.wait()){
+                STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
+                return false;
+            }
+        }
 
+        /*
+         * Possibly get rid of this section if the previous works.
         if (setting==-1){
             sunSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_d.smx";
         }else{
@@ -1107,6 +1138,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             STADIC_ERROR("The creation of the suns has failed. The command line is displayed below:\n\t"+gendaymtx.commandLine());
             return false;
         }
+        */
 
 
         //gendaymtx for sky
@@ -1120,7 +1152,19 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-ho");
         arguments.push_back(m_WeaFileName.get());
         Process gendaymtx2(gendaymtxProgram,arguments);
+        skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+"k.smx";
+        gendaymtx2.setStandardOutputFile(skySMX);
+        PathName skySMXpath(skySMX);
+        if (!skySMXpath.exists()){
+            gendaymtx2.start();
+            if (!gendaymtx2.wait()){
+                STADIC_ERROR("The creation of the sky has failed with the following errors.");
+                //I want to display the errors here if the standard error has any errors to show.
+                return false;
+            }
+        }
 
+        /*
         if (setting==-1){
             skySMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_k.smx";
         }else{
@@ -1137,6 +1181,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
 
             return false;
         }
+        */
 
         //gendaymtx for sun in patches
         arguments.clear();
@@ -1146,7 +1191,19 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
         arguments.push_back("-ho");
         arguments.push_back(m_WeaFileName.get());
         Process gendaymtx3(gendaymtxProgram,arguments);
+        sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+"kd.smx";
+        gendaymtx3.setStandardOutputFile(sunPatchSMX);
+        PathName sunPathSMXpath(sunPatchSMX);
+        if (!sunPathSMXpath.exists()){
+            gendaymtx3.start();
+            if (!gendaymtx3.wait()){
+                STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
+                return false;
+            }
+        }
 
+
+        /*
         if (setting==-1){
             sunPatchSMX=model->spaceDirectory()+model->intermediateDataDirectory()+model->spaceName()+"_"+model->windowGroups()[blindGroupNum].name()+"_base_kd.smx";
         }else{
@@ -1161,6 +1218,7 @@ bool Daylight::simStandard(int blindGroupNum, int setting, Control *model){
             STADIC_ERROR("The creation of the sun patches has failed.  The command line is as follows:\n\t"+gendaymtx3.commandLine());
             return false;
         }
+        */
     }
 
     if ((setting==-1 && model->windowGroups()[blindGroupNum].shadeControl()->needsSensor())){

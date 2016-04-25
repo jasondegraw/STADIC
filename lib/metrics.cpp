@@ -320,6 +320,45 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     }
     //Calculate ASE
     std::vector<int> countASE;
+    countASE.resize(baseDirectIlls[0].illuminance()[0].lux().size());
+    for (int i=0;i<countASE.size();i++){
+        countASE[i]=0;
+    }
+    std::vector<std::vector<double>> tempIll;
+    tempIll.resize(baseDirectIlls[0].illuminance().size());
+    int j=0;
+    for (auto v: baseDirectIlls[0].illuminance()){
+        tempIll[j].resize(countASE.size());
+        j++;
+    }
+
+    for (int i=0;i<baseDirectIlls.size();i++){                  //Loop over the illuminance files
+        int hours=0;
+        for (auto v: baseDirectIlls[i].illuminance()){          //Loop over the hours in the year for each illuminance file
+            int points=0;
+            for (auto p: v.lux()){
+                tempIll[hours][points]=p;
+                points++;
+            }
+            hours++;
+        }
+    }
+    for (int i=0;i<tempIll.size();i++){
+        for (int j=0;j<tempIll[i].size();j++){
+            if (tempIll[i][j]>1000){
+                countASE[j]++;
+            }
+        }
+    }
+    int totalPoints=0;
+    for (int i=0;i<countASE.size();i++){
+        if (countASE[i]>250){
+            totalPoints++;
+        }
+    }
+
+    /*
+    std::vector<int> countASE;
     for (int i=0;i<baseDirectIlls[0].illuminance()[0].lux().size();i++){            //Loop over points
         countASE.push_back(0);
         for (int j=0;j<baseDirectIlls[0].illuminance().size();j++){                 //Loop over hours in the year
@@ -340,6 +379,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
             totalPoints++;
         }
     }
+    */
     //Write out ASE
     std::ofstream outASE;
     outASE.open(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_ASE.res");
@@ -447,6 +487,34 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
     std::vector<int> sDACount;
     sDACount.resize(finalIlluminance.illuminance()[0].lux().size());
     if (model->illumUnits()=="lux"){
+        for (auto v: finalIlluminance.illuminance()){
+            if (v.hour()>=model->sDAStart() && v.hour()<=model->sDAEnd()){
+                countHours++;
+                int j=0;
+                for (auto p: v.lux()){
+                    if (p>model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                    j++;
+                }
+            }
+        }
+    }else{
+        for (auto v: finalIlluminance.illuminance()){
+            if (v.hour()>=model->sDAStart()&& v.hour()<=model->sDAEnd()){
+                countHours++;
+                int j=0;
+                for (auto p: v.fc()){
+                    if (p>model->sDAIllum()){
+                        sDACount[j]++;
+                    }
+                    j++;
+                }
+            }
+        }
+    }
+    /*
+    if (model->illumUnits()=="lux"){
         for (int i=0;i<finalIlluminance.illuminance().size();i++){          //Loop over the whole year
             if (finalIlluminance.illuminance()[i].hour()>=model->sDAStart()&&finalIlluminance.illuminance()[i].hour()<=model->sDAEnd()){
                 countHours++;
@@ -469,7 +537,7 @@ bool Metrics::calculatesDA(Control *model, DaylightIlluminanceData *dayIll)
             }
         }
     }
-
+    */
     finalIlluminance.writeIllFileLux(model->spaceDirectory()+model->resultsDirectory()+model->spaceName()+"_sDA.ill");
     int finalsDA=0;
     for (int i=0;i<sDACount.size();i++){

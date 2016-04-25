@@ -37,6 +37,7 @@
 #include "gridmaker.h"
 #include "functions.h"
 #include "elecill.h"
+#include "filepath.h"
 
 namespace stadic{
 
@@ -70,10 +71,10 @@ bool ElectricLight::simElectricLight()
             return false;
         }
         for (int j=0;j<zones.size();j++){
-            radFileNames.push_back(iesDirectory+spaces[i].get()->spaceName()+"_"+zones[i].name()+".rad");
-            illFileNames.push_back(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+zones[i].name()+".ill");
+            radFileNames.push_back(iesDirectory+spaces[i].get()->spaceName()+"_"+zones[j].name()+".rad");
+            illFileNames.push_back(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+zones[j].name()+".ill");
             iesFileName=iesDirectory+zones[j].iesFile();
-            if (!lum2Rad(zones[i], radFileNames[j], iesFileName, radUnits, iesDirectory)){
+            if (!lum2Rad(zones[j], radFileNames[j], iesFileName, radUnits, iesDirectory)){
                 return false;
             }
             //Test whether the points file exists.  If it doesn't, test whether the necessary arguments to create one exist.
@@ -241,9 +242,14 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
     }else{
         STADIC_LOG(Severity::Fatal, "The default parameter set is not found.");
     }
+
     //Create the octree
     std::string octName;
     octName=m_Model->spaces()[spaceIndex]->spaceDirectory()+m_Model->spaces()[spaceIndex]->geoDirectory()+m_Model->spaces()[spaceIndex]->spaceName()+".oct";
+    PathName octree(octName);
+    if (octree.exists()){
+        octree.remove();
+    }
     if (!createOctree(radFiles, octName)){
         STADIC_LOG(Severity::Fatal, "The creation of the octree failed.");
     }
@@ -278,9 +284,22 @@ bool ElectricLight::simZone(std::vector<std::string> radFiles, std::string ptsFi
         return false;
     }
 
+    //Remove rtrace tmp file
+    PathName rtraceTmp(zoneIllFile+".tmp");
+    if (rtraceTmp.exists()){
+        rtraceTmp.remove();
+    }
+
+
     ElectricIlluminanceData finalIll;
     if (!finalIll.parseNonSpatialIlluminance(zoneIllFile+".tmp2", m_Model->spaces()[spaceIndex]->spaceDirectory()+m_Model->spaces()[spaceIndex]->inputDirectory()+ptsFile, zoneIllFile, m_Model->illumUnits().get())){
         return false;
+    }
+
+    //Remove rcalc tmp file
+    PathName rcalcTmp(zoneIllFile+".tmp2");
+    if (rcalcTmp.exists()){
+        rcalcTmp.remove();
     }
 
     return true;
