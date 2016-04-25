@@ -31,6 +31,7 @@
 #include "dayill.h"
 #include "logging.h"
 #include <fstream>
+#include <cmath>
 #include "functions.h"
 #include "weatherdata.h"
 
@@ -68,7 +69,7 @@ std::vector<double> TemporalIlluminance::lux(){
 std::vector<double> TemporalIlluminance::fc(){
     std::vector<double> tempVec;
     for (int i=0;i<m_Illuminance.size();i++){
-        tempVec.push_back(m_Illuminance[i]/10.764);
+        tempVec.push_back(std::floor(m_Illuminance[i]/1.0764+0.5)/10);
     }
     return tempVec;
 }
