@@ -48,7 +48,7 @@ bool ProcessShade::processShades()
     for (int i=0;i<spaces.size();i++){
         //populate the time interval vector
         m_TimeIntervals.clear();
-        DaylightIlluminanceData timeData;
+        DaylightIlluminanceData timeData(spaces[i]->illumUnits());
         if (!timeData.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+"_"+spaces[i].get()->windowGroups()[0].name()+"_base.ill")){
             return false;
         }
