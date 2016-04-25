@@ -48,6 +48,9 @@ bool Metrics::processMetrics()
     for (int i=0;i<spaces.size();i++){
         DaylightIlluminanceData daylightIll;
         daylightIll.parseTimeBased(spaces[i].get()->spaceDirectory()+spaces[i].get()->resultsDirectory()+spaces[i].get()->spaceName()+".ill");
+        if(!parseOccupancy(spaces[i].get()->spaceDirectory()+spaces[i].get()->inputDirectory()+spaces[i].get()->occSchedule(),0.10)){
+            return false;
+        }
         //Test whether Daylight Autonomy needs to be calculated
         if (spaces[i].get()->runDA()){
             if(calculateDA(spaces[i].get(), &daylightIll)){
